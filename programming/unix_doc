@@ -1,0 +1,99 @@
+###########################################################
+### % gnu_linux学习网站
+###########################################################
+### RISC-V中文社区
+% https://www.riscv-mcu.com/
+
+### LaTex下载地址
+% http://tug.org/texlive/
+
+### 软件类问答网站
+% https://stackoverflow.com/ 
+
+### GNU_Linux命令行软件
+% http://www.afterstep.org/aterm.php
+
+
+### evince Gnome3下的PDF查看器
+
+
+### goldendict 翻译软件
+
+
+### Rhythmbox
+
+
+
+###########################################################
+### % gnu_linux常用命令
+###########################################################
+### 命令行终端字体大小调整
+% Maximum     ->ctrl+shift++
+% Minimum     ->ctrl+-
+% F11         ->全屏
+
+
+
+###########################################################
+### % cd ~/Documents/freeyshGitHub tree -L 2
+### % tree -L 2
+###########################################################
+
+
+
+###########################################################
+### % FHS(Filesystem Hierarchy Standard)
+###########################################################
+/                       % 根目录
+/bin                    一般用户使用的命令
+/boot                   放置内核及LILO、GRUB等导引程序(bootloader)的文件，用于启动。
+/dev                    硬盘，分区，键盘，鼠标，USB，tty等所有的设备文件都放在这个目录。
+/etc                    系统的所有配置文件都存放在此目录中。
+/home                   用户空间，所有的用户都是用此空间。
+/lib                    共享连接库，如C库和C编译器等等。
+/media                  挂接CD-ROM等设备的目录
+/mnt                    移动设备文件系统的挂点
+/opt                    存放后来追加的用户应用程序
+/root                   管理员之家
+/sbin                   存放系统管理所需要的命令
+/tmp                    临时文件目录，重新启动时被清除
+% /usr(存放只能读的命令和其他文件)
+    /usr/X11R6          X Window系统
+    /usr/bin            用户和管理员的标准命令
+    /usr/include        c/c++等各种开发语言环境的标准include文件
+    /usr/lib            应用程序及程序包的连接库
+    /usr/local/         系统管理员安装的应用程序目录
+    /usr/local/share    系统管理员安装的共享文件
+    /usr/sbin           用户和管理员的标准命令
+    /usr/share          存放使用手册等共享文件的目录
+    /usr/share/dict     存放词表的目录（选项）
+    /usr/share/man      系统使用手册
+    /usr/share/misc     一般数据
+    /usr/share/sgml     SGML数据（选项）
+    /usr/share/xml      XML数据（选项）
+% /var(存放应用程序数据和日志记录的目录)
+    /var/cache          应用程序缓存目录
+    /var/account        处理账号日志（选项）
+    /var/crash          系统错误信息（选项）
+    /var/games          游戏数据
+    /var/lib            各种状态数据
+    /var/lock           文件锁定纪录
+    /var/log            日志记录
+    /var/mail           电子邮件
+    /var/opt            /opt目录的变量数据
+    /var/run            进程的标示数据
+    /var/spool          存放电子邮件，打印任务等的队列目录。
+    /var/spool/rwho　
+    /var/tmp            临时文件目录
+    /var/yp             NIS等黄页数据（选项）
+% /proc(/proc是一种伪文件系统（也即虚拟文件系统）)
+% /run(此目录中的内容在重启时重新创建)
+% /sys(目录是可写的，可以通过它来访问和修改内核的参数)
+% /lost+found(使用标准的ext2/ext3档案系统格式才会产生的一个目录)
+
+
+
+
+
+
+

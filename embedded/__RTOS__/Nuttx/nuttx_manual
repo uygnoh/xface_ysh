@@ -1,0 +1,95 @@
+############################################################
+### % Nuttx
+############################################################
+mkdir nuttx_space
+cd muttx_space
+
+git clone https://github.com/apache/incubator-nuttx.git nuttx
+git clone https://github.com/apache/incubator-nuttx-apps.git apps
+
+
+nuttx_space/
+├── apps
+├── nuttx
+└── nuttx_doc
+
+
+sudo apt-get install kconfig-frontends
+
+
+
+############################################################
+### % 编译nuttx
+############################################################
+0 % 使用工具脚本 (自动配置目标板驱动程序)
+cd nuttx_space/nuttx/tools
+./configure.sh stm32f103-minimum/nsh
+
+
+1 % 命令行图形化配置MCU参数
+cd nuttx_space/nuttx
+make menuconfig
+
+
+2 % 修改目标板链接脚本文件
+vim boards/arm/stm32/stm32f103-minimum/scripts/ld.script
+MEMORY
+{
+	flash (rx)	: ORIGIN = 0x08000000, LENGTH = 128K
+	sram (rwx)	: ORIGIN = 0x20000000, LENGTH = 20K
+}
+
+
+3 % 编译程序
+cd nuttx_space/nuttx
+make all
+
+
+
+############################################################
+### % Nuttx系统分层
+############################################################
+4 % 各种APP, 这一层也就是实际的应用层，应用程序或者我们常说的终端
+NSH(Nuttx Shell)
+
+3 % (虚拟文件系统), 这一层比较容易理解，也就是一个文件系统              
+Virtual File System 
+
+2 % nuttx/include/driver(上层驱动)这一层也就是可以认为是系统的API            
+Upper Half Drivers
+  
+1 % (下层驱动)这一层的驱动提供的API直接操作各种芯片, 也就是说不同的芯片这部分的驱动将是不同的            
+Lower Half Drivers
+
+0 % nuttx/arch/*           
+Microcontroller + Peripherals   
+
+
+
+############################################################
+### % 各层之间的粘合剂
+############################################################
+Nuttx的各层之间存在着各种粘合剂。这些粘合剂是在
+进行Nuttx系统移植的时候，你需要进行编写或者修改的
+
+1 % 首先是configs/<board-name>/include/board.h这个文件。
+  这个文件中定义了，你所用的开发版的外设和芯片的有关参数。晶振配置，
+  SD卡，DMA的配置等等。这一层是粘合硬件与Lower Half Drivers 下层驱动的
+  
+2 % 其次，configs/<board-name>/src/*这个目录下的各种Nuttx
+  启动外设初始化c文件。比如我移植时编写的stm32_pwm.c就负责通过调用
+  设备注册函数，来创建PWM设备。stm32_sdio.c负责创建和初始化SD卡设备。
+
+
+
+############################################################
+### % nuttx开发 
+############################################################      
+1 % 移植Nuttx系统至你所用的开发版上（编写粘合剂）
+
+2 % 分析你的应用程序需要哪些设备，
+   并在configs/<board-name>/src/*
+   下的c文件中编写，创建并初始化你所需要的设备。
+   
+3 % 应用程序的开发，在app目录下创建你自己的app目录，
+  通过调用Upper Half Drivers 上层驱动来进行实现功能。

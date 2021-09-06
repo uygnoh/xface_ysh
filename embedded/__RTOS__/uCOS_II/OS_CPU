@@ -1,0 +1,186 @@
+############################################################
+### // uCOS-II 临界区的第3种方法实现 //
+############################################################
+// 通过“cpu_sr”保存CPU的中断状态
+#if OS_CRITICAL_METHOD = 3u
+        OS_CPU_SR cpu_sr = 0u;
+#endif
+______________________________________________________________
+#define OS_ENTER_CRITICAL()     { cpu_sr = OS_CPU_SR_Save(); }
+#deifne OS_EXIT_CRITICAL()      { OS_CPU_SR_Restore(cpu_sr); }
+______________________________________________________________
+
+// ARM-CM3 ( C程序和汇编程序相互调用_参数传递规则 )
+// R0~R3 可以用于传递参数
+// Set prio int mask to mask all (except faults)
+_______________________________
+OS_CPU_SR_Save  
+        MRS     R0, PRIMASK
+        CPSID   I
+        BX      LR
+
+OS_CPU_SR_Restore
+        MSR     PRIMASK, R0
+        BX      LR
+
+
+
+############################################################
+### // OSCtxSw || OSIntCtxSw //
+############################################################
+// 在任务中进行上下文切换
+OSCtxSw
+        LDR     R0, =NVIC_INT_CTRL
+        LDR     R1, =NVIC_PENDSVSET
+        STR     R1, [R0]
+        BX      LR
+
+// 在中断中进行上下文切换
+OSIntCtSw
+        LDR     R0, =NVIC_INT_CTRL
+        LDR     R1, =NVIC_PENDSVSET
+        STR     R1, [R0]
+        BX      LR
+        
+        
+        
+############################################################
+### // ARM-CM ( OS_CPU_PendSVHandler ) //
+############################################################
+/*
+;       ARM-CM3 使用小端模式(低字节放在低地址，高字节放在高地址)
+; Note:
+;      1) pendSV is user to cause a context switch. This is a recommended method
+;         for performing context switches with Cortex-M3. This is because the
+;         Cortex-M3 auto-saves half of the processor context on any exception
+;         , and restores same on return from exception.
+;          So only saving of R4-R11 is required and fixing up the stack
+;         pointers. using the PendSV exception this way means that contex saving 
+;         and restoring is identical wheher it is initiate from a thread or 
+;         occurs due to an interrupt or exception.
+;      2) Pseudo-code is:
+;         a) Get the process SP, if 0 then skip (goto d) the saving part (first context switch);
+;         b) Save remaining regs r4-r11 on process stack;
+;         c) Save the process SP in its TCB, OSTCBCur->OSTCBStkPtr = SP
+;         d) Call OSTaskSwHook(); 可以在此处添加定制化代码
+;         e) Get current high priority, OSPrioCur = OSPrioHighRdy;
+;         f) Get current ready thread TCB, OSTCBCur = OSTCBHighRdy;
+;         g) Get new process SP from TCB, SP = OSTCBHighRdy->OSTCBStkPtr;
+;         h) Restore R4-R11 form new process stack;
+;         i) Perform exception return which will restore remaining context.
+;      3) On entry into PendSv handler:  
+;         a) The following have been saved on the process stack (by processor);
+;            xPSR, PC, LR, R12, R0-R3
+;         b) Processor mode is switched to Handler mode (form Thread mode)
+;         c) Stack is Main stack (switched form Process stack)
+;         d) OSTCBCur     points to the OS_TCB of the task to suspend
+;            OSTCBHighRdy ponits to the OS_TCB of the task to resume
+;      4) Since PendSv is set to lowest priority in the system (by OSSTartHighRdy()
+;         aboue), we know that it will only be run when no other exception
+;         or interrupt is active, and therefore safe to assume that context
+;         being switched out was using the process stack (PSP).
+*/
+
+OS_CPU_PendSVHandler
+; //进入PendSV异常前CPU自动保存( xPSR, PC, LR, R12, R3, R2, R1, R0 )
+; //___________________________________________________________
+
+         
+        CPSID   I                  ; //进入PendSV异常，先把中断关闭，准备上下文切换
+        MRS     R0, PSP            ; //PSP is process stack pointer
+        
+        ; //如果PSP寄存器为“0”，则跳转 (表示这是任务的第一次切换)
+        ; //CBZ,先比较，结果为“0”，则跳转
+        CBZ     R0, OS_CPU_PendSVHandler_nosave
+        
+        SUBS    R0, R0, #0x20      ; //R0 = (R0 - 32)
+        STM     R0, {R4-R11}       ; //手动保存R4-R11到进程堆栈
+        
+        LDR     R1, =OSTCBCur      ; //(OSTCBCur->OSTCBStkPtr) = PSP
+        LDR     R1, [R1]
+        STR     R0, [R1]           ; //R0 is SP of process beging switched out
+
+
+; //在这个点整个寄存器的内容都会被保存到当前任务的OSTCBCur->OSTCBStkPtr栈中
+; //更新当前任务栈顶指针，此时此刻上文已保存-----------------------------
+
+
+OS_CPU_PendSVHandler_nosave
+
+
+; //下面的部分进行下文环境的准备工作，并切换到系统最高优先级任务中
+; //--------------------------------------------------------------
+
+
+        PUSH    {R14}              ; //Save LR exc_return value
+        LDR     R0, =OSTaskSwHook  ; //进入用户钩子函数
+        BLX     R0                 ; //带链接寄存器的返回
+        POP     {R14}              ; //恢复R14中的内容
+        
+        LDR     R0, =OSPrioCur     ; //OSPrioCur = OSPrioHighRdy
+        LDR     R1, =OSPrioHighRdy
+        LDRB    R2, [R1]
+        STRB    R2, [R0];
+        
+        LDR     R0, =OSTCBCur      ; //OSTCBCur = OSTCBHighRdy
+        LDR     R1, =OSTCBHighRdy
+        LDR     R2, [R1]
+        STR     R2, [R0]
+        
+
+        LDR     R0, [R2]     ; R0 is new process SP; PSP = OSTCBHighRdy->OSTCBStkPtr
+        LDM     R0, {R4-R11} ; Restore r4-r11 form new process stack
+        ADDS    R0, R0, #0x20; // R0 = (R0 + 32)
+        MSR     PSP, R0      ; Load PSP with new process SP
+        ORR     LR, LR, #0x04; Ensure exception return uses process stack
+        CPSIE   I
+        BX      LR           ; Exception return will restore remaining context
+
+
+; //进入任务处理程序这前，CPU自动恢复( xPSR, PC, LR, R12, R3-R0 )
+; //___________________________________________________________
+
+
+
+############################################################
+### // ARM-CM ( OSStartHighRdy ) //
+############################################################
+;Note:   
+;        1) This function triggers pendSV exception (essentially, causes a 
+;                 contex switch) to cause the first task to start.
+;                 
+;        2) OSStartHighRdy() MUST:
+;           a) Setup PendSV exception priority to lowest;
+;           b) Set initial PSP to 0, to tell context switcher this if first run;
+;           c) Set OSRunnig to TRUE;
+;           d) Trigger PendSV exception;
+;           e) Enable interrupts (tasks will run with interrupts enabled).                
+; 通过PendSV异常，引发上下文切换(此处并不是真正的上下文切换)，然后去启动系统的“第一个任务”
+
+
+#define NVIC_SYSPRI14           0xE000ED22
+#define NVIC_PENDSV_PRI         0xFF
+#define NVIC_INT_CTRL           0xE000ED04
+#define NVIC_PENDSVSET          0x10000000
+
+
+OSStartHighRdy
+        LDR     R0, =NVIC_SYSPRI14      ; % 设置PendSV异常设置系统优先级最“低”
+        LDR     R1, =NVIC_PENDSV_PRI
+        STRB    R1, [R0]
+        
+        MOVS    R0, #0                  ; % 设置PSP的初始值为“0”，它要告诉
+        MSR     PSP, R0                 ; % 上下文切换器，它是系统第一次运行
+
+        LDR     R0, =OSRunning          ; % 设置OSRunning = TRUE
+        MOVS    R1, #1                  ; "="表示变量的地址
+        STRB    R1, [R0]
+        
+        LDR     R0, =NVIC_INT_CTRL      ; % 触发PendSV异常
+        LDR     R1, =NVIC_PENDSVSET
+        STR     R1, [R0]
+        
+        CPSIE   I                       ; % 使能中断
+
+OSSTartHang                             ; % should never get here
+        B       OSSTartHang

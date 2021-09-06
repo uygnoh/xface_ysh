@@ -1,0 +1,368 @@
+###########################################################
+### % 本文环境如下
+###########################################################
+1 ubuntu 12.04      ->OS系统
+2 sdcc              ->编译器
+3 avrdude           ->烧录软件
+4 usbasp            ->烧录器件
+
+
+
+
+###########################################################
+### % 准备：软件安装
+###########################################################
+% 软件安装建议使用ubuntu的软件中心，比较方便。需要sdcc，avrdude即可了。
+% 文本编辑什么都行。可以集成在codeblocks和eclipse里面（51没干过），ubuntu下有个
+% 51MCU的IDE，可以下来用‘mcu8051ide’ 。
+% 对于命令行可以如下安装
+sudo apt-get install vim
+sudo apt-get install avrdude 
+
+
+
+
+
+###########################################################
+### % 源程序：
+###########################################################
+1 % 开始之前需要先写一个main.c的程序
+  % 这是一个很简单让一个blink的程序。
+#include <8052.h>
+typedef unsigned int size_t;
+ 
+#define LED P0_0
+ 
+void delay(size_t t)
+{
+    while(t--);
+}
+ 
+void main()
+{
+    while(1)
+    {
+        LED = 0;
+        delay(20000);
+        LED = 1;
+        delay(20000);
+    }
+}
+
+
+2 % 编译：
+  % 之后就要编译程序把程序变成单片机能使用的*.elf *.bin *.hex之类的
+  % 这里我们使用的是SDCC默认编译出现的*.ihx (intel hex)
+  % 在当前目录下执行
+sdcc -mmcs51 main.c
+
+
+
+
+
+###########################################################
+### % % 配置avrdude:
+###########################################################
+1 % 使用avrdude烧写 
+  % 我们不能直接使用avrdude烧写，这是因为它默认只支持AVR芯片，但是通过一些配置，我们可以使用它来烧写。
+  % 对于8051芯片，我们有三种配置文件，分别适用于不同的型号。看看你要哪一种，然后复制到/etc/avrdude.conf并保存。
+sudo gedit /etc/avrdude.conf
+
+
+2 % For AT89S51
+
+#------------------------------------------------------------
+# AT89S51
+#------------------------------------------------------------
+part
+    id               = "8052";
+    desc             = "AT89S51";
+    signature        = 0x1E 0x51 0x06;
+    chip_erase_delay = 500000;
+    pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    chip_erase       = "1 0 1 0  1 1 0 0    1 0 0 x  x x x x",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    timeout      = 200;
+    stabdelay      = 100;
+    cmdexedelay      = 25;
+    synchloops      = 32;
+    bytedelay      = 0;
+    pollindex      = 3;
+    pollvalue      = 0x53;
+    predelay      = 1;
+    postdelay      = 1;
+    pollmethod      = 0; 
+
+    memory "flash"
+        size            = 4096;
+        paged           = no;
+        min_write_delay = 4000;
+        max_write_delay = 9000;
+        readback_p1     = 0xff;
+        readback_p2     = 0xff;
+        read            = "  0   0   1   0    0   0   0   0",
+                          "  x   x   x a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  o   o   o   o    o   o   o   o"; 
+
+        write           = "  0   1   0   0    0   0   0   0",
+                          "  x   x   x a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  i   i   i   i    i   i   i   i";
+   mode      = 0x21;
+   delay      = 12;
+      ; 
+
+    memory "signature"
+        size            = 3;
+        read            = "0  0  1  0   1  0  0  0   x  x  x  0   0  0 a1 a0",
+                          "0  0  0  0   0  0  0  0   o  o  o  o   o  o  o  o";
+      ;
+  ;
+
+
+
+3 % For AT89S52
+
+<span style="color:#3366ff;">#------------------------------------------------------------
+# AT89S52
+#------------------------------------------------------------
+part
+    id               = "8052";
+    desc             = "AT89S52";
+    signature        = 0x1E 0x52 0x06;
+    chip_erase_delay = 500000;
+    pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    chip_erase       = "1 0 1 0  1 1 0 0    1 0 0 x  x x x x",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    timeout      = 200;
+    stabdelay      = 100;
+    cmdexedelay      = 25;
+    synchloops      = 32;
+    bytedelay      = 0;
+    pollindex      = 3;
+    pollvalue      = 0x53;
+    predelay      = 1;
+    postdelay      = 1;
+    pollmethod      = 0; 
+
+    memory "flash"
+        size            = 8192;
+        paged           = no;
+        min_write_delay = 4000;
+        max_write_delay = 9000;
+        readback_p1     = 0xff;
+        readback_p2     = 0xff;
+        read            = "  0   0   1   0    0   0   0   0",
+                          "  x   x   x a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  o   o   o   o    o   o   o   o";
+
+        write           = "  0   1   0   0    0   0   0   0",
+                          "  x   x   x a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  i   i   i   i    i   i   i   i";
+   mode      = 0x21;
+   delay      = 12;
+      ; 
+
+    memory "signature"
+        size            = 3;
+        read            = "0  0  1  0   1  0  0  0   x  x  x  0   0  0 a1 a0",
+                          "0  0  0  0   0  0  0  0   o  o  o  o   o  o  o  o";
+      ;
+  ;</span>
+
+
+
+4 % For AT89S8253
+
+#------------------------------------------------------------
+# AT89S8253
+#------------------------------------------------------------
+part
+    id               = "8253";
+    desc             = "AT89S8253";
+    chip_erase_delay = 20000;
+    pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    chip_erase       = "1 0 1 0  1 1 0 0    1 0 0 x  x x x x",
+                       "x x x x  x x x x    x x x x  x x x x"; 
+
+    timeout      = 200;
+    stabdelay      = 100;
+    cmdexedelay      = 25;
+    synchloops      = 32;
+    bytedelay      = 0;
+    pollindex      = 3;
+    pollvalue      = 0x53;
+    predelay      = 1;
+    postdelay      = 1;
+    pollmethod      = 0; 
+
+    memory "flash"
+        size            = 12288;
+        paged           = no;
+        min_write_delay = 4000;
+        max_write_delay = 9000;
+        readback_p1     = 0xff;
+        readback_p2     = 0xff;
+        read            = "  0   0   1   0    0   0   0   0",
+                          "  x   x a13 a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  o   o   o   o    o   o   o   o";
+
+        write           = "  0   1   0   0    0   0   0   0",
+                          "  x   x a13 a12  a11 a10  a9  a8",
+                          " a7  a6  a5  a4   a3  a2  a1  a0",
+                          "  i   i   i   i    i   i   i   i";
+   mode      = 0x21;
+   delay      = 12;
+      ; 
+
+    memory "signature"
+        size            = 2;
+        readback_p1     = 0x1E;
+        readback_p2     = 0x73;
+        read            = "0  0  1  0   1  0  0  0   x  x  x  x   x  x  x  x",
+                          "x  x  1  1   0  0  0 a0   o  o  o  o   o  o  o  o";
+      ;
+  ;
+
+% 特意要说明一下的是，网上有些配置在S51和S52的delay的参数上给的20000，这个delay太短了，
+% 在验证代码的时候会出错。因此还是建议用如上的配置。
+
+
+
+5 % 使用avrdude烧写：
+  % 配置完成之后，就可以烧写啦～要用main.hex哦～
+~/McuWork/51_SDCC/workpace/Blink$ make program 
+sudo avrdude -p 8052 -c usbasp -e -U flash:w:'./main.ihx'
+
+
+
+
+###########################################################
+### % 单源文件简易Makefile
+###########################################################
+
+CC=sdcc
+
+SOURCE = $(wildcard *.c)
+
+
+all :
+	$(CC) -mmcs51 $(SOURCE) 
+hex:
+	packihx '$(wildcard *.ihx)' > '$(patsubst %.ihx,%.hex,$(wildcard *.ihx))'
+
+program : 
+	sudo avrdude -p 8052 -c usbasp -e -U flash:w:'./$(wildcard *.ihx)'
+
+.PHONY:	clean
+clean:
+	rm -f *.bak
+	rm -f *.rel
+	rm -f *.asm
+	rm -f *.lst
+	rm -f *.sym
+	rm -f *.map
+	rm -f *.lnk
+	rm -f *.mem
+	rm -f *.i
+	rm -f *.d
+	rm -f *.rst
+
+
+
+
+
+###########################################################
+### % AT89S52在Linux下的烧录方法
+###########################################################
+1 % 这里以Ubuntu为例子,先安装avrdude.
+  % 用下面的命令一次装全吧:
+sudo apt-get install gcc-avr binutils-avr avrdude avr-libc
+
+2 % 然后编辑avrdude.conf:
+sudo gedit /etc/avrdude.conf
+% 在最后面加入AT89s52的相关信息(这是Joy Shukla写的)
+#------------------------------------------------------------
+# Below chips by added by me .. Joy Shukla(joy_shukla@yahoo.in)
+# these chips can be programmed with my usbasp programmer(changed atmega8 program)
+# after adding avrdude support in this file ..
+#------------------------------------------------------------
+
+#------------------------------------------------------------
+# AT89S52
+#------------------------------------------------------------
+part
+id               = "8052";
+desc             = "AT89S52";
+signature        = 0x1E 0x52 0x06;
+chip_erase_delay = 20000;
+pgm_enable       = "1 0 1 0  1 1 0 0    0 1 0 1  0 0 1 1",
+"x x x x  x x x x    x x x x  x x x x";
+
+chip_erase       = "1 0 1 0  1 1 0 0    1 0 0 x  x x x x",
+"x x x x  x x x x    x x x x  x x x x";
+
+timeout         = 200;
+stabdelay       = 100;
+cmdexedelay     = 25;
+synchloops      = 32;
+bytedelay       = 0;
+pollindex       = 3;
+pollvalue       = 0x53;
+predelay        = 1;
+postdelay       = 1;
+pollmethod      = 0;
+
+memory "flash"
+size            = 8192;
+paged           = no;
+min_write_delay = 4000;
+max_write_delay = 9000;
+readback_p1     = 0xff;
+readback_p2     = 0xff;
+read            = "  0   0   1   0    0   0   0   0",
+"  x   x   x a12  a11 a10  a9  a8",
+" a7  a6  a5  a4   a3  a2  a1  a0",
+"  o   o   o   o    o   o   o   o";
+
+write = "  0   1   0   0    0   0   0   0",
+"  x   x   x a12  a11 a10  a9  a8",
+" a7  a6  a5  a4   a3  a2  a1  a0",
+"  i   i   i   i    i   i   i   i";
+mode  = 0x21;
+delay = 12;
+;
+
+memory "signature"
+size  = 3;
+read  = "0  0  1  0   1  0  0  0   x  x  x  0   0  0 a1 a0",
+"0  0  0  0   0  0  0  0   o  o  o  o   o  o  o  o";
+;
+; 
+#------------------------------------------------------------
+
+3 % 然后保存;现在就可以烧录AT89S52的单片机了,
+  % 例如我想烧录放在桌面上的编译好的跑马灯程序,
+  % 用命令
+sudo avrdude -p 8052 -c usbasp -e -U flash:w:'/home/vowstar/桌面/跑马灯.hex'
+
+
+
+
+
+
+
+
+

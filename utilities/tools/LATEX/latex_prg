@@ -1,0 +1,488 @@
+###########################################################
+### % PRG0_BASIC LaTex字体
+###########################################################
+\documentclass[UTF8]{article}
+\usepackage{ctex}
+\begin{document}
+	% 罗马字体，无衬线字体，打字机字体设置
+	\textrm{罗马字体 Roman Family}\\
+	\textsf{无衬线字体 Sans Serif Family}\\
+	\texttt{打字机字体 Typewriter Family}\\
+	% 字体声明，需要大括号确定范围，否则后续不一致
+	{\rmfamily 罗马字体 Roman Family}\\
+	{\sffamily 无衬线字体 Sans Serif Family}\\
+	{\ttfamily 打字机字体 Typewriter Family}
+	
+	
+	% 中文字体声明，ctex宏包下
+	{\songti 宋体}\\
+	{\heiti 黑体}\\
+	{\fangsong 仿宋}\\
+	{\kaishu 楷书}
+	
+	
+	% 字体形状设置：直立，斜体，伪斜体，小型大写
+	\textup{Upright Shape 直立}\\
+	\textbf{Boldface Shape 粗体}\\
+	\textit{Italic Shape 斜体}\\
+	\textsl{Slanted Shape 伪斜体}\\
+	\textsc{Small Caps Shape 小型大写}
+	% 字体设置声明
+	{\upshape Upright Shape 直立}\\
+	{\itshape Italic Shape 斜体}\\
+	{\slshape Slanted Shape 伪斜体}\\
+	{\scshape Small Caps Shape 小型大写}
+	
+	
+	% 字体大小设置
+	{\tiny Word 字}\\
+	{\scriptsize Word 字}\\
+	{\footnotesize Word 字}\\
+	{\small Word 字}\\
+	{\normalsize Word 字}\\
+	{\large Word 字}\\
+	{\Large Word 字}\\
+	{\LARGE Word 字}\\
+	{\huge Word 字}\\
+	{\Huge Word 字}
+\end{document}
+
+
+
+
+###########################################################
+### % PRG1 LaTex中文文档结构构建
+###########################################################
+% 设置TeXstudio
+%   1 构建 ->默认编译器 [XeLaTex]
+%   2 编辑器 ->默认字体编码 [UTF-8]
+%   查看Latex帮助文件 ->texdoc lshor-zh
+%   查看Latex帮助文件 ->texdoc ctex
+%   查看Latex帮助文件 ->texdoc exCJK
+1 使用documentclass{article}类对英文的支持
+2 使用documentclass{ctexart}类对中文的支持
+3 使用usepackage{ctex}宏包对中文的支持
+% \documentclass{article}
+
+
+
+% LaTex章节构建框架
+% \chapter{}第一章
+% \chapter{}第二章
+\documentclass{ctexbook}
+\title{\heiti 中文}
+\author{\kaishu FREEYSH}
+\date{\today}
+
+\begin{document}
+	\chapter{}
+	    \section{引言}       %构建小节
+	    {\fbox{构建小节123}}
+	    正文正文正文正文正文正文正文正文正文
+	    正文正文正文正文正文正文正文正文正文
+	    正文正文正文正文正文正文正文正文正文
+	    \section{实验方法}    %构建小节
+	    \section{实验结果}    %构建小节
+	    \subsection{数据}    %构建子小节
+	    \subsection{图表}    %构建子小节
+	    \subsubsection{实验条件}
+	    \subsubsection{实验过程}
+	    \subsection{结果分析} %构建子小节
+	    \section{结论}
+	    \section{致谢} 
+	
+	\chapter{}
+       	\section{引言}       %构建小节
+	    正文正文正文正文正文正文正文正文正文
+	    正文正文正文正文正文正文正文正文正文
+	    正文正文正文正文正文正文正文正文正文
+	    \section{实验方法}    %构建小节
+	    \section{实验结果}    %构建小节
+	    \subsection{数据}    %构建子小节
+	    \subsection{图表}    %构建子小节
+	    \subsubsection{实验条件}
+	    \subsubsection{实验过程}
+	    \subsection{结果分析} %构建子小节
+	    \section{结论}
+	    \section{致谢} 
+\end{document}
+
+
+
+
+###########################################################
+### % LaTex文本格式设置
+###########################################################
+1 % LATEX对指定文本左对齐：
+  % 在正文中输入：
+    \begin{flushleft}
+        此处的文本就能实现左对齐
+    \end{flushleft}
+
+
+2 % LATEX之插入代码：
+  % 在导言区写入宏包：\usepackage{listings}
+  % 在正文区写入：   
+    \begin{lstlisting}[numbers=left]
+        此处插入你的代码
+    \end{lstlisting}
+
+
+3 % LATEX之换行，空格
+    换行符号 //
+    空格符号 ~
+    换页符号 \newpage \clearpage
+
+
+3 % 设置章标题居左
+    \CTEXsetup[format={\Large\bfseries}]{section} 
+
+
+4 % 页边距
+    \usepackage[left=2.50cm, right=2.50cm, top=2.50cm, bottom=2.50cm]{geometry} 
+
+    
+    
+    
+    
+###########################################################
+### % LaTex数学公式盒子
+###########################################################
+\documentclass{article}
+\usepackage{amsmath}
+% Definition of \boxed in amsmath.sty:
+% \newcommand{\boxed}[1]{\fbox{\m@th$\displaystyle#1$}}
+
+\usepackage{xcolor}
+
+% Syntax: \colorboxed[<color model>]{<color specification>}{<math formula>}
+\newcommand*{\colorboxed}{}
+\def\colorboxed#1#{%
+  \colorboxedAux{#1}%
+}
+\newcommand*{\colorboxedAux}[3]{%
+  % #1: optional argument for color model
+  % #2: color specification
+  % #3: formula
+  \begingroup
+    \colorlet{cb@saved}{.}%
+    \color#1{#2}%
+    \boxed{%
+      \color{cb@saved}%
+      #3%
+    }%
+  \endgroup
+}
+
+\begin{document}
+\begin{equation*}
+  \boxed{
+    E_{F_i}-E_c =
+    \frac{E_v-E_c}{2} +
+    \frac{K_B T}{2}\log\left[ \frac{N_v}{N_c} \right]
+  }
+\end{equation*}
+
+\begin{equation*}
+  \colorboxed{red}{
+    E_{F_i}-E_c =
+    \frac{E_v-E_c}{2} +
+    \frac{K_B T}{2}\log\left[ \frac{N_v}{N_c} \right]
+  }
+\end{equation*}
+
+\begin{equation*}
+  \colorboxed[rgb]{0, 0, 1}{
+    E_{F_i}-E_c =
+    \frac{E_v-E_c}{2} +
+    \frac{K_B T}{2}\log\left[ \frac{N_v}{N_c} \right]
+  }
+\end{equation*}
+\end{document}
+
+
+
+###########################################################
+### % LaTex盒子用法 0
+###########################################################
+\documentclass{ctexart}
+% fbox 盒子线宽默认为0.4pt，在框线和图形之间有 3pt 的距离。
+% 这些维数值都可以通过使用 \setlength 命令设置 LaTeX 的长度变量 % 	\fboxrule 	修改线宽
+%	\fboxsep	设置长度
+\setlength{\fboxrule}{6pt}
+\setlength{\fboxsep}{4cm}
+
+\begin{document}
+	\fbox{foo gar baz}
+	\fbox{[] gar baz}
+\end{document}
+
+
+###########################################################
+### % LaTex盒子用法 1
+###########################################################
+\documentclass{ctexart}
+\usepackage{fancybox}
+
+\begin{document}
+	
+	\shadowbox{这是一个阴影盒子}
+	
+	\vskip 5mm
+	
+	\setlength{\fboxsep}{6pt}
+	
+	\shadowbox{使用阴影盒子：\verb|\setlength{\fboxsep}{6pt}|修改内部间距}
+	
+	\vskip 5mm
+	
+	\fboxrule=2\fboxrule
+	\shadowsize=2\shadowsize
+	
+	\shadowbox{使用阴影盒子：\verb|\fboxrule|与\verb|shadowsize|都设置两倍}
+	
+	\fboxrule=0.5\fboxrule
+	\shadowsize=0.5\shadowsize
+	
+	\vskip 5mm
+	
+	\doublebox{两重线盒子}
+	
+	\vskip 5mm
+	
+	\fboxrule=2\fboxrule
+	
+	\doublebox{两重线盒子：\verb|fboxrule|线宽两倍}
+	
+	\fboxrule=0.5\fboxrule
+	
+	\vskip 5mm
+	
+	\ovalbox{椭圆盒子}
+	
+	\vskip 5mm
+	
+	\cornersize{2}
+	
+	\ovalbox{椭圆盒子：\verb|cornersize{2}|角度为2}
+	
+	\cornersize{0.5}
+	
+	\vskip 5mm
+	
+	\Ovalbox{椭圆盒子：\verb|cornersize{.5}|角度为.5}
+	
+	\cornersize{0.5}
+	
+	\shadowbox{\parbox{40mm}{可以使用 {\tt parbox} 进行换行的阴影盒子}}
+	
+	\vskip 5mm
+	
+	\doublebox{\parbox{40mm}{可以使用  {\tt parbox} 进行换行的盒子}}
+	
+	\vskip 5mm
+	
+	\ovalbox{\parbox{40mm}{可以使用 {\tt parbox} 进行换行的盒子}}
+	
+	\vskip 5mm
+	
+\end{document}
+
+
+
+
+###########################################################
+### % LaTex 颜色宏包使用
+###########################################################
+\documentclass[UTF8]{article}
+
+% 需求：xcolor默认颜色只有19种，
+% 使用时可以在option中加入另外3张颜色表来极大扩充颜色库。
+% 宏包：\usepackage{xcolor}
+% 选项：dvipsnames, svgnames, x11names
+% 使用：\usepackage[dvipsnames, svgnames, x11names]{xcolor}
+% 注意：xcolor宏包一般要放在最前面！否则那3张颜色表容易加不进来
+\usepackage[dvipsnames, svgnames, x11names]{xcolor}
+
+
+% ctex 宏包提供了一个统一的中文 LaTeX 文档框架，
+% 底层支持 CCT 和 CJK 两种中文 LaTeX 系统。 
+% ctex 宏包提供了编写中文 LaTeX 文档常用的一些宏定义和命令。
+% ctex 宏包需要 CCT 系统或者 CJK 宏包的支持。
+% 主要文件包括 ctex.sty、ctexart.cls、ctexrep.cls 
+% 和 ctexbook.cls。ctex 宏包由ctex.org 制作并负责维护。
+\usepackage{ctex}
+
+
+% geometry修改页面尺寸、页边距、页眉页脚等参数
+% a4paper   设置纸张为[A4]
+% scale=0.8 版心占页面长度的比例为80%
+% scale=0.7 也可以改为ratio表示版面边距占页面长度的比例
+% 设置页面的上下左右边距{left=2cm,right=2cm,top=1cm,bottom=1cm}
+\usepackage{geometry}
+\geometry{a4paper, margin = 1in}
+
+
+\title{xcolor颜色测试}
+\author{\bf{胜负55开}}
+\date{\bf{\today}}
+
+\begin{document}
+    \maketitle
+    红色  {\color{red}{红色}}   \\
+    绿色  {\color{green}{绿色}} \\
+    蓝色  {\color{blue}{蓝色}}  \\
+    黑色  {\color{black}{黑色}} \\
+    黄色  {\color{yellow}{黄色}}\\
+    橘色  {\color{orange}{橘色}}\\
+    这个是海军蓝  {\color{NavyBlue}{海军蓝}}     \\
+    这个是桃子色  {\color{Peach}{桃子色}}        \\
+    这个是春天绿  {\color{SpringGreen}{春天绿}}  \\
+    这个是海绿色  {\color{SeaGreen3}{海绿色}}    \\
+\end{document}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% 设置水印
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{draftwatermark}               % 所有页加水印
+\usepackage[firstpage]{draftwatermark}    % 只有第一页加水印
+\SetWatermarkText{Water-Mark}             % 设置水印内容
+\SetWatermarkText{\includegraphics{fig/ZJDX-WaterMark.eps}} % 设置水印logo
+\SetWatermarkLightness{0.9}               % 设置水印透明度 0-1
+\SetWatermarkScale{1}                     % 设置水印大小 0-1
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Latex中页眉页脚的设置
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1  % 我通常用(fancyhdr宏包)来设置页眉和页脚
+\usepackage{fancyhdr}
+
+
+我们在 LaTeX 中先把 page style 设为fancy，再设置这个style中的页眉和页脚。
+但是它默认每章的第一页的page style是plain，需要单独处理。
+% 设置 plain style 的属性
+
+\fancypagestyle{plain}{%
+
+\fancyhf{} % 清空当前设置
+
+% 设置页眉 (head)
+
+\fancyhead[RE]{\leftmark} % 在偶数页的右侧显示章名
+
+\fancyhead[LO]{\rightmark} % 在奇数页的左侧显示小节名
+
+\fancyhead[LE,RO]{~\thepage~} % 在偶数页的左侧，奇数页的右侧显示页码
+
+% 设置页脚：在每页的右下脚以斜体显示书名
+
+\fancyfoot[RO,RE]{\it Typesetting with \LaTeX}
+
+\renewcommand{\headrulewidth}{0.7pt} % 页眉与正文之间的水平线粗细
+
+\renewcommand{\footrulewidth}{0pt}
+
+\pagestyle{fancy} % 选用 fancy style
+
+% 其余同 plain style
+
+\fancyhf{}
+
+\fancyhead[RE]{\leftmark}
+
+\fancyhead[LO]{\rightmark}
+
+\fancyhead[LE,RO]{~\thepage~}
+
+\fancyfoot[RO,RE]{\it Typesetting with \LaTeX}
+
+\renewcommand{\headrulewidth}{0.7pt}
+
+\renewcommand{\footrulewidth}{0pt}
+
+2、要在首页加脚注，比如作者希望把基金资助和作者信息加在首页。
+
+我的做法是：（1）利用\title和\thanks{}语句完成
+
+\title{\xxxxxxxxx%
+       \thanks{\zihao{-5}{~xxxxxxx}}
+       }
+
+（2）利用脚注命令：\footnote
+
+\footenote[number]{脚注文本}
+
+可选参数number用来改变缺省的脚注的编号。这个命令只能
+
+有一般的文本段落中使用，而不能在诸如LR盒子、图形、报
+
+表环境中使用。
+
+如果想在article类文档中每当开始新的一节时，脚注编号重置
+
+为1，则需用在\section命令的前面或后面加入如下的命令
+
+\setcounter{footnote}{0}
+
+\footnote命令的缺省脚注标记为阿拉伯数字。若想改变其它
+
+样式的标记则可采用如下的命令
+
+\renewcommand{\thefootnote}{\数 字 式
+
+样{footnote}
+
+这里的数字式样可为\arabic,\roman,\Roman,\alph,\ALph.
+
+另外，使用\fnsymbol作为数字式样，则可\footnote的9个记
+
+数器值显示为9个符号:
+
+ 
+
+*, +、#、§ , ¶, k, ? ?,** #
+
+在使用第十个\footnote命令之前需要将脚注记数器重置为零.
+
+例如由下面三行命令得到第二个标记符号样式的脚注?
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+例如\footnote[2]{第二个标记符号}
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+
+这里最后一行是为了把脚注标记式样恢复成标准形式.
+
+ §2.1 \footnotemark命令
+
+\footenotemark[number]
+
+这条命令在文本中输出脚注的编号，可以在\footnote命令不
+
+能使用的地方使用,例如LR盒子，表格、数学模式。脚注文本
+
+由\footnotetext命令给出.
+
+§2.2 \footnotetext命令
+
+\footenotetext[number]{文本} 这条命令指定当前
+
+页底部放置的脚注内容，可以在\footnotemark命令之后的任
+
+何时候使用，但是\footnote语句不能使用的地方它也不能使
+
+用.
+
+
+
+
+
+
+
+
+

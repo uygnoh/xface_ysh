@@ -1,0 +1,54 @@
+###########################################################
+### Debian 安装搜狗输入法% http://pinyin.sogou.com/linux/
+###########################################################
+1 % sudo dpkg-reconfigure locales
+    选择 *zh_CN.UTF-8 中文语言环境
+    最后选择 en_US.UTF-8， 然后点击OK
+
+2 % 执行如下命令进行系统环境软件更新和安装:
+    sudo apt-get update
+    
+3 % Linux 下有两大输入法框架：ibus 和fcitx，其中fcitx 的体验要比ibus 好，
+  % 因此选择fcitx 框架，并安装搜狗输入法。
+$sudo apt-get install fcitx
+
+4 % 我们可以上搜狗官网下载搜狗输入法linux 版：
+  % http://pinyin.sogou.com/linux/
+
+5 % 下载完搜狗输入法的安装包后，我们切换至下载此安装包的目录，进行安装
+    $ sudo dpkg -i sogoupinyin_xxx_amd64.deb
+
+6 % 安装完后，需要重启系统，然后在终端中输入
+    $ fcitx-config-gtk3
+  % 在Input Method 栏中，点击+，然后选择搜狗输入法（Sogou Pinyin）。
+  % 设置好后，采用快捷键Ctrl+Space 即可调出搜狗输入法。
+
+
+7 % fcitx安装失败解决
+  % 自动修复安装出现broken的package
+  % 但是，如果还是失败的话，就需要手动进行干预了。
+    sudo apt --fix-broken install
+ 
+
+ 
+###########################################################
+### % debian五笔输入法安装 2
+###########################################################
+1 % sudo dpkg-reconfigure locales
+    选择 *zh_CN.UTF-8 中文语言环境
+    最后选择 en_US.UTF-8， 然后点击OK
+
+2 % 执行如下命令进行系统环境软件更新和安装:
+    sudo apt-get update 
+
+3 % 安装fctix中文输入法
+    sudo apt install fcitx
+
+4 % 在终端输入 fcitx 然后退出, 在左下角会弹出 fcitx的图标， Setting->Configuration
+
+5 % 五笔输入法,sudo apt-get install fcitx-table-wubi
+    apt-get install fcitx-table-wubi
+
+
+
+

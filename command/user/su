@@ -1,0 +1,82 @@
+###########################################################
+### ＳＵ　-
+###########################################################
+su [选项] 用户名                                                    
+-	选项使用“-”，代表连->用户的环境变量一起切换
+-c	仅执行一次命令，而不切换用户身份
+1 su - root		
+___________________________________________________________
+不切换root，但是执行useradd命令添加user3用户	
+2 su - root -c "useradd user3"
+
+
+
+###########################################################
+###  sudo
+###########################################################
+% 默认状态是没有sudo命令的，需要安装。
+apt-get update
+apt-get install sudo
+
+
+
+% 编辑sudoers文件, gedit /etc/sudoers
+# 在下面添加如下内容: ysh  ALL=(ALL:ALL) ALL
+# 其中"ysh"为自己的用户名
+# Allow members of group sudo to execute any command
+%sudo ALL=(ALL:ALL) ALL 
+ysh   ALL=(ALL:ALL) ALL
+
+
+
+% sudo使用2
+变成 root 用户，然后使用下面的命令安装 sudo 软件包
+    root@linuxtechi:~$ su -
+    Password:
+    root@linuxtechi:~# apt install sudo -y
+    
+% 添加你的本地用户到 sudo 组，使用下面的 usermod 命令，
+    root@linuxtechi:~# usermod -aG sudo ysh
+    root@linuxtechi:~#
+    
+% 现在验证是否本地用户获得 sudo 权限：
+    root@linuxtechi:~$ id
+    uid=1000(ysh) gid=1000(ysh) groups=1000(ysh),27(sudo)
+
+
+
+###  sudo 
+% sudo 是一种权限管理机制，
+% 管理员可以授权于一些普通用户去执行一些 root 执行的操作，而不需要知道 root 的密码	
+
+% 用户加入 sudo 组，您可以直接编辑 /etc/group 文件
+$ sudo vim /etc/group
+ 
+% 在 sudo 组中加入新的用户，要使用逗号分隔多个用户。
+% 或者您可以使用 usermod 命令把用户添加到一个组中：
+$ sudo usermod -a -G sudo jack
+ 
+ 
+ 
+ 
+###  sudo配置文件
+% sudo 命令的配置文件为   /etc/sudoers
+% 说白了就是哪个用户在哪个主机以谁的身份执行那些命令，那么这个 where, 
+% 是指允许在那台主机 ssh 连接进来才能执行后面的命令，
+% 文件里面默认给 root 用户定义了一条规则：
+% 那么整条规则就是 root 用户可以在任何主机以任何人的身份来执行所有的命令
+root    ALL=(ALL:ALL)       ALL
+root         %表示 root 用户。
+ALL　　 　　  %表示从任何的主机上都可以执行，也可以这样 192.168.100.0/24。
+(ALL:ALL) 　 %是以谁的身份来执行，ALL:ALL 就代表 root 可以任何人的身份来执行命令。
+ALL 　　　　  %表示任何命令。
+
+
+___________________________________________________________
+% 再看个例子：
+% 下面的配置只允许 nick在 192.168.10.0/24网段上连接主机并且以root权限执行useradd命令
+nick   192.168.10.0/24=(root) /usr/sbin/useradd
+
+
+
+

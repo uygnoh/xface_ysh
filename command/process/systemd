@@ -1,0 +1,831 @@
+###########################################################
+### % Basic systemctl usage
+###########################################################
+% 监视和控制systemd的主要命令是systemctl,该命令可用于查看系统状态和管理系统及服务
+所有可用的单元文件存放在 
+/usr/lib/systemd/system/ 和 /etc/systemd/system/ 目录（后者优先级更高）
+systemctl status                显示 系统状态
+systemctl list-units            输出激活的单元
+systemctl --failed              输出运行失败的单元
+systemctl status pid            显示 cgroup slice, 内存和父 PID
+systemctl list-unit-files       查看所有已安装服务：
+
+
+
+###########################################################
+### % 使用单元, Using units
+###########################################################
+% 一个单元配置文件可以描述如下内容之一,详情参阅 systemd.unit(5)
+系统服务(.service)   挂载点  (.mount)    sockets(.sockets)
+系统设备(.device )   交换分区(.swap )    文件路径(.path)
+启动目标(.target )   计时器  (.timer)
+
+使用 systemctl 控制单元时，通常需要使用单元文件的全名，
+包括扩展名（例如 sshd.service ）
+但是有些单元可以在 systemctl 中使用简写方式。
+如果无扩展名，systemctl 默认把扩展名当作 .service 。
+例如 netcfg 和 netcfg.service 是等价的。
+挂载点会自动转化为相应的 .mount单元.  例如 /home 等价于 home.mount 。
+设备会自动转化为相应的   .device单元，所以 /dev/sda2 等价于 dev-sda2.device 。
+
+注意: 有一些单元的名称包含一个 @ 标记（例如： name@string.service ），
+    这意味着它是模板单元 name@.service 的一个 实例。 
+    string 被称作实例标识符，在 systemctl 调用模板单元时，会将其当作一个参数传给模板单元，
+    模板单元会使用这个传入的参数代替模板中的 %I 指示符。
+	在实例化之前，systemd 会先检查 name@string.suffix 文件是否存在
+	（如果存在，就直接使用这个文件，而不是模板实例化）。
+	大多数情况下，包含 @ 标记都意味着这个文件是模板。
+	如果一个模板单元没有实例化就调用，该调用会返回失败，
+	因为模板单元中的 %I 指示符没有被替换。 
+
+___________________________________________________________
+% 提示：
+    下面的大部分命令都可以跟多个单元名, 详细信息参见 systemctl(1)。
+    systemctl命令在enable、disable和mask子命令中增加了--now选项，
+    可以实现激活的同时启动服务，取消激活的同时停止服务。
+    一个软件包可能会提供多个不同的单元。
+    如果你已经安装了软件包，可以通过pacman -Qql package | grep systemd命令检查这个软件包提供了哪些单元。
+systemctl start <unit>              立即激活单元
+systemctl stop <unit>               立即停止单元
+systemctl restart <unit>            重启单元
+systemctl reload <unit>             重新加载配置
+systemctl status <unit>             输出单元运行状态
+systemctl is-enable <unit>          检查单元是否配置为自动启动
+systemctl enable <unit>             开机自动激活单元
+systemctl enable --now <unit>       设置单元为自动启动并立即启动这个单元
+systemctl disable <unit>            取消开机自动激活单元
+systemctl mask <unit>               禁用一个单元（禁用后，间接启动也是不可能的）： 
+systemctl unmask <unit>             取消禁用一个单元
+systemctl help <unit>               显示单元的手册页（必须由单元文件提供）
+systemctl daemon-reload             重新载入 systemd 系统配置，扫描单元文件的变动
+systemctl reboot                    重启
+systemctl poweroff                  退出系统并关闭电源
+systemctl suspend                   待机
+systemctl hibernate                 休眠
+systemctl hybrid-sleep              混合休眠模式（同时休眠到硬盘并待机）
+
+
+systemctl isolate graphical.target  切换当前运行目标,该命令仅更改当前运行目标，对下次启动无影响
+systemctl get-default               用 systemctl 检查当前的默认启动目标
+
+用 systemctl 修改default.target以变更开机默认启动目标
+systemctl set-default multi-user.target
+
+
+% 编写单元文件
+systemd 单元文件的语法来源于 XDG 桌面项配置文件.desktop文件，
+最初的源头则是Microsoft Windows的.ini文件。
+单元文件可以从多个地方加载，systemctl show --property=UnitPath 
+可以按优先级从低到高显示加载目录：
+    /usr/lib/systemd/system/    软件包安装的单元
+    /etc/systemd/system/        系统管理员安装的单元
+    
+注意:
+    当 systemd 运行在用户模式下时，使用的加载路径是完全不同的。
+    systemd 单元名仅能包含 ASCII 字符，下划线和点号和有特殊意义的字符('@', '-')。
+    其它字符需要用 C-style "\x2d" 替换。参阅 systemd.unit(5) 和 systemd-escape(1) 。    
+    
+单元文件的语法，可以参考系统已经安装的单元，
+也可以参考 systemd.service(5) 中的EXAMPLES章节。
+提示： 以 # 开头的注释可能也能用在 unit-files 中，但是只能在新行中使用。
+不要在 systemd 的参数后面使用行末注释， 否则 unit 将会启动失败。
+    
+    
+% 处理依赖关系
+使用 systemd 时，可通过正确编写单元配置文件来解决其依赖关系。
+典型的情况是，单元 A 要求单元 B 在 A 启动之前运行。
+在此情况下，向单元 A 配置文件中的 [Unit] 段添加 Requires=B 和 After=B 即可。
+若此依赖关系是可选的，可添加 Wants=B 和 After=B 。
+请注意 Wants= 和 Requires= 并不意味着 After= ，
+即如果 After= 选项没有制定，这两个单元将被并行启动。
+
+依赖关系通常被用在服务（service）而不是目标（target）上。
+例如， network.target 一般会被某个配置网络接口的服务引入，
+所以，将自定义的单元排在该服务之后即可，因为 network.target 已经启动。     
+    
+
+% 服务类型
+编写自定义的 service 文件时，可以选择几种不同的服务启动方式。
+启动方式可通过配置文件 [Service] 段中的 Type= 参数进行设置。
+   　Type=simple  ：（默认值） systemd认为该服务将立即启动。服务进程不会 fork 。
+   　              如果该服务要启动其他服务，不要使用此类型启动，除非该服务是socket 激活型。
+   　              
+    Type=forking ：systemd认为当该服务进程fork，且父进程退出后服务启动成功。
+                  对于常规的守护进程（daemon），除非你确定此启动方式无法满足需求，使用此类型启动即可。
+                  使用此启动类型应同时指定 PIDFile=，以便 systemd 能够跟踪服务的主进程。
+                  
+    Type=oneshot ：这一选项适用于只执行一项任务、随后立即退出的服务。
+    可能需要同时设置 RemainAfterExit=yes 使得 systemd 在服务进程退出之后仍然认为服务处于激活状态。
+    
+    Type=notify 　：与 Type=simple 相同，但约定服务会在就绪后向 systemd 发送一个信号。
+    　　　　　　　　这一通知的实现由 libsystemd-daemon.so 提供。
+    　　　　　　　　
+    Type=dbus 　　：若以此方式启动，当指定的 BusName 出现在DBus系统总线上时，systemd认为服务就绪。
+    Type=idle 　　：systemd会等待所有任务处理完成后，才开始执行 idle 类型的单元。
+                    其他行为与 Type=simple 类似。
+
+type 的更多解释可以参考 systemd.service(5)。 
+
+
+% 修改现存单元文件
+为了避免和 pacman 冲突，不应该直接编辑软件包提供的文件。
+有两种方法可以不改动原始文件就做到修改单元文件：
+创建一个优先级更高的本地单元文件或创建一个片段，应用到原始单元文件之上。
+两种方法都需要在修改后重新加载单元，
+用 systemctl edit 编辑单元(会自动重载单元)或通过下面命令重新加载单元：
+
+# systemctl daemon-reload
+
+提示：
+    systemd-delta 命令用来查看哪些单元文件被覆盖、哪些被修改。
+    系统维护的时候需要及时了解哪些单元已经有了更新。
+    使用 systemctl cat unit 可以查看单元的内容和所有相关的片段.
+
+替换单元文件
+要替换 /usr/lib/systemd/system/unit, 
+创建文件 /etc/systemd/system/unit 并重新启用单元以更新链接：
+
+# systemctl reenable unit
+或者运行：
+# systemctl edit --full unit
+
+这将会在记事本中打开 /etc/systemd/system/unit，
+如果文件不存在，可以将安装的版本复制到这里，在编辑完成之后，会自动加载新版本。
+
+注意: 即使 Pacman 更新了新的单元文件，软件包中的版本也不会被使用，
+所以这个方式会增加系统维护的难度，推荐使用下面一种方法。
+
+
+% 附加配置片段
+要附加配置片段，先创建名为 /etc/systemd/system/<单元名>.d/ 的目录，
+然后放入 *.conf 文件，其中可以添加或重置参数。
+这里设置的参数优先级高于原来的单元文件。下面的更新方式比较简单：
+# systemctl edit unit
+这将会在编辑器中打开文件 /etc/systemd/system/unit.d/override.conf，编辑完成之后自动加载。
+
+Note: 并不是所有参数都会被子配置文件覆盖。例如要修改 Conflicts= 就必须 替换原始文件。
+
+
+% 重置到软件包版本
+要回退单元的变更，使用 systemctl edit 并执行:
+# systemctl revert unit
+
+示例
+例如，如果想添加一个额外的依赖，创建如下文件即可：
+/etc/systemd/system/<unit>.d/customdependency.conf
+[Unit]
+Requires=<新依赖>
+After=<新依赖>
+
+
+要修改一个非 oneshot 单元的 ExecStart 命令，创建下面文件:
+/etc/systemd/system/unit.d/customexec.conf
+[Service]
+ExecStart=
+ExecStart=new command
+修改 ExecStart 前必须将其置空，参见 ([1] 。
+所有可能多次赋值的变量都需要这个操作，例如定时器的 OnCalendar 。
+
+
+下面是自动重启服务的一个例子：
+/etc/systemd/system/unit.d/restart.conf
+[Service]
+Restart=always
+RestartSec=30
+
+
+
+###########################################################
+### % 获取当前目标, 不要使用 runlevel 命令了
+###########################################################
+$ systemctl list-units --type=target
+
+创建自定义目标
+在 sysvinit 中有明确定义的运行级别（如：0、1、3、5、6）与 systemd 中特定的 目标 存在一一对应的关系。
+然而，对于用户自定义运行级别（2、4）却没有。
+如需要同样功能，建议你以原有运行级别所对应的 systemd 目标为基础，
+新建一个/etc/systemd/system/<目标名>.target（可参考/usr/lib/systemd/system/graphical.target）, 
+然后创建目录/etc/systemd/system/<目标名>.wants，并向其中加入需启用的服务链接（指向/ur/lib/systemd/system/）
+
+% "SysV 运行级别" 与 "systemd 目标" 对照表
+Mapping between SysV runlevels and systemd targets
+SysV Runlevel       systemd Target 	                     Notes
++________________+_____________________________________________________________
+|  0             |runlevel0.target, poweroff.target 	/Halt the system.
+|________________|_____________________________________________________________
+|  1             |runlevel1.target, rescue.target 	    /Single user mode.单用户模式 
+|________________|_____________________________________________________________
+|  2, 4          |runlevel2.target, runlevel4.target,  /用户自定义运行级别，
+|                |    multi-user.target                  通常识别为级别3                
+|________________|_____________________________________________________________        
+|  3             |runlevel3.target, multi-user.target  /多用户,无图形界面,
+|                |                                     用户可以通过终端或网络登录
+|________________|_____________________________________________________________    
+|  5             |runlevel5.target, graphical.target   /多用户，图形界面
+|                |                                       继承级别3的服务，
+|                |                                       并启动图形界面服务
+|________________|_____________________________________________________________                                 
+|  6             |runlevel6.target, reboot.target 	   /Reboot,重启 
+|________________|_____________________________________________________________
+|    emergency 	 |emergency.target 	                  /Emergency shell,急救模式
++________________+_____________________________________________________________
+
+
+
+
+###########################################################
+###  systemd服务
+###########################################################
+### 列出系统的服务
+% systemctl --type=service
+
+### 列出OpenSSH服务状态 
+% systemctl status sshd.service
+% systemctl is-active sshd.service
+
+
+
+###########################################################
+###  systemd目标
+###########################################################
+# 切换当前运行目标,该命令仅更改当前运行目标，对下次启动无影响 [系统运行级别]
+% systemctl isolate graphical.target 
+
+### 用 systemctl 检查当前的默认启动目标
+% systemctl get-default    
+% systemctl list-dependencies | grep target           
+% systemctl list-dependencies graphical.target | grep target
+
+### 用 systemctl 修改default.target以变更开机默认启动目标[runlevel]运行级别
+% systemctl set-default multi-user.target
+
+
+
+###########################################################
+### % ＳＹＳＴＥＭＣＴＬ
+###########################################################
+systemctl start <unit>              立即激活单元
+systemctl stop <unit>               立即停止单元
+systemctl restart <unit>            重启单元
+systemctl reload <unit>             重新加载配置
+systemctl status <unit>             输出单元运行状态
+systemctl is-enable <unit>          检查单元是否配置为自动启动
+systemctl enable <unit>             开机自动激活单元
+systemctl enable --now <unit>       设置单元为自动启动并立即启动这个单元
+systemctl disable <unit>            取消开机自动激活单元
+systemctl mask <unit>               禁用一个单元（禁用后，间接启动也是不可能的）
+systemctl unmask <unit>             取消禁用一个单元
+systemctl help <unit>               显示单元的手册页（必须由单元文件提供）
+systemctl daemon-reload             重新载入 systemd 系统配置，扫描单元文件的变动
+systemctl reboot                    重启
+systemctl poweroff                  退出系统并关闭电源
+systemctl suspend                   待机
+systemctl hibernate                 休眠
+systemctl hybrid-sleep              混合休眠模式（同时休眠到硬盘并待机）
+
+
+
+###########################################################
+### % SYSTEMD
+###########################################################
+% systemd 是一个 Linux 系统基础组件的集合，
+提供了一个系统和服务管理器，运行为 PID 1 并负责启动其它程序。
+功能包括：支持并行化任务；同时采用 socket 式与 D-Bus 总线式激活服务；
+按需启动守护进程（daemon）；利用 Linux 的 cgroups 监视进程；支持快照和系统恢复；
+维护挂载点和自动挂载点；各服务间基于依赖关系进行精密控制。
+systemd 支持 SysV 和 LSB 初始脚本，可以替代 sysvinit。
+除此之外，功能还包括日志进程、控制基础系统配置，
+维护登陆用户列表以及系统账户、
+运行时目录和设置，可以运行容器和虚拟机，
+可以简单的管理网络配置、网络时间同步、日志转发和名称解析等。
+
+
+% 检查 systemd 的版本
+systemctl --version
+
+% 查看 systemd 和 systemctl 程序相关的目录
+$ whereis systemd
+$ whereis systemctl
+
+
+
+
+###########################################################
+### % 系统管理
+###########################################################
+Systemd 并不是一个命令，而是一组命令，涉及到系统管理的方方面面。
+systemctl是 Systemd 的主命令，用于管理系统。
+
+    # 重启系统
+    $ sudo systemctl reboot
+
+    # 关闭系统，切断电源
+    $ sudo systemctl poweroff
+
+    # CPU停止工作
+    $ sudo systemctl halt
+
+    # 暂停系统
+    $ sudo systemctl suspend
+
+    # 让系统进入冬眠状态
+    $ sudo systemctl hibernate
+
+    # 让系统进入交互式休眠状态
+    $ sudo systemctl hybrid-sleep
+
+    # 启动进入救援状态（单用户状态）
+    $ sudo systemctl rescue
+
+
+
+###########################################################
+### % systemd-analyze
+###########################################################
+systemd-analyze命令用于查看启动耗时。
+
+    # 查看启动耗时
+    $ systemd-analyze                                                                                       
+
+    # 查看每个服务的启动耗时
+    $ systemd-analyze blame
+
+    # 显示瀑布状的启动过程流
+    $ systemd-analyze critical-chain
+
+    # 显示指定服务的启动流
+    $ systemd-analyze critical-chain atd.service
+
+
+
+###########################################################
+### % hostnamectl
+###########################################################
+3.3 
+hostnamectl命令用于查看当前主机的信息。
+
+    # 显示当前主机的信息
+    $ hostnamectl
+
+    # 设置主机名。
+    $ sudo hostnamectl set-hostname rhel7
+
+
+
+###########################################################
+### % localectl
+###########################################################
+3.4 
+localectl命令用于查看本地化设置。
+
+    # 查看本地化设置
+    $ localectl
+
+    # 设置本地化参数。
+    $ sudo localectl set-locale LANG=en_GB.utf8
+    $ sudo localectl set-keymap en_GB
+
+
+3.5 timedatectl
+timedatectl命令用于查看当前时区设置。
+
+    # 查看当前时区设置
+    $ timedatectl
+
+    # 显示所有可用的时区
+    $ timedatectl list-timezones                                                                                   
+
+    # 设置当前时区
+    $ sudo timedatectl set-timezone America/New_York
+    $ sudo timedatectl set-time YYYY-MM-DD
+    $ sudo timedatectl set-time HH:MM:SS
+
+
+
+###########################################################
+### % loginctl
+###########################################################
+3.6 loginctl
+loginctl命令用于查看当前登录的用户。
+
+    # 列出当前session
+    $ loginctl list-sessions
+
+    # 列出当前登录用户
+    $ loginctl list-users
+
+    # 列出显示指定用户的信息
+    $ loginctl show-user ruanyf
+
+
+
+###########################################################
+### % Unit
+###########################################################
+% Systemd 可以管理所有系统资源。不同的资源统称为 Unit（单位）。
+% Unit 一共分成12种
+    Service unit：   系统服务
+    Target unit：    多个 Unit 构成的一个组
+    Device Unit：    硬件设备
+    Mount Unit：     文件系统的挂载点
+    Automount Unit： 自动挂载点
+    Path Unit：      文件或路径
+    Scope Unit：     不是由 Systemd 启动的外部进程
+    Slice Unit：     进程组
+    Snapshot Unit：  Systemd 快照，可以切回某个快照
+    Socket Unit：    进程间通信的 socket
+    Swap Unit：      swap 文件
+    Timer Unit：     定时器
+        
+        
+        
+% systemctl list-units
+% systemctl list-units命令可以查看当前系统的所有 Unit 。
+    # 列出正在运行的 Unit
+    $ systemctl list-units
+
+    # 列出所有Unit，包括没有找到配置文件的或者启动失败的
+    $ systemctl list-units --all
+
+    # 列出所有没有运行的 Unit
+    $ systemctl list-units --all --state=inactive
+
+    # 列出所有加载失败的 Unit
+    $ systemctl list-units --failed
+
+    # 列出所有正在运行的、类型为 service 的 Unit
+    $ systemctl list-units --type=service
+
+
+% systemctl status
+% systemctl status命令用于查看系统状态和单个 Unit 的状态。
+    # 显示系统状态
+    $ systemctl status
+
+    # 显示单个 Unit 的状态
+    $ sysystemctl status bluetooth.service
+
+    # 显示远程主机的某个 Unit 的状态
+    $ systemctl -H root@rhel7.example.com status httpd.service
+
+% 除了status命令，systemctl还提供了三个查询状态的简单方法，主要供脚本内部的判断语句使用。
+    # 显示某个 Unit 是否正在运行
+    $ systemctl is-active application.service
+
+    # 显示某个 Unit 是否处于启动失败状态
+    $ systemctl is-failed application.service
+
+    # 显示某个 Unit 服务是否建立了启动链接
+    $ systemctl is-enabled application.service
+
+
+
+% Unit 管理
+% 对于用户来说，最常用的是下面这些命令，用于启动和停止 Unit（主要是 service）。
+    # 立即启动一个服务
+    $ sudo systemctl start apache.service
+
+    # 立即停止一个服务
+    $ sudo systemctl stop apache.service
+
+    # 重启一个服务
+    $ sudo systemctl restart apache.service
+
+    # 杀死一个服务的所有子进程
+    $ sudo systemctl kill apache.service
+
+    # 重新加载一个服务的配置文件
+    $ sudo systemctl reload apache.service
+
+    # 重载所有修改过的配置文件
+    $ sudo systemctl daemon-reload
+
+    # 显示某个 Unit 的所有底层参数
+    $ systemctl show httpd.service
+
+    # 显示某个 Unit 的指定属性的值
+    $ systemctl show -p CPUShares httpd.service
+
+    # 设置某个 Unit 的指定属性
+    $ sudo systemctl set-property httpd.service CPUShares=500
+
+
+___________________________________________________________
+% 依赖关系
+4.4 依赖关系
+Unit 之间存在依赖关系：A 依赖于 B，就意味着 Systemd 在启动 A 的时候，同时会去启动 B。
+systemctl list-dependencies命令列出一个 Unit 的所有依赖。
+
+    $ systemctl list-dependencies nginx.service
+
+上面命令的输出结果之中，有些依赖是 Target 类型（详见下文），默认不会展开显示。
+如果要展开 Target，就需要使用--all参数。
+
+
+    $ systemctl list-dependencies --all nginx.service
+
+
+%  Unit 的配置文件
+% 每一个 Unit 都有一个配置文件，告诉 Systemd 怎么启动这个 Unit 。
+Systemd 默认从目录/etc/systemd/system/读取配置文件。
+但是，里面存放的大部分文件都是符号链接，
+指向目录/usr/lib/systemd/system/，真正的配置文件存放在那个目录。
+systemctl enable命令用于在上面两个目录之间，建立符号链接关系。
+    $ sudo systemctl enable clamd@scan.service
+    # 等同于
+    $ sudo ln -s '/usr/lib/systemd/system/clamd@scan.service' \
+    '/etc/systemd/system/multi-user.target.wants/clamd@scan.service'
+
+如果配置文件里面设置了开机启动，systemctl enable命令相当于激活开机启动。
+与之对应的，systemctl disable命令用于在两个目录之间，
+撤销符号链接关系，相当于撤销开机启动。
+
+    $ sudo systemctl disable clamd@scan.service
+配置文件的后缀名，就是该 Unit 的种类，比如sshd.socket。
+如果省略，Systemd 默认后缀名为.service，所以sshd会被理解成sshd.service。
+
+
+
+
+### % 配置文件的状态
+___________________________________________________________
+systemctl list-unit-files命令用于列出所有配置文件。
+
+
+    # 列出所有配置文件
+    $ systemctl list-unit-files
+
+    # 列出指定类型的配置文件
+    $ systemctl list-unit-files --type=service
+
+这个命令会输出一个列表。
+    $ systemctl list-unit-files
+
+    UNIT FILE              STATE
+    chronyd.service        enabled
+    clamd@.service         static
+    clamd@scan.service     disabled
+
+这个列表显示每个配置文件的状态，一共有四种。
+        enabled：已建立启动链接
+        disabled：没建立启动链接
+        static：该配置文件没有[Install]部分（无法执行），只能作为其他配置文件的依赖
+        masked：该配置文件被禁止建立启动链接
+注意，从配置文件的状态无法看出，该 Unit 是否正在运行。这必须执行前面提到的systemctl status命令。
+
+
+    $ systemctl status bluetooth.service
+一旦修改配置文件，就要让 SystemD 重新加载配置文件，然后重新启动，否则修改不会生效。
+
+
+    $ sudo systemctl daemon-reload
+    $ sudo systemctl restart httpd.service
+    
+    
+    
+    
+    
+### % 配置文件的格式
+___________________________________________________________
+配置文件就是普通的文本文件，可以用文本编辑器打开。
+systemctl cat命令可以查看配置文件的内容。
+
+    $ systemctl cat atd.service
+
+    [Unit]
+    Description=ATD daemon
+
+    [Service]
+    Type=forking
+    ExecStart=/usr/bin/atd
+
+    [Install]
+    WantedBy=multi-user.target
+
+从上面的输出可以看到，配置文件分成几个区块。
+每个区块的第一行，是用方括号表示的区别名，比如[Unit]。
+注意，配置文件的区块名和字段名，都是大小写敏感的。
+
+每个区块内部是一些等号连接的键值对。
+
+
+    [Section]
+    Directive1=value
+    Directive2=value
+
+    . . .
+
+注意，键值对的等号两侧不能有空格。
+
+
+
+
+### % 配置文件的区块
+___________________________________________________________
+[Unit]区块通常是配置文件的第一个区块，用来定义 Unit 的元数据，
+以及配置与其他 Unit 的关系。它的主要字段如下。
+
+        Description：简短描述
+        Documentation：文档地址
+        Requires：当前 Unit 依赖的其他 Unit，如果它们没有运行，当前 Unit 会启动失败
+        Wants：与当前 Unit 配合的其他 Unit，如果它们没有运行，当前 Unit 不会启动失败
+        BindsTo：与Requires类似，它指定的 Unit 如果退出，会导致当前 Unit 停止运行
+        Before：如果该字段指定的 Unit 也要启动，那么必须在当前 Unit 之后启动
+        After：如果该字段指定的 Unit 也要启动，那么必须在当前 Unit 之前启动
+        Conflicts：这里指定的 Unit 不能与当前 Unit 同时运行
+        Condition...：当前 Unit 运行必须满足的条件，否则不会运行
+        Assert...：当前 Unit 运行必须满足的条件，否则会报启动失败
+
+[Install]通常是配置文件的最后一个区块，用来定义如何启动，以及是否开机启动。它的主要字段如下。
+        WantedBy：它的值是一个或多个 Target，
+            当前 Unit 激活时（enable）符号链接会放入/etc/systemd/system目录下面以 
+            Target 名 + .wants后缀构成的子目录中
+        
+        RequiredBy：它的值是一个或多个 Target，当前 Unit 激活时，
+            符号链接会放入/etc/systemd/system目录下面以 
+            Target 名 + .required后缀构成的子目录中
+        
+        Alias：当前 Unit 可用于启动的别名
+        Also：当前 Unit 激活（enable）时，会被同时激活的其他 Unit
+
+
+[Service]区块用来 Service 的配置，只有 Service 类型的 Unit 才有这个区块。它的主要字段如下。
+        Type：定义启动时的进程行为。它有以下几种值。
+        Type=simple：默认值，执行ExecStart指定的命令，启动主进程
+        Type=forking：以 fork 方式从父进程创建子进程，创建后父进程会立即退出
+        Type=oneshot：一次性进程，Systemd 会等当前服务退出，再继续往下执行
+        Type=dbus：当前服务通过D-Bus启动
+        Type=notify：当前服务启动完毕，会通知Systemd，再继续往下执行
+        Type=idle：若有其他任务执行完毕，当前服务才会运行
+        ExecStart：启动当前服务的命令
+        ExecStartPre：启动当前服务之前执行的命令
+        ExecStartPost：启动当前服务之后执行的命令
+        ExecReload：重启当前服务时执行的命令
+        ExecStop：停止当前服务时执行的命令
+        ExecStopPost：停止当其服务之后执行的命令
+        RestartSec：自动重启当前服务间隔的秒数
+        Restart：定义何种情况 Systemd 会自动重启当前服务，
+                可能的值包括always（总是重启）、
+                on-success、on-failure、
+                on-abnormal、on-abort、on-watchdog
+        TimeoutSec：定义 Systemd 停止当前服务之前等待的秒数
+        Environment：指定环境变量
+
+
+
+###########################################################
+### % Target
+###########################################################
+启动计算机的时候，需要启动大量的 Unit。
+如果每一次启动，都要一一写明本次启动需要哪些 Unit，显然非常不方便。
+Systemd 的解决方案就是 Target。
+
+简单说，Target 就是一个 Unit 组，包含许多相关的 Unit 。
+启动某个 Target 的时候，Systemd 就会启动里面所有的 Unit。
+从这个意义上说，Target 这个概念类似于"状态点"，
+启动某个 Target 就好比启动到某种状态。
+
+传统的init启动模式里面，有 RunLevel 的概念，跟 Target 的作用很类似。
+不同的是，RunLevel 是互斥的，不可能多个 RunLevel 同时启动，
+但是多个 Target 可以同时启动。
+
+
+    # 查看当前系统的所有 Target
+    $ systemctl list-unit-files --type=target
+
+    # 查看一个 Target 包含的所有 Unit
+    $ systemctl list-dependencies multi-user.target
+
+    # 查看启动时的默认 Target
+    $ systemctl get-default
+
+    # 设置启动时的默认 Target
+    $ sudo systemctl set-default multi-user.target
+
+    # 切换 Target 时，默认不关闭前一个 Target 启动的进程，
+    # systemctl isolate 命令改变这种行为，
+    # 关闭前一个 Target 里面所有不属于后一个 Target 的进程
+    $ sudo systemctl isolate multi-user.target
+
+Target 与 传统 RunLevel 的对应关系如下。
+________________________________________________________________________________
+    Traditional runlevel      New target name     Symbolically linked to...
+
+    Runlevel 0           |    runlevel0.target -> poweroff.target
+    Runlevel 1           |    runlevel1.target -> rescue.target
+    Runlevel 2           |    runlevel2.target -> multi-user.target
+    Runlevel 3           |    runlevel3.target -> multi-user.target
+    Runlevel 4           |    runlevel4.target -> multi-user.target
+    Runlevel 5           |    runlevel5.target -> graphical.target
+    Runlevel 6           |    runlevel6.target -> reboot.target
+
+它与init进程的主要差别如下。
+
+    （1）默认的 RunLevel（在/etc/inittab文件设置）现在被默认的 Target 取代，
+    	位置是/etc/systemd/system/default.target，
+    	通常符号链接到graphical.target（图形界面）或者multi-user.target（多用户命令行）。
+
+    （2）启动脚本的位置，以前是/etc/init.d目录，符号链接到不同的 RunLevel 目录 
+    	（比如/etc/rc3.d、/etc/rc5.d等），现在则存放在/lib/systemd/system和/etc/systemd/system目录。
+
+    （3）配置文件的位置，以前init进程的配置文件是/etc/inittab，
+    	各种服务的配置文件存放在/etc/sysconfig目录。
+    	现在的配置文件主要存放在/lib/systemd目录，在/etc/systemd目录里面的修改可以覆盖原始设置。
+    
+    
+    
+    
+    
+    
+###########################################################
+### % 日志管理
+###########################################################
+Systemd 统一管理所有 Unit 的启动日志。带来的好处就是，可以只用journalctl一个命令，
+查看所有日志（内核日志和应用日志）。
+日志的配置文件是/etc/systemd/journald.conf。
+journalctl功能强大，用法非常多。
+
+
+    # 查看所有日志（默认情况下 ，只保存本次启动的日志）
+    $ sudo journalctl
+
+    # 查看内核日志（不显示应用日志）
+    $ sudo journalctl -k
+
+    # 查看系统本次启动的日志
+    $ sudo journalctl -b
+    $ sudo journalctl -b -0
+
+    # 查看上一次启动的日志（需更改设置）
+    $ sudo journalctl -b -1
+
+    # 查看指定时间的日志
+    $ sudo journalctl --since="2012-10-30 18:17:16"
+    $ sudo journalctl --since "20 min ago"
+    $ sudo journalctl --since yesterday
+    $ sudo journalctl --since "2015-01-10" --until "2015-01-11 03:00"
+    $ sudo journalctl --since 09:00 --until "1 hour ago"
+
+    # 显示尾部的最新10行日志
+    $ sudo journalctl -n
+
+    # 显示尾部指定行数的日志
+    $ sudo journalctl -n 20
+
+    # 实时滚动显示最新日志
+    $ sudo journalctl -f
+
+    # 查看指定服务的日志
+    $ sudo journalctl /usr/lib/systemd/systemd
+
+    # 查看指定进程的日志
+    $ sudo journalctl _PID=1
+
+    # 查看某个路径的脚本的日志
+    $ sudo journalctl /usr/bin/bash
+
+    # 查看指定用户的日志
+    $ sudo journalctl _UID=33 --since today
+
+    # 查看某个 Unit 的日志
+    $ sudo journalctl -u nginx.service
+    $ sudo journalctl -u nginx.service --since today
+
+    # 实时滚动显示某个 Unit 的最新日志
+    $ sudo journalctl -u nginx.service -f
+
+    # 合并显示多个 Unit 的日志
+    $ journalctl -u nginx.service -u php-fpm.service --since today
+
+    # 查看指定优先级（及其以上级别）的日志，共有8级
+    # 0: emerg
+    # 1: alert
+    # 2: crit
+    # 3: err
+    # 4: warning
+    # 5: notice
+    # 6: info
+    # 7: debug
+    $ sudo journalctl -p err -b
+
+    # 日志默认分页输出，--no-pager 改为正常的标准输出
+    $ sudo journalctl --no-pager
+
+    # 以 JSON 格式（单行）输出
+    $ sudo journalctl -b -u nginx.service -o json
+
+    # 以 JSON 格式（多行）输出，可读性更好
+    $ sudo journalctl -b -u nginx.serviceqq
+     -o json-pretty
+
+    # 显示日志占据的硬盘空间
+    $ sudo journalctl --disk-usage
+
+    # 指定日志文件占据的最大空间
+    $ sudo journalctl --vacuum-size=1G
+
+    # 指定日志文件保存多久
+    $ sudo journalctl --vacuum-time=1years
+
+
+

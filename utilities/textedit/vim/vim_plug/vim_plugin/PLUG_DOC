@@ -1,0 +1,31 @@
+############################################################
+### % Vim-plug 插件管理器
+############################################################
+% https://github.com/junegunn/vim-plug
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+
+% Vim-plug 手动安装安装
+mkdir -p  ~/.vim/autoload/
+cp plug.vim  ~/.vim/autoload/plug.vim
+
+
+
+############################################################
+### % 插件的添加和删除：
+############################################################
+% 编辑 ~/.vimrc 文件中的内容，比如安装“lightline.vim” 插件
+call plug#begin('~/.vim/plugged')
+Plug 'itchyny/lightline.vim'
+call plug#end()
+%运行命令重新加载：
+:source ~/.vimrc
+
+
+% Vim-plug 操作现在，打开 vim 编辑器 `$ vim`
+:PlugStatus       `检查插件状态`
+:PlugInstall      `安装插件`
+:PlugUpdate       `更新插件`
+:PlugDiff         `审查插件`
+:PlugClean        `删除插件`
+:PlugUpgrade      `升级 vim-plug`

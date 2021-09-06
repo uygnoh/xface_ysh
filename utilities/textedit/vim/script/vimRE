@@ -1,0 +1,672 @@
+###########################################################
+### 基本的正则表达式
+###########################################################
+Vim是一个文本编辑器，这意味着大量的Vimscript代码将专注于处理文本。 
+Vim对正则表达式有着强大的支持，尽管一如既往地也有着一些坑。
+
+% 把下面的文本打到缓冲区中：
+% 这个就是我们将用来测试Vimscript的正则支持的文本。
+% 它恰好是Python代码，但不要担心你看不懂Python。 它只是一个例子。
+max = 10
+print "Starting"
+for i in range(max):
+    print "Counter:", i
+print "Done"
+
+
+
+###########################################################
+### 高亮
+###########################################################
+在开始之前，先花点时间讲讲搜索高亮，这样我们可以让匹配的内容更明显。
+hlsearch  让Vim高亮文件中所有匹配项，
+incsearch 则令Vim在你正打着搜索内容时就高亮下一个匹配项
+    :set hlsearch incsearch
+
+
+
+###########################################################
+### 搜索
+###########################################################
+移动你的光标到文件顶部并执行下面命令：
+当你逐字母敲打时，Vim开始在第一行高亮它们。
+当你按下回车来进行搜索时，高亮_所有_的print， 
+同时移动你的光标到下一处匹配。
+    /print
+
+% 现在尝试执行下面的命令：
+% 这将移动到文件顶部并开始搜索print，带我们到第一处匹配。 
+% 用的是我们前一章看过的:execute "normal! ..."语法。
+    :execute "normal! gg/print\<cr>"
+
+% 要到达文件中的第二处匹配，你仅需在命令的结尾加一点别的。执行这个命令：
+% Vim将移动光标到缓冲区中的第二个print(同时高亮所有匹配)。
+    :execute "normal! gg/print\<cr>n"
+
+% 让我们尝试从反方向开始。执行这个命令：
+% 这次我们用G移动到文件结尾并用?来反向搜索。
+% 所有的搜索命令应该已经烂熟于心 —— 我们在让你习惯:execute "normal! ..."惯用法时已经反复练习过， 
+% 因为它让你在Vimscript代码中能够做日常在Vim里做的事。
+    :execute "normal! G?print\<cr>"
+
+
+
+###########################################################
+### 魔力(Magic)
+###########################################################
+/和?命令能接受正则表达式，而不仅仅是普通字符。执行下面命令：
+    :execute "normal! gg/for .+ in .+:\<cr>"
+% Vim抱怨说找不到模式！我告诉过你Vim支持正则搜索，所以为何如此？试试下面命令：
+:execute "normal! gg/for .\\+ in .\\+:\<cr>"
+% 这次Vim高亮"for"循环，如我们一开始所指望的。
+% 在继续阅读之前，花一分钟来想想为何如此。 记住execute接受一个字符串。
+% 答案在此：我们需要这样写命令的原因有二：
+    首先，execute接受一个字符串，在调用normal!命令时，双反斜杠将转换成单反斜杠。
+    Vim有四种不同的解析正则表达式的"模式"！ 默认模式下需要在+前加上一个反斜杠来让
+    它表示"一或多个之前的字符"而不是"一个字面意义上的加号"。
+% 直接在Vim里执行搜索，你很容易就注意到它们的不同，输入下面的命令并按下回车：
+    /print .\+
+% 现在你可以看到\+的魔力了。双反斜杠仅仅在把模式作为字符串传递给execute时才需要。
+
+
+
+###########################################################
+### 字面量字符串
+###########################################################
+正如我们在字符串那一章提到的，Vim允许你使用单引号来定义可以直接传递字符的字面量字符串。 
+比如，字符串'a\nb'有四个字符长。
+我们可以使用字面量字符串来避免频繁敲打双重反斜杠吗？ 
+先思考这个问题一两分钟，毕竟答案恐怕比你所认为的要更复杂一些。
+% 试试执行下面的命令(注意这次的单引号和单反斜杠)：
+    :execute 'normal! gg/for .\+ in .\+:\<cr>'
+
+Vim带你到文件的顶部却不再移动到第一个匹配的地方。你猜对了吗？
+命令之所以不能工作，是因为我们需要模式中的\<cr>被转义成回车，来启动搜索。 
+因为我们用的是字面量字符串，它并不等价于平常在Vim里键入/for .\+ in .\+:\<cr>， 显然这是无法工作的。
+别怕，方法还是比困难多！不要忘了Vim允许字符串连接，所以可以将命令分割成容易理解的一小段。 执行下面的命令：
+    :execute "normal! gg" . '/for .\+ in .\+:' . "\<cr>"
+% 这种方法可以在传递给execute之前把三小段字符串连接起来， 
+% 而且我们可以为正则使用字面量字符串并为其他的使用一般的字符串。
+
+
+%%%%%%%%%%%%%%% 更多的魔力(Very Magic)
+你可能会好奇Vimscript的四种不同的正则解析模式和它们跟Python，Perl或Ruby中的正则表达式有何不同。 
+你可以阅读它们的文档，如果你乐意。不过如果你只想找到一种简单科学的解决办法，请继续读下去。
+执行下面的命令：
+    :execute "normal! gg" . '/\vfor .+ in .+:' . "\<cr>"
+我们又一次把正则表达式放在单独的字面量字符串里，而这次我们用\v来引导模式。 
+这将告诉Vim使用它的"very magic"正则解析模式，而该模式就跟其他语言的非常相似。
+如果你以\v开始你的所有正则表达式，你就不用再纠结Vimscript另外三种疯狂的正则模式了。
+
+
+
+% 练习
+认真阅读:help magic。
+阅读:help pattern-overview来看看Vim支持的正则类型。在看到character classes时停下来。
+阅读:help match。尝试手动执行几次:match Error /\v.../。
+在你的~/.vimrc文件中加入使用match来高亮多余的空白为错误的映射。建议使用<leader>w。
+加入另一个映射来清除匹配项(比如<leader>W)。
+加入一个normal模式下的会在进行搜索时自动插入\v的映射。 
+如果你卡在这个练习上，不要忘了Vim的映射是非常简单的，你只需要告诉它把映射键转换成哪些键。
+在你的~/.vimrc文件中加入hlsearch和incsearch选项，随你所欲地设置它。
+阅读:help nohlsearch。注意这是一个_命令_并且不是hlsearch的"off mode"。
+在你的~/.vimrc文件中加入消除最后一次搜索的匹配项的高亮的映射。
+
+
+
+###########################################################
+###  Grep
+###########################################################
+如果你未曾用过:grep，现在你应该花费一分钟读读:help :grep和:help :make。 
+如果之前没用过quickfix window，阅读:help quickfix-window。
+简明扼要地说：:grep ...将用你给的参数来运行一个外部的grep程序，
+解析结果，填充quickfix列表， 这样你就能在Vim里面跳转到对应结果。
+我们将会添加一个"grep运算符"到任意Vim的内置(或自定义！)的动作中，
+来选择想要搜索的文本， 让:grep更容易使用。
+
+
+
+%%%%%%%%%%%%%%% 用法
+在写下每一个有意义的Vimscript程序的第一步，你需要思索一个问题：“它会被用户怎么使用呢？”。 
+尝试构思出一种优雅，简易，符合直觉的调用方法。
+% 这次我会替你把这活干了：
+    我们将创造一个"grep运算符"并绑定到<leader>g。
+    它将表现得同其他任意Vim运算符一样，还可以加入到组合键(比如w和i{)中。
+    它将立刻开始搜索并打开quickfix窗口展示结果。
+    它将_不会_跳到第一个结果，因为当第一个结果不是你想要的时候，这样做会困扰你。
+% 一些你将怎么使用它的用例：
+    <leader>giw: Grep光标下的词(word)。
+    <leader>giW: Grep光标下的词的大写形式(WORD)。
+    <leader>gi': Grep当前所在的单引号括住的词。
+    viwe<leader>g: 可视状态下选中一个词并拓展选择范围到下一词，然后Grep。
+% 有很多，_很多_其他的方法可以用它。看上去它好像需要写很多，很多代码， 
+% 但事实上我们只需要实现"运算符"功能然后Vim就会完成剩下的工作。
+
+
+
+
+%%%%%%%%%%%%%%% 一个原型
+在埋头写下巨量(trickey bits)的Vimscript之前，
+有一个也许会帮上忙的方法是简化你的目标并实现它， 来推测你最终解决方案可能的"外形"。
+让我们简化我们的目标为"创造一个映射来搜索光标下的词"。
+这有用而且应该更简单，所以我们能更快得到可运行的成果。 目前我们将映射它到<leader>g。
+% 我们从一个映射骨架开始并逐渐填补它。执行这个命令：
+    :nnoremap <leader>g :grep -R something .<cr>
+如果你阅读过:help grep，你就能轻易理解这个命令。我们之前也看过许多映射，这里没有什么是新的。
+显然我们还没做什么，所以让我们一步步打磨这个映射直到它符合我们的要求。
+
+
+%%%%%%%%%%%%%%%  搜索部分
+首先我们需要搜索光标下的词，而不是something。执行下面的命令：
+    :nnoremap <leader>g :grep -R <cword> .<cr>
+现在试一下。<cword>是一个Vim的command-line模式的特殊变量， 
+Vim会在执行命令之前把它替换为"光标下面的那个词"。
+% 你可以使用<cWORD>来得到大写形式(WORD)。执行这个命令：
+    :nnoremap <leader>g :grep -R <cWORD> .<cr>
+现在试试把光标放在诸如foo-bar的词上面。Vim将grepfoo-bar而不是其中的一部分。
+% 我们的搜索部分还有一个问题：如果这里面有什么特殊的shell字符，Vim会毫不犹豫地传递给外部的grep命令。 
+% 这样会导致程序崩溃(或更糟：铸成某些大错)。
+让我们看看如何使它挂掉。输入foo;ls并把光标放上去执行映射。
+grep命令失败了， 而Vim将执行ls命令！这肯定糟透了，如果词里包括比ls更危险的命令呢？
+为了解决这个问题，我们将调用参数用引号括起来。执行这个命令：
+    :nnoremap <leader>g :grep -R '<cWORD>' .<cr>
+% 大多数shell把单引号括起来的内容当作(大体上)字面量，所以我们的映射现在更加健壮了。
+
+
+
+
+%%%%%%%%%%%%%%% 转义Shell命令参数
+搜索部分还有一个问题。在that's上尝试这个映射。它不会工作，因为词里的单引号与grep命令的单引号发生了冲突！
+为了解决问题，我们可以使用Vim的shellescape函数。 阅读:help escape()和:help shellescape()来看它是怎样工作的(真的很简单)。
+因为shellescape()要求Vim字符串，我们需要用execute动态创建命令。 首先执行下面命令来转换:grep映射到:execute "..."形式：
+    :nnoremap <leader>g :execute "grep -R '<cWORD>' ."<cr>
+% 试一下并确信它可以工作。如果不行，找出拼写错误并改正。 然后执行下面的使用了shellescape的命令。
+    :nnoremap <leader>g :execute "grep -R " . shellescape("<cWORD>") . " ."<cr>
+
+% 在一般的词比如foo上执行这个命令试试。它可以工作。再到一个带单引号的词，比如that's，上试试看。 它还是不行！为什么会这样？
+问题在于Vim在拓展命令行中的特殊变量，比如<cWORD>，的之前，就已经执行了shellescape()。 
+所以Vim shell-escaped了字面量字符串"<cWORD>"(什么都不做，除了给它添上一对单引号)并连接到我们的grep命令上。
+通过执行下面的命令，你可以亲眼目睹这一切。
+    :echom shellescape("<cWORD>")
+
+Vim将输出'<cWORD>'。注意引号也是输出字符串的一部分。Vim把它作为shell命令参数保护了起来。
+为解决这个问题，我们将使用expand()函数来强制拓展<cWORD>为对应字符串， 抢在它被传递给shellescape之前。
+让我们单独看看这一部分是怎么工作的。把你的光标移到带单引号的词(比如that's)上去， 并执行下面命令：   
+    :echom expand("<cWORD>")
+
+% Vim输出that's，因为expand("<cWORD>")以Vim字符串的形式返回当前光标下的词。 是时候加入shellescape的部分了：
+    :echom shellescape(expand("<cWORD>"))
+
+这次Vim输出'that'\''s'。 如果觉得这看上去真可笑，你大概没有感受过看透了各种shell转义的疯狂形式后的淡定吧。 
+目前，不用为此而纠结。就相信Vim接受了expand的输出并正确地转义了它。
+目前我们已经得到了光标下的词的彻底转义版本。是时候连接它到我们的映射了！ 执行下面的命令：
+
+    :nnoremap <leader>g :exe "grep -R " . shellescape(expand("<cWORD>")) . " ."<cr>
+试一下。这个映射不再有问题，即使我们用它搜索带古怪符号的词。
+"从简单的Vimscript开始并一点点转变它直到达成你的目标"这样的工作方式将会被你一再取用。
+
+
+
+
+%%%%%%%%%%%%%%% 整理整理
+在完成映射之前，还要处理一些小问题。首先，我们说过我们不想自动跳到第一个结果， 所以要用grep!替换掉grep。执行下面的命令：
+    :nnoremap <leader>g :execute "grep! -R " . shellescape(expand("<cWORD>")) . " ."<cr>
+
+再一次试试，发现什么都没发生。Vim用结果填充了quickfix窗口，我们却无法打开。 执行下面的命令：
+    :nnoremap <leader>g :execute "grep! -R " . shellescape(expand("<cWORD>")) . " ."<cr>:copen<cr>
+
+现在试试这个映射，你将看到Vim自动打开了包含搜索结果的quickfix窗口。 我们所做的仅仅是在映射的结尾续上:copen<cr>。
+最后一点，在搜索的时候，我们要移除Vim所有的grep输出。执行下面的命令：
+    :nnoremap <leader>g :silent execute "grep! -R " . shellescape(expand("<cWORD>")) . " ."<cr>:copen<cr>
+我们完成了，试一试并犒劳一下自己吧！silent命令仅仅是在运行一个命令的同时隐藏它的正常输出。
+
+
+% 练习
+
+把我们刚刚做出来的映射加入到你的~/.vimrc文件。
+如果你未曾读过:help :grep，去读它。
+阅读:help cword。
+阅读:help cnext和help cprevious。修改你的grep映射，试一下它们。
+设置:cnext和:cprevious的映射，让在匹配内容间的移动更加方便。
+阅读:help expand。
+阅读:help copen。
+在我们创建的映射中加入height参数到:copen命令中，看看quickfix窗口能不能以指定的高度打开。
+阅读:help silent。
+
+
+
+###########################################################
+###  Grep运算符(Operator)
+###########################################################
+目前为止，我们已经完成了一个原型，是时候扩充它，让它更加强大。
+记住：我们初始目标是创建"grep运算符"。我们还需要做一大堆新的东西来达成目标， 
+但要像前一章的过程一样：从简单的东西开始，并逐步改进直到它满足我们的需求。
+在开始之前，注释掉~/.vimrc中在前一章创建的映射。我们还要用同样的快捷键来映射新的运算符。
+
+
+
+%%%%%%%%%%%%%%% 新建一个文件
+创建一个新的运算符需要许多命令，把它们手工打出来将很快变成一种折磨。 
+你可以把它附加到~/.vimrc，但让我们为这个运算符创建一个独立的文件。我们有足够的必要这么做。
+首先，找到你的Vimplugin文件夹。在Linux或OS X，这将会是~/.vim/plugin。 
+如果你是Windows用户，它将位于你的主目录下的vimfiles文件夹。
+(如果你找不到，在Vim里使用`:echo $HOME命令) 如果这个文件夹不存在，创建一个。
+在plugin/下新建文件grep-operator.vim。这就是你放置新运算符的代码的地方。 
+一旦文件被修改，你可以执行:source %来重新加载代码。 
+每次你打开Vim，这个文件也会被重新加载，就像~/.vimrc。
+不要忘了，在你source之前，你_必须_先保存文件，这样才能看到变化！
+
+
+
+%%%%%%%%%%%%%%% 骨架(Skeleton)
+要创建一个新的Vim运算符，你需要从两个组件开始：一个函数还有一个映射。 
+% 先添加下面的代码到 grep-operator.vim
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+function! GrepOperator(type)
+    echom "Test"
+endfunction
+
+保存文件并用:source %source它。尝试通过按下<leader>giw来执行"grep整个词"。 
+Vim将在接受iw动作(motion)后，输出Test，意味着我们已经搭起了骨架。
+函数部分是简单的，没有什么是我们没讲过的。不过映射部分比较复杂。 
+我们首先对函数设置了operatorfunc选项，然后执行g@来以运算符的方式调用这个函数。 
+看起来这有点绕，不过这就是Vim工作的原理。
+暂时把这个映射看作黑魔法吧。稍后你可以到文档里一探究竟。
+
+
+
+%%%%%%%%%%%%%%% 可视模式
+我们已经在normal模式下加入了这个运算符，但还想要在visual模式下用到它。 在之前的映射下面添加多一个：
+    vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+    
+保存并source文件。现在在visual模式下选择一些东西并按下<leader>g。 
+什么也没发生，但Vim确实输出了Test，所以我们的函数已经运行了。
+
+之前我们就见过<c-u>，但是还没有解释它是做什么的。试一下在可视模式下选中一些文本并按下:。 
+Vim将打开一个命令行就像平时按下了:一样，但是命令行的开头自动添加了'<,'>！
+
+Vim为了提高效率，插入了这些文本来让你的命令在被选择的范围内执行。 
+但是这次，我们不需要它添倒忙。我们用<c-u>来执行"从光标所在处删除到行首的内容"，移除多余文本。 
+最后剩下一个孤零零的:，为调用call命令作准备。
+
+我们传递过去的visualMode()参数还没有讲过呢。 这个函数是Vim的内置函数，
+它返回一个单字符的字符串来表示visual模式的类型： 
+"v"代表字符宽度(characterwise)，"V"代表行宽度(linewise)，Ctrl-v代表块宽度(blockwise)。
+
+
+
+
+
+
+%%%%%%%%%%%%%%% 动作类型
+我们定义的函数接受一个type参数。我们知道在visual模式下它将会是visualmode()的返回值， 但是在normal模式下呢？
+% 编辑函数体部分，让代码像这样：
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+function! GrepOperator(type)
+    echom a:type
+endfunction
+
+Source文件，然后继续并用多种的方式测试它。你可能会得到类似下面的结果：
+    按下viw<leader>g显示v，因为我们处于字符宽度的visual模式。
+    按下Vjj<leader>g显示V，因为我们处于行宽度的visual模式。
+    按下<leader>giw显示char，因为我们在字符宽度的动作(characterwise motion)中使用该运算符。
+    按下<leader>gG显示line，因为我们在行宽度的动作(linewise motion)中使用该运算符。
+现在我们已经知道怎么区分不同种类的动作，这对于我们选择需要搜索的词是很重要的。
+
+
+
+%%%%%%%%%%%%%%% 复制文本
+% 我们的函数将需要获取用户想要搜索的文本，而这样做最简单的方法就是复制它。 把函数修改成这样：
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+
+function! GrepOperator(type)
+    if a:type ==# 'v'
+        execute "normal! `<v`>y"
+    elseif a:type ==# 'char'
+        execute "normal! `[v`]y"
+    else
+        return
+    endif
+
+    echom @@
+endfunction
+
+哇。好多新的东西啊。试试按下<leader>giw，<leader>g2e和vi(<leader>g看看。 
+每次Vim都会输出动作所包括的文本，显然我们已经走上正道了！
+
+让我们把这段代码一步步分开来看。首先我们用if语句检查a:type参数。如果是'v'， 
+它就是使用在字符宽度的visual模式下，所以我们复制了可视模式下的选中文本。
+
+注意我们使用大小写敏感比较==#。如果我们只用了==而用户设置ignorecase， 
+"V"也会是匹配的，结果_不会_如我们所愿。重视防御性编程！
+
+if语句的第二个分支则会拦住normal模式下使用字符宽度的动作。
+
+剩下的情况只是默默地退出。我们直接忽略行宽度/块宽度的visual模式和对应的动作类型。 
+Grep默认情况下不会搜索多行文本，所以在搜索内容中夹杂着换行符是毫无意义的。
+
+% 我们每一个if分支都会执行normal!命令来做两件事：
+1 在可视状态下选中我们想要的文本范围：
+        先移动到范围开头，并标记
+        进入字符宽度的visual模式
+        移动到范围结尾的标记
+2 复制可视状态下选中的文本。
+
+先不要纠结于特殊标记方式。你将会在完成本章结尾的练习时学到为什么它们会不一样。
+函数的最后一行输出变量@@。不要忘了以@开头的变量是寄存器。@@是"未命名"(unnamed)寄存器： 
+如果你在删除或复制文本时没有指定一个寄存器，Vim就会把文本放在这里。
+简明扼要地说：我们选中要搜索的文本，复制它，然后输出被复制的文本。%
+
+
+
+
+%%%%%%%%%%%%%%% 转义搜索文本
+% 既然得到了Vim字符串形式的需要的文本，我们可以像前一章一样将它转义。修改echom命令成这样：
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+
+function! GrepOperator(type)
+    if a:type ==# 'v'
+        normal! `<v`>y
+    elseif a:type ==# 'char'
+        normal! `[v`]y
+    else
+        return
+    endif
+
+    echom shellescape(@@)
+endfunction
+保存并source文件，然后在可视模式下选中带特殊字符的文本，按下<leader>g。 
+Vim显示一个被转义了的能安全地传递给shell命令的文本。
+
+
+
+
+%%%%%%%%%%%%%%% 执行Grep
+% 我们终于可以加上grep!命令来实现真正的搜索。替换掉echom那一行，代码看起来就像这样：
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+
+function! GrepOperator(type)
+    if a:type ==# 'v'
+        normal! `<v`>y
+    elseif a:type ==# 'char'
+        normal! `[v`]y
+    else
+        return
+    endif
+
+    silent execute "grep! -R " . shellescape(@@) . " ."
+    copen
+endfunction
+
+看起来眼熟吧。我们简单地执行上一章得到的silent execute "grep! ..."命令。 
+由于我们不再把所有的代码塞进单个nnoremap命令里，现在代码甚至更加清晰易懂了！
+保存并source文件，然后尝试一下，享受自己辛勤劳动的成果吧！
+
+% 因为定义了一个全新的Vim运算符，现在我们可以在许多场景下使用它了，比如：
+    viw<leader>g: 可视模式下选中一个词，然后grep它。
+    <leader>g4w: Grep接下来的四个词。
+    <leader>gt;: Grep到分号为止的文本。
+    <leader>gi[: Grep方括号里的文本.
+% 这里彰显了Vim的优越性：它的编辑命令就像一门语言。当你加入新的动词，它会自动地跟(大多数)现存的名词和形容词搭配起来。
+
+
+
+
+% 练习
+
+阅读:help visualmode()。
+阅读:help c_ctrl-u。
+阅读:help operatorfunc。
+阅读:help map-operator。
+
+
+
+###########################################################
+###  Grep运算符(Operator)
+###########################################################
+我们新鲜出炉的"grep运算符"工作得很好，但是写Vimscript的目的，就是要体贴地改善你的用户的生活。 
+我们可以额外做两件事，让我们的运算符更加符合Vim生态圈的要求。
+
+
+
+%%%%%%%%%%%%%%% 保护寄存器
+由于把文本复制到未命名寄存器中，我们破坏了之前在那里的内容。
+这并不是我们的用户想要的，所以让我们在复制之前先保存寄存器中的内容并于最后重新加载。 修改代码成这样：
+
+nnoremap <leader>g :set operatorfunc=GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call GrepOperator(visualmode())<cr>
+
+function! GrepOperator(type)
+    let saved_unnamed_register = @@
+
+    if a:type ==# 'v'
+        normal! `<v`>y
+    elseif a:type ==# 'char'
+        normal! `[v`]y
+    else
+        return
+    endif
+
+    silent execute "grep! -R " . shellescape(@@) . " ."
+    copen
+
+    let @@ = saved_unnamed_register
+endfunction
+
+我们在函数的开头和结尾加入了两个let语句。 第一个用一个变量保存@@中的内容，第二个则重新加载保存的内容。
+保存并source文件。测试一下，复制一些文本，接着按下<leader>giw来执行运算符， 然后按下p来粘贴之前复制的文本。
+当写Vim插件时，你_总是_应该尽量在修改之前保存原来的设置和寄存器值，并在之后加载回去。 这样你就避免了让用户陷入恐慌的可能。
+
+
+
+
+%%%%%%%%%%%%%%% 命名空间
+我们的脚本在全局命名空间中创建了函数GrepOperator。 
+这大概不算什么大问题，但当你写Vimscript的时候，事前以免万一远好过事后万分歉意。
+仅需增加几行代码，我们就能避免污染全局命名空间。把代码修改成这样：
+
+nnoremap <leader>g :set operatorfunc=<SID>GrepOperator<cr>g@
+vnoremap <leader>g :<c-u>call <SID>GrepOperator(visualmode())<cr>
+
+function! s:GrepOperator(type)
+    let saved_unnamed_register = @@
+
+    if a:type ==# 'v'
+        normal! `<v`>y
+    elseif a:type ==# 'char'
+        normal! `[v`]y
+    else
+        return
+    endif
+
+    silent execute "grep! -R " . shellescape(@@) . " ."
+    copen
+
+    let @@ = saved_unnamed_register
+endfunction
+
+脚本的前三行已经被改变了。首先，我们在函数名前增加前缀s:，这样它就会处于当前脚本的命名空间。
+我们也修改了映射，在GrepOperator前面添上<SID>，所以Vim才能找到这个函数。 
+如果我们不这样做，Vim会尝试在全局命名空间查找该函数，这是不可能找到的。
+欢呼吧，我们的grep-operator.vim脚本不仅非常有用，而且是一个善解人意的Vimscript公民！
+
+
+% 练习
+阅读:help <SID>。
+享受一下，吃点零食犒劳自己。
+
+
+
+###########################################################
+### Vimscript 切换
+###########################################################
+在开头前几章我们曾讲过怎么在Vim里设置选项。 对于布尔选项，我们可以使用set someoption!来"切换"选项。 
+如果我们能给这个命令创建一个映射，那就再好不过了。
+% 执行下面的命令：
+:nnoremap <leader>N :setlocal number!<cr>
+
+在normal模式中按下<leader>N看看。Vim将会在开启和关闭行号显示之间切换。 
+像这样的"切换"映射是十分方便的，因此我们就不需要两个独立的键来开/关。
+
+不幸的是，这只对布尔选项起作用。如果我们想要切换一个非布尔选项，还需要做更多的工作。
+
+
+
+
+%%%%%%%%%%%%%%% 切换选项
+
+从创建一个可以切换选项的函数，以及调用该函数的映射开始吧。 
+把下面的代码加入到你的~/.vimrc(或一个~/.vim/plugin/中的独立文件，如果你想要的话)：
+
+nnoremap <leader>f :call FoldColumnToggle()<cr>
+
+function! FoldColumnToggle()
+    echom &foldcolumn
+endfunction
+保存并source文件，然后按下<leader>f试试看。Vim显示当前foldcolumn选项的值。 
+如果你不熟悉这个选项，阅读:help foldcolumn再继续。
+
+% 让我们添加真正的切换功能。修改代码成这样：
+nnoremap <leader>f :call FoldColumnToggle()<cr>
+
+function! FoldColumnToggle()
+    if &foldcolumn
+        setlocal foldcolumn=0
+    else
+        setlocal foldcolumn=4
+    endif
+endfunction
+
+保存并source文件，然后试试看。每次你按下它Vim将显示或隐藏折叠状态条(fold column)。
+if语句判断&foldcolumn是否为真(记住Vim把0看作假而其他数字为真)。 
+如果是，把它设成0(隐藏它)。否则就设置它为4。就是这么简单。
+你可以使用一个简单的函数像这样来切换任何以0代表关，以其他数字代表开的选项。
+
+
+
+
+%%%%%%%%%%%%%%% 切换其他东西
+我们的梦想不应止于切换选项。还有一个我们想切换的东西是quickfix窗口。 
+依然以之前的骨架代码作为起点。加入下面的代码到你的文件：
+
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
+function! QuickfixToggle()
+    return
+endfunction
+
+% 这个映射暂时什么都不干。让我们把它转变成其他稍微有点用的东西(不过还没有彻底完成)。 把代码改成这样：
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
+function! QuickfixToggle()
+    copen
+endfunction
+
+保存并source文件。如果现在你试一下这个映射，你就会看到一个空荡荡的quickfix窗口。
+为了达到实现切换功能的目的，我们将选择一个既快捷又肮脏的手段：全局变量。 把代码改成这样：
+
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
+function! QuickfixToggle()
+    if g:quickfix_is_open
+        cclose
+        let g:quickfix_is_open = 0
+    else
+        copen
+        let g:quickfix_is_open = 1
+    endif
+endfunction
+
+我们干的事情十分简单 —— 每次调用函数时，我们用一个全局变量来储存quickfix窗口的开关状态。
+保存并source文件，接着执行映射试试看。Vim将抱怨变量尚未定义！那么我们先把变量初始化吧。
+
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
+let g:quickfix_is_open = 0
+
+function! QuickfixToggle()
+    if g:quickfix_is_open
+        cclose
+        let g:quickfix_is_open = 0
+    else
+        copen
+        let g:quickfix_is_open = 1
+    endif
+endfunction
+
+保存并source文件，接着试一下映射。成功了！
+
+
+
+
+%%%%%%%%%%%%%%% 改进
+
+我们的切换函数可以工作，但还留有一些问题。
+第一个问题是，假设用户用:copen或:cclose手动开关窗口，我们的全局变量将不会刷新。 
+实际上这不会是个大问题，因为大多数情况下用户会用这个映射开关窗口，万一没有打开，他们也会再按一次。
+
+这又是关于写Vimscript代码的重要经验：如果你试图处理每一个边际条件，你将陷在里面，而且不会有任何进展。
+
+在大多数情况下，先推出可工作(而且即使不能工作也不会造成破坏)的代码然后回过头改善， 
+要比耗费许多小时苛求完美好得多。除外你正在开发一个很可能有很多人用到的插件。 
+在这种情况下它才值得耗费时日来达到无懈可击的程度，让用户满意并减少bug报告。
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%% 重新加载窗口/缓冲区
+
+我们的函数的另外一个问题是，当用户已经打开了quickfix窗口，并执行这个映射时， 
+Vim关闭了窗口，接着把他们弹到上一个分割中，而不是送他们回之前的地方。 
+如果你仅仅想快速查看一下quickfix窗口然后继续工作，发生这种事是让人恼怒的。
+为了解决这个问题，我们将引入一种写Vim插件时非常有用的惯用法。把你的代码改成这样：
+
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
+let g:quickfix_is_open = 0
+
+function! QuickfixToggle()
+    if g:quickfix_is_open
+        cclose
+        let g:quickfix_is_open = 0
+        execute g:quickfix_return_to_window . "wincmd w"
+    else
+        let g:quickfix_return_to_window = winnr()
+        copen
+        let g:quickfix_is_open = 1
+    endif
+endfunction
+
+我们在映射中加入了新的两行。其中一行(在else分支)设置了另一个全局变量，来保存执行:copen时的当前窗口序号。
+另一行(在if分支)执行以那个序号作前缀的wincmd w，来告诉Vim跳转到对应窗口。
+我们的解决方法又一次不是无懈可击的，用户可能在两次执行映射之间打开或关闭新的分割。 
+即使这样，它还是适合于大多数场合，所以目前这已经够好的了。
+
+在大多数程序中，这种手工保存全局状态的伎俩会遭到谴责，但对于一个非常短小的Vimscript函数而言， 
+它既快捷又肮脏，却能不辱使命，完成重任。
+
+
+
+
+% 练习
+阅读:help foldcolumn.
+阅读:help winnr()
+阅读:help ctrl-w_w.
+阅读:help wincmd.
+在需要的地方加上s:和<SID>来把函数限定在独自的命名空间中。
+
+
+
+
+
+
+
+
+

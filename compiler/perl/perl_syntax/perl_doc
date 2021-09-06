@@ -1,0 +1,690 @@
+###########################################################
+###  %perl-doc
+###########################################################
+apt-get install perl-doc
+perldoc -h
+perldoc -m Data::Dumper
+
+%查找包含”regex“关键字的文件
+perdoc -q regex                        
+
+% 将 Text::Wrap这个模块以 LaTex格式输出到 textrap.docs文件中
+perldoc -o LaTex -d textrap.docs Text::Wrap 
+
+% 查看 File:Basename这个模块的帮助信息
+perldoc File:Basename
+
+% 查看帮助文档
+perldoc perlfaq
+perldoc perlfaq2
+perldoc perlre
+perldoc perlstyle
+
+
+
+###########################################################
+###  perl标量 $
+###########################################################
+my $name = 123;
+
+
+
+###########################################################
+###  perl数组 @
+###########################################################
+% 直接量列表, 该操作符会从最左边的数字计数到最右边的数字, 每次加1, 产生一边串数字 
++ (1..5)          ;代表(1,2,3,4,5)
++ (5..1)          ;空列表 
++ (0, 2..6, 9)    ;代表(0,2,3,4,5,6,9)
++ ($m, $n)        ;两个标量值之间累加产生的数字
+
+% 纯字符串列表，可以用”qw“表示，可以省去对字符串加引号的过程
+% 也可以使用任何标点符号作为定界符，代替括号 
+`qw(str1 str2 str3);` 等同于 `("str1","str2","str3");`
+
+
+@array = ("World", 123);
+@arrax = (@array, "Hello");
+@array = @arrax;
+
+% POP, PUSH
+@array = (5..9);            #@arry=5,6,7,8,9
+$test1 = pop(@array);       #$test1=9 @array=5,6,7,8;
+@array = (5..9);            #@arry=5,6,7,8,9
+push(@array, 123);          #@array=5,6,7,8,9,123
+
+% SHIFT, UNSHIFT
+@array = (5..9);            #@arry=5,6,7,8,9
+$test1 = shift(@array);     #$test1=5 @array=6,7,8,9;
+@array = (5..9);            #@arry=5,6,7,8,9
+unshift(@array, 123);       #@array=123,5,6,7,8,9
+
+
+% 取数组中元素的值
+@array = ("Hello", "World", 123);
+print $arry[0];
+print $arry[1];
+print $arry[2];
+
+
+% 特殊索引值
++ 用$#<数组名>代表最后元素的索引值
+`@array = ("hello", "world", 1..34, qw/FreeBSD/, 0..9);`
+`$end = $#array;`         ###它会比元素个数少1
++ 使用负数索引
+$array[-1];               ###最后一个元素，值为 9
+
+
+
+###########################################################
+###  perl上下文 
+###########################################################
+在perl中，很多地方会切换上下文。
+所谓上下文，它的重点在于同一个表达式出现在不同地方，得到的结果不同。
+换句话说，同一个表达式，它表达的值不是固定的。这就像是同一个单词，在不同语境下的意思不同。
+$number = 42+@people;             %标量上下文 
+$number = 42+scalar (@people);
+@people = qw(fred barney betty); %列表上下文 
+@sorted = sort(@people);
+
+
+% perl不像C/C++有各种变量类型。perl中的变量类型通过上下文来确定，到底是字符串还是整形变量。例如：
+    my $para = @_ #这是标量上下文，$para得到的是@_中元素的个数。
+    my ($para) = @_ #这是列表上下文，$para得到的是@_中的元素值。
+% 具体是什么上下文是由等号左边的变量类型决定的，等号左边是标量，则是标量上下文，等号左边是列表，则是列表上下文。
+
+
+% 强制指定标量上下文, 使用scalar函数
+    my @a = (1..10);
+    print @a;          #打印1-10
+    print scalar @a;   #打印10，scalar强制到标量上下文，取元素个数。
+% 只有强制指定标量上下文，没有强制指定列表上下文！
+
+
+
+###########################################################
+###  ($标量) & (@列表)
+###########################################################
+% 列表指的是标量的有序集合，数组则是存储列表的变量
+@array=[1,2,3,4,5];
+
+
+% 数组的访问
+$arry[0] = 1; $arry[1] = 2; $arry[3] = 3;
+
+
+% 数组的最后一个元素角标  $#array;
+% 数组元素个数 =        $#array+1;
+@array=[1,2,3,4,5]
+@number = (1..100);
+print "@number\n";
+
+
+% 构建列表,可以使用其它界定符，如!, #, /, {, <,
+% 加入qw,字符出现空格可以不用使用引号
+@strings = qw (fred barney betty wilma dino);
+@string1 = qw !fred barney betty wilma dino!;
+@string2 =    #fred barney betty wilma dino#;
+@string3 = qw /fred barney betty wilma dino/;
+@string4 = qw {fred barney betty wilma dino};
+@string5 = qw <fred barney betty wilma dino>;
+
+
+% 数组赋值
+($fred, $barney, $dino) = ("flintstone", "rubble", undef);
+print "$fred\n";
+prinf "$barney\n";
+print "$dino\n";
+
+
+
+###########################################################
+###  (%哈希)
+###########################################################
+#!/bin/perl -w
+%phonenumber=();
+$phonenumber{"zhang"} = 134xxxxxxxx;
+$phonenumber{"wang"}  = 135xxxxxxxx;
+$phonenumber{"li"}    = 136xxxxxxxx;
+%phonenumber=("a","1","b","2","c","3");
+%phonenumber = (
+    "a" => 1,
+    "b" => 2,
+    "c" => 3,);
+
+#!/bin/perl -w
+use Data::Dumper;
+%hash=();
+open IN, "<$ARGV[0]";
+while (<IN>) {
+    chomp;
+    @line=split /\s+/, $_;
+    $hash{$line[0]}=$liee[1]; ###键和值存入hash中
+    print "@line\n";
+}
+close IN;
+print Dumper (\%hash);
+
+
+
+###########################################################
+###  %foreach
+###########################################################
+% $_ 系统默认把标量存放在此处
+
+#!/bin/perl -w
+@number = (1..10);
+foreach $num (@number) {
+    print "$num\n";
+}
+
+
+#!/bin/perl -w
+@number = (1..10);
+foreach (@number) {
+    print "$_\n";
+}
+
+
+
+###########################################################
+###  %文件句柄
+###########################################################
+% 输入输出 
+% perl保留文件句柄
+% STDIN, STDOUT, STDERR, DATA, ARGV, ARGVOUT
+% 定义文件句柄时不能使用这6个，建议文件句柄大写
+#!/bin/perl -w
+use strict;
+open IN, "<gene.ffn";       %读入
+open OU, ">protein.faa";    %写入
+open OU, ">>protein.faa";   %将内容加入文件结尾
+
+
+
+###########################################################
+###  %命令行参数
+###########################################################
+perl red.pl blue gray
+% red.pl    $0          ;存储的是程序的名字
+% blue      $ARGV[0]    ;命令行的第一个参数
+% gray      $ARGV[1]    ;命令行的第二个参数
+
+
+
+###########################################################
+###  $!
+###########################################################
+#!/bin/perl
+use warnings; 
+
+open IN, "<$ARGV[0]", or die "cna not open the file \n$!";
+
+print "\$0 is $0\n";
+print "\$ARGV[0] is $ARGV[0]\n";
+print "\$ARGV[1] is $ARGV[1]\n";
+print "\$ARGV[2] is $ARGV[2]\n";
+
+
+
+###########################################################
+###  <IN>
+###########################################################
+#!/bin/perl -w
+open IN, "<$ARGV[0]";
+$first  = <IN>;
+$first1 = <IN>;
+$first2 = <IN>;
+print "$first\n$first1\n$first2\n";
+
+
+
+###########################################################
+###  $/
+###########################################################
+% $/默认的字段分隔符为： $/="\n";
+
+#!/bin/perl -w
+open IN, "<$ARGV[0]";
+open OU, ">$ARGV[1]";
+while (<IN>) {
+    chomp;          ###去掉换行符
+    print OU "$_";
+}
+close IN;
+close OU;
+
+
+
+###########################################################
+###  % 文件格式转换
+###########################################################
+% perl读压缩文件方法
+% open IN, "zcat <$ARGV[0] |";
+
+#!/bin/perl -w
+open IN, "<$ARGV[0]";
+open OU, ">$ARGV[1]";
+while ($id=<IN>) {
+    chomp ($id);
+    chomp ($sep=<IN>);
+    <IN>;
+    <IN>;
+    $id =~ tr /@/>/;
+    print OU "$sid\n";
+    print OU "$seq\n";
+}
+close IN;
+close OU;
+
+
+
+###########################################################
+###  %perl帮助文档
+###########################################################
++ perldoc perl            ;返回perl文档列表
++ perdoc perlsyn          ;返回perl语法详细说明
++ perdoc -f funtion_name  ;返回perl内置函数的说明
+
+perl语言中引号不一定非要写成符号，可以使用以下方法
++ q();  q{};    q%%;    q{};    单引号' 
++ qq(); qq{};   qq%%;   qq{};   双引号""
++ qx(); qx{};   qx%%;   qx{};   反引号`
+
+
+
+###########################################################
+###  %perl变量
+###########################################################
+1. 变量范围分为两类：全局、局部
+2. 全局变量标准（our）关键字、局部变量标准（my）关键字
+3. (local)关键字将全局变量临时借用为局部、（state）关键字将局部变量变得持久
+4. 在Perl中，所有的变量、子程序和其他可以被命名的实体默认都拥有包作用域(亦称“全局作用域”)
+5. 也就是说它们存在于当前包的符号表中。
+6. 如果没有关键字声明变量，Perl会默认变量为全局变量，
+7. 但如果启用了use strict指令强制规定，则Perl会强制要求必须先声明变量后才可使用变量。
+#!/usr/bin/perl
+use strict;
+use warnings;           ###开启内建警告信息
+use diagnostics;        ###查看更详细问题描述
+use feature 'say';
+use feature 'switch';
+use v5.28;              
+
+
+
+----------------
+% 1.包域全局 our
+our操作符用于显式地创建包作用域变量
+# 关键字our  
+ our $Scalar =1;                  #全局, 作用域为包  
+ sub Subroutine{  
+     our $Scalar =2;              #全局, 作用域为包  
+     $Scalar +=1;  
+     print $Scalar;                   
+ }  
+ &Subroutine;                     #输出3  
+ &Subroutine;                     #输出3   
+ print $Scalar;                   #输出3
+
+注1：our操作符是在Perl 5时代被引入的，Perl 4时代变量均为全局，且不需声明。
+    到了Perl 5时代为避免变量混乱，引入了use strict指令强制规定必须声明变量，
+    而our操作符就是定义了一个看起来像词法作用域的全局变量，从而通过strict指令限制。
+注2：如果全局变量已存在，则our的作用是声明这个全局变量（类似于C中的extern）。
+```
+
+
+% 2.临时全局 local
+local操作符需配合our操作符使用（或其他包中的全局变量），用于产生一个局部变量的效果。
+```perl
+# 关键字local  
+ our $Scalar =1;                  #全局, 作用域为包  
+ sub Subroutine{  
+     local $Scalar =2;            #临时全局变量,  作用域为子程序内部  
+     $Scalar +=1;  
+     print $Scalar;                   
+ }  
+ &Subroutine;                     #输出3  
+ &Subroutine;                     #输出3   
+ print $Scalar;                   #输出1
+
+注1：很显然local只能声明已定义的全局变量，
+    被my定义的变量是不可以被local声明的，即local本身不能创造变量。
+注2：local变量是在运行时起作用，它会将参数的值保存在一个运行栈中，
+    当执行线程离开所在作用域时，原先作用域暂存的变量会被恢复。
+```
+
+% 3.私有局部 my
++ 虽然local操作符的历史比my操作符久远，但Perl后来还是新增了my来分担local的工作，
++ 在大部分情况下应首选my，但也有一些特殊情况下必须使用local。
++ my操作符用于创建词法作用域变量，通过my创建的变量，存活于声明开始的地方，直到闭合作用域的结尾。
++ 闭合作用域指的可以是一对花括号中的区域，可以是一个文件，也可以是一个eval字符串。
+
+# 关键字my  
+ my $Scalar =1;                   #私有局部变量, 作用域为当前文件  
+ sub Subroutine{  
+     my $Scalar =2;               #私有局部变量, 作用域为花括号  
+     $Scalar +=1;  
+     print $Scalar;                   
+ }  
+ &Subroutine;                     #输出3  
+ &Subroutine;                     #输出3   
+ print $Scalar;                   #输出1
+
+注1：my是编译时在私有符号表中创建新变量，
+    这个变量在运行时无法使用名字进行独立访问，即它不存在于包符号表中（非全局）。
+注2：当闭合作用域里的my变量与外层变量重名时，当前my变量有效，当退出作用域时，外层变量值不变。
+
+
+% 4.持久局部 state
++ state操作符功能类似于C里面的static修饰符，
++ 它与my不同的是，my变量在退出闭合作用域后其值不存在了，而state变量的值会被保留。
+
+# 关键字state  
+ my $Scalar =1;                   #私有局部变量, 作用域为当前文件  
+ sub Subroutine{  
+     state $Scalar =2;            #持久局部变量, 作用域为子程序内部  
+     $Scalar +=1;  
+     print $Scalar;                   
+ }  
+ &Subroutine;                     #输出3  
+ &Subroutine;                     #输出4   
+ print $Scalar;                   #输出1
+
+注1：state仅能创建闭合作用域为子程序内部的变量。
+注2：state是从Perl 5.10开始引入的，所以使用前必须加上use 5.010或更高版本指令。
+注3：state可以声明标量、数组、哈希。但在声明数组和哈希时，不能对其初始化（至少Perl 5.14不支持）
+
+------------
+
+
+
+
+
+
+
+###########################################################
+###  perl引用 \
+###########################################################
+```
+perl的引用，类似C语言的指针；意义都是指向一个内存空间的地址。
+比如下述例子中，
+脚本输出的信息SCALAR(0x7836d0)代表标量数据的存储地址；
+ARRAY(0x93d6d0)代表数组数据的存储地址。
+
+引用一般会包含“定义引用”，“解引用”两个步骤。
+“定义引用”是为数据定义内存地址；
+“解引用”是取内存地址里的数据。
+
+引用的变量是标量类型，那么解引用就必须用标量符号$；
+引用的变量是数组类型，那么解引用就必须用数组符号@；
+引用的变量是散列类型，那么解引用就必须用散列符号%；
+….
+总之，解引用和定义引用的数据类型，要保持一致。
+```
+% 0. 标量引用
+```perl
+my $value = 10; 
+my $pointer = \$value; 
+print "Pointer Address $pointer of $value \n"; 
+print "What Pointer *($pointer) points to $$pointer\n";
+```
+
+
+% 1. 数组的引用
+```perl
+my @array = (1, 2, 3);
+my $array_ref = \@array;
+print $array_ref->[0];
+```
+
+```perl
+my @name=qw(FreeBSD FVWM);
+my $ref_name=\@name;
+say "@$ref_name";
+say "$ref_name->[1]";
+say "$$ref_name[0]";
+```
+
+
+
+% 2. 哈希的引用
+```perl
+my %hash = (1, 2, 3, 4);
+my $hash_ref = \%hash;
+print $hash_ref->{1};
+```
+
+```perl
+my %hash = (
+    FreeBSD => "0123456789",
+    Debian  => "9876543210",
+    FVWM    => "1234567890",
+    ubuntu  => "0987654321"
+);
+my $ref_hash =\%hash;
+say "%$ref_hash";
+say "$ref_hash->{FVWM}";
+say "$$ref_hash{'FreeBSD'}";
+```
+
+
+%. 除了使用 \ 符号， 声明一个引用外，还可以声明一个匿名引用， 
++  数组的引用使用 [  ] 操作符， 哈希的引用使用 {  } 操作符；
+```perl
+my $array_ref = [1, 2, 3, 4];
+my $hash1_ref = {1, 2, 3, 4};
+print $array_ref->[0];
+print $hash1_ref->{1};
+```
+
+
+-----------------------------------------------------------
+# scalar$
+```perl
+#!/usr/bin/perl
+use strict;
+use warnings;           ###开启内建警告信息
+use diagnostics;        ###查看更详细问题描述
+use feature 'say';
+use feature 'switch';
+use v5.28;
+```
+
+
+```perl
+print "Hello World\n";
+my $name = 'FreeLinux';
+my ($age, $fvwm) = (18, 'FreeBSD');
+my $my_info = "\[$name\] lives on \"$fvwm\"\n";
+#my $my_info = qq{"$name lives on \"$fvwm\"\n"};
+print $my_info;
+
+my $info = <<"EOF";
+123000000000000
+456000000000000
+789000000000000
+EOF
+say $info;
+
+my $first = 1;
+my $second = 2;
+($first, $second) = ($second, $first);
+say "$first $second";
+
+
+
+my $age1 = 79;
+my $is_not_intoxicated = 1;
+my $age_last_exam = 16;
+if (($age1 >= 1) && ($age1 < 16)) {
+    say "You can't drive";
+} elsif (!$is_not_intoxicated) {
+    say "You can't drive";
+} elsif ($age1 >= 80) {
+    say "You can't drive";
+} else {
+    say "You can drive";
+}
+```
+
+
+# array@
+```perl
+my @abc = ('a' .. 'z');
+print join(", ", @abc), "\n";
+
+my @info = ("Free", "FVWM", 123);
+for my $some (@info) {
+    say $some;
+}
+
+
+my @sp_abc = (1 .. 5);
+say "Remove Index 0-2: ", join(", ", (splice @sp_abc, 0, 3));
+
+
+my $customers = "Sue Sally Paul";
+my @cust_array = split / /, $customers;
+print join(", ", @cust_array), "\n";
+@cust_array = reverse @cust_array;
+say join(", ", @cust_array);
+
+
+my @number_array = (1 .. 8);
+my @odds_array = grep {$_ % 2} @number_array;
+say join(", ", @odds_array);
+my @dbl_array = map {$_ * 2} @number_array;
+say join(", ", @dbl_array);
+```
+
+
+# hash%
+```perl
+my %employees = (
+    "FreeBSD" => 1,
+    "FVWM"    => 2,
+    "Debian"  => 3
+);
+printf("FreeBSD is %d \n", $employees{FreeBSD});
+say "FreeBSD is ", $employees{FreeBSD};
+
+
+while (my ($k, $v)=each %employees) {
+    print "$k => $v\n";
+}
+
+
+for my $key (keys %employees) {
+    if ($employees{$key} == 2) {
+        say "Hi FVWM";
+    }
+}
+```
+
+
+# sub function
+```perl
+sub get_random {
+    return int(rand 11);
+}
+say "Random Number ", get_random();
+
+
+sub get_random_max {
+    my ($max_num) = @_;
+    $max_num ||= 11;
+    return int(rand $max_num);
+}
+say "Random Number ", get_random_max(100);
+
+
+sub get_sum {
+    my ($num_1, $num_2) = @_;
+    $num_1 ||= 1;
+    $num_2 ||= 1;
+    return $num_1 + $num_2;
+}
+sub sum_many {
+    my $sum = 0;
+    foreach my $val (@_) {
+        $sum += $val;
+    }
+    return $sum;
+}
+say "Sum: ", sum_many(1 .. 5);
+
+
+sub increment {
+    state $execute_total = 0;
+    $execute_total++;
+    say "Executed $execute_total times";
+}
+increment();
+increment();
+
+
+sub double_array {
+    my @num_array = @_;
+    $_ *= 2 for @num_array;
+    return @num_array;
+}
+my @rand_array = (1 .. 5);
+print join(", ", double_array(@rand_array)), "\n";
+
+
+
+
+sub get_mults {
+    my ($rand_num) = @_;
+    $rand_num ||= 1;
+    return $rand_num * 2, $rand_num * 3;
+}
+my ($dbl_num, $trip_num) = get_mults(3);
+say "$dbl_num $trip_num";
+
+
+
+sub factorial {
+    my ($num) = @_;
+    return 0 if $num <= 0;
+    return 1 if $num == 1;
+    return $num * factorial($num - 1);
+}
+say "Factorial 4 = ", factorial(1);
+#1st: num = 4 * factorial(3) = 4 * 6 = 24
+#2st: num = 3 * factorial(2) = 3 * 2 = 6
+#3st: num = 2 * factorial(1) = 2 * 1 = 2
+```
+
+
+
+###########################################################
+###  FILE <>
+###########################################################
+
+```perl
+my $emp_file = 'employees.txt';
+open my $fh, '<', $emp_file
+    or die "Can't Open File: $_";
+
+ehile (my $info = <$fh>) {
+    chomp($info);
+    my ($emp_name, $job, $id) = split /:/, $info;
+    print "$emp_name is a $job and has the id $id \n";
+}
+close $fh or die "Couldn't Close File : $_";
+
+open $fh, '>>', $emp_file
+    or die "Can't Open File : $_";
+print $fh "Mark:Salesman:124\n";
+close $fh or die "Couldn't Close File : $_";
+
+
+open $fh, '+<', $emp_file
+    or die "Can't Open File : $_";
+seek $fh, 0, 0;
+print $fh "Phil:Salesman:125\n";
+```
+
+

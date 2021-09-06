@@ -1,0 +1,156 @@
+### % 堆栈
++ 堆栈(Stack):具有一定操作约束的线性表
++ 只在一端(栈顶,Top)做 插入、删除
++ 插入数据:入栈(Push)
++ 删除数据:出栈(Pop)
++ 后入先出:Last In First Out(LIFO)
+
+
+### % 堆栈的抽象数据类型描述
++ 类型名称: 堆栈(Stack)
++ 数据对象集:一个有0个或多个元素的有穷线性表。
++ 操作集:长度为MaxSize的堆栈S  ∈ Stack,堆栈元素item ∈ ElementType
+1. Stack CreateStack( int MaxSize )         :生成空堆栈,其最大长度为MaxSize;
+2. int IsFull( Stack S, int MaxSize )       :判断堆栈S是否已满;
+3. void Push( Stack S, ElementType item )   :将元素item压入堆栈;
+4. int IsEmpty ( Stack S )                  :判断堆栈S是否为空;
+5. ElementType Pop( Stack S )               :删除并返回栈顶元素;
+
+
+### % 栈的顺序存储实现
+```c
+栈的顺序存储结构通常由一个一维数组和一个记录
+栈顶元素位置的变量组成。
+#define MaxSize <储存数据元素的最大个数>
+typedef struct SNode *Stack;
+struct SNode {
+    ElementType Data[MaxSize];
+    int top;
+};
+
+void Push(Stack PtrS, ElementType item)
+{
+    if (PtrS->Top == MaxSize-1) {
+        printf(“堆栈满”);
+        return;
+    } else {
+        PtrS->Data[++(PtrS->Top)] = item;
+        return;
+    }
+}
+
+
+
+ElementType Pop(Stack Ptrs)
+{
+    if (Ptrs->Top == -1) {
+        printf(“堆栈空”);
+        return ERROR; /* ERROR是ElementType的特殊值,标志错误 */
+    } else {
+        return(PtrS->Data[(PtrS->Top)--]);
+    }
+}
+```
+
+
+### [例] 请用一个数组实现两个堆栈,要求最大地利用数组空间,
++ 使数组只要有空间入栈操作就可以成功。
++ 【分析】 
++ 一种比较聪明的方法是使这两个栈分别从数组的两头开始向中间生长;
++ 当两个栈的栈顶指针相遇时,表示两个栈都满了。
+```c
+#define MaxSize <存储数据元素的最大个数>
+struct DStack {
+    ElementType Data[MaxSize];
+    int Top1; /* 堆栈1的栈顶指针 */
+    int Top2; /* 堆栈2的栈顶指针 */
+} S;
+S.Top1 = -1;
+S.Top2 = MaxSize;
+
+void Push(struct DStack *PtrS, ElementType item, int Tag)
+{ /* Tag作为区分两个堆栈的标志,取值为1和2 */
+    if (PtrS->Top2 - PtrS->Top1 == 1) {
+        printf("堆栈满");
+        return;
+    }
+    if (Tag == 1)
+        PtrS->Data[++(PtrS->Top1)] = item; /* 对第1个堆栈操作 */
+    else
+        PtrS->Data[--(PtrS->Top2)] = item; /* 对第2个堆栈操作 */
+}
+
+ElementType Pop(struct DStack *PtrS, int Tag)
+{
+    if (Tag == 1) {
+        if (PtrS->Top1  == -1) {
+            printf("堆栈1空“);
+            return NULL;
+        }
+    } else {
+        if (PtrS->Top2 == MaxSize) {
+            printf("堆栈2空");
+            return NULL;
+        } else {
+            return PtrS->Data[(PtrS->Top2)++];
+        }
+    }
+}
+```
+
+
+### 堆栈的链式存储实现
++ 栈的链式存储结构实际上就是一个单链表,叫做链栈。
++ 插入和删除操作只能在链栈的栈顶进行。 
++ 栈顶指针Top应该在链表的哪一头?
++ 应该在链表的头部
+typedef struct SNode *Stack;
+struct SNode {
+    ElementType Data;
+    struct SNode *Next;
+};
+1. 堆栈初始化（建立空栈）
+
+Stack CreateStack()
+{
+    Stack S;
+    S = (Stack)malloc(sizeof(struct SNode));
+    S->Next = NULL;
+    return S;
+}
+
+2. 判断堆栈S是否为空
+int IsEmpty(Stack S)
+{   /* 判断堆栈S是否为空,若为空函数返回整数1,否则返回0 */
+    return (S->Next == NULL);
+}
+
+void Push(ElementType item, Stack S)
+{   /* 将元素item压入堆栈S */
+    struct SNode *TmpCell;
+    TmpCell = (struct SNode*)malloc(sizeof(struct SNode));
+    TmpCell->Element = item;
+    TmpCell->Next = S->Next;
+    S->Next = TmpCell;
+}
+
+ElentType Pop(Stack S)
+{
+    struct SNode *FirstCell;
+    ElementType TopElem;
+    if (IsEmpty(S)) {
+        printf("堆栈空");
+        return;
+    } else {
+        FirstCell = S->Next;
+        S->Next = FirstCell->Next;
+        TopElem = FirstCell->Element;
+        free(FirstCell);
+        reurn TopElem;
+    }
+}
+
+
+
+
+

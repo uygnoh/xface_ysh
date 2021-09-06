@@ -1,0 +1,101 @@
+###########################################################
+###  几个了解系统状态的命令
+###########################################################
+uptime      :了解系统启动时间和忙碌程度
+top         :列出资源占用排名靠前的进程
+free        :了解内存使用情况
+vmstat      :了解系统负载情况
+who         :确定谁在系统中
+last
+
+
+
+###########################################################
+###  fork
+###########################################################
+___________________________________________________________
+程序文件:   /usr/bin/passwd
+disk:       28k
+disk IO:    不分配
+memory:     不分配
+cpu:        不分配
+network:    不分配
+
+
+___________________________________________________________
+进程(程序正在运行的过程，一旦运行就会产生一系列标识)
+内核(kernel)负责调度进程 
+alice执行：	/usr/bin/passwd, 会产生以下服务
+进程标识:   PID PPID
+进程状态:   runing, 就绪(ready)态, 等待(wait)态：又称为阻塞(blocked)态或睡眠(sleep)态
+生命周期:	父进程通过fork()函数产生子进程(), exec, exit
+用户:       进程执行的对象
+disk:       28k
+disk IO:    需要分配
+memory:     需要分配
+cpu:        需要分配
+network:    需要分配
+
+父进程复制自己的地址空间(fork())创建一个新的子进程，
+每个新进程分配1个唯一的进程ID(PID)，（PID是随机的）满足跟踪安全性之需。
+PID和父进程ID(PPID)是子进程环境元素，
+任何进程都可以创建子进程，所有进程都是第一个系统进程的后代。
+子进程会继cheng父进程的安全身份，过去和当前文件描述符，端口和资源特权，环境变量，以及程序代码。
+随后，子进程可能exec自己的程序代码。
+通常，父进程在子进程运行期间处于睡眠(sleepint)状态。
+当子进程完成时发送(exit)信号请求，在退出时，子进程已经关闭或丢弃了其资源环境，
+剩余的部分称之为僵尸 (Zombie).
+父进程在子进程退出时收到信号而被唤醒，清理剩余的结构，然后继续执行其自己的程序代码。
+
+init        1       Centos5
+systemd     1       Centos6
+
+
+
+
+
+###########################################################
+###  who:确定有谁在系统中
+###########################################################
+命令who: 列出当前已登录入系统的用户
+    wujian tty00  Jul 5 14:49
+    sun    tty01  Jul 5 11:31
+    liang  ttyp02 Jul 5 15:50
+    第一列:用户名;第二列:终端设备的设备文件名
+    设备在文件系统中有一个文件名(同普通磁盘文件不同的是文件类型属于
+    特殊文件),设备文件一般放于目录/dev下
+
+命令tty       可以打印出当前终端的设备文件名
+命令whoami    仅列出当前终端上的登录用户
+
+
+ Unix command-line interface programs and shell builtins
+===========================================================
+
+         File system            cat chmod chgrp cksum cmp cp dd du df file 
+                                fuser ln ls mkdir mv pax pwd rm rmdir split 
+                                tee touch type umask
+                                
+           Processes            at bg crontab fg kill nice ps time          
+           
+    User environment            env exit logname mesg takl tput uname who 
+                                write                           
+                                                               
+     Text processing            awk basename comm csplit cut diff dirname 
+                                ed ex fold head iconv join m4 more nl paste
+                                printf sed sort strings tail tr uniq vi wc
+                                xargs
+      Shell builtins            alial cd echo test unset wait
+      
+           Searching            find grep 
+           
+       Documentation            man 
+       
+Software development            ar ctags lex make nm strip yacc
+
+       Miscellaneous            bc cal expr lp od sleep true false
+
+
+
+
+

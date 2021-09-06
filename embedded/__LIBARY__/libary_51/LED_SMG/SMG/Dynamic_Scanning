@@ -1,0 +1,58 @@
+#include <reg51.h>
+sbit WEI0 = P1^0;
+sbit WEI1 = P1^1;
+sbit WEI2 = P1^2;
+sbit WEI3 = P1^3;
+/* 注意！ 用 code 是把后面的数据存储到程序存储区*/
+/* 共阳极数码管编码表 */
+uint8_t code table[] = { 
+    0xc0,0xf9,0xa4,0xb0,
+    0x99,0x92,0x82,0xf8,
+    0x80,0x90,0x88,0x83,
+    0xc6,0xa1,0x86,0x8e
+};
+
+
+int main(void)
+{
+	smg_display(8421);
+}
+
+
+/* 4位共阳极数码管动态显示 */
+void smg_display(uint16_t dat)
+{
+	uchar qian, bai, shi, ge;
+	qian = dat/1000;       /* % 求模，取整去余 */
+	bai  = dat%1000/100    /* % 求余，去整留余 */
+	shi  = dat%100/10;     /* % 十位 */
+	ge   = dat%10;         /* % 个位 */
+/* 第 0 个数码管打开，其它数码管关闭 */
+	WEI0 = 0;
+	P0 = table[qian];
+	delay_ms(2);
+	WEI0 = 1;
+/* 第 1 个数码管打开，其它数码管关闭 */
+	WEI1 = 0;
+	P0 = table[bai];
+	delay_ms(2);
+	WEI1 = 1;
+/* 第 2 个数码管打开，其它数码管关闭 */
+	WEI2 = 0;
+	P0 = table[shi];
+	delay_ms(2);
+	WEI2 = 1;
+/* 第 3 个数码管打开，其它数码管关闭 */
+	WEI3 = 0;
+	P0 = table[ge];
+	delay_ms(2);
+	WEI3 = 1;
+}
+
+
+
+
+
+
+
+

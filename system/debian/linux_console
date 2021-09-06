@@ -1,0 +1,74 @@
+###########################################################
+### % Linux 控制台
+###########################################################
+当我提到 Linux 控制台，我指的是 TTY1-6，
+即你从图形环境用 Ctrl-Alt-F1 到 F6 切换到的虚拟终端。
+按下 Ctrl+Alt+F7 会切回图形环境。(不过这些热键已经不再通用，
+你的 Linux 发行版可能有不同的键映射。你的 TTY 的数量也可能不同，
+你图形环境会话也可能不在 F7。比如，Fedora 的默认图形会话是 F2，它只有
+一个额外的终端在 F1。) 我觉得能同时拥有 X 会话和终端会话实在是太酷了。
+
+Linux 控制台是内核的一部分，而且并不运行在 X 会话中。
+它和你在没有图形环境的无头服务器中用的控制台是一样的。
+我称呼在图形会话中的 X 终端为终端，而将控制台和 X 终端统称为终端模拟器。
+
+但这还没完。Linux 终端从早期的 ANSI 时代开始已经经历了长久的发展，
+多亏了 Linux framebuffer，它现在支持 Unicode 并且对图形也有了
+有限的一些支持。而且出现了很多在控制台下运行的多媒体应用，
+这些我们在以后的文章中会提到。
+
+
+
+###########################################################
+### % dpkg-reconfigure console-setup 字符终端配置
+###########################################################
+% 如果你正在使用 Debian、Ubuntu 和其他基于 DEBIAN 的系统
+% 你可以使用 “console-setup” 命令来设置字体该控制台设置的配置文件位于
+“/etc/default/console-setup”
+
+1 % 现在，运行以下命令来设置 Linux 控制台的字体
+sudo dpkg-reconfigure console-setup
+
+2 % 接下来，在列表中选择受支持的字符集。默认情况下，它是最后一个选项，
+即在我的系统中 Guess optimal character set（猜测最佳字符集）。
+只需保留默认值，然后按回车键。
+
+3 % 接下来选择控制台的字体，然后按回车键。我这里选择 “TerminusBold”。
+
+
+
+###########################################################
+### % /etc/default/console-setup 
+###########################################################
+% 你也可以直接编辑 /etc/default/console-setup，并根据需要设置字体类型和大小。
+% 根据以下示例，我的 Linux 控制台字体类型为 “Terminus Bold”，字体大小为 32。
+ACTIVE_CONSOLES="/dev/tty[1-6]"
+CHARMAP="UTF-8"
+CODESET="guess"
+FONTFACE="TerminusBold"
+FONTSIZE="16x32"
+
+VIDEOMODE=
+
+    
+    
+% Linux-Debian字符终端默认设置    
+# CONFIGURATION FILE FOR SETUPCON
+
+# Consult the console-setup(5) manual page.
+
+ACTIVE_CONSOLES="/dev/tty[1-6]"
+
+CHARMAP="UTF-8"
+
+CODESET="Lat15"
+FONTFACE="Fixed"
+FONTSIZE="8x16"
+
+VIDEOMODE=
+
+# The following is an example how to use a braille font
+# FONT='lat9w-08.psf.gz brl-8x8.psf'    
+    
+
+

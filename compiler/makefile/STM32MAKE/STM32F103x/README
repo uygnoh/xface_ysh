@@ -1,0 +1,183 @@
+### Linux OS 嵌入式开发环境， 系统环境变量配置 ====================================
+% sudo gedit ~/.bashrc
+===============================================================================
+
+% GNU Arm Embedded Toolchain ->CORTEX-M 编译环境
+export GCC_HOME=/opt/gcc-arm-none-eabi-7-2018-q2-update-linux\
+                /gcc-arm-none-eabi-7-2018-q2-update/
+export PATH=$PATH:$GCC_HOME/bin
+
+
+% JAVA-JDK java虚拟机
+export JAVA_HOME=/opt/jdk-8u181-linux-x64/jdk1.8.0_181/
+export PATH=$PATH:$JAVA_HOME/bin
+
+% eclipse IDE开发环境
+export PATH=$PATH:/opt/eclipse-cpp-2018-09-linux-gtk-x86_64/eclipse/
+
+
+
+
+
+### ===========================================================OpenOCD | ST_Link
+
+% sudo apt-get install openocd
+
+git clone https://github.com/texane/stlink.git
+apt-get install cmake libusb-1.0
+cd stlink/
+make
+cp st-flash /usr/bin
+cp ~/stlink/etc/udev/rules.d/49-stlinkv2-1.rules /etc/udev/rules.d
+	
+___________________________________________________________             
+% 添加规则，其中OWNER 修改为你的用户名
+	
+sudo cp 49-stlinkv2.rules  /etc/udev/rules.d/
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="3748",  \
+MODE:="0666", SYMLINK+="stlinkv2_%n" ,OWNER="ysh"
+
+	◆ 让系统识别新的规则
+	===================
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+
+
+
+### ================================================================== GDB_Debug
+
+___________________________________________________________
+% GDB Debugger
+
+1.openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
+
+2.arm-none-eabi-gdb blink.elf
+	(gdb)	target remote localhost:3333
+	(gdb)	monitor reset
+	(gdb)	monitor halt
+	(gdb)	load
+
+
+___________________________________________________________
+% 串口调试软件安装
+sudo apt-get install minicom 
+sudo minicom -s
+Serial Device: /dev/ttyUSB0
+
+
+___________________________________________________________
+%arm-none-eabi-gdb的调试指令
+
+l               list指令的缩写，意为列出当前执行的源代码。
+                同时输入指令后重复按回车等效于再次输入上次的指令 
+c               continue的缩写，在嵌入式GDB中我们不能使用RUN指令来运行代码，
+                相应的我们需要continue指令来运行。
+s               step缩写，会进入子函数的单步运行
+n               next缩写，即会跳过子函数的单步运行
+u               until缩写使用时后方加行号如： u 16 即运行到第16行
+p               print缩写，使用时后面加变量名称如：p tmp ，用来显示变量数值
+display         使用时后面加变量名称如：display tmp ，用于跟踪变量数值，
+                在每次执行停下时会自动显示变量数值。
+finish          完成并跳出当前的子函数
+———————————————————————————————————————————————————————————————————————————————
+b               break缩写，用于在程序中打断点，使用方式有很多种
+b 16            在当前低16行代码出加断点。
+b i=1           当i等于1时停止,类似于这种条件式断点的方式也是GDB独有的一种强大功能
+b main          在main函数的入口打断点。
+i b             info break 缩写，显示当前设置的断点信息。
+	            如下面这个查到了在main函数处有两个断点，序号分别为1 和 2.
+d break         delet break 缩写，删除所有断点
+d break 1       删除序号为1的断点
+bt              查看堆栈
+q/Ctrl+d        使用q即quit指令或快捷键Ctrl+d来正常退出GDB
+
+———————————————————————————————————————————————————————————————————————————————
+在GDB的指令窗口我们输入
+(gdb)-		对就是一个 减号，然后回车我们来见证奇迹的时刻
+
+
+### =====================================================================
+
+
+
+
+___________________________________________________________
+% 打开tui模式(Text User Interface)
+
+  使用"gdbtui -q" 或 "gdb -tui -q"开始一个调试
+$ gdbtui -q test_struct
+(gdb) ....
+
+___________________________________________________________
+$ gcc -gdb3 simple_gdb.c -o simple_gdb
+$ gdb simple_gdb 
+(gdb) start
+"ctrl+x ctrl+a" or "ctrl+x A"
+
+___________________________________________________________
+% TUI模式下有4个窗口
+
+command                         命令窗口. 可以键入调试命令
+source                          源代码窗口. 显示当前行,断点等信息
+assembly                        汇编代码窗口
+register                        寄存器窗口
+除command 窗口外,其他三个窗口不可同时显示.其可用 layout 命令来进行选择
+自己需要的窗口. 可参见 `help layout`   
+  
+  
+
+
+__________________________________________________________ 
+% GDB指令
+
+list			    #查看程序源代码
+break function		#在某函数的入口设定断点
+break 行号		    #在指定行添加断点
+break 行号 if 条件 	#当条件为真时，指定行号处断点生效
+info break		    #查看断点
+delete			    #删除断点
+run			        #开始运行程序
+next			    #单步运行程序，不进入子函数
+step			    #单步运行程序，进入子函数
+continue		    #继续运行程序
+print 变量名		    #查看指定变量的值
+finish			    #运行程序，直到当前函数结束
+display             #
+quit			    #Exit GDB
+
+### =============================================================== stm32烧写固件
+
+sudo st-flash write main.bin 0x8000000
+
+
+
+
+### ==================================此配置参数针对 STM32F10X标准固件函数库  V3.5.0
+
+%__________________________________________________________
+STM32F10X_HD
+USE_STDPERIPH_DRIVER
+### stm32f10x_conf.h >>此文件的定义位于 >>stm32f10x.h 文件中
+### 此文件定义所有库函数的头文件定义部分
+
+
+%__________________________________________________________
+2 启动文件后缀名改为大写 >>[.S]
+
+
+%__________________________________________________________
+3 修改 core_cm3.c文件，
+### % 针对STM32F10x_StdPeriph_Lib_V3.5.0库函数
+打开工程文件STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport
+下的core_cm3.c，
+在此文件的最后几行的位置，找到
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );	  
+### 两行，并更改如下 ___________________________________________________________________
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+修改完成后，保存！注意，请再选中工程项目，刷新F5，再一次编译
+### ======================================================================	
+
+

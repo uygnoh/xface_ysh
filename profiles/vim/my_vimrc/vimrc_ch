@@ -1,0 +1,156 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 安装vim-plug插件管理器                  
+" Download plug.vim and put it in ~/.vim/autoload
+" curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" plug-in 插件配置
+call plug#begin('~/.vim/plugged')                   
+Plug 'scrooloose/nerdtree'
+call plug#end()
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => NERDTreeFind 插件配置
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap ,v :NERDTreeFind<cr>                " ,v 设置为开关NERDTree的快捷键
+nnoremap ,g :NERDTreeToggle<cr>              " ,g 设置为开关NERDTree的快捷键
+autocmd vimenter * NERDTree                  " 打开vim时自动打开NERDTree
+autocmd vimenter * if !argc()|NERDTree|endif " 打开vim时如果没有文件自动打开NERDTree
+let g:NERDTreeHidden=0                       " 不显示隐藏文件
+let g:NERDTreeDirArrowExpandable = '+'       " 修改树的显示图标
+let g:NERDTreeDirArrowCollapsible = '-'      " 修改树的显示图标
+"let g:NERDTreeSize=20                       " 窗口尺寸
+let g:NERDTreeShowLineNumbers=1              " 窗口是否显示行号
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => molokai 配色主题
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+colorscheme  molokai 
+set t_Co=256            " 启用256色 
+set background=dark     " 设置背景色
+let g:molokai_original=1
+let g:rehash256=1
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 常规设置 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set cursorline          " 高亮显示当前行
+syntax enable           " 语法高亮 
+syntax on               " 语法高亮
+set novisualbell        " turn off visual bell
+set visualbell t_vb=    " turn off error beep/flash
+set nocompatible        " 不与vi兼容(采用vim自己的操作命令)    
+set showcmd             " 输入的命令显示出来，看的清楚些
+set magic               " 设置魔术 
+set number              " 显示行号           
+set nowrap              " 不自动换行
+set history=1000        " 历史记录数  
+set ruler               " 在屏幕下方显示标尺
+set showmode            " 在左下角显示当前的模式名称，没有显示则代表现在是常规模式
+set scrolloff=3         " 光标移动到buffer的顶部和底部时保持3行距离  
+set wildmenu            " 命令行补全参数
+set lazyredraw          " 只在需要时重绘窗口   
+set ttyfast             " 使屏幕显示更流畅
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => tab & 缩进 & 正常处理indent, eol, start等 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"set expandtab           " 用空格代替制表符 
+set noexpandtab         " 不要用空格代替制表符
+set tabstop=4           " Tab键的宽度    
+set softtabstop=4       " 统一缩进为4  
+set shiftwidth=4        " 反向制表符中的空格数目 
+set autoindent          " 设置自动缩进
+set smartindent         " 比autoindent稍智能的自动缩进
+set cindent             " cindent对c语法的缩进更加智能灵活   
+set smarttab            " 解决 shiftwidth 和 tabstop 不等时的麻烦
+set backspace=2         
+" 使回格键（backspace）正常处理indent, eol, start等                       
+" set backspace=indent,eol,start 
+" 代表的意思是“缩进位置”，“行结束符”，“段首
+" 这样设置可以使得 backspace 键在这三个特殊的位置也能进行回删动作
+
+" set list listchars=eol:¬,tab:▸\ ,trail:.,
+" list 开启对于制表符（tab）、行尾空格符（trail）、行结束符（eol）等等特殊符号的回显，
+" 有助于你观察这些特殊符号的状态，精确地控制文本的编辑。
+
+" set fillchars=vert:\ ,stl:\ ,stlnc:\   
+" 在被分割的窗口间显示空白，便于阅读
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 文件类型侦测 & 查找 & 文件备份 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+filetype on             " 侦测文件类型     
+filetype indent on      " 文件类型，开启缩进规则
+filetype plugin on      " 顾名思义，这是开启对应插件的
+filetype plugin indent on
+" set ignorecase        " 搜索忽略大小写    
+set hlsearch            " 搜索逐字符高亮  
+set incsearch           " 输入搜索内容时就显示搜索结果    
+set showmatch           " 高亮显示匹配的括号     
+set matchtime=5         " 匹配括号高亮的时间（单位是十分之一秒）
+set smartcase           " 此选项的开启会让搜索模式更加聪明
+set nobackup            " 用来控制我们是否为当前正在编辑的文件建立备份
+set confirm             " 在处理未保存或只读文件的时候，弹出确认
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 编码设置 & 语言设置 & 鼠标设置
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set encoding=utf-8
+set fileencodings=ucs-bom,utf-8,cp936
+set fileencoding=gb2312
+set termencoding=utf-8
+set langmenu=zh_CN.UTF-8  
+set helplang=cn
+set mouse=a  
+set selection=exclusive  
+set selectmode=mouse,key  
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 窗格切换  & 命令行模式增强
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+cnoremap <C-a> <Home>
+cnoremap <C-e> <End>
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Mapping
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+inoremap jk <esc> " 映射插入模式下的 jk 键为 ESC 键
+inoremap vv <esc> " 映射插入模式下的 vv 键为 ESC 键
+
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 自动命令分组
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup configgroup
+	autocmd!
+	autocmd BufEnter *.c inoremap ( ()<Esc>i
+	autocmd BufEnter *.c inoremap [ []<Esc>i
+	autocmd BufEnter *.c inoremap { {}<Esc>i<CR><Esc>O
+	autocmd BufEnter *.c inoremap " ""<Esc>i
+	autocmd BufEnter Makefile setlocal noexpandtab
+augroup END
+
+autocmd BufNewFile * normal G

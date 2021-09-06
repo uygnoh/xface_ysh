@@ -1,0 +1,53 @@
+###########################################################
+###  redshift
+###########################################################
+### debian下保护眼睛的RedShift %http://jonls.dk/redshift/
+sudo apt-get install redshift
+
+
+
+###########################################################
+###  redshift.conf
+###########################################################
+% 在当前用户家目录的.config目录，建立一个redshift.conf的文件。
+% 然后，在新建的redshift.conf文件中输入类似下面的内容，这里已经详细添加了说明。
+[redshift]
+; 白天屏幕温度
+temp-day=5800
+
+; 夜晚屏幕温度
+temp-night=4600
+
+; 昼夜是否平滑过度(1/0)
+transition=1
+
+; 全局屏幕亮度
+;brightness=0.9
+
+; 昼夜屏幕亮度(version >= 1.8)
+brightness-day=0.9
+brightness-night=0.7
+
+; 屏幕gamma
+gamma=0.9
+
+; 位置提供方式(redshift -l list)
+location-provider=manual
+
+; 调整工具(redshift -m list)
+adjustment-method=randr
+
+
+[manual]
+; 位置提供方式设置
+; 经纬度(北京)
+lat=39.90
+lon=116.41
+
+; 屏幕调整工具设置
+; 第1 块屏幕(0)
+
+
+
+[randr]
+screen=0

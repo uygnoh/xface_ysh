@@ -1,0 +1,29 @@
+/********** dot -Tsvg text.gv -o text.svg **********/
+
+/*
+digraph G {
+        //从左向右方向
+        rankdir=LR
+        
+        //节点的形状, 节点边框的颜色, 节点字体为:Monaco
+        node [shape=box, color=blue, fontname=Monaco]
+        
+        //设置节点1的背景色为蓝色
+        node1 [style=filled]
+        
+        //设置节点2的背景色为红色
+        node2 [style=filled, fillcolor=red]
+        
+        node0 -> node1 -> node2
+}
+*/
+
+
+digraph structs {
+        //rankdir=LR;
+        node [shape=record, color=blue, fontname=Monaco];
+        struct1 [label="<f0> prev | <f1> | <f2> next"];
+        struct2 [label="<f0> prev | <f1> | <f2> next"];
+        struct1:f2 -> struct2:f1;
+        struct2:f0 -> struct1:f1;
+}

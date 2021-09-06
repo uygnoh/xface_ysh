@@ -1,0 +1,144 @@
+############################################################
+### // 函数指针 //
+############################################################
+// % 函数实际上就是一个代码块，这个代码块执行到最后会返回
+______________________________________________________
+// 函数指针, (只能指向-> 无参数,无返回值的函数 )
+void (*p)(void);
+
+// 函数指针, (只能指向-> 2个整形参数,无返回值的函数 )
+void (*p1)(int, int);
+
+// 函数指针, (只能指向-> 1个整形参数,1个char类型返回值的函数 )
+char (*p2)(int);
+
+// 函数指针, (只能指向-> void *fun(int *)这样的函数 )
+void * (*p3)(int *);
+______________________________________________________
+
+
+void fun1(void)
+{
+    printf("我是fun1\n");
+}
+void fun2(void)
+{
+    printf("我是fun2\n");
+}
+
+int main(void)
+{
+    // 函数指针赋值，必须格式相同
+    void (*p)(void);
+    // 让p这个指针指向fun1的整个函数
+    p = fun1;
+    
+    // % 函数指针运行(原始的运行方法), 实际就是它指向的函数对象的运行
+    // % 表示通过“*”(*在C语言中为解引用)拿到所指向的对象，然后让它运行
+    (*p)();
+    // % 函数指针运行(简写的运行方法), 实际就是它指向的函数对象的运行
+    p();
+    
+    // % 修改p的指向，继续运行
+    p = fun2;
+    // % 运行p指向的对象
+    p();
+}
+
+
+
+###########################################################
+### // 使用 typedef 定义函数指针 //
+###########################################################
+
+
+int (*padd)(int, int);        //传统形式，定义一个函数指针变量
+typedef int (fun_type)(int, int);      //定义一个函数类型
+typedef int (*fun_ptr_type)(int, int); //定义一个函数指针类型
+
+
+/*
+ * 我们为什么一定要使用 typedef 定义函数指针呢？
+ * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
+ * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。
+ */
+#include <stdio.h>
+void FunA() 
+{
+    printf("call FunA\n");
+}
+void FunB(int n) 
+{
+    printf("call FunB. n is : %d\n", n);
+}
+typedef void (*PtrFunA)();
+typedef void (*PtrFunB)(int);
+/* 函数指针作为函数参数使用 */
+void usePtrFunA(PtrFunA p) 
+{
+    p();
+}
+void usePtrFunB(PtrFunB p, int n) 
+{
+    p(n);
+}
+ 
+
+/*
+ *             < 函数指针作为函数返回值使用 >
+ * 函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译
+ * 下面这种语法编译器已经无法识别了
+ *      (void (*PtrFunA)()) getPtrFunA2() 
+ *      { 
+ *          return FunA; 
+ *      }
+ */
+/* 函数指针作为函数返回值使用 */
+PtrFunA getPtrFunA() 
+{
+    PtrFunA p = FunA;
+    return p;
+}
+PtrFunB getPtrFunB() 
+{
+    PtrFunB p = FunB;
+    return p;
+}
+int main() {
+    /* 获取 FunA 函数的函数指针 */
+    PtrFunA a = getPtrFunA();
+    /* 使用 FunA 函数的函数指针 */
+    usePtrFunA(a);
+ 
+    /* 获取 FunB 函数的函数指针 */
+    PtrFunB b = getPtrFunB();
+    /* 使用 FunB 函数的函数指针 */
+    usePtrFunB(b, 1);
+    return 0;
+}
+
+
+
+############################################################
+### // 函数指针类型 //
+############################################################
+#include <stdio.h>
+int add(int a, int b) 
+{ 
+        return a + b; 
+}
+
+typedef int (fun_type)(int, int);       //定义一个函数类型
+typedef int (*fun_ptr_type)(int, int);  //定义一个函数指针类型
+int (*padd)(int, int);                  //传统形式，定义一个函数指针变量
+
+int main(void) 
+{
+    fun_type    *fun_add  = add;        //[函数类型]
+    fun_ptr_type ptr_add  = add;        //[函数指针类型]
+    padd                  = add;        //函数名为函数入口地址
+    printf("%d\n", fun_add(1, 2));
+    printf("%d\n", ptr_add(1, 2));
+    printf("%d\n",    padd(1, 2));
+    return 0;
+}

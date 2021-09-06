@@ -1,0 +1,258 @@
+###########################################################
+###  sed流编辑器
+###########################################################
+%%% sed 3种用法
+sed '命令' 文件列表名
+sed -e '命令1' -e '命令2' -e '命令3' 文件列表名
+sed -f 命令文件 文件列表名
+
+% 参数说明  
+-n      一般sed命令会把所有数据输出到屏幕上
+        加次选项,则只有经过sed特殊处理的那一行(或动作)才会列出
+-e      直接在指令模式上进行sed的动作编辑
+-i      直接修改文档的内容，而不是由屏幕输出
+-f      <script文件>或--file=<script文件> 以选项中指定的script文件来处理输入的文本文件
+
+% 动作说明
+a       新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～
+c       取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+d       删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+i       插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；
+p       打印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
+s       取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！
+
+
+
+###########################################################
+###  sed 字符串替换
+###########################################################
+sed '1,2s/old_string/new_string/g'
+%%% sed 字符串替换
+sed ' [range] s/<string>/<replacement>/ ' /etc/passwd
+sed ' /^ysh/ s@/bin/bash@/bin/sh@ ' /etc/passwd
+% 以 ysh为开头并以此作为边界替换其中的内容
+sed -n ' /^ysh/ s@/bin/bash@/bin/sh@p ' /etc/passwd
+% 把第2行到第5行的内容取代为“no 2-5number!”
+nl /etc/passwd | sed '2,5c no 2-5number!'
+
+
+
+###########################################################
+###  sed 追加 插入 删除 打印文件
+###########################################################
+% 用\可以追加多行
+nl /etc/passwd | sed '2a drink tea or ....\
+drink beer?'
+% 在/etc/passwd文件中的第6到第9行添加 4个空格，并打印出其内容
+sed -n ' 6,9 s/^/    /p ' /etc/passwd
+%%% sed 追加
+sed ' /^server 3/ a server ntp.example.com ' /etc/ntp.conf
+%%% sed 插入
+sed ' /^server 0/ i server ntp.example.com ' /etc/ntp.conf
+
+%%% sed删除文件
+sed ' /^server\s[0-9]\.ubuntu/ d ' /etc/ntp.conf
+sed ' /^#/ d ' ~/test           # 删除以"#"开头的行
+sed ' /^#/ d; /^$/ d ' ~/test   # 删除以"#"开头的行和空白行	
+% 删除以"#"开头的行和空白行;
+% -i.bak; 表示直接修改原文件，并且备份原文件中的内空，以".bak"作为后缀名
+sed -i.bak ' /^#/ d; /^$/ d ' ~/test
+% 例如，下面使用d 命令删除空行或只包含空格的行：
+sed '/^ *$/d' inputFileName
+
+
+%%% sed 打印文件内容
+sed ' p ' /etc/passwd               %打印/etc/passwd中的内容
+sed -n ' p ' /etc/passwd            %打印文件内容，并显示行号
+sed -n '1,3 p ' /etc/passwd         %打印文件1～3行内容，并显示行号
+sed -n '/^root/ p ' /etc/passwd     %打印以root开头的行，并显示行号
+
+
+%%% sed 命令行编辑模式
+sed 'command' fileName
+ysh@debian:~$ sed ' {
+> /^server 0/ i ntp.example.com
+> /^server\s[0-9]\.ubuntu/ d
+> } ' /etc/ntp.conf
+
+sed -i 's/abc/def/' fileName
+sed –e 'command1' –e 'command2' –e '命令3' fileName
+
+
+
+###########################################################
+###  sed脚本
+###########################################################
+% 将几个sed命令（每行一个命令）放入脚本文件（例如subst.sed）中,
+% 然后使用-f选项从文件中运行命令（例如s/x/y/g）通常很有用：
+sed -f subst.sed inputFileName > outputFileName
+
+
+% sed 使用脚本处理文本
+tail -f pppd.log | sed 's/145\.37\.23\.26/桥西/g'
+tail -f pppd.log | sed -f sed.cmd
+% sed.cmd 
+s/145\.37\.23\.26/桥西/g
+s/102\.157\.23\.109/柳荫街/g
+s/145\.37\.123\.57/大山子/g
+
+
+% vim rox.sed
+'s/^/FF/'
+'s/$/FF/'
+% 使用sed脚本处理文件， -i.bak参数会产生备份文件
+sed -f rox.sed /etc/passwd
+sudo sed -i.bak -f rox.sed /etc/passwd
+
+
+
+###########################################################	
+###  sed模式匹配	
+###########################################################
+% 模式描述中增加\(和\)
+% 在正则表达式中圆括号,仍然代表它自身,在正则表达式中出现的\(和\)不影响匹配操作
+[a-zA-Z_][a-zA-Z0-9_]*->number
+\([a-zA-Z_][a-zA-Z0-9_]*\)->number
+
+
+% 替换字符串中的 \0 \1 \2 ......
+% \0 表示我这个正则表达式能匹配上的整个字符串是什么
+% \1 表示用 \(\) 包含里面的部分真正匹配的内容 
+root->num, subs->number; adc = number;
+s/\([a-zA-Z_][a-zA-Z0-9_]*\)->number/\1->num/g
+
+
+% 将日期格式“月-日-年”改为“年.月.日”,
+% 比如:将 04-26-1997替换为1997.04.26使用命令:
+s/\([0-9][0-9]\)-\([0-9][0-9]\)-\([0-9][0-9]*\)/\3.\1.\2/g
+
+
+
+###########################################################
+###  sed字符过滤
+###########################################################
+% 在Unix下，sed通常用作管道中的过滤器, generateData | sed 's/x/y/g'
+% 也就是说，诸如“generateData”之类的程序生成数据，然后用sed把x替换成y。例如：
+$ echo xyz xyz | sed 's/x/y/g'
+yyz yyz
+
+
+
+###########################################################
+###  sed 分组
+###########################################################
+%                   替换分组
+s/              \([^,]*\)               /\U\1/
+substitution    Groupint defined with   Replace string: upper cases
+                escaped parentheses             first grouping
+
+sed 's@\([^,]*\)@\U\1@' employees
+sed 's@\([^,]*\),\([^,]*\)@\U\1\L\2@' employees
+\([^,]*\)   ;搜索字符串标识到第一个逗号的所有字符
+\U\1        ;替换字符串大写第一组
+,           ;每个分组本身都是逗号分隔的
+
+% Demo Time: Format teh employees file
+sed ' s/\([^,]*\)/\U\1/ ' empoyees
+sed ' s/\([^,]*\),\([^,]*\)/\U\1\L\2/ ' empoyees
+sed ' s/\([^,]*\),\([^,]*\)/\U\1,\L\2/ ' empoyees
+
+
+% sed ' s/\([^,]*\),\([^,]*\)/\U\1,\L\2/ ' empoyees
+% 把第1个单词转换成大写，把第2个单词转换成小写
+% cat empoyees
+Jones,Bob,232-78-3456
+Jackeson,Jane,,
+Federer,Jack,xxx-xx-xxx
+Maw,Michael,1879-0
+Alexander,Sally,345-89-8095
+Beder,Ioana,567-34-9802
+Staines,Brad,,
+
+
+% 
+sed ' s/\(^\|[^0-9.]\)\([0-9]\+\)\([0-9]\{3\}\)/\1\2,\3/g ' /catlog
+% cat catalog.sed
+s/,/:/g
+s/\(^\|[^0-9.]\)\([0-9]\+\)\([0-9]\{3\}\)/\1\2,\3/g
+%或 s@\(^\|[^0-9.]\)\([0-9]\+\)\([0-9]\{3\}\)@\1\2,\3@g
+sed -f catalog.sed /proc/loadavg
+
+
+
+###########################################################
+###   使用sed执行命令
+###########################################################
+sed ' s/^/ls -l /e listoffiles.txt
+
+sed ' /^\// s/^/tar -rf catalog.tar /e ' cat.list
+/^\//           ;需要前导正斜杠
+-rf catlog.tar  ;将匹配的lint附加到tar文件 
+cat.list        ;文件将包含要存档的目录
+
+sed ' /^\// s/^/rm -f /e ' cat .list
+rm -f           ;删除原始目录
+
+% cat file.list
+/etc/hosts
+/etc/services
+% 
+sed ' s/^/ls -l /e ' file.list
+sed ' s/^/stat /e ' file.list
+
+
+% cat user.list
+ysh1
+ysh2
+% 
+sed ' s/^/sudo useradd /e ' user.list
+tail -n 2 /etc/passwd
+sed ' s/^/sudo userdel -r /e ' user.list
+
+
+
+% cat cat.list
+/home/ysh/catlog/garden
+% 
+sed ' /^\// s/^/tar -rf catalog.tar /e ' cat.list
+
+
+
+###########################################################
+### % sed_demo
+###########################################################
+% vim sed-demo.txt
+    # cat sed-demo.txt
+    
+    1 Linux Operating System
+    2 Unix Operating System
+    3 RHEL
+    4 Red Hat
+    5 Fedora
+    6 Arch Linux
+    7 CentOS
+    8 Debian
+    9 Ubuntu
+    10openSUSE
+___________________________________________________________
+sed '1d' sed-demo.txt                   % 删除文件首行
+sed '$d' sed-demo.txt                   % 删除文件最后一行
+sed '3d' sed-demo.txt                   % 删除 sed-demo.txt 中的第 3 行
+sed '5,7d' sed-demo.txt                 % 删除 sed-demo.txt 中的第 5 到 7 行
+sed '1d;5d;9d;$d' sed-demo.txt          % 命令删除了第 1 行、第 5 行、第 9 行和最后一行
+sed '3,6!d' sed-demo.txt                % 删除 sed-demo.txt 中第 3 到 6 行范围以外的所有行
+sed '/^$/d' sed-demo.txt                % 删除 sed-demo.txt 中的空行
+sed '/System/d' sed-demo.txt            % 删除 sed-demo.txt 中匹配到 System 模式的行
+sed '/System\|Linux/d' sed-demo.txt     % 删除 sed-demo.txt 中匹配到 System 或 Linux 表达式的行
+sed '^[RF]/d' sed-demo.txt              % 删除 R 或者 F 字符开头的所有行
+sed '/m$/d' sed-demo.txt                % 删除 m 字符结尾的所有行
+sed '/[xm]$/d' sed-demo.txt             % 删除 x 或者 m 字符结尾的所有行s
+sed '/^[A-Z]/d' sed-demo.txt            % 删除所有大写字母开头的行
+sed '1,6{/Linux/d;}' sed-demo.txt       % 删除第 1 到 6 行中包含 Linux 表达式的行
+sed '/Ststem/{N;d;}' sed-demo.txt       % 删除包含 System 表达式的行以及它的下一行
+sed '/[0-9]/d' sed-demo.txt             % 删除所有包含数字的行
+sed '/^[0-9]/d' sed-demo.txt            % 删除所有以数字开头的行
+sed '/[0-9]$/d' sed-demo.txt            % 删除所有以数字结尾的行
+sed '/[A-Za-z]/d' sed-demo.txt          % 删除所有包含字母的行
+
+

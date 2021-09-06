@@ -1,0 +1,129 @@
+###########################################################
+###  智能匹配 ~~
+###########################################################
+% 使用=~绑定操作符
+my $name = "You and Fred and me";
+print "I found Fred in the name!\n" if $name =~ /Fred/;
+
+% ~~智能匹配操作符
+% 智能匹配符合交换律， 左右两侧可以互换。
+my $name = "You and Fred and me";
+print "I found Fred in the name!\n" if $name ~~ /Fred/;
+
+
+
+###########################################################
+###  查找是否有“four”
+###########################################################
+%% 使用foreach循环查找是否有“four”
+my %names = ("one"   => 1,
+             "two"   => 2,
+             "three" => 3,
+             "four"  => 4,
+             "five"  => 5,
+             "six"   => 6);
+my $flag = 0;
+foreach my $key (keys %names) {
+    next unless $key =~ /four/;
+    $flag = $key;
+    last;
+}
+print "I found a key matching 'four'. \n" if $flag;
+
+
+%% 使用智能匹配~~查找是否有“four”; 用它来代替foreach.
+my %names = ("one"   => 1,
+             "two"   => 2,
+             "three" => 3,
+             "four"  => 4,
+             "five"  => 5,
+             "six"   => 6);
+print "I found a key matching 'four'. \n" if %names ~~ /four/;
+% 智能匹配操作符~~; 此处智能匹配可以替代foreach循环
+
+
+
+
+###########################################################
+###  比较两个数组中的内容
+###########################################################
+%% 使用foreach循环比较两个数组中的内容
+%% (0..$#name1)，代表数组的索引从第0个到最后一个索引。
+%% @#name1，数组元素的最后一个索引值。
+my @name1 = qw(one weo three four five);
+my @name2 = qw(one weo three four five);
+my $equal = 0;
+foreach my $index (0..$#name1) {
+    last unless $name1[$index] eq $name2[$index];
+    $equal++;
+}
+print "The arrays have the same elements!\n" if $equal == @name1;
+
+
+
+
+%% 使用智能匹配操作符~~ 比较两个数组中的内容
+my @name1 = qw(one weo three four five);
+my @name2 = qw(one weo three four five);
+print "The arrays have the same elements!\n" if @name1 ~~ @name2;
+% 智能匹配操作符~~; 此处智能匹配可以替代for循环
+
+
+
+
+###########################################################
+###  查找数组中的数字
+###########################################################
+%% 使用foreach循环
+my @nums = qw(1 2 3 57 78);
+my $flag = 0;
+foreach my $num (@nums) {
+    next unlesss $nums == 27;
+    $flag = 1;
+    last;
+}
+print "found 27 \n" if $flag;
+
+
+
+
+%% 智能匹配操作符~~; 此处智能匹配可以替代foreach循环
+my @nums = qw(1 2 3 57 78);
+print "found 27 \n" if @nums ~~ /27/;
+
+
+
+
+
+###########################################################
+###  跨行的模式匹配
+###########################################################
++ m匹配每一行的开头， g匹配所有的
+```perl
+$_ = "thie is the firse line\nthis is the second line\nthis is the third line";
+s/^this/that/;
+print;
+
+$_ = "thie is the firse line\nthis is the second line\nthis is the third line";
+s/^this/that/mg;
+print;
+```
+
+
+
+1. 把要打开的文件名存储起来 $filenames
+2. 用文件句柄[FILE]来打开文件, or die 如果打开这个文件失败，输出错误信息
+3. 用行输入操作符[FILE], 把这个文件每一行都读出来，再用join把它连接成一个大大的字符串
+4. 用绑定操作符来进行替换， 在每一行的开头， 把文件名加上去 
+5. m跨行的模式匹配
+```perl
+$filenames = "stm32.c";
+open FILE, $filenames or die "can't open '$filenames': $!";
+my $lines = join '', <FILE>;
+$lines =~ s/^/$filename: /gm;
+print “$lines\n";
+```
+
+
+
+

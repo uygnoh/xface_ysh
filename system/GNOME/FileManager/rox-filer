@@ -1,0 +1,67 @@
+###########################################################
+### % rox-filer
+###########################################################
+% rox-filer是由Thomas Leonard开发，为X11设计的RISC OS风格的许可证
+% 为GPL的文件管理器它可以在使用X11的GNU/Linux系统上运行，只需搭配一个
+% 窗口管理器比如openbox，便构成一个高效方便的桌面。尤其适合不喜欢GNOME
+% KDE等庞大桌面环境的用户。
+
+ctrl+h      % 隐藏文件打开|关闭
+
+
+
+###########################################################
+### % ROX-Filer文件关联
+###########################################################
+0 % cd ~/.config/rox.sourceforge.net/MIME-types/
+
+
+1 % SHELL脚本, vim application_x-shellscript
+cat > ~/.config/rox.sourceforge.net/MIME-types/application_x-shellscript <<-EOF
+#!/bin/bash
+exec "$@"
+EOF
+
+2 % 文本文件, vim text
+#!/bin/bash
+gedit "$@"
+
+
+3 % 网页, vim text_html
+#!/bin/bash
+firefox "$@"
+
+
+4 % 图片, vim image
+#!/bin/bash
+gimp "$@"
+
+
+5 % 视频, vim video
+#!/bin/bash
+smplayer "$@"
+
+
+6 % 音乐, vim audio
+#!/bin/bash
+cmus "#@"
+
+
+
+7 % 然后在~/.config/rox.sourceforge.net/MIME-types/目录下执行chmod 0755 *即可
+
+
+
+
+###########################################################
+### % 快捷键在 ROX-Filer 中的妙用
+###########################################################
+记忆目录 有些目录藏得比较深，一层一层的打开会浪费很多时间。在首次打开该
+目录后，我们可以使用 Ctrl + 1 来记住它。以后，需要打开它时，只需按 1 
+即可。ROX-Filer 总共支持记住 10 个常用的目录。你可以用 Ctrl + 1、
+Ctrl + 2……Ctrl + 0 来记忆这些目录。
+
+
+打开终端 在 ROX-Filer 中，要打开某个目录的终端，可以使用 ` 键。
+
+

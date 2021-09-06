@@ -1,0 +1,90 @@
+###########################################################
+### % cmus 是"C* Music Player"(C音乐播放器)的简写，它完全由C写成
+###########################################################
+
+x                           播放或重播音乐
+c                           暂停
+b                           播放下一首音乐
+z                           播放前一首音乐
+s                           激活随机播放   
+
+:clear                      清空当前文件列表 
+:save /path/to/playlist     保存播放列表
+:load /path/to/playlist     加载播放列表 
+:a /music/pach/             导入音乐            
+1-7                         在7个不同的功能界面之间切换
+q                           退出播放器 
+		
+ 			
+ 			
+###########################################################	
+### % cmus command1		
+###########################################################
+[q]             quit -i                         退出
+[^C]            :quit<enter> to exit cmus.      退出（^就是ctrl的意思）
+[b]             player-next                     下一首
+[c]             player-pause                    暂停
+[x]             player-play                     播放
+[z]             player-prev                     前一首
+[v]             player-stop                     停止
+[^L]            refresh                         刷新
+[n]             search-next                     查找下一个
+[N]             search-prev                     查找上一个
+[.]             seek +1m                        快进
+[l], [right]    seek +5                         快快进
+[,]             seek -1m                        快退
+[h], [left]     seek -5                         快快退
+[m]             toggle aaa_mode                 修改aaa_mode模式 （all from library | artist from library | album from library）
+[C](ontinue)    toggle continue                 持续播放，也就是说这首播放完了继续播放下一首
+[M]             toggle play_library             切换到playlist
+[o]             toggle play_sorted              切换成all from sorted library
+[r](peat)       toggle repeat                   循环
+[^R]            toggle repeat_current           对当前循环
+[t]             toggle show_remaining_time      显示剩余时间（默认是显示播放时间）
+[s]             toggle shuffle                  乱序播放
+[F]             push filter<space>              不清楚，只看到命令提示行显示了:fliter ，估计是提示筛选神马的
+[L]             push live-filter<space>         我也不清楚，命令显示为：:live-filter， 看着想即时筛选？
+[i]             toggle show-hidden              显示/取消显示隐藏文件
+
+
+
+###########################################################
+### % cmus command2
+###########################################################
+[1]             view tree                       主界面
+[2]             view sorted
+[3]             view playlist                   显示播放列表
+[4]             view queue                      显示Queue （我也不知道是啥东西）
+[5]             view browser                    显示文件目录
+[6]             view filters                    显示筛选结果（？）
+[7]             view settings                   显示快捷键
+
+[!]             push shell<space>
+[]]             vol +0 +1                       音量控制，左声道不变，右声道+1
+[[]             vol +1 +0                       音量控制，左声道+1，右声道+0
+[+], [=]        vol +10%                        声音变大10%
+[-]             vol -10%                        声音减小10%
+[}]             vol -0 -1                       音量控制，左声道不变，右声道-1  
+[{]             vol -1 -0                       音量控制，左声道+0，右声道+1
+
+
+[enter]         win-activate                    激活
+[E]             win-add-Q(uery)                 将track拷贝至列表
+[a]             win-add-l(ibrary)               将track拷贝至库
+[y]             win-add-p(lalist)               将track拷贝至播放列表
+[G], [End]      win-bottom                      跳至列表底
+[g], [Home]     win-top                         跳至列表头
+[u]             win-update                      更新
+[k], [up]       win-up                          光标向下移动一行
+[j], [down]     win-down                        光标向上移动一行
+[backspace]     browser-back                    返回上一级目录
+
+[:clear -l]                                     清空Library
+[:clear -p]                                     清空Playlist（播放列表）
+[:clear -q]                                     清空query（队列）
+[:add -l]                                       添加至Library（库)
+[:add -p]                                       添加至Playlist（播放列表）
+[:add -q]                                       添加至query（队列)
+[:colorscheme green|cyan|green-mono-88|gray-88|xterm-white|zenburn]     切换主题
+
+

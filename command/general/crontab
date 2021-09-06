@@ -1,0 +1,50 @@
+###########################################################
+###  计划任务
+###########################################################
+% ysh@debian:~$ crontab -e
+*/1 * * * * cd /home/freeysh/Documents/ysh;/bin/bash freeysh.sh
+crontab -e	        #/var/spool/cron/crontabs/freeysh
+cd /var/log         #/etc/rsyslog.d/50-default.conf
+
+
+
+### linux 系统下的定时任务
+# ┌───────────── minute (0 - 59)
+# │ ┌───────────── hour (0 - 23)
+# │ │ ┌───────────── day of the month (1 - 31)
+# │ │ │ ┌───────────── month (1 - 12)
+# │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
+# │ │ │ │ │                                   7 is also Sunday on some systems)
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * * command to execute
+
+
+
+###########################################################
+### 用户级别计划任务
+###########################################################
+% ysh@debian:~/Documents$ crontab -e
+*/1 * * * * ls >> /tmp/ls.txt                           # 每分钟执行一次
+0 */1 * * * echo “Have a break now.” >> /tmp/test.txt   # 每1个小时执行一次
+
+___________________________________________________________
+1.at                只执行一次.
+2.crontab           执行一个任务一次或者多次.
+crontab -u          设定某个用户的cron服务，Root	
+crontab -l          列出某个用户cron服务的详细内容
+crontab -r          删除每个用户的cron服务
+crontab -e          编辑某个用户的cron服务
+crontab -u root -l  比如说root查看自己的cron设置：
+crontab -u alice -r 再例如，root想删除fred的alice设置：
+
+
+
+###########################################################
+###  crond
+###########################################################
+
+
+
+
+

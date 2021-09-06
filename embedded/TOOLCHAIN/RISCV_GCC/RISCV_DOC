@@ -1,0 +1,12 @@
+/*******************************************************************************
+                 riscv64-unkown-elf-gcc (riscv64-gcc交叉编译器)
+*******************************************************************************/
+0 //vim $HOME/.bashrc
+# riscv-gcc
+RISCV_GCC_CROSS_COMPILER=/home/freeysh/Documents/RSICV_OS/riscv_gcc
+export PATH=$PATH:$RISCV_GCC_CROSS_COMPILER/bin
+
+
+1 //查看riscv64-unknown-elf-gcc是否安装成功
+riscv64-unknown-elf-gcc -v
+

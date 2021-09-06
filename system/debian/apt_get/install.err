@@ -1,0 +1,42 @@
+###########################################################
+### 在 Ubuntu 执行 sudo apt-get upgrade 时，出现了如下的报错：
+###########################################################
+dpkg: error processing package bluez (--configure):
+dpkg: dependency problems prevent configuration of bluez-alsa:i386:                       
+ ...等等一系列的错误
+
+because ... have many errors
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+
+通过执行下面的命令可以解决该问题：
+$ sudo mv /var/lib/dpkg/info/ /var/lib/dpkg/info_old/
+$ sudo mkdir /var/lib/dpkg/info/
+$ sudo apt-get update...
+$ sudo apt-get -f install    
+
+
+
+%  pkg-config command not found解决
+$apt-get install pkg-config
+pkg-config简介：
+pkg-config 是一个在源代码编译时查询已安装的库的使用接口的计算机工具软件。
+pkg-config原本是设计用于Linux的，但现在在各个版本的BSD、windows、Mac OS X和Solaris上都有着可用的版本。
+它输出已安装的库的相关信息，包括：
+    C/C++编译器需要的输入参数
+    链接器需要的输入参数
+    已安装软件包的版本信息
+
+
+
+
+###########################################################
+### % 在执行更新或者安装软件命令时
+###########################################################
+sudo apt-get upgrade
+sudo apt-get install
+遇到：Errors were encountered while processing
+查看错误信息发现： not fully installed 
+ysh@debian:/var/lib/dpkg$ sudo mv info info.bak
+ysh@debian:/var/lib/dpkg$ sudo mkdir info
+ysh@debian:/var/lib/dpkg$ sudo apt-get upgrade
+

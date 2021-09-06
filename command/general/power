@@ -1,0 +1,59 @@
+###########################################################
+### % 查看电池状态信息 upower
+###########################################################
+$ upower -i /org/freedesktop/UPower/devices/battery_BAT0
+
+
+% 使用下面的格式检查电池的特定信息
+$ upower -i /org/freedesktop/UPower/devices/battery_BAT0\
+  | grep -i "state\|percentage\|time to empty"
+  
+  
+ysh@localhost:~$ upower -i `upower -e | grep 'BAT'`
+% 在~/.bashrc中添加命令别名
+$ sudo vim ~/.bashrc
+% 将以下内容放在文件结尾
+alias battery="upower -i `upower -e | grep 'BAT'`"
+  
+
+
+###########################################################
+### % 查看电池状态信息 acpi
+###########################################################
+root@localhost:/home/ysh # apt-get install acpi
+
+acpi -V
+  
+
+
+###########################################################
+### % 查看电池状态信息 tlp
+###########################################################
+root@localhost:~ # apt-get install tlp
+
+% 安装完成之后，你只有在第一次的时候需要运行下面命令来启动 tlp。
+% TLP 会在下次启动系统时自动运行
+root@localhost:~ # tlp start
+TLP started in battery mode.
+
+
+
+% 现在 TLP 已经被启动起来了，而且已经设置好了节省电池所需要的默认配置。
+% 我们可以查看该配置文件。文件路径为 /etc/default/tlp。
+% 我们需要编辑该文件来修改各项配置。
+% 配置文件中有很多选项，要启用某个选项的话只需要删除行首的 # 就行了。
+% 每个选项能够赋予什么值都有说明。下面是你可能会用到的选项：
+root@localhost:~ # vim /etc/default/tlp
+
+    自动休眠 USB 设备
+    设定启动时启用/禁用无线设备
+    降低硬盘转速
+    关闭无线设备
+    设置 CPU 以性能优先还是节能优先
+% 结论
+​% TLP 是一个超棒的工具，可以延长 Linux 系统的电池使用寿命。
+% 我个人的经验是使用 TLP 能延长至少 30-40% 的电池使用寿命。
+
+
+
+

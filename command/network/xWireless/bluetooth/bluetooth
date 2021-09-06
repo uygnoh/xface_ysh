@@ -1,0 +1,256 @@
+###########################################################
+### bluetooth
+###########################################################
+===============
+添加蓝牙驱动模块:
+
+开机日志检测
+检查蓝牙缺少的固件程序
+dmesg | egrep -i 'blue|firm'
+
+
+
+ysh@debian:~$ sudo dmesg | egrep -i 'blue|firm'
+[sudo] ysh 的密码：
+[    1.302929] psmouse serio1: elantech: assuming hardware version 4 (with firmware version 0x381f00)
+[    8.123144] Bluetooth: Core ver 2.22
+[    8.123158] Bluetooth: HCI device and connection manager initialized
+[    8.123160] Bluetooth: HCI socket layer initialized
+[    8.123162] Bluetooth: L2CAP socket layer initialized
+[    8.123171] Bluetooth: SCO socket layer initialized
+[    8.568806] usb 1-6: firmware: failed to load ar3k/AthrBT_0x31010000.dfu (-2)
+[    8.568845] usb 1-6: Direct firmware load for ar3k/AthrBT_0x31010000.dfu failed with error -2
+[    8.568847] Bluetooth: Loading patch file failed
+[   17.403040] r8169 0000:02:00.0: firmware: failed to load rtl_nic/rtl8168g-3.fw (-2)
+[   17.403083] r8169 0000:02:00.0: Direct firmware load for rtl_nic/rtl8168g-3.fw failed with error -2
+[   17.403087] r8169 0000:02:00.0 enp2s0: unable to load firmware patch rtl_nic/rtl8168g-3.fw (-2)
+[   27.407153] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   27.407155] Bluetooth: BNEP filters: protocol multicast
+[   27.407159] Bluetooth: BNEP socket layer initialized
+
+
+
+[    8.568806] usb 1-6: firmware: failed to load ar3k/AthrBT_0x31010000.dfu (-2)
+[    8.568845] usb 1-6: Direct firmware load for ar3k/AthrBT_0x31010000.dfu failed with error -2
+
+可以看到缺少蓝牙驱动固件！
+
+
+
+
+
+
+
+
+下载蓝牙相应的固件程序,并放到相应的位置
+一般情况下放在: /lib/firmwar/
+
+
+
+ysh@debian:/lib$ 
+mkdir -p /firmware/ar3k
+
+ysh@debian:/lib/firmware/ar3k$ 
+AthrBT_0x31010000.dfu
+ramps_0x31010000_40.dfu
+
+重启计算机
+
+==================
+	Blueman
+Blueman是个非常方便的图形化蓝牙管理软件，使用apt-get可以直接安装它：
+
+$ sudo apt-get install blueman
+
+完成后左下角会出现蓝牙图标也可使用
+手动启动
+
+$ blueman-applet
+
+
+
+
+
+
+
+
+
+１.检测蓝牙服务
+systemctl status bluetooth
+
+2.检测内核加载模块
+lsmod | grep blue
+
+3.检测软硬件开关
+sudo rfkill list
+
+
+4.开机日志检测
+dmesg | egrep -i 'blue|firm'
+
+
+● Notes
+5.rfkill 是一个命令行工具，
+您可使用它查询和更改系统中启用了RFKill的设备。
+要获得这个工具，请安装 rfkill 软件包
+很多计算机系统包含无线电传输，其中包括Wi-Fi、蓝牙和3G设备。这些设备消耗电源，
+在不使用这些设备时是一种能源浪费。 
+
+RFKill 是Linux内核中的一个子系统，它可提供一个接口，在此接口中可查询、
+激活并取消激活计算机系统中的无线电传输。当取消激活传输时，
+可使其处于可被软件重新激活的状态（ 软锁定 ）或软件无法重新激活的位置（ 硬锁定 ）。
+
+RFKill 为内核子系统提供应用程序编程界面（API）。
+内核驱动程序被设计为支持RFKill使用这个API注册内核，
+并包含启用和禁用这个设备的方法。
+另外，
+RFKill提供用户程序可解读的通知以及用户程序查询传输状态的方法。
+
+RFKill接口位于 /dev/rfkill，其中包含系统中所有无线电传输的当前状态。
+每个设备都在 sysfs 中注册当前RFKill状态。另外，
+在启用了RFKill的设备中每当状态更改时，RFKill会发出 uevents。
+安装 rfkill
+rfkill 软开关蓝牙及无线功能
+sudo apt-get install rfkill
+
+5.蓝牙模块加载
+sudo modprobe btusb
+
+
+
+ 三、节能控制
+
+上面说到一个关于rfkill的命令，
+其实通过这个命令可以在必要的时候关闭无线或蓝牙设备，
+来节约设备用电，以软关闭蓝牙模块为例。
+
+1.关闭蓝牙模块
+rfkill block 0 #0为设备ID号
+
+2.检测是否关闭
+rfkill list
+0: hci0: Bluetooth
+Soft blocked: yes
+Hard blocked: no
+1: phy0: Wireless LAN
+Soft blocked: no
+Hard blocked: no
+
+
+3.开启蓝牙模块
+rfkill unblock 0
+
+4.检测是否开启
+rfkill list
+0: hci0: Bluetooth
+Soft blocked: no
+Hard blocked: no
+
+1: phy0: Wireless LAN
+
+Soft blocked: no
+Hard blocked: no
+
+ 
+
+
+---------------------------------------------------------------------------
+
+蓝牙是一个短距离无线通信标准，适用于手机、计算机和其他电子设备之间的通信。
+在 Linux 中，通常使用的蓝牙协议栈实现是 BlueZ. 
+
+安装
+安装 bluez 和 bluez-utils 软件包。
+bluez 软件包提供蓝牙协议栈，
+bluez-utils 软件包提供 bluetoothctl 工具。 
+如果尚未加载通用蓝牙驱动则需先加载：
+
+# modprobe btusb
+然后 启动 bluetooth.service systemd 单元。可以在系统引导时自动 启用 它。 
+
+注意:
+
+    默认情况下，蓝牙仅为 lp 用户组中的用户启用 bnep0 设备。
+如果想要加入蓝牙系统，需确认已将用户加入该组。
+可以修改/etc/dbus-1/system.d/bluetooth.conf文件中相应的组配置来实现。
+    有些蓝牙适配器是与无线网卡绑定在一起的（比如：英特尔迅驰）。
+这就要求无线网卡先被启用（典型情况是在笔记本电脑上用快捷键启用）以便蓝牙适配器对内核可见。
+    有些厂家（如 Broadcom）的蓝牙卡与网卡有冲突（不兼容）。
+这就需要确认在网络服务引导之前蓝牙设备已连接。
+
+通过命令行工具配置蓝牙
+Bluetoothctl
+
+通过命令行配对是最可靠的选择。准确的配对过程依不同设备类型及其所提供的输入功能而各不相同。
+下面提供使用/usr/bin/bluetoothctl配对的一般过程：
+
+启动 bluetoothctl 交互命令。可以输入 help 列出所有有效的命令。
+
+    输入power on 命令打开控制器电源。默认是关闭的。
+    输入devices 命令获取要配对设备的 MAC 地址。
+    如果设备未在清单中列出，输入 scan on 命令设置设备发现模式。
+    输入agent on 命令打开代理。
+    输入 pair MAC Address 开始配对（支持 tab 键补全）。
+    如果使用无 PIN 码设备，再次连接可能需要手工认证。输入 trust MAC Address 命令。
+    最后，用 connect MAC_address 命令建立连接。
+
+以下为一个交互实例： 
+# bluetoothctl 
+[NEW] Controller 00:10:20:30:40:50 pi [default]
+[bluetooth]# agent KeyboardOnly 
+Agent registered
+[bluetooth]# default-agent 
+Default agent request successful
+[bluetooth]# scan on
+Discovery started
+[CHG] Controller 00:10:20:30:40:50 Discovering: yes
+[NEW] Device 00:12:34:56:78:90 myLino
+[CHG] Device 00:12:34:56:78:90 LegacyPairing: yes
+[bluetooth]# pair 00:12:34:56:78:90
+Attempting to pair with 00:12:34:56:78:90
+[CHG] Device 00:12:34:56:78:90 Connected: yes
+[CHG] Device 00:12:34:56:78:90 Connected: no
+[CHG] Device 00:12:34:56:78:90 Connected: yes
+Request PIN code
+[agent] Enter PIN code: 1234
+[CHG] Device 00:12:34:56:78:90 Paired: yes
+Pairing successful
+[CHG] Device 00:12:34:56:78:90 Connected: no
+[bluetooth]# connect 00:12:34:56:78:90
+Attempting to connect to 00:12:34:56:78:90
+[CHG] Device 00:12:34:56:78:90 Connected: yes
+Connection successful
+
+
+引导后蓝牙自动上电
+
+引导后蓝牙适配器默认不上电。
+以前的通过 hciconfig hci0 up 上电方式已不再推荐使用(参阅 release note )。
+现在只需在 /etc/bluetooth/main.conf 文件的 [Policy] 一节最后加上一行 AutoEnable=true：
+
+/etc/bluetooth/main.conf
+
+[Policy]
+AutoEnable=true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

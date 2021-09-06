@@ -1,0 +1,165 @@
+###########################################################
+# % tmux
+###########################################################
+### % tmux常用命令
+( server )      服务器 
+( session )     会话
+( window )      窗口 
+( panel )       面板
+
+<crtl+a   >                                     #激活控制台(系统默认Ctrl+b)
+<ctrl+a s >                                     #会话切换
+tmux new-session -s <session_name>              #创建一个会话
+tmux list-sessions                              #查看会话	
+tmux detach                                     #分离会话
+tmux attach-session -t <target_session_name>	#连接会话
+tmux rename-session -t session_old session_new  #重命名会话
+tmux kill-server                                #关闭tmux服务器
+tmux kill-server -t session_name                #关闭指定的会话
+tmux kill-server -a -t session_name             #关闭所有会话，除了这个会话
+
+
+
+### % 系统操作
+?               列出所有快捷键,按q返回
+d               脱离当前会话
+D               选择要脱离的会话,在同时开启多个会话时使用
+ctrl+z          挂起当前会话
+r               强制重绘未脱离的会话
+s               选择并切换会话
+:               进入命令行模式
+[               进入复制模式
+~               列出提示信息缓存
+
+
+### % 窗口操作
+c               创建新窗口
+&               关闭当前窗口
+数字键          切换指定窗口
+p               切换上1个窗口
+n               切换下1个窗口
+|               在前后2个窗口相互切换
+w               通过窗口列表切换窗口
+,               重命名当前窗口
+.               修改当前窗口编号，相当于重新排列窗口
+f               在所有窗口查看指定文本
+
+
+### % 面板操作
+"               将当前面板分为上下2块
+%               将当前面板分为左右2块
+x               关闭当前面板
+!               将当前面板至于新窗口
+ctrl+方向键     以1个单元格为单位移动边缘以调整当前面板大小
+alt +方向键     以5单元格为单位移动边缘以调整当前面板大小
+space           在预置的面板布局中循环切换
+q               显示面板编号
+o               在当前窗口选择下一个面板
+方向键          移动光标以选择面板
+{               向前置换面板
+}               向后置换面板
+ctrl+o          顺时针旋转当前面板
+alt +o          逆时针旋转当前面板
+__________________________________________________
+可以用 Ctrl+b o	    来切换到下一个pane，
+或者用 Ctrl+b Up	切换到当前pane上方的pane, 
+或者用 Ctro+b Down	切换到当前pane下方的pane.
+还有一种切换方法是{ Ctrl+b q }
+tmux会显示每个pane的序号，按这个序号就可以跳过去了
+(按慢了可不行，得在数字消失前按)
+
+
+
+###########################################################
+# % tmux配置文件位置 ~/.tmux.conf
+###########################################################
+# Changing the default prefix key
+set-option -g prefix C-a
+unbind-key C-b
+bind-key C-a send-prefix
+
+# windows operation,窗口操作
+# 不用按prefix，直接用shift+箭头在窗口之间switch
+bind -n S-Left previous-window 
+bind -n S-Right next-window 
+
+# pane operation,窗格操作
+# prefix + v 代表竖着切
+# prefix + h 代表横着切
+bind-key v split-window -h              
+bind-key h split-window -v              
+
+# 不用按prefix，直接用alt+箭头在pane之间switch
+bind -n M-Left select-pane -L 
+bind -n M-Right select-pane -R 
+bind -n M-Up select-pane -U 
+bind -n M-Down select-pane -D 
+ 
+set-window-option -g mode-keys vi       # 复制模式中的默认键盘布局使用 vi
+set-option -g mouse on                  # Mouse mode on
+
+# 直接用prefix+r,就能重新加载设置。
+bind-key r source-file ~/.tmux.conf \; display-message "tmux.conf reloaded"
+
+
+
+### % => status-bar,状态栏
+
+# pretty colors,漂亮的颜色
+set -g status-bg black
+set -g status-fg white
+
+# 对齐方式
+set-option -g status-justify centre
+
+# 左下角
+set-option -g status-left '#[bg=black,fg=green][#[fg=cyan]#S#[fg=green]]'
+set-option -g status-left-length 20
+
+# 窗口列表
+setw -g automatic-rename on
+set-window-option -g window-status-format '#[dim]#I:#[default]#W#[fg=grey,dim]'
+set-window-option -g window-status-current-format '#[fg=cyan,bold]#I#[fg=blue]:#[fg=cyan]#W#[fg=dim]'
+
+# 右下角
+set -g status-right '#[fg=green][#[fg=cyan]%Y-%m-%d#[fg=green]]'
+
+
+
+
+
+###########################################################
+### % touch tmuxlaunch.sh
+###########################################################
+SESSION=stm32
+tmux new-session -d -s $SESSION
+tmux new-window -t $SESSION:1 -n 'build'
+tmux select-window -t $SESSION:1
+tmux split-window -h
+# tmux send-keys 'cd example/ysh; python -m SimplHTTPServer' C-m
+tmux attach -t $SESSION
+
+
+### % tmux_script
+% touch tmuxlaunch.sh
+SESSION=stm32
+tmux new-session -d -s $SESSION
+tmux new-window -t $SESSION:1 -n 'build'
+tmux select-window -t $SESSION:1
+tmux split-window -h
+# tmux send-keys 'cd example/ysh; python -m SimplHTTPServer' C-m
+tmux attach -t $SESSION
+
+
+### 
+#!/bin/bash
+SESSION=STM32
+tmux new-session -d -s $SESSION
+tmux new-window -t $SESSION:1 -n 'user'
+tmux new-window -t $SESSION:2 -n 'libs'
+tmux select-window -t $SESSION:1
+tmux split-window -h
+tmux send-keys 'cd user' C-m
+tmux attach -t $SESSION
+
+

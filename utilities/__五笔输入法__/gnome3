@@ -1,0 +1,209 @@
+###########################################################
+### % linux system
+### % CLI（command-line interface,   命令行界面)
+### % GUI (Graphical User Interface, 图形用户界面)
+###########################################################
+% FAQ[Frequently Asked Questions] “常见问题解答”
+% official supported,官方支持
+% installation guide,安装指南
+```
+recommend,      [ˌrekəˈmend] 推荐
+stretch,        [stretʃ]完整版,伸展
+Unarchiver,     未归档
+contain,        [kənˈteɪn]包含
+correctly,      [kə'rektlɪ]正确地
+education,      [ˌedʒuˈkeɪʃn]教育
+community,      [kəˈmju:nəti]社区
+blog,           [blɒg] 博客
+forums,         论坛
+stroke,         [strəʊk] 划
+```
+
+
+
+###########################################################
+### % gnome
+###########################################################
+Activities,活动              Frequent,频繁的                  Volume,卷;音量;
+Trash,垃圾                   remaining,剩余的                 Visiable,可见属性
+Text Editor,文本编辑器        snap,拍…的快照                   Templates,模板
+Workbench,工作台             Packages,打包                     Public,公共的
+Recent,最近的	                Desktop,桌面                     Documents,文档
+Downloads,下载               Music,音乐                       Pictures,照片
+Devices,设备                 Details,细节                     Privacy,隐私
+Background,背景              Notifications,通知               Sharing,分享
+Sound,声音                   Power,权力	                     Network,网络
+Videos,视频                  Authenticate,认证                 Dock,码头
+Settings,设置                Introduction,介绍;引言	           emulator,仿真器
+Overview,概述               Hyperlinks,超链接                  Cursor,光标
+Terminal,终端               View,视图                         Search,搜索
+Contents,内容  
+             
+Other Locations,其他位置            Authentication Required,需要身份验证
+Airplane Mode,飞机模式              Visible Networks,可见网络
+Online Accounts,在线账户            Universal Access,通用访问
+Color Schemes,配色方案              Fullscreen session,全屏会议
+Character encoding,字符编码         Custom commands and shells,自定义命令和外壳
+Keyboard accessibility,键盘辅助功能  Login shells,登录外壳
+Advanced Settings,高级设置          Change profile character encoding,更改配置文件字符编码
+Keyboard shortcuts,键盘快捷键       Characters look too narrow,字符看起来太窄
+Troubleshooting,故障排除            Set audible bell,设置可听铃声
+Scrollbar preferences,滚动条首选项	   Menubar visibility,菜单栏可见性
+Manage profile,管理配置文件
+Customize Behavior,自定义行为
+
+
+
+###########################################################
+### % grub
+###########################################################
+%__________________________________________________________
+% BIOS    "Basic Input Output System"
+% CMOS    "Complementary Metal Oxide Semiconductor"
+% UEFI    "Unified Extensible Firmware Interface"
+%__________________________________________________________
+BIOS即Basic Input/Output System，翻成中文是“基本输入/输出系统”，
+是一种所谓的“固件”，负责在开机时做硬件启动和检测等工作，
+并且担任操作系统控制硬件时的中介角色
+
+
+%__________________________________________________________
+CMOS是Complementary Metal Oxide Semiconductor（互补金属氧化物半导体）的缩写。
+它是指制造大规模集成电路芯片用的一种技术或用这种技术制造出来的芯片，
+是电脑主板上的一块可读写的RAM芯片。
+因为可读写的特性，所以在电脑主板上用来保存BIOS设置完电脑硬件参数后的数据，
+这个芯片仅仅是用来存放数据的。
+
+
+%__________________________________________________________
+新型UEFI，全称“统一的可扩展固件接口”(Unified Extensible Firmware Interface)， 
+是一种详细描述类型接口的标准。
+这种接口用于操作系统自动从预启动的操作环境，加载到一种操作系统上。
+
+
+%__________________________________________________________
+因为硬件发展迅速，传统式（Legacy）BIOS 成为进步的包袱，
+现在已发展出最新的UEFI（Unified Extensible Firmware Interface）可扩展固件接口，
+相比传统 BIOS 的来说，未来将是一个“没有特定 BIOS”的电脑时代。
+
+
+%__________________________________________________________
+Security--->Secure Boot     Disable ### 关闭可以安linux系统
+1 部分电脑品牌需要设置BIOS密码才能修改BIOS选项
+2 在Secrurity中选择--->Set Supervisor Passoword--->按回车设置密码
+Secure Boot是UEFI BIOS的一个子规则，位于传统(Legacy)BIOS的BOOT选项下，
+微软规定，所有预装Win8操作系统的厂商(即OEM厂商)都必须打开Secure Boot。
+
+
+
+###########################################################
+### % 高频单词
+###########################################################
+Absolutely,     [ˈæbsəlu:tli]绝对地;完全地;毫无疑问地
+relative,       [ˈrelətɪv]    相对的
+%__________________________________________________________
+horizontal,     [ˌhɒrɪˈzɒntl]水平的
+vertical,       [ˈvɜ:tɪkl]   垂直的
+%__________________________________________________________
+row             [rəʊ]        行
+column          [ˈkɒləm]     列
+% _________________________________________________________
+maximum,        [ˈmæksɪməm]最大限度
+minimum,        [ˈmɪnɪməm] 最低限度
+min,            最小
+max,            最大
+low,            [ləʊ]低的
+high,           [haɪ] 高的
+next,           [nekst]下一个
+previous,       [ˈpri:viəs]以前的
+create,         [kriˈeɪt]创造
+destroy,        [dɪˈstrɔɪ]破坏
+source,         [sɔ:s]来源
+target,         [ˈtɑ:gɪt]目标
+source,         [sɔ:s]来源
+destination,    [ˌdestɪˈneɪʃn]目的地
+send,           [send]发送
+receive,        [rɪˈsi:v]接收
+get,            [get] 得到
+release,        [rɪˈli:s]释放;发布;发行;放开
+Matlab,         
+
+
+
+###########################################################
+### % network
+###########################################################
+Destination Host Unreachable                    % 目标主机不能到达
+Authentication Required                         % 需要身份认证
+
+
+
+###########################################################
+### % 标点符号
+###########################################################
++       plus　加号
+-       minus　减号
+×       is multiplied by　
+÷       is divided by
+=       is equal to
+<       is less than　
+>       is greater than　
+%       percent　百分之…
+‰       permill 千分之…
+∑       sigma
+|       vertical bar， vertical virgule　竖线
+&       ampersand， and， reference， ref　和，引用
+*       asterisk， star
+/       slash
+//      slash-slash
+#       pound
+\       backslash
+~       tilde
+.     　Full Stop,  period
+,       comma　逗号
+:       colon　冒号
+;       semicolon　分号
+?       Question Mark
+!       exclamation mark （英式英语） exclamation point （美式英语）
+'       apostrophe
+-       hyphen　连字号
+--      dash 破折号
+……　    dots/ ellipsis
+"       single quotation marks
+""      double quotation marks
+‖       parallel
+&       ampersand = and
+~       swung dash
+
+
+∞　      infinity　无限大号
+√　      （square） root　（平方）根
+∠　      angle　角
+⌒　      semicircle　半圆
+⊙　      circle　圆
+○　      circumference　圆周
+π       pi 圆周率
+△　     triangle　三角形
+⊥       perpendicular to　垂直于
+∪       union of　并，合集
+∩       intersection of 交，通集
+∫       the integral of …的积分
+°       degree　度
+′       minute　分
+″       second　秒
+℃　     Celsius system　摄氏度
+
+                       
+{　      open brace， open curly　左花括号
+}　      close brace， close curly　右花括号
+(        open parenthesis， open paren　左圆括号
+)        close parenthesis， close paren　右圆括号
+()       brackets/ parentheses　括号
+[　      open bracket 左方括号
+]　      close bracket 右方括号
+[]       square brackets　方括号
+
+           
+
+
+

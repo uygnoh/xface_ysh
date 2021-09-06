@@ -1,0 +1,52 @@
+###########################################################
+###  % OpenSSH服务器配置 
+###########################################################
+#Port 22
+#AddressFamily any                  # 指定 sshd应当使用哪种地址族,取值范围是："any"(默认)、"inet"(仅IPv4)、"inet6"(仅IPv6)
+#ListenAddress 0.0.0.0              # 指定 sshd监听的网络地址，默认监听所有地址
+#ListenAddress ::        
+# Logging                           # 指定的日志等级(详细程度)
+#SyslogFacility AUTH
+#LogLevel INFO
+#PermitRootLogin prohibit-password  # 是否允许 root 登录, "yes"(默认) 表示允许。"no"表示禁止
+#LoginGraceTime 2m                  # 限制用户必须在指定的时限内认证成功,0表示无限制,默认值是 120 秒
+#PubkeyAuthentication yes           # 是否允许公钥认证。仅可以用于SSH-2。默认值为"yes"
+#PasswordAuthentication yes         # 是否允许使用基于密码的认证。默认为"yes"
+#PermitEmptyPasswords no            # 不允许使用空密码
+#PermitRootLogin prohibit-password  # 是否允许 root 登录, "yes"(默认) 表示允许。"no"表示禁止
+#LoginGraceTime 2m                  # 限制用户必须在指定的时限内认证成功,0表示无限制,默认值是 120 秒
+#GSSAPIAuthentication no            # 是否允许使用基于 GSSAPI 的用户认证。默认值为"no"。仅用于SSH-2。
+RSAAuthentication yes               # 开启RSA认证
+
+
+
+###########################################################
+### % OpenSSH密钥对认证
+###########################################################
+1 由客户端（client）用户在本地创建密钥对
+2 上传公钥文件 id_rsa.pub到OpenSSH服务器端
+3 导入公钥信息文件 到服务器端 用户freeysh 公钥数据库中（server）
+  公钥文件位置：/home/freeysh/.ssh/autorized_keys 
+cat id_rsa.pub >> /home/freeysh/.ssh/authorized_keys
+chmod 600 /home/freeysh/.ssh/authorized_keys
+  	  
+4 使用密钥对认证
+  此时写入要连接的服务器IP，就可以登陆到 用户freeysh中的系统上了
+
+5 服务器端关闭SElinux服务－》option
+  vim /etc/selinux/config
+  SELINUX=disbale
+
+6、启动SSH服务            /etc/init.d/ssh start 
+7、验证SSH服务状态        /etc/init.d/ssh status
+8、添加开机自启动         update-rc.d ssh enable
+9、关闭自启动为           update-rc.d ssh disabled
+
+10     $HOME/.ssh/authorized_keys
+存放 RSA/DSA 公钥, 用户通过它登录机器.  sshd(8) 手册页描述了这个
+文件的格式. 最简单的文件格式和 .pub 身份文件一样.  文件内容并非高
+度敏感, 但是仍然建议仅让此文件的用户读写, 而拒绝其他用户的访问.
+
+
+
+

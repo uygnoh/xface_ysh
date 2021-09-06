@@ -1,0 +1,95 @@
+/*******************************************************************************
+                 gcc-arm-none-eabi (CORTEX-M 交叉编译器)
+*******************************************************************************/
+0 //vim $HOME/.bashrc
+export ARM_GCC_CROSS_COMPILER=/opt/gcc-arm-none-eabi-7-2018-q2-update-linux\
+                /gcc-arm-none-eabi-7-2018-q2-update/
+export PATH=$PATH:$ARM_GCC_CROSS_COMPILER/bin
+
+
+
+/*******************************************************************************
+                           arm-none-eabi-gdb 指令
+*******************************************************************************/
+l               //list指令的缩写，意为列出当前执行的源代码。
+c               //continue的缩写，在嵌入式GDB中我们不能使用RUN指令来运行代码，
+s               //step缩写，会进入子函数的单步运行
+n               //next缩写，即会跳过子函数的单步运行
+u               //until缩写使用时后方加行号如： u 16 即运行到第16行
+p               //print缩写，使用时后面加变量名称如：p tmp ，用来显示变量数值
+display         //使用时后面加变量名称如：display tmp ，用于跟踪变量数值，
+finish          //完成并跳出当前的子函数
+———————————————————————————————————————————————————————————————————————————————
+b               //break缩写，用于在程序中打断点，使用方式有很多种
+b 16            //在当前低16行代码出加断点。
+b i=1           //当i等于1时停止,类似于这种条件式断点的方式也是GDB独有的一种强大功能
+b main          //在main函数的入口打断点。
+i b             //info break 缩写，显示当前设置的断点信息
+d break         //delet break 缩写，删除所有断点
+d break 1       //删除序号为1的断点
+bt              //查看堆栈
+q/Ctrl+d        //使用q即quit指令或快捷键Ctrl+d来正常退出GDB
+
+———————————————————————————————————————————————————————————————————————————————
+
+
+
+/*******************************************************************************
+                                  GDB-TUI
+*******************************************************************************/
+//GDB: may not be intuitive but it is very powerful
+//TUI: Text User Interface
+//[ctrl-x 2]~[ctrl-x 1]可以在2个窗口间切换
+ctrl-x a            toggle to/from TUI mode(%先按ctrl-x，再按a)
+ctrl-l              refresh the screen
+ctrl-p / ctrl-n     prev, next, commands
+ctrl-x 2            second window; cycle through(%先按ctrl-x，再按2)
+
+//gdb操作示例
+//gcc -g hello.c
+//gdb a.out
+(gdb) start
+//ctrl-x-a
+
+
+
+/*******************************************************************************
+                                gdb-python
+*******************************************************************************/
+//gdb-python调入python模块并执行相应的功能
+(gdb) python
+>import os
+>print('I am running on pid %d', os.getpid())
+>
+ctrl-d
+
+
+//gdb-python执行下一行代码
+(gdb) python gdb.execute('next)
+
+//gdb-python设置断点（第3行为断点）
+(gdb) python bp = gdb.Breakpoint('hello.c:3')
+
+//gdb-python显示第一个断点位置信息
+(gdb) python print (bps[0].location)
+
+//gdb-python显示第一个断点信息
+(gdb) python print (bps)
+
+//gdb-python打印变量信息
+(gdb) python var_i = gdb.parse_and_eval('i')
+(gdb) python print ('var_i is %d' //var_i)
+(gdb) python help(gdb)
+(gdb) python help(gdb.Breakpoint)
+
+
+
+/*******************************************************************************
+                               gdb-shell
+*******************************************************************************/
+//gdb-shell执行shell下相关的命令
+//ctrl-x a
+(gdb) shell ps
+
+
+

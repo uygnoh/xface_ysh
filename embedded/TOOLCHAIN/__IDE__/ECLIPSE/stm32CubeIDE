@@ -1,0 +1,67 @@
+/*******************************************************************************
+                              STM32CubeIDE
+*******************************************************************************/
+0 //C/C++ 编译器选项
+Porject ->properties ->C/C++ Build ->Settings
+
+
+1 //C/C++ 源文件和头文件路径设置
+Porject ->properties ->C/C++ General ->Paths an Symbols
+Includes
+Source Location
+
+
+3 //STM32CubeIDE Tab键设置
+Window ->Preferences ->C/C++ ->Code Style ->Formatter ->Edit
+Profile name: [freeysh]
+
+
+
+/*******************************************************************************
+                              STM32CubeIDE调式Error
+*******************************************************************************/
+//STM32CubeIDE调式出现下面的错误
+//arm-none-eabi-gdb: error while loading shared libraries: 
+//libncurses.so.5: cannot open shared object file: No such file or directory
+sudo apt install libncurses5
+
+
+
+/*******************************************************************************
+                           STM32CubeIDE使用ITM调试
+*******************************************************************************/
+0 //STM32CubeMX，进入到配置页面，
+_____________________________
+先配置“HCLK”，记好这个值
+
+
+
+1 // Ctrl+S 生成代码，打开main.c
+_____________________________
+添加以下代码到“main.c”文件中
+#include "stdio.h"
+
+int _write(int file, char *ptr, int len)
+{
+    int i = 0;
+    for (i = 0; i < len; i++)
+        ITM_SendChar((*ptr++));
+    return len;
+}
+
+while (1)
+{
+    printf("Hello World!\n");
+    HAL_Delay(1000);
+}
+
+
+2 //点击小锤子构建项目，完成后点击Debug
+_____________________________
+点击 调试器选项卡，更改调试探头为实际使用的仿真器，勾选 [Enable SWV]，
+并修改内核时钟为创建工程时设置的[HCLK]的值。点击 [Apply]，再点击OK。
+//进入到Debug页面后，点击 
+Windows-->show View --->SWV--->SWV ITM data console
+可以看到在下部出现了SWV ITM data console窗口，点击configure trace
+
+

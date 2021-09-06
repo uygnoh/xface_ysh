@@ -1,0 +1,33 @@
+!!! ysh@localhost:~$ xrdb .Xdefaults 
+
+
+
+!!! Xterm Fonts settings
+
+xterm*faceName: Consolas: antialias=True: pixelsize=18
+xterm*faceNameDoublesize: Microsoft YaHei: antialias=True: pixelsize=16
+
+xterm*background: black
+xterm*foreground: gray
+
+XTerm*faceName: Bitstream Vera Serif Mono
+XTerm*faceSize: 11
+XTerm*vt100*geometry: 100x30
+XTerm*saveLines: 16384
+XTerm*loginShell: true
+XTerm*charClass: 33:48,35:48,37:48,43:48,45-47:48,\
+                 64:48,95:48
+XTerm*termName: xterm-color
+XTerm*eightBitInput: false
+XTerm*fullscreen: false
+
+
+
+!!! ~/.profile
+!alias ls='ls -FGa'
+!slial ll='ls -FGal'
+!TERM=xterm-color; exprot TERM
+!
+!~/.bashrc
+!xrdb -merge ~/.Xdefaults
+

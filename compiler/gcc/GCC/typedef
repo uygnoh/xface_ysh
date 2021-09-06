@@ -1,0 +1,94 @@
+###########################################################
+% 使用 typedef 定义函数指针
+###########################################################
+typedef long BaseType_t;
+typedef BaseType_t (*TaskHookFunction_t)( void * );
+TaskHookFunction_t xTaskGetApplicationTaskTag( TaskHandle_t xTask )	;
+typedef int (PTypeFun1)(int, int);  /* 声明一个函数类型 */
+typedef int (*PTypeFun2)(int, int); /* 声明一个函数指针类型 */
+int (*padd)(int, int);              /* 传统形式，定义一个函数指针变量 */
+/*
+ * 我们为什么一定要使用 typedef 定义函数指针呢？
+ * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
+ * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。
+ */
+#include <stdio.h>
+void FunA() 
+{
+    printf("call FunA\n");
+}
+void FunB(int n) 
+{
+    printf("call FunB. n is : %d\n", n);
+}
+typedef void (*PtrFunA)();
+typedef void (*PtrFunB)(int);
+/* 函数指针作为函数参数使用 */
+void usePtrFunA(PtrFunA p) 
+{
+    p();
+}
+void usePtrFunB(PtrFunB p, int n) 
+{
+    p(n);
+}
+ 
+ 
+ 
+/*
+ *             < 函数指针作为函数返回值使用 >
+ * 函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译
+ * 下面这种语法编译器已经无法识别了
+ *      (void (*PtrFunA)()) getPtrFunA2() 
+ *      { 
+ *          return FunA; 
+ *      }
+ */
+/* 函数指针作为函数返回值使用 */
+PtrFunA getPtrFunA() 
+{
+    PtrFunA p = FunA;
+    return p;
+}
+PtrFunB getPtrFunB() 
+{
+    PtrFunB p = FunB;
+    return p;
+}
+int main() {
+    /* 获取 FunA 函数的函数指针 */
+    PtrFunA a = getPtrFunA();
+    /* 使用 FunA 函数的函数指针 */
+    usePtrFunA(a);
+ 
+    /* 获取 FunB 函数的函数指针 */
+    PtrFunB b = getPtrFunB();
+    /* 使用 FunB 函数的函数指针 */
+    usePtrFunB(b, 1);
+    return 0;
+}
+
+
+
+typedef int (PTypeFun1)(int, int);  /* 声明一个函数类型 */
+typedef int (*PTypeFun2)(int, int); /* 声明一个函数指针类型 */
+int (*padd)(int, int);              /* 传统形式，定义一个函数指针变量 */
+ /*
+ * 我们为什么一定要使用 typedef 定义函数指针呢？
+ * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
+ * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。
+ */
+#include <stdio.h>
+int add(int a, int b) { return a + b; }
+typedef int (PTypeFun1)(int, int);      /* 声明一个函数类型 */
+typedef int (*PTypeFun2)(int, int);     /* 声明一个函数指针类型 */
+int (*padd)(int, int);                  /* 传统形式，定义一个函数指针变量 */
+int main() {
+    PTypeFun1 * pTypeAdd1 = add;        /* [函数类型]    声明并初始化函数指针，加* */
+    PTypeFun2   pTypeAdd2 = add;        /* [函数指针类型] 声明并初始化函数指针 */
+                     padd = add;        /* 函数名为函数入口地址 */
+    printf("%d\n", pTypeAdd1(1, 2));
+    printf("%d\n", pTypeAdd2(1, 2));
+    printf("%d\n", padd(1, 2));
+    return 0;
+}

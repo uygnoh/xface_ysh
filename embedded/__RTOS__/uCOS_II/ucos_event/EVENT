@@ -1,0 +1,173 @@
+############################################################
+### // OS_InitEventList() //
+############################################################
+static void OS_InitEventList(void)
+{
+#if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
+        #if (OS_MAX_EVENTS > 1u)
+        INT16U           ix;
+        INT16U           ix_next;
+        OS_EVENT        *pevent1;
+        OS_EVENT        *pevent2;
+        
+        //Clear the event table
+        OS_MemClr((INT8U *)&OSEventTbl[0], sizeof(OSEventTbl));
+        //Init. list of free EVENT control blocks
+        for (ix = 0u; ix < (OS_MAX_EVENTS - 1u); ix++) {
+                ix_next = ix + 1;
+                pevnet1 = &OSEventTbl[ix];
+                pevent2 = &OSEventTbl[ix_next];
+                pevent1->OSEventType   = OS_EVENT_TYPE_UNUSED;
+                pevent1->OSEventPtr    = pevent2;
+                #if OS_ENENT_NAME_EN > 0u
+                pevent1->OSEventName   = (INT8U *)(void *)"?"; //Unknown name
+                #endif
+        }
+        pevent1                 = &OSEvenTbl[ix];
+        pevent1->OSEventType    = OS_EVENT_TYPE_UNUSED;
+        pevent1->OSEventPtr     = (OS_EVENT *)0;
+        #if OS_EVENT_NAME_EN > 0u
+        pevent1->OSEventName    = (INT8U *)(void *)"?"; //Unknown name
+        #endif
+        OSEVentFreeList         = &OSEventTbl[0];
+        
+        
+        //如果OS_MAX_EVENTS=1，也就是系统只有一个事件
+        #else
+        OSEventFreeList              = &OSEventTbl[0];
+        OSEventFreeList->OSEventType = OS_EVENT_TYPE_UNUSED;
+        OSEventFreeList->OSEventPtr  = (OS_EVENT *)0;
+        
+        
+        #if OS_EVENT_NAME_EN > 0u
+        pevent1->OSEventName    = (INT8U *)(void *)"?"; //Unknown name
+        #endif
+        
+        #endif
+#endif
+}
+
+
+
+############################################################
+### // OS_EventWaitListInit() //
+############################################################
+#if (OS_EVENT_EN)
+void OS_EventWaitListInit(OS_EVETN *pevent)
+{
+        INT8U i;
+        pevent->OSEVentGrp = 0u;
+        for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
+                pevent->OSEVentTbl[i] = 0u;
+        }
+}
+#endif
+
+
+
+
+############################################################
+### // OS_EvenTasktWait() //
+############################################################
+如果创建了事件，任务就会等待事件，如果要任务和事件建立关系的话，就使用这
+个函数来实现。这个函数一定是在当前正在执行的任务中被调用。
+
+#if (OS_EVENT)
+void OS_EventTaskWait(OS_EVENT *pevent)
+{
+        INT8U   y;
+        
+        //在任务的那个方向作登记
+        //Store ptr to ECB in TCB
+        OSTCBCur->OSTCBEventPtr               = pevent;
+        
+        //在事件的那个方向作登记
+        //Put task in waiting list
+        pevent->OSEventTbl[OSTCBCur->OSTCBY] |= OSTCBCur->OSTCBBitX;
+        pevent->OSEVentGrp                   |= OSTCBCur->OSTCBBitY;
+        
+        //当前任务正在申请资源或事件，那么就让当前任务从运行态转换为非就绪态。
+        y            = OSTCBCur->OSTCBY;  //Task no longer ready
+        OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitx;
+        if (OSRdyTbl[y] == 0u) {  //Clear event grp bit if this was only task pending
+                OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
+        }
+}
+#endif
+
+
+
+############################################################
+### // OS_EventTaskRemove() //
+############################################################
+#if (OS_EVENT_EN)
+void OS_EventTaskRemove(OS_TCB *ptcb, OS_EVENT *pevent)
+{
+        INT8U   y;
+        
+        //移出事件只是在事件这里作了注销
+        y                      = ptcb->OSTCBY;
+        //把这个任务从它的等待列表中删除掉
+        //解除事件与任务的关系
+        pevent->OSEventTbl[Y] &= (OS_PRIO)~ptcb->OSTCBBitX;
+        if (pevent->OSEventTbl[Y] == 0u) {
+                pevent->OSEventGrp &= (OS_PRIO)~ptcb->OSTCBBitY);
+        }
+}
+#endif
+
+
+
+############################################################
+### // OS_EventTaskRdy() //
+############################################################
+// 解除事件与任务的关系
+#if (OS_EVENT_EN)
+INT8U OS_EventTaskRdy(
+        OS_EVENT    *pevent,
+        void         msk;       //事件状态掩码
+        INT8U        pend_stat) //申请的事件状态
+{
+        OS_TCB      *ptcb;
+        INT8U        y;
+        INT8U        x;
+        INT8U        prio;
+        
+        #if OS_LOWEST_PRIO <= 63
+        y    = OSUnMapTbl[pevent->OSEventGrp];   //Find HPT waiting for message
+        x    = OSUnMapTbl[pevent->OSEvnetTbl[y]];
+        prio = (INT8U)((y << 3u) + x);  //Find priority of task getting the msg
+        #endif
+        
+        ptcb            = OSTCBPrioTbl[prio];   //Point to this task's OS_TCB
+        ptcb->OSTCBDly  = 0u;       //Prevent OSTimeTick() form readying task
+        
+        #if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u) || (OS_MBOX_EN > 0U)
+        ptcb->OSTCBMsg      = pmsg; //Send message directly to waiting task
+        #else
+        pmsg                = pmsg; //Prevent compiler warning if not used
+        #endif
+        
+        ptcb->OSTCBStat    &= (INT8U)~msk; //Clear bit associated with event type
+        ptcb->OSTCBStatPend = pend_stat;   //Set pend status of post or abort
+        
+        //如果这个任务不是挂起态，那么就让它变成就绪态
+        if ((ptcb->OSTCBStat &  OS_STAT_SUSPEND) == OS_STAT_RDY) {
+                OSRdyGrp     |= ptcb->OSTCBBitY;
+                OSRdyTbl[y]  |= ptcb->OSTCBBitX;
+        }
+        
+        //Remove this task form event wait list
+        OS_EventTaskRemove(ptcb, pevent);
+        
+        #if (OS_EVENT_MULTI_EN > 0u)
+        //Remove this task from events' wait lists
+        if (ptcb->OSTCBEventMultiPtr |= (OS_EVENT **)0) {
+                OS_EventTaskRemoveMulti(ptcb, ptcb->OSTCBEventMultiPtr);
+                //Return this task from events' wait lists
+                ptcb->OSTCBEventPtr = (OS_EVENT *)pevent;
+        }
+        #endif
+        
+}
+#endif

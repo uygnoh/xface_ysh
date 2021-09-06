@@ -1,0 +1,74 @@
+###########################################################
+### % https://riscv.org/technical/specifications/
+### 1 % QEMU(qemu-system-riscv32)安装
+###########################################################
+0 % 安装QEMU ( https://www.qemu.org/ )
+% 下载qemu-5.2，解压后进入qemu-5.2
+$ ./configure --target-list=riscv32-softmmu
+$ make
+$ sudo make install
+% 验证QEMU是否安装成功
+$ qemu-system-riscv32 --version
+
+1 % QEMU有两种主要的运行模式(qemu-system-riscv32)
+User mode   (用户模式,直接运行应用程序)
+System mode (模拟整个计算机系统，包含CPU和外设)
+
+2 % QEMU运行时退出方式
+Press Ctrl-A and then X to exit QEMU
+
+3 % (make debug)GDB运行时退出方式
+Pree Ctrl-C and then input 'quit' to exit GDB and QEMU
+
+
+
+###########################################################
+### 2 % riscv64-unkown-elf-gcc (交叉编译器安装)
+###########################################################
+% vim $HOME/.bashrc
+# riscv-gcc
+export PATH=$PATH:/home/freeysh/Documents/RSICV_OS/riscv_gcc/bin
+% 查看riscv64-unknown-elf-gcc是否安装成功
+riscv64-unknown-elf-gcc -v
+
+
+
+
+###########################################################
+### % RISC-V(RVOS)教程
+###########################################################
+-1 % 进入RISC-V(RV32I)工作目录
+  cd /home/ysh/ws/riscv-operating-system-mooc-main/code/asm
+
+
+0 % 编译程序
+  cd add
+  make
+
+
+1 % 调式程序，启动( QUEM系统级模拟器 ) 与 (本地机器连接)
+  make debug
+% (QEMU, -nographic不启动图形界面, -smp 1只启动一个核心CPU)
+% (QEMU, -s在qemu中自动启动一个gdbserver)
+% QEMU为目标机(默认端口号为1234)
+% (QEMU目标机与本地机的连接为本地的回环)
+% (QEMU, -S启动一个程序，它会告诉GDB停在那里，方便调式)
+  si        % 单步执行程序，用于调式
+
+
+
+###########################################################
+### % RISC-V(RV32I)
+###########################################################
+% Big Endian & Little Endian(大端格式 & 小端格式)
+% RV32I采用小端格式
+大端与小端是指字节在存储器中存储顺序的两种方式
+大端是将一个字数据的最低位字节存储在最高字节地址上
+小端是将一个字数据的最低位字节存储在最低字节地址上
+
+
+% RV32I汇编    
+instruction         % (指令)
+pseudo-instruction  % (伪指令)
+directive           % (指示/伪操作，必须以“.”开头)
+macro               % (采用.macro/.endm自定义宏)

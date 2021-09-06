@@ -1,0 +1,109 @@
+###########################################################
+### % XTerm配置文件详情， xterm*前缀
+###########################################################
+% 下列选项应用到配置文件时，请自行添加 xterm* 前缀。这无需解释吧
+% 指定xterm 启动时是否要求窗口管理器使用全屏布局。此选项接受一个字符串参数或数字
+
+fullscreen: false   在启动时不启用全屏，但稍后可以通过菜单进入全屏模式
+fullscreen: true    在启动时启用全屏，但稍后可以手动退出全屏模式
+fullscreen: always  在启动时启用全屏，并且不能取消
+fullscreen: never   在启动时不启用全屏，并且无法通过其他方式进入全屏
+
+hold:               如果选择 true，则 当你在xterm中退出 shell 后，窗口不会关闭，
+                    这意味着你要执行 kill 窗口进程的操作才能关闭xterm。
+                    退出shell 后，你仍可以执行向后滚屏、选择文本等图形界面的操作，
+                    但无法进行 shell 交互了。
+
+hpFunctionKeys:     惠普的功能键支持，默认是 false
+
+iconHint:           指定将被添加到窗口管理器提示的图标。的xterm没有提供默认值。
+                    选择 “none” 表示忽略，让窗口管理器决定。
+                    如果为此选项指定了参数，或用 -n 选项启动 xterm，则xterm 会在当前目录，
+                    或 /usr/share/pixmaps 目录中寻找指定名称的点阵图文件。
+
+
+keyboardType:       指定键盘类型（注意，不是布局方案），xterm支持的键盘类型包括： 
+                    hpFunctionKeys,scoFunctionKeys,sunFunctionKeys, 
+                    tcapFunctionKeys, oldXtermFKeys，sunKeyboard 。
+                    上述键盘对应的参数分别为：“hp”，“sco”，“sun”，“tcap”，“legacy”，“vt220”
+
+maxBufSize:         指定输入缓冲区的最大值。默认值是 “32768”。此参数不能小于 minBufSize 指定的值。
+
+minBufSize:         指定输入缓冲区的最小值。默认值是 “4096”。此参数不能小于 “64”。
+scaleHeight:        设置行高，参数取值为 0.9 到 1.5 之间，默认值为 1 。
+
+termName:           指定 xterm 在环境变量 TERM 中的名称
+
+title:              指定一个字符串，作为窗口管理器的标题
+
+toolBar:            是否显示工具栏，默认值为 true，需要在编译时加入工具栏支持
+
+% 一下是作为 vt100 （类 VT100）的一部分指定的，大部分桌面用户会用到：
+allowBoldFonts:     当设为 “false” 时，xterm 将不使用粗体字。
+                    此选项将覆盖 alwaysBoldMode 和 boldMode 参数
+
+alwaysHighlight:    指定 xterm 是否应该始终突出显示文本光标。
+                    默认情况下，无论是指针移动到窗口外还是窗口丧失输入焦点，都显示一个中空的文本光标。
+
+background:         设置 xterm 的背景颜色，默认值为：“XtDefaultBackground”
+
+bellIsUrgent:       设置 当蜂鸣器响起时，是否开启一个紧急提示，默认值为“false”
+
+bellOnReset:        设置当硬重启时，是否蜂鸣
+
+cjkWidth:           设定 xterm 是否应该遵循亚洲东部的宽度规则。
+                    如果你使用一些依赖此项的老旧终端模拟器可能会用到。默认为 false。
+
+color255:           让 xterm 支持255色终端显示
+
+
+
+###########################################################
+### % XTerm 配置文件
+###########################################################
+
+% 1.建立~/.Xresources文件,可参考下列内容:
+    XTerm*faceName: Bitstream Vera Serif Mono
+    xterm*faceSize: 11
+    xterm*vt100*geometry: 100x30
+    xterm*saveLines: 16384
+    xterm*loginShell: true
+    xterm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+    xterm*termName: xterm-color
+    xterm*eightBitInput: false
+    xterm*fullscreen: false
+    
+% 2.运行xrdb(X server resource database utility):
+    xrdb -merge ~/.Xresources
+
+% 3. 修改配置文件, 使不同类型的文件在终端中显示不同的颜色
+% 在家目录的 .profile 文件中添加以下内容:
+alias ls='ls -FGa'
+alias ll='ls -FGal'
+TERM=xterm-color; export TERM
+
+% 4. 设置 xterm 的启动方式
+% 这时候如果直接启动 xterm, 你会发现第3步设置的内容没有生效, 
+% 这是因为 xterm 默认启动是不会读用户的 .profile 文件的, 
+% 要想读 .profile 中的配置, 需要添加 -ls 选项. 
+% 所以你可以在 .fvwm2rc 文件中启动 xterm 的地方这样写:
+exec xterm -ls
+
+
+% 5. 执行下面的命令使配置文件生效
+% vim ~/.bashrc 将下面代码添加到~/.bashrc最后一行
+xrdb .Xdefaults 
+
+
+
+###########################################################
+### % XTerm XTerm快捷键
+###########################################################
+% XTerm常用选项设置
+
+ctrl+鼠标左键   Manin Options
+ctrl+鼠标右键   VT Fonts
+ctrl+鼠标中键   VT Fonts
+
+
+

@@ -1,0 +1,144 @@
+###########################################################
+### % Automake介绍
+###########################################################
+Automake是从Makefile.am(定义一系列make变量的文件)自动生成Makefile.in文件的工具。
+生成的Makefile.in符合GNU Makefile 标准。
+
+因为不同的平台需要修改Makefile，所以编写configure脚本自动修改Makefile，
+再执行./configure && make && make install命令安装包，形成了GNU构建系统。
+
+Autotools是为包创建GNU构建系统的工具；Autoconf主要关注configure；Automake主要关注Makefile。
+
+% 当安装一个程序时，安装步骤有以下几步：
+    tar -zxf xxx.tar.gz
+    cd xxx
+    ./configure         #检查要求的环境，生成包括Makefile（s）在内的多个文件
+    make                #构建所有的文件结构，生成文件
+    make check          #源码检查
+    su                  #切换到root用户
+    make install        #复制源码文件到目的目录
+    make installcheck   #安装后检查
+
+% note：
+    make uninstall      需要在构建树下运行
+    make clean          删除make生成的文件
+    make distclean      额外删除 ./configure生成的文件
+    make dist           从源码重新创建xxx.tar.gz
+
+% 有一些可配置变量，可以通过./configure --help查看完整版
+% 如果想配置系统默认变量，可以修改/usr/local/share/config.site文件中指定
+
+
+
+###########################################################
+### % 标准目录变量
+###########################################################
+
+% Directory variable	Default value
+prefix				/usr/local
+exec_prefix			${prefix}
+bindir				${exec_prefix}/bin
+libdir				${exec_prefix}/lib
+…
+includedir			${prefix}/include
+datarootdir			${prefix}/share
+datadir				${datarootdir}
+mandir				${datarootdir}/man
+infodir				${datarootdir}/info
+docdir				${datarootdir}/doc/${PACKAGE}
+
+% 通过./configure --help查看完整版。
+% 可以在运行时改变这些目录：./configure --prefix ~/usr
+
+
+
+###########################################################
+### % automake 宏
+###########################################################
+AC_                 % 开头的是autocofig的宏；
+AM_                 % 开头的是automake的宏。
+AC_INIT             % 定义了包名、版本、联系地址
+AM_INIT_AUTOMAKE    % 括号中的是automake的选项。
+                    -Wall -Werror 意味着关闭警告并作为错误进行报告；
+foreign             % 不要遵守GNU的规则，GNU包总是还应该有其他的文件
+AC_PROG_CC          % 使configure脚本搜索C编译器然后用其名字定义变量CC，
+                    src/Makefile.in文件需要使用CC变量来构建hello
+AC_CONFIG_HEADERS   % 使configure脚本创建config.h文件收集在
+                    configure.ac文件中定义的宏
+AC_CONFIG_FILES     % 声明了configure文件应该从*.in模板创
+                    建的文件列表，否则不会使用Makefile.am文件
+AC_OUTPUT           % 是一个关闭命令，是真正的负责生成文件
+                   （在AC_CONFIG_HEADERS和AC_CONFIG_FILES中注册的）的脚本部分
+
+
+
+###########################################################
+### % Autotools必要的工具
+###########################################################
+
+% autoconf
+生成可以自动配置软件源码包，
+用于适应多种UNIX类系统的shell脚本工具，
+最后生成可执行程序 configure
+
+
+% automake
+从Makefile.am文件自动生成Makefile.in的工具。
+configure程序使用Makefile.in生成Makefile
+
+% libtool
+方便生成各种程序库的工具。
+
+
+% m4
+GNU m4 是一种宏处理器，它扫描用户输入的文本并将其输出，
+期间如果遇到宏就将其展开后输出。宏有两种，一种是内建的，
+另一种是用户定义的，它们能接受任意数量的参数。
+除了做展开宏的工作之外，m4 内建的宏能够加载文件，
+执行 Shell 命令，做整数运算，操纵文本，形成递归等等。
+m4 可用作编译器的前端，或者单纯作为宏处理器来用。
+
+所有的 Unix 系统都会提供 m4 宏处理器，因为它是 POSIX 标准的一部分。
+通常只有很少一部分人知道它的存在，这些发现了 m4 的人往往会在某个方面成为专家。
+这不是我说的，这是 m4 手册说的。
+
+有些人对 m4 非常着迷，他们先是用 m4 解决一些简单的问题，
+然后解决了一个比一个更大的问题，直至掌握如何编写一个复杂的 m4 宏集。
+若痴迷于此，往往会对一些简单的问题写出复杂的 m4 脚本，然后耗费很多时间去调试，反
+而不如直接手动解决问题更有效。所以，对于程序猿中的强迫症患者，
+要对 m4 有所警惕，它可能会危及你的健康。这也不是我说的，是 m4 手册说的。
+
+
+###########################################################
+### % Makefile.am中可用的全局变量
+###########################################################
+变量			    含义
+INCLUDE			% 比如链接时所需要的头文件
+LDADD			% 比如链接时所需要的库文件
+LDFLAGS			% 比如链接时所需要的库文件选项标志
+EXTRA_DIST		% 源程序和一些默认的文件将自动打入　.tar.gz包。
+			    % 其它文件若要进入　.tar.gz包可以用这种办法，
+			    % 比如配置文件，数据文件
+SUBDIRS			% 在处理本目录之前要递归处理那些子目录
+
+
+
+###########################################################
+### % configure.in 中，有一些被 autoconf 宏预先定义的变量
+###########################################################
+includedir      % C 头文件目录。
+top_srcdir      % 源代码的最上层目录。
+srcdir          % 为 Makefile 提供的源代码路径。
+LIBS            % 给连接程序的 -l 选项
+LDFLAGS         % 给连接程序的 stripping（-s）和其他一些选项。
+DEFS            % 给 C 编译器的 -D 选项。
+CFLAGS          % 给 C 编译器的 debug 和优化选项。当调用了 AC_PROG_CC 才有效。
+CPPFLAGS        % 头文件搜索路径（-I)和给 C 预处理器和编译器的其他选项。
+CXXFLAGS        % 给 C++ 编译器的 debug 和优化选项。当调用了 AC_PROG_CXX 才有效。
+bindir          % 安装可执行文件的目录。
+sbindir         % 为管理员运行该该程序提供的安装路径。
+mandir          % 安装手册页的目录。
+infodir         % info 页安装目录。
+
+
+

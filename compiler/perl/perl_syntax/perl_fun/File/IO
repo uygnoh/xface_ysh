@@ -1,0 +1,103 @@
+
+### 行输入操作符 <STDIN>
+my $line = <STDIN>;
+chomp($line);
+print "$line\n";
++
+use strict;
+my $line;
+chomp($line = <STDIN>);
+print "$line\n";
+
+
+my $line;
+while (defined($line = <STDIN>)) {
+    print "I saw $line";
+}
+print "$line\n";
+
+
+
+my $line;
+while (<STDIN>) {
+    print "I saw $_";
+}
+
+foreach (<STDIN>) {
+    print "I saw $_";
+}
+print "$line\n";
+
+
+
+### 钻石操作符   <>
++ 当没有调用参数的时候，钻石操作符会调用标准输入
++ 当有调用参数的时候，  钻石操作符会去处理调用参数
++ 钻石操作符读一个数组@ARGV, @ARGV里面是调用参数
++ @ARGV = qw/ b.txt - a.txt/; 可以修改调用参数@ARGV
+
+my $line;
+while (defined($line = <>)) {
+    chomp($line);
+    print "I saw $line";
+}
+print "$line\n";
+
+
+while (defined($_<>)) {
+    chomp($_);
+    print "I saw $_";
+}
+
+
+
+while (<>) {
+    chomp;
+    print "I saw $_";
+}
+
+
+
+### 调用参数     @ARGV
+
+
+
+### 文件句柄
+[STDIN, STDOUT, STDERR, DATA, ARGV, ARGVOUT] 标准文件句柄
+
+while (<STDIN>) {
+    print "I saw $_";
+}
+
+
+
+
+### 打开文件句柄, 使用文件句柄, 关闭文件句柄
+1. 文件输入
+
+open TXTFILE, "<", "a.txt";
+while (<TXTFILE>) {
+    print $_;
+}
+close TXTFILE;
+
+
+2. 文件输出
+open FILE, ">", "b.txt";
+print FILE "Hello Perl";
+close FILE;
+
+
+3. 文件追加输出
+open FILE2, ">>", "b.txt";
+print FILE2 "Hello Perl new";
+close FILE2;
+
+
+
+4. 如果打开文件失败停止执行， 并且显示出错信息
+if (! open FILE3, "<", "c.txt") {
+    die "Cannot open file: $!";
+
+
+

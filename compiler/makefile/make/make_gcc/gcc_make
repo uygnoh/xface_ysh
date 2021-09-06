@@ -1,0 +1,142 @@
+###########################################################
+### % gcc_make编译选项
+###########################################################
+-E                          # 指示编译器仅对输入文件进行预处理
+-S                          # 告诉 GCC编译器 在为 C 代码产生了汇编语言文件后停止编译
+-c                          # 只编译并生成目标文件
+-o                          # 指定目标名称, 缺省的时候, gcc 编译出来的文件是 a.out
+
+-O                          # 对程序进行优化编译、链接，采用这个选项
+-w                          # 不生成任何警告信息
+-Wall                       # 生成所有警告信息。
+-Wextra                     # 输出-Wall不包含的警告等
+-Werror                     # 将警告视为错误输出
+-g                          # 生成调试信息。GNU 调试器可利用该信息
+-pg                         # 要启用gprof很简单，gcc编译的时候带上-pg参数即可
+
+-shared                     # 生成共享目标文件。通常用在建立共享库时。
+-static                     # 禁止使用共享连接。 
+
+-Idir                       # 将 dir目录加入搜索头文件的目录路径
+-Ldir                       # 将 dir目录加入搜索库文件的目录路径
+-llib                       # 链接lib库
+
+-pipe	                    # 使用管道代替编译中临时文件, 在使用
+                              非 gnu 汇编工具的时候, 可能有些问题
+-ansi                       # 关闭 gnu c中与 ansi c 不兼容的特性, 
+                               激活 ansi c 的专有特性
+                             （包括禁止一些 asm inline typeof 关键字, 
+                               以及 UNIX,vax 等预处理宏）
+
+
+-nostdinc                   # 使编译器不再系统缺省的头文件目录里面找头文件, 
+                              一般和 -I 联合使用,明确限定头文件的位置
+-imacros file               # 将 file 文件的宏, 扩展到 gcc/g++ 的输入文件, 
+                              宏定义本身并不出现在输入文件中
+-Dmacro                     # 相当于 C 语言中的 #define macro　　
+-Dmacro=defn                # 相当于 C 语言中的 #define macro=defn　　
+-Umacro                     # 相当于 C 语言中的 #undef macro
+-undef                      # 取消对任何非标准宏的定义 
+-DMACRO                     # 以字符串"1"定义 MACRO 宏
+-DMACRO=DEFN                # 以字符串"DEFN"定义 MACRO 宏
+
+-Wl,option                  # 通过该选项将参数 option 作为后续链接器 ld 使用的参数
+-Wl,rpath=/path/to/lib      # 为链接器指定一个非默认的运行时库的搜索路径，运行采用了
+                              该选项编译的程序时，链接器会在-rpath 指定的目录中搜索
+                              所需的 so 库文件，以将其载入内存中
+　　　
+-D name=definition          # 加入宏定义，若不指定def，则默认为1
+
+-O0, -O1, -O2, -O3          # 编译器的优化选项的 4 个级别，
+                              -O0 表示没有优化, -O1为 缺省值，
+                              -O3 优化级别最高
+
+
+
+###########################################################
+### % GCC编译器制作静态库文件(.a)
+###########################################################
+(ar == archive) (rcs == replace create save)
+% 格式：ar rcs  libxxx.a xx1.o xx2.o
+% ar命令最常见的用法是将目标文件打包为静态链接库
+1 生成目标文件
+% gcc -c hello.c            
+2 把生成的 hello.o 这个文件归档,生成一个 libhello.a      	
+% ar -r libhello.a hello.o  
+3 使用静态库      
+% gcc main.c libhello.a -o App    
+4 加入搜索库文件的目录路径,并指定要链接的库文件名
+% gcc -L. main.c -o App -lhello   
+
+
+
+###########################################################
+### % GCC编译器制作共享库文件(.so)
+###########################################################
+shared      % (表示生成共享库格式)
+fpic        % {产生位置无关码(position independent code)}
+libxxx.so   % 库名规则：	
+l           % 链接共享库存，只要库名即可（去掉lib及版本号）
+L	        % 链接库所在路径
+
+GCC编译器制作动态库文件 .so
+_____________________________
+1 编译独立的代码目标文件 -fpic
+% gcc -c -fpic hello.c		
+2 编译生成共享库
+gcc -shared hello.o -o libmy.so 
+3 第1部和第2部合并写法
+% gcc -fpic -shared hello.o -o libmy.so
+4 使用共享库	
+% gcc main.c libmy.so -o App	
+5 库依赖环境
+% 定位共享库依赖 LIBRARY_PATH, 
+% 运行时依赖 LD_LIBRARY_PATH.
+
+
+
+###########################################################
+### % LDD, ldconfig
+###########################################################
+gcc -I 或者 gcc -L 用于命令行方式指定头文件、库文件的搜索路径。
+如果是源码安装一些东西，   发生了找不到头文件、   库文件的时候，
+用的makefile直接编译还好；如果是用的configure，甚至其他的来
+生成makefile，或者有的时候，甚至都不知道怎么编译出来的。这时候就傻了。
+这时候，可以用C_INCLUDE_PATH、CPLUS_INCLUDE_PATH（for c++）、
+LIBRARY_PATH作为环境变量来指定GCC的相应搜索路径。
+% 另外，环境变量 CPPFLAGS、LDFLAGS等用于makefile。
+C_INCLUDE_PATH
+LIBRARY_PATH
+LD_LIBRARY_PATH
+
+
+0 % ldd(list dynamic dependencies)列出动态库依赖关系
+
+
+1 % ldconfig几个需要注意的地方:
+1. 往/lib和/usr/lib里面加东西，是不用修改/etc/ld.so.conf的，
+   但是完了之后要调一下ldconfig，不然这个library会找不到
+2. 想往上面两个目录以外加东西的时候，一定要修改/etc/ld.so.conf，
+    然后再调用ldconfig，不然也会找不到
+    比如安装了一个mysql到/usr/local/mysql，
+    mysql有一大堆library在/usr/local/mysql/lib下面，
+    这时就需要在/etc/ld.so.conf下面加一行/usr/local/mysql/lib，
+    保存过后ldconfig一下，新的library才能在程序运行时被找到。
+3. 如果想在这两个目录以外放lib，
+   但是又不想在/etc/ld.so.conf中加东西（或者是没有权限加东西）。
+   那也可以，就是export一个全局变量LD_LIBRARY_PATH，
+   然后运行程序的时候就会去这个目录中找library。
+   一般来讲这只是一种临时的解决方案，在没有权限或临时需要的时候使用。
+4. ldconfig做的这些东西都与运行程序时有关，跟编译时一点关系都没有。
+    编译的时候还是该加-L就得加，不要混淆了。
+5. 总之，就是不管做了什么关于library的变动后，
+   最好都ldconfig一下，不然会出现一些意想不到的结果。
+   不会花太多的时间，但是会省很多的事。
+   再有，诸如libdb-4.3.so文件头中是会含有库名相关的信息的
+   （即含“libdb-4.3.so”，可用strings命令察看），
+   因此仅通过修改文件名以冒充某已被识别的库
+   （如libdb-4.8.so）是行不通的。为此可在编译库的Makefile中直接修改配置信息，
+   指定特别的库名。
+
+
+

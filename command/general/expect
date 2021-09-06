@@ -1,0 +1,79 @@
+###########################################################
+### % expect是什么？
+###########################################################
+set timeout 30      
+% 设置超时时间，单位是秒，-1,为永不超时。
+
+
+spawn(starts a process)
+% spawn 它的主要作用是传递交互指令
+
+expect(waits for output from a process)
+% 在/usr/bin/expect的环境内部还有一个 expext的内部命令。
+% expext的内部命令：判断输出是否包含某项字符串，没有则立即返回，否则就等一段时间返回
+% expext的内部命令：它的等待时间通过 timeout设置。
+
+
+send(sends to a process)
+% 执行交互动作， 将交互要执行的动作进行输入给交互指令
+% 命令字符串结尾要加上“r”，如果出现异常等待的状态可以进行核查。
+
+
+interact(lets you interact with a process)
+% 执行完保持交互状态，把控制权交给控制台。
+% 如果不加这一项，交互完成会自动退出。
+
+
+exp_continue
+% 继续执行接下来的交互操作。
+
+
+$argv
+% expect脚本可以接受从bash传递过来的参数，可以使用 [index $argv n]获得。
+% n 从0开始计算。
+% 分别示 第1个，第2个， 第3个，第N个参数。
+
+
+
+
+
+###########################################################
+###  OpenSSH 无交互
+###########################################################
+vim OpenSSH.exp
+
+#!/usr/bin/expect   #设置脚本执行环境
+set timeout 30      #设置超时时间，单位是秒，-1,为永不超时。
+set ipaddress "192.168.1.61"
+set password "123456"
+
+spaw ssh root@$ipaddress
+expect {
+    "yes/no" { send "yes\r"; exp_contine }
+    "password:" { send "$password\r" }
+}
+interact
+
+
+
+###########################################################
+###  OpenSSH 无交互
+###########################################################
+% 通过位置参数来进行传递
+vim OpenSSH.exp
+
+#!/usr/bin/expect
+set ipaddress [ lindex $argv 0 ]
+set user [ lindex $argv 1 ]
+set passwd [ lindex $argv 2 ]
+set timeou 30
+spawn ssh $user@$ipaddress
+expect { 
+    "yes/no" { send "yes\r"; exp_contine }
+    "password:" { send "$passwd\r"}
+    
+}
+% ./OpenSSh.exp 192.168.1.61 jack 123456
+
+
+

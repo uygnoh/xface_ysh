@@ -1,0 +1,136 @@
+###########################################################
+### % eclipse
+###########################################################
+% IDE ->Integrated Development Environment,集成开发环境
+Build Automatically,自动生成                    Rebuild Last Target,重新生成上一个目标
+Re-resolve,重新解析                             Unresolved,未解决的
+Create Parser Log File,创建分析程序日志文件       Recursively,递归地
+Add separator,添加分隔符
+
+Convert Line Delimiters,转换行分隔符             Incremental Find Previous,增量查找上一个
+Extract Local Variable,提取局部变量              Add Block Comment,添加块注释
+Toggle Comment,切换注释                          Remove Block Comment,删除块注释
+Align Const,对齐常量                             Correct Indention,正确缩进
+Implement Method,实现方法                        Problem Details,问题细节 
+Project Explorer,工程资源管理器
+
+
+Launch,开始         Workspace,工作空间       Browser,浏览器      
+Artifacts,人工产品  Development,新产品       Preferences,参数选择
+Organize,组织       surround,包围           Perspective,透视的
+Appearence,外观     contextual,上下文的      Expand All,展开所有 
+
+
+Refactor,重构       Navigate,导航             Properties,特性
+Undo,撤消           Redo,重做                 Find/Replace,查找/替换
+Previous,以前的     Incremental,增量          Add Bookmark,添加书签
+Completion,完成     Quick Fix,快速修复        Set Encoding,集合编码
+Tooltip,工具提示     Description,描述         Toggle Block Selection,切换块选择
+
+
+% Help->Help Contents,帮助内容
+Corntribute,贡献        Marketplace,市场      Cheat Sheets,备忘单
+Enhancement,增强        Keybindings,键绑定     Tips and Tricks,小窍门
+
+
+% Projece->Properties,C/C++ Build,Settings, 性质,C/C++ 建造,设置
+Traget Processor                            目标处理机
+Cross ARM GNU Assembler                     交叉ARM GNU汇编程序
+Cross ARM GNU C Compiler                    交叉ARM GNU C编译程序
+Cross ARM GNU C Linker                      交叉ARM GNU C链接器
+Cross ARM GNU Create Flash Image            交叉ARM GNU 创建Flash图像
+Cross ARM GNU Print Size                    交叉ARM GNU
+Miscellaneous,[ˌmɪsəˈleɪniəs]其他           Optimizstion,最优化
+
+
+% Windows->preferences, Windows->首选项
+Run/Debug->String Substitution              运行/调试->字符串替换
+
+
+% Run->
+Skip All Breakpoints,跳过所有断点           Toggle Method Breakpoint,切换方法断点
+Toogle Watchpoint,切换观察点
+
+
+% Navigate->导航
+Open Declaration,公开声明                 Open Type Hierarchy,打开类型层次结构
+Open Call Hierarchy,打开调用层次结构
+Open Element,->Visible element types, 开放元素,可见元素类型
+Namespace,命名空间           Class,等级          Struct,结构         Typedef,定义类型
+Macro,宏                    Union,联合          Function,函数       Variable,变量
+Enumerator,枚举器            Enumeration,枚举
+
+
+
+###########################################################
+### % stm32
+###########################################################
+RAM (Random Access Memory, 随机存取存储器)
+ROM (Read-Only Memory, 只读存储器)
+FLASH闪存(的英文名称是"Flash Memory"，一般简称为"Flash")
+它属于内存器件的一种，是一种非易失性（ Non-Volatile ）内存。
+
+
+%__________________________________________________________    
+CMSIS (ARM Cortex™ 微控制器软件接口标准)
+(CMSIS：Cortex Microcontroller Software Interface Standard) 
+是 Cortex-M 处理器系列的与供应商无关的硬件抽象层
+英文原文为：
+(a vendor-independent hardware abstraction layer 
+for the Cortex-M processor series and defines 
+generic tool interfaces--来自ARM官方定义）
+
+NVIC (Nested Vectored Interrupt Controller 内嵌向量中断控制器)
+
+
+%__________________________________________________________
+% TTL电平 
+% transistor transistor logic,晶体管-晶体管逻辑电平 
+TTL电平信号规定，+5V等价于逻辑“1”，0V等价于逻辑“0”(采用二进制来表示数据时)。
+这样的数据通信及电平规定方式，被称做TTL（晶体管-晶体管逻辑电平）信号系统。
+这是计算机处理器控制的设备内部各部分之间通信的标准技术。
+
+
+% ARM-Architecture V7-M Thumb-2
+AAPCS->(ARM Archtecture Procedure Call Standard) 
+CMSIS	Cortex Microcontroller Software Interface Standard
+		ARM Cortex™ 微控制器软件接口标准
+MSP		Main Stack Point							主堆栈指针
+PSP		Process Stack Point							进程堆栈指针
+LR		Link Register								连接寄存器
+PC		Program Counter								->
+PSR		program status Register						程序状态寄存器
+APSR												应用程序PSR
+IPSR												中断号PSR（IPSR）
+EPSR												执行PSR（EPSR）
+NVIC	Nested Vectored Interrupt Controller		内嵌向量中断控制器
+NMI		Non Maskable Interrupt						不可屏蔽中断(即CPU不能屏蔽)
+IRQ		Interrupt Request							中断请求
+ISR		Interrupt Service Routines					中断服务程序 
+MSB		Most Significant Bit						最高有效位
+LSB		Least Significant Bit						最低有效位
+LSU		Load/Store Unit
+MPU		Memory Protection Unit
+AHB		Advanced High-performance Bus
+APB		Advanced Peripheral Bus
+PPB		Private Perpheral Bus
+RCC		Reset and Clock Control						HSE,HSI,LSE,LSI,PLL		
+GPIO	General-purpose I/O
+AFIO	Alternate functions I/O
+RTC		Real-time clock
+DMA		Direct memory access
+EXTI	External interrupt/event controller			外部中断/事件控制器
+SW-DP	Serial wire Debug Port
+SWJ-DP	Serial Wire JTAG Debug Port
+ITM		Instrumentation Trace Macrocell				测量跟踪宏单元
+ETM		Embeedded Trance Macrocell					嵌入式跟踪宏单元 
+FPB		Flashpatch and Breakpoint
+DWT		Data Watchpoint and Trace
+TPIU	Trace Point Interface Unit
+MIPS    Million Instructions Per Second 			单字长定点指令平均执行速度
+
+
+
+
+
+

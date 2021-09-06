@@ -1,0 +1,121 @@
+### ====================================================================== smba
+windows中最常用的是 “网上邻居”，网上邻居使用的文件系统是CIFS（通用互联网文件系统）
+协议进行数据共享Linux上常用的是NFS服务
+Samba是在Linux和UNIX系统上实现SMB协议的一个免费软件，由服务器及客户端程序构成
+SMB（Server Messages Block，信息服务块）是一种在局域网上共享文件和打印机的一种通信协议
+它为局域网内的不同计算机之间提供文件及打印机等资源的共享服务
+SMB协议是客户机/服务器型协议，客户机通过该协议可以访问服务器上的共享文件系统、打印机及其他资源
+通过设置“NetBIOS over TCP/IP”使得Samba不但能与局域网络主机分享资源，还能与全世界的电脑分享资源
+Samba基于NetBIOS协议开发，所以可以和Window通信，但只能在局域网内通信
+### =============================================================== samba主要应用
+1 文件共享
+2 打印服务器
+3 samba登陆时需要身份认证
+4 可进行windows主机名解析
+
+### ================================================================ smba安装
+samba                   主服务包
+samba－client            客户端
+samba－common            通用工具
+samba4－libs             库
+samba－winbind           windows域映射
+samba－winbind－clients  域映射客户端
+
+### ============================================================= samba的守护进程
+smbd    提供对服务器中文件,打印资源的共享访问    端口：139／445      tcp协议通信
+nmbd    提供基于NetBIOS主机名称的解析          端口：137／138      udp协议通信
+service smb start
+netstat -tlun
+service nmb start
+netstat -tlun
+
+
+
+
+################################################################################
+#############     samba配置文件: /etc/samba/smb.conf  ###########################
+
+# 对应NetBIOS名与主机的IP的文件，一般samba会自动搜索，
+/etc/samba/lmhosts          是IP和主机名解析的，针对局域网，只对本机生效
+_______________________________________________________________________________
+/etc/hosts                  是IP和域名解析，针对互联网访问的，只对本机生效!!!!!!!!!!!!
+
+
+# samba密码保护文件，默认是不存在的 ->600
+/etc/samba/smbpasswd
+
+
+# 用户别名，用于适用不同操作系统中用户名习惯，需在配置文件中“username map”选项支持
+／etc／samba／smbusers
+＃Unix_name=SMB_name1 SMB_name2
+root = administator admin
+nobody = guest pcguest smbguest
+
+testparm      检查配置文件是否正确
+
+
+### =============================================================SAMBA配置文件结构
+
+1 samba的配置文件主在分为两大部分的配置设定：全局的设置和共享的设置
+
+2 Global Settings
+[global]                全局设置
+
+3 Share Definitions     共享目录设置
+[homes]                 用户目录共享设置
+[printers]              打印共享设置
+[myshare]               自定义目录共享设置
+
+
+### ======================================================= samba支持两种注释方法
+1 “#”
+
+2 “;”这种注释代表给用户举的例子，只要你打开就可以使用
+
+linux uniq 命令详，解报告或删除文件中重复的行
+cat sub.conf |　grep -v "^#"　|　grep -v "^;" |　grep -v "#"　|uniq
+
+### =============================================================== SELINUX 服务
+sestatus                %查看SELinux状态
+
+vi /etc/selinux/config
+SELINUX=disabled        %关闭SELINUX服务
+
+
+
+### =============================================================samba [全局设置]
+workgroup               所在工作组名称
+server string           服务器描述信息
+log file                日志文件位置
+max log size            日志文件最在容量
+security                samba服务安全级别
+
+samba安全级别[security]可用如下的值：
+share                   不需要密码就可以访问
+user                    使用系统用户，使用samba密码
+server                  由其它服务器提供认证
+domain                  由域控制器提供认证
+
+samba内置常用变量：
+%v                      samba的版本号
+%S                      任意用户都可以登陆
+%m                      client端的NetBIOS主机名
+%L                      server端的NetBIOS主机名
+%u                      当前登陆的用户名
+%g                      当前登陆的用户组名
+
+
+### ======================================= samba的Share Definitions[共享设置定义]
+comment                 samba的描述信息
+path                    共享路径，指定共享路径的位置
+guest ok                允许所有人访问，public
+read only               所有人只读
+writable                所有人可写
+write list              拥有写权限的用户列表
+browseable              浏览的时候是否可以看到此共享的目录
+valid users             指定可以访问的用户
+
+
+
+
+

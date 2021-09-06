@@ -1,0 +1,34 @@
+###########################################################
+###  ip
+###########################################################
+ip addr 
+
+
+###########################################################
+###  debain 固定IP地址
+###########################################################
+% ip addr
+% 接下来，修改 /etc/network/interfaces，
+% 添加如下内容（注意，不要添加中文注释，有可能影响启动）
+auto enp2s0 
+iface enp2s0 inet static 
+address 192.168.100.38      
+netmask 255.255.255.0      
+gateway 192.168.100.1   
+
+% 修改DNS
+apt-get install resolvconf
+
+% 编辑 /etc/resolvconf/resolv.conf.d/base |
+% 编辑 /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+% 重新加载
+resolvconf -u
+
+% 重启网卡
+/etc/init.d/networking restart
+
+
+

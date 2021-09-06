@@ -1,0 +1,139 @@
+###############################################################
+### % STM32_SDT_V3.5.0 宏定义
+###############################################################
+0 % ->stm32f10x.h
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && \
+    !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && \
+    !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && \
+    !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
+    #error "Please select first the target STM32F10x device  \
+         used in your application (in stm32f10x.h file)"
+#endif
+#if !defined  USE_STDPERIPH_DRIVER
+  /*#define USE_STDPERIPH_DRIVER*/
+#endif
+
+
+1 % 这里边包含一个条件编译，如果我们要把中断向量表存储在RAM或者FLASH就要定义相关的宏
+  % 文件位置 system_stm32f10x.c ->SystemInit();
+#ifdef VECT_TAB_RAM
+    NVIC_SetVectorTable(NVIC_VectTab_RAM, 0x0000000);
+#else
+    NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+#endif
+
+
+2 % 头文件相关 ->stm32f10x.h
+#ifdef USE_STDPERIPH_DRIVER
+  #include "stm32f10x_conf.h"
+#endif
+
+
+3 % Makefile.common
+TypeOfMCU       =STM32F10X_MD
+CFLAGSlib       +=-D $(TypeOfMCU)
+CFLAGSlib       +=-D VECT_TAB_FLASH
+CFLAGSlib       +=-D USE_STDPERIPH_DRIVER
+
+
+
+
+
+###############################################################
+### % gcc编译参数详解一 (-ffunction-sections -fdata-sections)
+###############################################################
+% 背景
+有时我们的程序会定义一些暂时使用不上的功能和函数，虽然我们不使用这些功能和函数，
+但它们往往会浪费我们的ROM和RAM的空间。这在使用静态库时，体现的更为严重。有时，
+我们只使用了静态库仅有的几个功能，但是系统默认会自动把整个静态库全部链接到可执
+行程序中，造成可执行程序的大小大大增加。
+% 参数详解
+为了解决前面分析的问题，我们引入了标题中的几个参数。GCC链接操作是以section作为最小的处理单元，
+只要一个section中的某个符号被引用，该section就会被加入到可执行程序中去。因此，GCC在编译时可
+以使用 -ffunction-sections和 -fdata-sections 将每个函数或符号创建为一个sections，其中
+每个sections名与function或data名保持一致。而在链接阶段， -Wl,–gc-sections 指示链接器去掉
+不用的section（其中-wl, 表示后面的参数 -gc-sections 传递给链接器），这样就能减少最终的可执行程序的大小了。
+% 我们常常使用下面的配置启用这个功能：
+CFLAGS += -ffunction-sections -fdata-sections
+LDFLAGS += -Wl,--gc-sections
+
+
+
+###############################################################
+### % gcc和ld 中的参数 --whole-archive 和 --no-whole-archive
+###############################################################
+首先 --whole-archive 和 --no-whole-archive 是ld专有的命令行参数，gcc 并不认识，
+要通gcc传递到 ld，需要在他们前面加 -Wl，字串。
+% --whole-archive 
+可以把 在其后面出现的静态库包含的函数和变量输出到动态库，--no-whole-archive 则关掉这个特性。
+% 比如你要把 liba.a  libb.a libc.a 输出到 libabc.dll(或libabc.so)时应该这么写：
+libabc.dll:liba.c libb.a libc.a
+       gcc  -shared -o $@ -L. -Wl,--whole-archive -la -lb -lc -Wl,--no-whole-archive
+在--whole-archive作用下的库里不能有函数同名。
+
+
+
+###############################################################
+### % gcc和ld 中的参数 -Wl,--start-group -Wl,--end-group
+###############################################################
+这里有１个链接顺序的问题，在command line上面的库会依赖之后的库如果碰到循环链接，
+-lliba -llibb -lliba,这样就需要使用 --start-group和--end-group 反复在.a中进行搜索，
+直到所以未定义的字符都被找到为止，而不是默认只搜索一次．
+
+
+
+###############################################################
+### % gcc和ld 中的参数 -nostartfiles -nodefaultlibs -nostdlib
+###############################################################
+% -nostartfiles 
+连接的时候不使用标准系统的启动文件。标准系统库通常被使用，
+除非选项“-nostdlib”和“-nodefaultlibs”被使用。 
+
+% -nodefaultlibs
+连接的使用不使用标准系统库。只有你指定的库才能够传递给连接器。
+与系统库有关的特定的连接选项（例如-static-libgcc 和 -shared-libgcc ）将会被忽略。
+标准的启动文件通常会被使用，除非-nostartfiles选项被使用。 
+
+% -nostdlib
+链接的时候不使用标准的系统启动文件和系统库。 没有启动文件和只用你指定的库可以被传递给连接器。
+
+
+
+###############################################################
+### % gcc编译stm32f103出现错误!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+###############################################################
+init.c:(.text.__libc_init_array+0x20): undefined reference to `_init'
+% 解决方法：
+方法一：去掉makefile中的编译选项：-nostartfiles
+方法二：方法一不凑效的情况下，添加编译选型：--specs=nano.specs
+% 要使用newlib-nano，用户应提供额外的gcc链接时间选项：–specs=nano.specs
+Nano.specs还处理两个额外的gcc库：libstdc ++ _ s.a和libsupc ++ _ s.a，
+它们针对代码大小进行了优化。
+
+
+
+
+
+
+###############################################################
+### % 此配置参数针对 STM32F10X标准固件函数库  V3.5.0
+###############################################################
+1 STM32F10X_HD
+USE_STDPERIPH_DRIVER
+### stm32f10x_conf.h >>此文件的定义位于 >>stm32f10x.h 文件中
+### 此文件定义所有库函数的头文件定义部分
+
+2 启动文件后缀名改为大写 >>[.S]
+
+3 修改 core_cm3.c文件，针对STM32F10x_StdPeriph_Lib_V3.5.0库函数, 文件在 736 行处
+% 打开工程文件STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport/core_cm3.c
+% 在此文件的最后几行的位置，找到
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );	  
+% 以下两行，并更改如下 ___________________________________________________________________
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+
+
+
+

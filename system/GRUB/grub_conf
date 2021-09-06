@@ -1,0 +1,232 @@
+###########################################################
+###  在grub2中，修改运行级别
+###########################################################
+% 1 系统启动时出现GRUB2菜单，按 [e键]
+% 2 找到首字母为"linux16"这一行， 在其尾部添加如下内容
+systemd.unit=multi-user.target
+% 3 修改完成后按Ctrl+x ，重启系统
+
+
+
+###########################################################
+###  恢复ROOT用户密码
+###########################################################
+% 1 重启系统
+% 2 中断系统引导 ，按 [e键]
+% 3 编辑选择菜单
+% 找到首字母为"linux16"这一行， 在其尾部添加如下内容
+    rd.break console=tty0
+% 修改完成后按Ctrl+x ，启动系统 
+% 4 修改密码
+  mount -o remount,rw /sysroot/
+  chroot /sysroot/
+  passwd
+___________________________________________
+5 重置 SELINUX 标签
+  touch /.autorelabel
+
+
+
+###########################################################
+###  /etc/grub.d目录
+###########################################################
+% 1 GRUB2菜单使有位于/etc/grub.d目录下的一系列脚本创建菜单
+00_header               #用于加载／etc／default／grub文件中的设置
+10_linux                #用于定位RHEL操作系统内核文件所在的位置
+30_os-prober            #用于搜索在其它分区的操作系统
+40_custom               #用于自定义额外的菜单入口项
+    
+% 2 更新grub.conf
+grub2－mkconfig －O ／boot／grub2／grub.cfg
+    
+% 3 改变缺省启动项
+GRUB2不支持手工设置一个数字编号来改变默认在启动的系统
+／etc／default／grub文件中的 GRUB_DEFAULT＝saved 用于加载最后一次成功加载的操作系统
+
+% 4 改变默认在启动的操作系统：(在有多个操作系统时)
+grub-set-default 2      #表示要启动的第3个操作系统
+    
+    
+    
+###########################################################
+###  查看linux内核文件
+###########################################################
+% 1 查看linux内核文件位置
+root@debian:~# ls /boot/vmlinuz-4.9.0-8-amd64       
+linux /boot/vmlinuz-4.9.0-8-amd64
+
+% 2 查看UUID
+root@debian:~# blkid /dev/sda5                      
+/dev/sda5: UUID="48b39318-99da-439d-96ec-5ee0dabf6059" TYPE="ext4" PARTUUID="ae8578f5-a14b-4927-ae2f-6adfda619f23"
+
+% 3 查看初始化内存盘位置
+root@debian:~# ls /boot/initrd.img-4.9.0-8-amd64    
+/boot/initrd.img-4.9.0-8-amd64
+
+
+
+###########################################################
+###  vim /etc/grub.d/40_sustom
+###########################################################
+% 40_custom 和 41_custom 这两个特别的文件用于生成用户对 GRUB 配置的修改。
+% 你仍然要注意对这些文件的更改的后果，并保存一份原始 grub.cfg 文件的备份。
+% 以只读的方式加载
+linux /boot/vmlinuz-4.9.0-8-amd64 ro
+  
+% 操作系统启动后需要把根/ 转换成UUID5         
+root=UUID=48b39318-99da-439d-96ec-5ee0dabf6059 
+
+cd /etc/grub.d/
+vim 40_custom
+
+menuentry 'my rhel7 os' {                               
+    set root='hd0,msdos1'               
+    linux /boot/vmlinuz-4.9.0-8-amd64 ro root=UUID=48b39318-99da-439d-96ec-5ee0dabf6059
+    initrd /boot/initrd.img-4.9.0-8-amd64
+
+}
+
+% ### 生成grub2配置文件命令
+% /boot/grub/grub.cfg
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+
+###########################################################
+###  GRUB2明文密码设定 1
+###########################################################
+% vim 40_custom
+set superusers="john"
+password john johnspassword
+password jane janespassword
+
+
+memuentry 'Red Hat Enterprise Linux Client' {
+    set root=(hd0,msdos1)
+    linux /vmlinuz
+}
+
+
+menuentry 'Fedora' --user jane {
+    set root=(hd0,msdos2)
+    linux /vmlinuz
+}
+
+
+
+###########################################################
+###  GRUB2明文密码设定 2
+###########################################################
+% vim 40_custom
+set superusers="john"
+password john redhat
+password jane 123456
+
+menuentry 'my rhel7 os' --users=jane {                               
+    set root='hd0,msdos1'               
+    linux /boot/vmlinuz-4.9.0-8-amd64 ro root=UUID=48b39318-99da-439d-96ec-5ee0dabf6059
+    initrd /boot/initrd.img-4.9.0-8-amd64
+
+}
+
+
+
+###########################################################
+###  GRUB2生成加密密码设定
+###########################################################
+% GRUB2生成加密密码设定
+grub2-mkpasswd-pbkdf2
+    
+% 配置文件中加密密码的样式、
+set superuser="john"
+password_pbkdf2 john
+grub.pbkdf2.sha512.10000.19074484548afd0fd
+fjkdeij13k3j4i4k55k565r4444444455555555555
+dkdiejijfeij152s8f158fe8f18e1f8e1f8e51f51f
+dfjeijfiejfief12f5e12f451f5e1f31f61fg56e16
+
+% GRUB2生成加密密码设定
+grub2-mkpasswd-pbkdf2
+
+
+
+% vim 40_custom
+set superusers="john"
+password john redhat
+password_pbkdf2 jane grub.pbkdf2.sha512..... 加密密码
+menuentry 'my rhel7 os' --users=jane {                               
+    set root='hd0,msdos1'               
+    linux /boot/vmlinuz-4.9.0-8-amd64 ro root=UUID=48b39318-99da-439d-96ec-5ee0dabf6059
+    initrd /boot/initrd.img-4.9.0-8-amd64
+
+}
+
+% grub2-mkconfg -o /boot/grub2/grub.cfg
+
+
+
+###########################################################
+###  grub2 终端菜单编辑方法
+###########################################################
+1 按 C 进入GRUB命令行
+2 系统启动时按下 e可以编辑菜单
+    Ctrl＋a 定位光标到行首
+    Ctrl＋e 定位光标到行尾
+    按Esc会退出，但是不保存作保修改
+% 1 按 C 进入GRUB命令行
+grub> set root='hd0,msdos1'
+grub> linux /boot/vmlinuz-4.9.0-8-amd64 ro root=/dev/vda1
+grub> initrd /boot/initrd.img-4.9.0-8-amd64 
+grub> boot
+
+            
+% 救援模式
+    1 救援模式提供了方便的单用户管理模式，用于修复系统
+    2 加载本地文件系统
+    3 启动重要的服务
+    4 不加载网络
+    5 不允许其它用户登陆
+    6 使用 systemd.unit=rescue.target
+% 2 救援模式 e
+找到首字母为"linux16"这一行， 在其行尾添加如下内容
+    systemd.unit=emergency.target
+Ctrl+x
+
+        
+% 急救模式   
+    1 提供最小的系统环境
+    2 仅挂载根文件系统
+    3 不会尝试挂载其它本地文件系统
+    4 不加载网络
+    5 仅启动必须的几个重要的服务
+    6 使用 systemd.unit=emergency.target
+% 3 急救模式
+找到首字母为"linux16"这一行， 在其行尾添加如下内容
+    systemd.unit=rescue.target
+Ctrl+x 
+     
+
+
+###########################################################
+###  修改grud背景图片
+###########################################################
+1    替换/usr/share/images/desktop-base/desktop-grub.png
+2    update-grub
+
+
+
+###########################################################
+###  grub2用户自定义启动项
+###########################################################
+% 40_custom, 用来加入用户自定义的菜单样板，
+% 将会在执行update-grub时更新至grub.cfg中
+
+vim /etc/grub.d/40_custom
+menuentry 'my free os' {
+	set root='hd0,gpt7'
+	linux /boot/vmlinuz-4.9.0-7-amd64 ro root=UUID=109fb2a2-0838-4f2b-b7a8-ef7f228305e9
+	initrd /boot/initrd.img-4.9.0-7-amd64
+}
+
+
+

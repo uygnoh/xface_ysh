@@ -1,0 +1,275 @@
+###########################################################
+###  % make自动化变量 ！(makefile必须用Tab缩进，不能使用空格代替)
+###########################################################
+% http://www.downloads.seng.de/HowTo_ToolChain_STM32_Ubuntu.pdf
+	$<	第一个依赖文件的名称
+	$^	所有的依赖文件，以空格分开，不包含重复依赖的文件
+	$@	目标文件的名称
+
+0 % Makefile 语法规则
+_____________________________
+
+target:   dependencies ...
+          commands
+          ...
+
+
+1 % make_example_1
+_____________________________
+% 注意：.PHONY后面都是伪目标
+main: main.o add.o sub.o
+	gcc -Wall -g main.o add.o sub.o -o main
+main.o: main.c
+	gcc -Wall -g main.c -o main.o
+add.o: add.c
+	gcc -Wall -g add.c -o add.o
+sub.o: sub.c 
+	gcc -Wall -g sub.c -o sub.o
+
+.PHONY: clean
+clean:
+	rm -f main main.o add.o sub.o
+
+
+2 % make_example_2 自动化变量
+_____________________________
+OBJ=main.o add.o sub.o
+main: $(OBJ)
+	gcc -Wall -g $^ -o $@
+main.o: main.c
+	gcc -Wall -g $< -o $@
+add.o: add.c
+	gcc -Wall -g $< -o $@
+sub.o: sub.c 
+	gcc -Wall -g $< -o $@
+
+.PHONY: clean
+clean:
+	rm -f main $(OBJ)
+
+
+3 % make自动化变量 “$<”, “$@”
+_____________________________
+% “$<”表示规则中的第一个依赖文件, “$@”表示规则中的目标文件。
+foo.o : foo.c
+	$(CC) -c $(CFLAGS) $< -o $@
+bar.o : bar.c
+	$(CC) -c $(CFLAGS) $< -o $@
+	
+
+
+###########################################################
+###  % makefile赋值
+###########################################################
+ =      % 是最基本的赋值
+:=      % 是覆盖之前的值
+?=      % 是如果没有被赋值过就赋予等号后面的值
++=      % 是添加等号后面的值
+
+1、“=”
+make会将整个makefile展开后，再决定变量的值。
+也就是说，变量的值将会是整个makefile中最后被指定的值。
+x = foo;    y = $(x) bar;   x = xyz
+% 在上例中，y的值将会是 (xyz bar), 而不是 foo bar 。
+　　
+2、“:=”
+“:=”表示变量的值决定于它在makefile中的位置，
+而不是整个makefile展开后的最终值。
+x := foo;   y := $(x) bar;  x := xyz
+% 在上例中，y的值将会是 (foo bar), 而不是 xyz bar 了。
+
+
+	　　	
+###########################################################
+###  % makefile函数
+###########################################################
+% 返回 Makefile 真实绝对的路径 
+TOP=$(shell readlink -f "$(dir $(lastword $(MAKEFILE_LIST)))")
+% 首先$(MAKEFILE_LIST) 会返回最近使用的Makefile文件（如果使用了include 
+包含了一个Makefile文件那么返回就是这个被include 包含的Makefile文件的路径，
+如果没有使用include 那么返回的是正在使用的Makefile文件所在的绝对路径）
+% (lastword)这个函数表示提取最后一个MAKEFILE_LIST列表里的最后一个元素。
+元素与元素之间是以空格符分开。 %  $(lastword $(MAKEFILE_LIST)) 表示 
+提取最后一个Makefile从文件名序列<names>中取出目录部分。目录部分是指最后
+一个反斜杠（“/”）之前的部分。如果没有反斜杠，那么返回“./”。
+% 最后使用readlink -f 返回绝对路径
+$(readlink -f .)	获得当前目录的真实路径
+$(readlink -f ../..	获得上上一级目录的真实路径
+
+
+1 函数调用$(function arguments)   
+2 匹配当前目录下的模式文件$(wildcard PATTERN) 
+% 例如:   src=$(wildcard *.c)
+3 模式替换函数$(patsubst PATTERN, REPLACEMENT, TEXT) 
+% 例如:   $(patsubst %.c,%.o,$src)
+% 等于:   $(src:.c=.o)
+4 执行shell命令$(shell ls -d */)    
+
+
+
+###########################################################
+###  % makefile规则
+###########################################################
+1 % makefile自动推导规则
+_____________________________
+% 01test/01test.c, 02test/02test.c,编译多个可执行文件，并且用自动推导规则
+.PHONY clean all
+BIN=01test 02test
+all: $(BIN)
+
+clean: 
+	rm -f $(BIN)
+
+
+2  % makefile模式规则 (%.o: %.c)
+_____________________________
+%.o: %.c              
+% 01test/01test.c, 02test/02test.c, 编译多个可执行文件
+
+.PHONY clean all
+BIN=01test 02test
+all: $(BIN)
+
+%.o: %.c
+	gcc -Wall -g -c $< -o $@
+
+01test: 01test.o
+	gcc -Wall -g $^ -o $@
+02test: 02test.o
+	gcc -Wall -g $^ -o $@
+
+clean: 
+	rm -f $(BIN)
+
+
+3 % makefile后缀规则 (.c.o:)
+_____________________________
+% .c.o:                  
+% touch 01test.c 02test.c
+% 01test.c--->01test     02test.c--->02test
+% 编译多个可执行文件
+
+
+.PHONY clean all
+BIN=01test 02test
+all: $(BIN)
+
+.c.o:
+	gcc -Wall -g -c $< -o $@
+
+01test: 01test.o
+	gcc -Wall -g $^ -o $@
+02test: 02test.o
+	gcc -Wall -g $^ -o $@
+
+clean: 
+	rm -f $(BIN) *.o
+
+
+
+
+4 % makefile模式规则 (%.o: %.c)    
+_____________________________
+% touch 01test.c 02test.c pub.c pub.h
+% (01test.c--->01test) (02test.c--->02test)
+% 编译多个可执行文件
+
+
+.PHONY clean all
+CC=gcc
+CFLAGS=-Wall -g
+BIN=01test 02test
+all: $(BIN)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+01test: 01test.o
+	$(CC) $(CFLAGS) $^ -o $@
+02test: 02test.o pub.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+clean: 
+	rm -f $(BIN) *.o
+	
+	
+	
+###########################################################
+###  % 多级目录的Makefile例程
+###########################################################
+% main.c,     Makefile,   ui/,    dal/,   bll/
+CC      =gcc
+CFLAGS  =-Wall -g
+BIN=    =main
+SUBDIR  =$(shell ls -d */)
+ROOTSRC =$(wildcard *.c)
+ROOTOBJ =$(ROOTSRC:%.c=%.o)
+SUBSRC  =$(shell find $(SUBDIR) -name '*.c')
+SUBOBJ  =$(SUBSRC:%.c=%.o)
+
+$(BIN): $(ROOTOBJ) $(SUBOBJ)
+	$(CC) $(CFLAGS) -o $(BIN) $(ROOTOBJ) $(SUBOBJ)
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean
+
+clean:
+	rm -r $(BIN) $(ROOTOBJ) $(SUBOBJ)
+
+###########################################################
+###  % 把每个目录下的文件生成可执行文件
+###########################################################
+% Makefile,     test1/,     test2/
+SUBDIRS=test1 test2
+.PHONY: default all clean $(SUBDIRS)
+deafult: all ### 此命令会试图生成default,当发现此个命令不存在时，它会生成->all
+             ### 此处的default伪目录是为了生成all
+
+all clean:
+	$(MAKE) $(SUBDIRS) TARGET=$@    ### make test1 test2 TARGET=all
+$(SUBDIRS):                         ### make -c test1 all
+	$(MAKE) -c $@ $(TARGET)         ### make -c test2 all
+### make all test1/Makefile         ### 把all传递给test1/Makefile
+### make all test1/Makefile         ### 把all传递给test2/Makefile
+                                       
+###########################################################
+###  % test1->Makefile
+###########################################################
+CC=gcc
+BIN=test1
+OBJS=test1.o
+
+.PHONY: all clean print
+all: print $(BIN)
+print:
+	@echo "===== make all in $(PWD) ====="
+$(BIN): $(OBJ)
+	$(CC) $(OBJS) -o $@
+%.o: %.c
+	$(CC) -c $<
+clean:
+	@echo "===== make clean in $(PWD) ====="
+	rm -f $(BIN) $(OBJ)
+
+###########################################################
+###  % test2->Makefile
+###########################################################
+CC=gcc
+BIN=test2
+OBJS=test2.o
+
+.PHONY: all clean print
+all: print $(BIN)
+print:
+	@echo "===== make all in $(PWD) ====="
+$(BIN): $(OBJ)
+	$(CC) $(OBJS) -o $@
+%.o: %.c
+	$(CC) -c $<
+clean:
+	@echo "===== make clean in $(PWD) ====="
+	rm -f $(BIN) $(OBJ)
+
+
+

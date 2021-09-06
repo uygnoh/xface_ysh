@@ -1,0 +1,21 @@
+1.Linux文件服务器：ftp服务器（ftp/tftp）、 Samba服务器、NFS服务器。
+ftp的客户可以是任意平台，samba是专门针对windows客户，而NFS则是面向linux/unix用户的。
+                    下面是三种服务器的对比情况：
+                    
+服务器名称       用户客户端平台                 使用范围 	                    服务端口
+FTP             Windows/linux/unix/macOS等     发布网站,文件共享 	        Tcp/21
+Samba           Windows 	                   文件共享（网上邻居） 	     　Tcp/445,tcp/139
+NFS             Linux/unix 	                   网站发布，文件共享（mount） 	 Tcp/2049
+
+
+总结：
+samba服务器用于Linux与Windows系统间文件共享/传输；
+只能在内网中使用
+　　
+NFS服务器（network file system）用于Linux与Linux/Unix系统间的文件共享/传输；
+  　　
+TFTP/FTP服务器，万能的服务器可用于各种平台系统的文件共享/传输
+无法在直接在服务器端修改数据，如果要修改数据，先把它从远程服务器下载到本地计算机，
+在本地计算机修改完后再上传到远程服务器
+
+

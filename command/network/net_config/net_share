@@ -1,0 +1,150 @@
+###########################################################
+###  两台linux主机 NAT共享上网
+###########################################################
+% 如果Linux主机有两个网卡，比如一个有线、一个无线，当无线连接后，
+% 其他机器即可通过有线共享上网，为了方便叙述，假设环境如下：
+    A机器有两块网卡，eth0和ws0，其中ws0为无线网卡，已连接wifi，而eth0为有线网卡
+    B机器只有一个有线网卡，假设也为eth0
+    
+    
+% 首先需要以root身份在A机器上执行以下代码（注意ws0应替换为你自己的无线网卡名称）
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -t nat -I POSTROUTING -o ws0 -j MASQUERADE
+
+
+
+% 然后需要将A、B机器的eth0设置在同一个网段内，并且A机器的eth0不能设置默认网关，
+% 假设A、B的IP分别为：
+    A：192.168.78.133
+    B：192.168.78.130
+   
+
+
+% 编辑B机器网卡配置文件
+% root@raspberrypi:~# cat /etc/network/interfaces
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Please note that this file is written to be used with dhcpcd
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf'
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto eth0
+iface eth0 inet static
+
+address 192.168.78.130
+netmask 255.255.255.0
+gateway 192.168.78.133
+% 则我们需要把B机器的默认网关设置为A的IP，即192.168.78.133
+
+
+
+% 编辑B机器的DNS可设置为8.8.8.8，然后应该就可以上网了
+% root@raspberrypi:~# /etc/resolv.conf
+nameserver 8.8.8.8
+
+
+
+
+
+###########################################################
+###  OpenSSH
+###########################################################
+% 自启动需要重启生效
+1、vi /etc/ssh/sshd_config       %修改sshd_config文件
+2、#PasswordAuthentication no    %注释去掉，并且将NO修改为yes
+3、#PermitRootLogin yes          %注释去掉  
+4、/etc/init.d/ssh start         %启动SSH服务
+5、/etc/init.d/ssh status        %验证SSH服务状态
+6、update-rc.d ssh enable        %添加开机自启动SSH服务
+7、update-rc.d ssh disabled      %关闭SSH服务
+
+
+
+###########################################################
+###  debain10和其它linux计算机有线网络互连
+###########################################################
+% debain图形界面配置有线网络
+Settings ->Network ->Wired
+    ->⚙ ->IPv4 ->IPv4 Method ->Manual
+        ->Address 
+            Address 192.168.78.133
+            Network 255.255.255.0
+# apt-get install ssh
+# /etc/init.d/ssh start            
+
+
+
+% 树霉派计算机配置
+1、修改sshd_config文件，命令为：vi /etc/ssh/sshd_config 
+2、将#PasswordAuthentication no的注释去掉，并且将NO修改为YES 
+3、将#PermitRootLogin yes的注释去掉           
+# ip a add 192.168.78.130/24 dev eht0
+
+
+
+
+% 在debian10计算机下连接树霉派计算机
+ysh@localhost:~$ ssh pi@192.168.78.130
+
+
+
+
+
+
+###########################################################
+###  IP
+###########################################################
+% 查看所有IP地址
+ip [a|addr|address]
+ip [a|addr|address] [sh|show]
+# ip a
+
+
+% 查看指定IP地址
+# ip address show dev eth1
+
+
+% 增加或删除IP地址
+ip [a|addr|address] add 192.168.78.130/24 dev eth1
+ip [a|addr|address] [del|delete] 192.168.78.130/24 dev eth1
+# ip a add 192.168.78.130/24 dev enp2s0     %增加IP地址
+# ip a del 192.168.78.130/24 dev eth0       %删除IP地址
+# ip a flush dev eth1                       %删除eth1所有IP地址
+# ip -4 a flush dev eth1                    %删除eth1的所有IPv4的IP地址
+
+
+% 停止与激活网络设备
+# ip link set dev eth1 down
+# ip link set dev eth1 up
+
+
+% 查看网络设备信息
+ip link sh/show/l/list/ls
+ip link sh/show/l/ls/lsit eth1
+ip link sh/show/l/ls/list dev eth1
+
+
+% 查看路由表
+ip r/ro/route
+ip r/ro/route sh/show
+ip r/ro/route sh/show dev eth1
+
+
+% 添加或删除路由
+ip r/ro/route add 192.168.79.0/24 dev eth1
+ip r/ro/route d/del/delete 192.168.79.0/24
+ip r/ro/route d/del/delete 192.168.79.0/24 dev eth1
+
+
+% 默认路由的删除、添加与修改
+ip r/ro/route d/del/delete default
+ip r/ro/route add default via 192.168.78.1
+ip r/ro/route chg/change default via 192.168.78.2
+
+
+% 查看ARP表
+ip n/neigh/neighbuor sh/show
+
+

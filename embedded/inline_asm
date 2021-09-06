@@ -1,0 +1,20 @@
+/*******************************************************************************
+                            gcc-arm-none-eabi
+*******************************************************************************/
+//通用的内嵌汇编模版
+asm (assembler template 
+		: output operands             /* optional */
+		: input operands              /* optional */
+		: list of clobbered registers /* optional */
+		);
+
+
+
+//http://www.ethernut.de/en/documents/arm-inline-asm.html
+//换行符和制表符的使用可以使得指令列表看起来变得美观
+__asm (
+		"mov r0, r0\n\t"
+		"mov r0, r0\n\t"
+		"mov r0, r0\n\t"
+		"mov r0, r0"
+);

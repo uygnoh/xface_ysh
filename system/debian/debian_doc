@@ -1,0 +1,213 @@
+/*******************************************************************************
+                              debian系统安装指南
+*******************************************************************************/
+0  //下载 Debian 10 ISO 文件
+   https://www.debian.org/releases/stable/
+1  //使用dd命令，将系统镜像文件写入 U盘
+   sudo time dd if=xxx.iso of=/dev/xxx bs=4M status=progress oflag=sync
+2  //插入U盘到电脑，重启计算机
+3  //按<F2>热键进入BIOS系统
+4  //修改电脑启动顺序为 [U盘为第一启动]
+5  //Secure 设置为禁止 [ Security ->Secure Boot menu ->Secure Boot Control [Disabled] ]
+6  //保存BIOS设置
+
+
+
+// Configure the package manager 配置包管理
+重要的一步来了，很多安装慢就是因为这里。首先问你要不要使用
+网络镜像，按照默认不要使用，因为这些我们安装好之后都可以更新配置。
+Configure the package manager
+if you wish to scan another CD or DVD, plase insert it now
+Scan another CD or DVD?
+[ No ]
+
+
+//统计软件包流行度的。会定期上报本机安装了哪些软件包。
+% 是可选安装。包名是 popularity-contest。
+Configuring popularity-contest
+This choice can be later modified by running "dpkg-reconfigure popularity-contest".
+Participate in the package usage survery?
+[ No ]
+
+
+
+/*******************************************************************************
+                              debian修改镜像源
+*******************************************************************************/
+//cp /etc/apt/sources.list ./sources.list.bak
+//gedit /etc/apt/sources.list
+//清华大学镜像站
+___________________________________________________________
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security/ buster/updates main contrib non-free
+
+deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security/ buster/updates main contrib non-free
+
+
+
+
+//把debian 10 buster更新为国内的中国科学技术大学的源，速度快稳定。
+___________________________________________________________
+
+1 //先备份源
+  mv /etc/apt/sources.list /etc/apt/sources.list.bak
+
+
+2 //增加国内的新源 
+  nano /etc/apt/sources.list
+
+
+3 //输入以下的源地址
+deb http://mirrors.ustc.edu.cn/debian/ buster main
+deb-src http://mirrors.ustc.edu.cn/debian/ buster main
+
+deb http://mirrors.ustc.edu.cn/debian-security buster/updates main
+deb-src http://mirrors.ustc.edu.cn/debian-security buster/updates main
+
+deb http://mirrors.ustc.edu.cn/debian/ buster-updates main
+deb-src http://mirrors.ustc.edu.cn/debian/ buster-updates main
+
+
+
+4 //更新
+ apt-get update
+
+
+
+
+/*******************************************************************************
+                                     安装sudo 
+*******************************************************************************/
+1 //默认状态是没有sudo命令的，需要安装。
+  apt-get update
+  apt-get install sudo
+
+
+2 //编辑sudoers文件, gedit /etc/sudoers在 
+  //其中 ysh 为自己的用户名
+  %sudo ALL=(ALL:ALL) ALL //下面添加如下内容
+  ysh  ALL=(ALL:ALL) ALL
+
+
+
+
+/*******************************************************************************
+                               Debian 语言环境( locale )
+*******************************************************************************/
+# env | grep LANG               //查看语系环境
+# export LANG=zh_CN.UTF-8       //中文字符
+# export LANG=en_US.UTF-8       //英文字符
+
+# dpkg-reconfigure locales      //语言环境设定   
+* zh_CN.UTF-8 UTF-8
+* en_US.UTF-8 UTF-8
+
+locale -a                       //语系字符集查看
+
+//空格键选中目标　,tab键切换
+
+
+
+/*******************************************************************************
+                               debain时区设置
+*******************************************************************************/
+1 su -
+2 tzselect
+3 选择Asia
+4 选择China
+5 vim /etc/profile
+//在文件尾部加入：
+export TZ='Asia/Shanghai'
+export PATH=$PATH:$TZ
+
+
+//适用于Debian 命令, Asia,亚洲
+# dpkg-reconfigure tzdata 
+
+
+
+
+/*******************************************************************************
+                               Debian 安装输入法
+*******************************************************************************/
+0 //英文版(gnu/debian10), 设置中文语言环境
+sudo dpkg-reconfigure locales
+*zh_CN.UTF-8      //选择( *zh_CN.UTF-8 )中文语言环境
+*en_US.UTF-8      //最后选择( en_US.UTF-8), 然后点击OK
+
+
+1 //安装( fcitx )输入法框架
+$sudo apt-get install fcitx
+
+
+2 //fcitx安装失败解决
+  //自动修复安装出现broken的package
+  //但是，如果还是失败的话，就需要手动进行干预了。
+sudo apt --fix-broken install
+
+
+3 安装搜狗输入法
+//http://pinyin.sogou.com/linux/
+$ sudo dpkg -i sogoupinyin_xxx_amd64.deb
+
+
+4 //安装完后，需要重启系统，然后在终端中输入
+$ fcitx-config-gtk3
+//在Input Method 栏中，点击+，然后选择搜狗输入法（Sogou Pinyin）。
+//设置好后，采用快捷键Ctrl+Space 即可调出搜狗输入法。
+
+
+
+/*******************************************************************************
+                              debian software packages
+*******************************************************************************/
+#!/bin/bash
+# 
+echo -e "\033[41;37m--->>>BEGING INSTALL UTILITIES\033[37;0m"
+sudo apt-get -y install gcc
+sudo apt-get -y install gdb
+sudo apt-get -y install git
+sudo apt-get -y install vim
+sudo apt-get -y install curl
+sudo apt-get -y install wget
+sudo apt-get -y install tmux
+sudo apt-get -y install ranger 
+sudo apt-get -y install make
+sudo apt-get -y install cmake
+sudo apt-get -y install automake
+sudo apt-get -y install autoconf
+sudo apt-get -y install libtool 
+# sudo apt-get -y install cryptsetup
+# 
+sudo apt-get -y install sdcc
+sudo apt-get -y install kicad
+sudo apt-get -y install freecad
+sudo apt-get -y install openscad
+sudo apt-get -y install mcu8051ide
+# 
+sudo apt-get -y install fvwm
+sudo apt-get -y install rox-filer
+sudo apt-get -y install smplayer
+sudo apt-get -y install xchm
+sudo apt-get -y install dia
+sudo apt-get -y install cmus 
+sudo apt-get -y install openocd
+# _____________________________
+# //以下的软件需要手动安装(2020/06/06)
+# sudo apt-get -y install qemu
+# sudo apt-get -y install vscode
+# sudo apt-get -y install platformio
+# sudo apt-get -y install stm32cubeide
+# sudo apt-get -y install java
+# sudo apt-get -y install eclipse
+# sudo apt-get -y install stlink
+# sudo apt-get -y install arm-none-eabi-gcc
+# sudo apt-get -y install riscv64-unknown-elf-gcc
+# 
+echo -e "\033[41;37mINSTALLATION IS COMPLETE--->>>\033[37;0m"
+echo "return $?"

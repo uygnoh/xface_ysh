@@ -1,0 +1,140 @@
+###########################################################
+### % automake创建(.am文件)             第1步
+###########################################################
+mkdir /src /inc
+touch main.c
+touch autogen.sh
+
+
+### 为顶层目录创建  Makefile.am文件 {vim Makefile.am}
+_________________________________________________
+% 指示 automake代码级别，默认级别为 GNU.
+% GNU规定自由软件发布需要 NEW, README, AUTHORS, ChangLog说明文件，
+% 这里降级为 foreign,从而避免准备这些文件。
+AUTOMAKE_OPTIONS=foreign
+
+% 打包 autogen.sh 文件
+EXTRA_DIST=autogen.sh
+
+% 指定需要处理的子目录，如果要处理多个子目录，以空格隔开，
+% 这里只有：src, inc 两个子目录文件
+SUBDIRS=src inc
+
+% 利用PWD命令来获取当前目录路径
+ROOTDIR=$(shell /bin/pwd)
+
+% 指定头文件所在路径，并导出供 子目录，Makefile.am 使用
+INCLUDES=-I$(ROOTDIR)/inc
+export INCLUDES
+
+% 指定要产生的执行文件名
+bin_PROGRAMS=target
+
+% 指定要产生的执行文件需要的源文件，如果有多个，以空格隔开，这里只有main.c
+target_SOURCES=main.c
+
+% 库文件名要和下一页的对应, 利用 src 创建静态库文件
+% 或者 LIBS+=... 增加链接库
+target_LDADD=$(ROOTDIR)/src/libxxx.a
+
+
+
+### 在src子目录创建 Makefile.am文件{vim Makefile.am}
+_________________________________________________
+
+% 在src子目录生成静态库文件 "xxx.a" 以便顶层目录主文件链接时使用
+% 自己定义的静态库名 xxx.a
+noinst_LIBRARIES=libxxx.a
+
+% 以上面命名的库文件对应，产生静态库需要的源文件，以空格隔开。
+libxxx_a_SOURCES=src1.c src2.c
+
+
+
+###  在inc子目录创建 Makefile.am文件{vim Makefile.am}
+_________________________________________________
+
+% EXTRA_DIST表示用来定义额外打包的文件名称
+EXTRA_DIST=inc1.h inc2.h
+
+
+
+
+
+
+
+###########################################################
+### %  在工工程的根目录输入               第2步
+###########################################################
+./autoscan
+1 % 准备 autoconf必须的配置文件 configure.in
+2 % 将“configure.scan”更名为“configure.in”,并对其脚本进行修改
+3 % 修改AC_INIT宏，指定软件包名称/版本/bug报吿地址。
+4 % 加入automake必须的宏 AM_INIT_AUTOMAKE()
+5 % 屏蔽宏 AC_CONFIG_HEADER()
+6 % 由于需要把 src目录的源文件编译成静态库，需要加入宏 AC_PROG_RANLIB()
+
+
+aclocal
+% 生成 configure文件
+% 为autoconf产生处理本地宏 aclocal.m4文件
+
+
+autoconf
+% 产生配置文件
+
+
+automake --add-missing
+% add-missing 选项会自动添加一些必要的脚本文件
+
+
+./configure
+% 产生Makefile文件
+% configure会读入 Makefile.in生成 Makefile
+% configure有大量的选项可供不同的需求
+% --help查看所有选项
+% --prefix=PEWFIX(输入安装目录前缀)
+./configure --prefix=/opt/gcc
+
+
+### % ./configure
+1 使用下面命令将重新执行 ./configure
+  ./configure CFLAGS="-Wall -g"
+  当然也可以在顶层 Makefile.am中添加   CFLAGS="-Wall -g"
+
+2 发布版本时加入优化选项
+  ./configure CFLAGS="-Wall -O2"
+
+### % --host
+### --host  指定软件运行的系统平台
+### 如果没有指定，将会用 “config.guess"来检测
+### 例如：嵌入式arm-linux通常用 “--host=arm-linux”
+###       ./config --host-linux
+./configure --host=arm-linux --build=i386-linux
+
+### % 编译器选项
+
+CFLAGS="-Wall -g" ./configure
+LDFLAGS="-L libpath -l libname -static" ./configure
+CC="arm-linux-gcc"
+
+
+### % 为顶层目录创建 autogen.sh文件 {vim autogen.sh}
+#!/bin/bash
+./configure CFLAGS="-Wall -g"
+CC=arm-linux-gcc CFLAGS="-Wall -g" ./configure --host=arm-linux
+
+
+
+###########################################################
+### %  automake其它指今                 第3步
+###########################################################
+make                #执行编译，产生可执行文件
+make clean          #清除前一次编译的目标文件，库文件，可执行文件
+make install        #将可执行文件安装到系统目录
+make unistall       #卸载
+make distclean      #除了执行 make clean的工作外，还清除了 configure过程中生成的文件
+make dist	        #将源程序和相关文档打包成一个压缩文档以供发布
+
+
+

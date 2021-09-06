@@ -1,0 +1,88 @@
+###########################################################
+###  % raspberry-pi-40pin
+###########################################################
+3.3V            5V
+SDA.1           5V
+SCL.1           GND----->GND
+GPIO.7          TXD----->Rx
+GND             RXD----->Tx
+GPIO.0          GPIO.1
+GPIO.2          GND
+GPIO.3          GPIO.4
+3.3V            GPIO.5
+MOSI            GND
+MISO            GPIO.6
+SCLK            CE0
+GND             CE1
+SDA.0           SCL.0
+GPIO.21         GND
+GPIO.22         GPIO.26
+GPIO.23         GND
+GPIO.24         GPIO.27
+GPIO.25         GPIO.28
+GND             GPIO.29
+
+
+
+
+
+###########################################################
+###  % 树莓派 3B+ 使用串口终端输出
+###########################################################
+% USB->TTL 模块接树莓派 6、8、10 三个口(TX, RX, GND)
+% 打开 /boot/config.txt 文件，在后面增加一行：
+dtoverlay=pi3-miniuart-bt
+
+% 系统默认 serial1 链接 /dev/ttyAMA0，当配置这个 dtoverlay 后
+% serial1 链接到 /dev/ttyS0，serial0 链接到 /dev/ttyAMA0
+% 更深层的动作触发原理，是在 udev 里搞的
+
+
+
+% PuTTY Configuration
+Serial Line: /dev/ttyUSB0   Speed: 115200
+
+
+
+% 登录时输入raspberrypi默认账户进行登录
+raspberrypi login:  pi
+Password:           raspberry
+% 设置ROOT密码
+sudo passwd root
+
+
+
+
+###########################################################
+###  % 树莓派 3B+ 网络设置
+###########################################################
+% 如果登录了树莓派，输入
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+% 在文件尾部添加
+network={
+    ssid="Linux86"
+    psk="12345678yu"
+    priority=1
+}
+
+
+
+% 树莓派3B+开启wifi
+1.打开树莓派配置
+sudo raspi-config
+
+2.选择 localisation options
+
+3.选择 change Timezone,在里面选择亚洲ASIAN，里面选择地址，我选的上海
+
+4.选择change wi-fi country，选择中国
+
+
+
+
+
+
+
+
+
+

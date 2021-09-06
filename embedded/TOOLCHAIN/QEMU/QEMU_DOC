@@ -1,0 +1,26 @@
+/*******************************************************************************
+                              https://www.qemu.org/
+*******************************************************************************/
+//安装QEMU
+//下载qemu-5.2，解压后进入qemu-5.2
+$ ./configure --target-list=riscv32-softmmu
+$ make
+$ sudo make install
+//验证QEMU是否成功
+$ qemu-system-riscv32 --version
+
+
+
+// 安装QEMU所需要的依赖
+0 // ERROR: Cannot find Ninja
+sudo apt-get install ninja-build
+
+
+1 // Qemu安装依赖环境
+sudo apt install pkg-config
+sudo apt install libglib2.0-dev
+sudo apt install libpixman-1-dev
+
+
+
+

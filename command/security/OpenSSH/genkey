@@ -1,0 +1,29 @@
+###########################################################
+### ＳＳＨ密钥对认证
+###########################################################
+1 由客户端（client）用户在本地创建密钥对
+2 上传公钥文件 id_rsa.pub
+
+3 导入公钥信息文件 到服务器端 用户freeysh 公钥数据库中（server）
+公钥文件位置：/home/freeysh/.ssh/autorized_keys 
+cat id_rsa.pub >> /home/freeysh/.ssh/authorized_keys
+chmod 600 /home/freeysh/.ssh/authorized_keys
+  	  
+4 使用密钥对认证
+此时写入要连接的服务器IP，就可以登陆到 用户freeysh中的系统上了
+
+5 服务器端关闭SElinux服务－》option
+  vim /etc/selinux/config
+  SELINUX=disbale 
+  
+
+###########################################################
+### ＳＳＨ远程登陆
+###########################################################
+ssh root@192.168.0.88                  # Linux os 之间远程登录命令(ssh username@ip)
+scp root@192.168.0.88:/root/test.txt   #远程下载(. 代表本机当前目录)
+scp -r /root/123/  root@192.168.0.88   #远程上传(上传目录需要加‘-r'选项)
+sftp root@192.168.0.88                 #文件传输命令(文件服务器命令)
+
+
+

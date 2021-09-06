@@ -1,0 +1,10 @@
+use File::Basename;                 #使用模块
+
+
+my $name = "/demo/demo.pl";
+my $basename = basename $name;      #提取文件名
+my $dirname = dirname $dirname;     #提取文件夹名
+### 写命名也可以
+my $name = "/demo/demo.pl";
+my $basename = use File::Basename::basename $name;      #提取文件名
+my $dirname  = use File::Basename::dirname $dirname;     #提取文件夹名

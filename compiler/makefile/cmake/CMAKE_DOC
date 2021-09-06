@@ -1,0 +1,141 @@
+###########################################################
+###  % CMAKE Demo
+###########################################################
+# cmake version
+cmake_minimum_required(VERSION 2.6)
+
+# 设定工程文件名
+PROJECT(demoA)
+
+# 把库文件保存到LIBRARIES变量中
+SET(LIBRARIES /usr/lib/x86-linux-gnu/libm.so)
+
+# 把3个文 件保存到ALL_CORE_LIST变量中
+SET(ALL_CODE_LIST demo.cpp sqrt.cpp sqrt.h)
+
+# 打印变量和变量的值
+#MESSAGE(${ALL_CODE_LIST})
+MESSGAE(STATUS "This is BINARY dir" ${demoA_BINARY_DIR})
+MESSAGE(STATUS "This is SOURCE dir" ${demoA_SOURCE_DIR})
+
+# 添加可执行文件
+ADD_EXECUTABLE(sqrtDemoA ${ALL_CODE_LIST})
+
+# 添加可执行文件所需要的库
+TARGET_LINK_LIBRARIES(sqrtDemoA ${LIBRARIES})
+
+# 设置输出文件路径
+# CMAKE == DemoA == PROJECT
+SET(EXECUTABLE_OUTPUT_PATH "{CMAKE_BINARY_DIR}/bin")
+
+=============================
+1 此例程使用外部构建方法：
+2 mkdir build
+3 cd build
+4 cmake ..
+5 make
+
+
+
+
+###########################################################
+###  % 这个工程有子目录，但是只有一个 CMakeLists.txt
+###########################################################
+% 本一程全部文件： tree指令查看目录树
+b/CMakeLists.txt
+b/src/sqrt.cpp
+b/src/demo.cpp
+b/include/sqrt.h
+=============================
+
+#cmake version
+cmake_minimum_required(VERSION 2.6)
+
+IF(WIN32)
+	MESSAGE(FATAL_ERROR "windows is error!")
+ELSEIF(UNIX)
+	MESSAGE(STATUS"This is Linux.")
+ENDIF(WIN32)
+
+PROJECT(demoB)
+
+INCLUDE_DIRCTORIES(./include)
+
+AUX_SOURCE_DIRCTORY(./src CPP_FILES)
+MESSAGE(STATUS"CPP_FILES" $(CPP_FILES)}
+MESSAGE(STATUS"binary_dir" $(PROJECT_BINARY_DIR)}
+MESSAGE(STATUS"source_dir" $(PROJECT_SOURCE_DIR)}
+SET(LIBRARIES /usr/lib/x86-linux-gnu/libm.so)
+ADD_EXECUTABLE(sqrtDemoB ${CPP_FILES})
+TARGET_LINK_LIBRARIES(sqrtDemoB m)
+SET(EXECUTABLE_OUTPUT_PATH"${CMAKE_BINARY_DIR}/bin")
+
+
+
+###########################################################
+###  % 多级目录CMake
+###########################################################
+% 多目录构建===标准工程	tree查看目录树
+% 每个目录都有一个CMakeLists.txt
+% 本次工程的全部文件：
+2/CMakeLists.txt
+2/core/sqrt.cpp
+2/core/sqrt.h
+2/core/CMakeLists.txt
+2/example/demo.cpp
+2/example/CMakeLists.txt
+=============================
+
+
+2/CMakeLists.txt
+=============================
+#cmake version
+cmake_minimum_required(VERSION 2.8)
+PROJECT(demoB)
+
+SET(CPP_LIST ${})
+MESSAGE(STATUS "initial_cpplist=" ${CPP_LIST})
+
+ADD_SUBDIRECTORY(./core)
+MESSAGE(STATUS "cpplsit_after_core=${CPP_LIST}")
+ADD_SUBDIRECTORY(./example)
+MESSAGE(STATUS "EXT_LIB_main" ${EXT_LIB})
+MESSAGE(STATUS "CMAKE_BINARY_DIR=" ${CMAKE_BINARY_DIR})
+MESSAGE(STATUS "PROJECT_BINARY_DIR=" ${PROJECT_BINARY_DIR})
+MESSAGE(STATUS "PROJECT_SOURCE_DIR=" ${PROJECT_SOURCE_DIR})
+
+###% 主要通过MESSAGE去跟踪CPP_LIST和EXT_LIB两个变量，进而理解整个构建过程。
+
+
+2/core/CMakeLists.txt
+============================= 
+INCLUDE_DIRECTORIES(.)
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/core CORE_CPP_LIST)
+LIST(APPEND CPP_LIST ${CPP_LIST} ${CORE_CPP_LIST})
+MESSAGE(STATUS "cpplist_core=${CPP_LIST}")
+SET(CPP_LIST ${CPP_LIST} PARENT_SCOPE)
+SET(EXT_LIB /usr/lib/x86_64-linux-gnu/libm.so)
+SET(EXT_LIB ${EXT_LIB} PARENT_SCOPE)
+MESSAGE(STATUS "EXT_LIB_cor=" ${EXT_LIB})
+
+
+2/example/CMakeLists.txt
+=============================
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/example EXAM_CPP_LIST)
+MESSAGE(STATUS "EXAM_CPP_LIST=${EXAM_CPP_LIST}")
+MESSAGE(STATUS "before exam cpp_list=${EXAM_CPP_LIST}")
+LIST(APPEND CPP_LIST $(CPP_LIST} ${EXAM_CPP_LIST})
+MESSAGE(STATUS "cpplist_example=${CPP_LIST}")
+ADD_EXECUTABLE(sqrtDemoC ${CPP_LIST})
+SET(EXECUTABLE_OUTPUT_PATH"${CMAKE_BINARY_DIR}/bin")
+MESSAGE(STATUS "EXT_LIB_example="${EXT_LIB})
+TARGET_LINK_LIBRARBIES(sqrtDemoC ${EXT_LIB})
+
+
+============================= 
+2/ mkdir build
+cd build
+cmake ..
+make
+
+

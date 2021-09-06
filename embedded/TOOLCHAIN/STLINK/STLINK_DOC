@@ -1,0 +1,52 @@
+/*******************************************************************************
+                   https://github.com/stlink-org/stlink
+                            STLINK 安装依赖
+*******************************************************************************/
+sudo apt-get install libusb-1.0-0-dev git
+
+
+
+/*******************************************************************************
+                             STLINK 安装
+*******************************************************************************/
+//下载stlink源码并安装
+git clone https://github.com/texane/stlink stlink.git
+cd stlink.git
+make
+
+
+
+/*******************************************************************************
+                             STLINK 配置
+*******************************************************************************/
+1 //复制stlink固件程序到/usr/bin目录下
+cd build/Release/bin
+sudo cp st-flash /usr/bin
+
+
+2 //复制stlink规则文件到/etc/udev/rules.d
+cd config/udev/rules.d
+sudo cp *.rules /etc/udev/rules.d
+
+
+3 //vim 49-stlinkv2.rules (可选项)
+  //修改49-stlinkv2.rules文件内容如下所示             
+  //其中OWNER, 修改为你的用户名(freeysh)
+SUBSYSTEM=="usb",           \
+ATTR{idVendor}=="0483",     \ 
+ATTR{idProduct}=="3748",    \
+MODE:="0666",               \ 
+SYMLINK+="stlinkv2_%n",     \ 
+OWNER="freeysh"
+
+
+4 //udev是Linux的设备管理器,动态地创建和删除节点的硬件设备.
+  //udevadm control --reload-rules 让系统识别新的规则.
+  //udevadm trigger 强制内核触发设备事件，主要用于重放内
+  //核初始化过程中的冷插(coldplug)设备事件。
+  //或者使用(sudo restart udev)
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+
+

@@ -1,0 +1,70 @@
+############################################################
+### % YouCompletemeMe
+############################################################
+0 Plgu-in插件管理器安装
+call plug#begin('~/.vim/plugged')                     
+Plug 'scrooloose/nerdtree'
+Plug 'Valloric/YouCompleteMe'
+call plug#end()
+
+
+1 CMAKE安装
+sudo apt-get install libssl-dev
+% wget http://www.cmake.org/files/v3.16/cmake-3.16.6.tar.gz
+tar xf cmake-3.16.6.tar.gz 
+sudo chmod -R 777 cmake-3.16.6
+cd cmake-3.16.6/
+./bootstrap
+make
+sudo make install
+
+
+2 YouCompleteMe安装, 只安装对“C”语言的支持
+cd ~/.vim/plugged/YouCompleteMe
+./install.sh --clangd-completer
+./install.sh --clangd-completer
+
+
+3 VIM-源码安装
+./configure --with-features=huge \
+        --enable-multibyte \
+        --enable-rubyinterp=yes \
+        --enable-python3interp=yes \
+        --with-python-config-dir=/usr/bin/python3.7m-config \
+        --enable-perlinterp=yes \
+        --enable-luainterp=yes \
+        --enable-gui=gtk2 \
+        --enable-cscope \
+        --prefix=/usr/local
+请注意：把 python3-config-dir 这个目录换成你自己的，就是你的操作系统自带的 
+python3 的 config 目录，/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu 
+这个是我的目录，跟你的可能不一样，请自行查找
+
+
+
+############################################################
+### % YouCompleteMe 配置文件 
+############################################################
+set completeopt=menu,menuone
+let g:ycm_server_python_interpreter='/usr/bin/python3'
+let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_server_log_level = 'info'
+let g:ycm_min_num_identifier_candidate_chars = 2
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
+let g:ycm_complete_in_strings=1
+highlight PMenu ctermfg=0 ctermbg=242 guifg=black guibg=darkgrey
+let g:ycm_semantic_triggers =  {
+                        \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
+                        \ 'cs,lua,javascript': ['re!\w{2}'],
+                        \ }
+filetype plugin indent on
+
+
+############################################################
+### .ycm_extra_conf.py
+############################################################
+
+
+
+

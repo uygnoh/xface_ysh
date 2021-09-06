@@ -1,0 +1,16 @@
+### =================================================================== vim主题
+% 复制molokai主题到/usr/share/vim/vim80/colors/目录下
+cp molokai.vim /usr/share/vim/vim80/colors/
+
+% 编辑.vimrc文件，增加一下配置
+colorscheme  molokai  
+set t_Co=256
+set background=dark
+let g:molokai_original=1
+let g:rehash256=1
+
+% 有关vim主题的命令
+:colorscheme            "查看当前主题
+:colorscheme space tab  "列出所有主题
+:colorscheme your-theme "切换主题
+

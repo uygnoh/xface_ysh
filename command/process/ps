@@ -1,0 +1,102 @@
+###########################################################
+###   查看进程PID的四种方法
+###########################################################
+% cat /run/sshd.pid             :830
+
+ps aux |grep sshd
+root 10180 0.0 0.0 7224 1024 ? Ss 16:00 0:00 /usr/sbin/sshd
+
+% pgrep -l sshd                 :10180 sshd
+% pgrep sshd                    :10180
+% pidof sshd                    :10180
+
+
+
+###########################################################
+###  PS
+###########################################################
+Column Header                   Contents
+%CPU                How much of the CPU the process is using
+%MEM                How much memory the process is using
+ADDR                Memory address of the process
+C or CP             CPU usage and scheduling information
+COMMAND*            Name of the process, including arguments, if any
+NI                  nice value
+F                   Flags
+PID                 Process ID number
+PPID                ID number of the process′s parent process
+PRI                 Priority of the process
+RSS                 Resident set size
+S or STAT           Process status code
+START or STIME 	    Time when the process started
+VSZ                 Virtual memory usage
+TIME                The amount of CPU time used by the process
+TT or TTY           Terminal associated with the process
+UID or USER 	    Username of the process′s owner
+WCHAN               Memory address of the event the process is waiting for 
+
+
+
+###########################################################
+### pstree
+###########################################################
+pstree  [option]
+-p      显示进程ID
+-u      显示进程所属用户
+    
+
+
+########################################################### 
+###  ps选项
+###########################################################
+% 查阅进程状态(process status)(实际上就是将内核中进程状态信息有选择地打印出来)
+    
+选项
+    用于控制列表的行数(进程范围)和列数(每进程列出的属性内容)
+    %无选项:只列出在当前终端上启动的进程列出的项目有:PID,TTY,TIME,COMMAND
+    e选项:        列出系统中所有的进程(进程范围)
+    f选项:        以full格式列出每一个进程(控制列的数目)
+    l选项:        以long格式列出每一个进程(控制列的数目)
+    
+% 命令ps列出的进程属性
+    UID:用户ID(->USER ID)
+    PID:进程ID 
+    PPID:父进程的PID
+    C:CPU占用指数:最近一段时间(秒级别)进程占用CPU情况
+    STIME:启动时间
+    SZ:进程逻辑内存大小(Size)
+    TTY:终端的名字
+    COMMAND:命令名
+    WCHAN:进程在内核的何处睡眠(Wait Channel)
+    TIME:累计执行时间(占用CPU的时间)
+    PRI:优先级
+    S:状态,S(Sleep),R(Run), Z(Zombie)
+    
+    
+
+###########################################################    
+### free:了解内存使用情况
+###########################################################
+free -h
+
+
+
+###########################################################
+### vmstat:了解系统负载
+###########################################################
+    Procs  r,等待运行的进程数     b,处在非中断睡眠状态的进程数
+    Memory free,空闲的内存       buff/cache,用做缓存的内存数
+    Swap   磁盘/内存的交换页数量,单位:KB/秒
+    IO     块设备I/O块数,单位:块/秒
+    System
+        in: 每秒的硬件中断数(interrupt),包括时钟中断
+        cs: 每秒的环境切换次数(context switch)
+    CPU 的总使用率 us=user, sy=system, id=idle,wa=wait for disk I/O
+
+
+
+
+
+
+
+

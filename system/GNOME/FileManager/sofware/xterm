@@ -1,0 +1,46 @@
+###########################################################
+### 0 % Xterm Fonts settings
+###########################################################
+### ! % 编辑 (gedit ~/.Xresources) 写入下面的内容
+xterm*faceName: Consolas: antialias=True: pixelsize=18
+xterm*faceNameDoublesize: Microsoft YaHei: antialias=True: pixelsize=16
+
+xterm*background: black
+xterm*foreground: gray
+
+XTerm*faceName: Bitstream Vera Serif Mono
+XTerm*faceSize: 11
+XTerm*vt100*geometry: 100x30
+XTerm*saveLines: 16384
+XTerm*loginShell: true
+XTerm*charClass: 33:48,35:48,37:48,43:48,45-47:48,\
+                 64:48,95:48
+XTerm*termName: xterm-color
+XTerm*eightBitInput: false
+
+!!! 这里是注释部分
+
+
+
+###########################################################
+### 1 % 编辑 (gedit ~/.profile) 写入下面的内容
+###########################################################
+% 修改配置文件, 使不同类型的文件在终端中显示不同的颜色
+% 在 ($HOME/.profile) 文件中添加以下内容
+alias ls='ls -FGa'
+alias ll='ls -FGal'
+TERM=xterm-color; export TERM 
+
+
+
+###########################################################
+### 2 % 编辑 (gedit ~/.fvwm/.fvwm2rc) 写入下面的内容
+###########################################################
+% 设置 xterm 的启动方式
+% 这时候如果直接启动 xterm, 你会发现第四步设置的内容没有生效, 
+% 这是因为 xterm 默认启动是不会读用户的 .profile 文件的, 
+% 要想读 .profile 中的配置, 需要添加 -ls 选项. 所以你可以
+% 在 .fvwm2rc 文件中启动 xterm 的地方这样写:
+exec xterm -ls 
+
+

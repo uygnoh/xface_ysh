@@ -1,0 +1,246 @@
+###########################################################
+### % 线性表的链式存储实现
+###########################################################
+% 不要求逻辑上相邻的两个元素物理上也相信
+% 通过“链”建立数据元素之间的逻辑关系
+插入，删除不需要移动数据元素，只需要修改“链”
+
+
+
+
+###########################################################
+### % 例程 0
+###########################################################
+typedef struct LNode *List;
+struct LNode {
+    ElementType Data;
+    List Next;
+};
+struct LNode L;
+List PtrL;
+
+
+1 % 求链表的长度
+  % 时间性能为 O(n)
+int Length(List PtrL)
+{
+    List p = PtrL;      //p指向链表的第一个结点
+    int j = 0;
+    
+    while (p)
+    {
+        p = p->Next;
+        j++;            //当前p指向的是第j个结点
+    }
+    
+    return j;
+}
+
+
+
+2 % 按序号查找
+List FindKth(int k, List PtrL)
+{
+    List p = PtrL;
+    int i = 1;
+    
+    while ((p != NULL) && (i < k))
+    {
+        p = p->Next;
+        i++;
+    }
+    
+    if (i == k)
+        return p;
+    else
+        return NULL;
+}
+
+
+2 % 按值查找
+List Find(ElementType X, List PtrL)
+{
+    List p = PtrL;
+    
+    while (P != NULL && p->Data != X)
+        p = p->Next;
+    
+    return p;
+}
+
+
+
+
+% 插入(在第 i-1(1≤i≤n+1)个结点后插入一个值为X的新结点)
++ (1)先构造一个新结点,用s指向;
++ (2)再找到链表的第 i-1个结点,用p指向;
++ (3)然后修改指针,插入结点 ( p之后插入新结点是 s)
+% ### 插入操作实现
+List Insert(ElementType X, int i, List PtrL)
+{
+    List p, s;
+    if (i == 1)                                 % 新结点插入在表头
+    {                  
+        s = (List)malloc(sizeof(struct LNode)); % 申请、填装结点
+        s->Data = X;
+        s->Next = PtrL;
+        return s;
+    }
+    
+    p = FindfKth(i-1, PtrL);         % 查找第i-1个结点 
+    if (p == NULL)                   % 第i-1个不存在,不能插入
+    {                                       
+        printf("参数i错");
+        return NULL;
+    } 
+    else 
+    {
+        s = (List)malloc(sizeof(struct LNode)); /*申请、填装结点*/
+        s->Data = X;
+        s->Next = p->Next; /*新结点插入在第i-1个结点的后面*/
+        p->Next = s;
+        return PtrL;
+    }
+}
+
+
+
+### 删除(删除链表的第 i (1≤i≤n)个位置上的结点)
++ (1)先找到链表的第 i-1个结点,用p指向;
++ (2)再用指针s指向要被删除的结点(p的下一个结点);
++ (3)然后修改指针,删除s所指结点;
++ (4)最后释放s所指结点的空间。
+
+删除操作实现
+List Delete(int i, List PtrL0
+{
+    List p, s;
+    if (i == 1) { /* 若要删除的是表的第一个结点 */
+        s = PtrL; /*s指向第1个结点*/
+        if (PtrL != NULL) Ptr = PtrL->Next; /*从链表中删除*/
+        else return NULL;
+        free(s);
+        return PtrL;
+    }
+    p = FindKth(i-1, PtrL); /*查找第i-1个结点*/
+    if (p == NULL) {
+        printf(“第%d个结点不存在”, i-1); 
+        return NULL;
+    } else if (p->Next == NULL) {
+        printf(“第%d个结点不存在”, i);
+        return NULL;  
+    } else {
+        s = p->Next;        /*s指向第i个结点*/
+        p->next = s->Next;  /*从链表中删除*/
+        free(s);            /*释放被删除结点 */
+        return PtrL;
+    }
+}
+
+
+
+
+
+###########################################################
+### % 例程 1
+###########################################################
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int ElementType;
+typedef struct LNode *List;
+
+struct LNode {
+	ElementType Data;
+	List Next;
+};
+
+struct Lnode L;
+List PtrL;
+
+/* 求表长 */
+int Length(List PtrL)
+{
+    List p = PtrL; /* p指向表的第一个结点*/
+    int j = 0;
+    while (p) {
+        p = p->Next;
+        j++;        /* 当前p指向的是第 j 个结点*/
+    }
+    return j;
+}
+
+/* 按序号查找: FindKth; */
+List FindKth(int k, List PtrL)
+{
+    List P = PtrL;
+    int i = 1;
+    while (P != NULL && i < K) {
+        p = P->Next;
+        i++;
+    }
+    if (i == K) /* 找到第K个,返回指针 */
+        return p;
+    else        /* 否则返回空 */
+        return NULL;
+}
+
+/* 按值查找: Find */
+List Find(ElementType X, List PtrL)
+{
+    List p = PtrL;
+    while (p != NULL && p->Data != X)
+        p = p->Next;
+    return p;
+}
+
+/* 插入操作实现 */
+List Insert(ElementType X, int i, List PtrL)
+{
+    List p, s;
+    if (i == 1) { /* 新结点插入在表头 */
+        s = (List)malloc(sizeof(struct LNode)); /*申请、填装结点*/
+        s->Data = X;
+        s->Next = PtrL;
+        return s;
+    }
+    p = FindKth(i-1, PtrL); /* 查找第i-1个结点 */
+    if (P == NULL) {        /* 第i-1个不存在,不能插入 */
+        printf("参数i错");
+        return NULL;
+    } else {
+        s = (List)malloc(sizeof(struct LNode)); /*申请、填装结点*/
+        s->Data = X;
+        s->Next = p->Next;      /*新结点插入在第i-1个结点的后面*/
+        p->Next = s;
+        retrun Ptrl;
+    }
+}
+
+/* 删除操作实现 */
+List Delete(int i, List PtrL)
+{
+    List p, s;
+    if (i == 1) {               /* 若要删除的是表的第一个结点 */
+        s = PtrL;               /*s指向第1个结点*/
+        if (PtrL != NULL)
+            PtrL = PtrL->Next; /*从链表中删除*/
+        else
+            return NULL;
+        free(s);
+        return PtrL;
+    }
+    p = FindKth(i-1, PtrL);     /*查找第i-1个结点*/
+    if (P == NULL) {
+        printf("第%d个结点不存在", i-1);
+        return NULL;
+    } else if (p->Next == NULL) {
+        printf("第%d个结点不存在", i);
+        return NULL;
+    } else {
+        s = p->Next;        /*s指向第i个结点*/
+        p->Next = s->Next;  /*从链表中删除*/
+        free(s);            /*释放被删除结点 */
+        return PtrL;
+    }
+}

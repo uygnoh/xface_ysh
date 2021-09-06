@@ -1,0 +1,105 @@
+#include<reg52.h>
+ 
+#include<intrins.h>
+#define uint unsigned int
+#define uchar unsigned char
+void display_shumaguan4();
+void delay(uint z);
+void init_systems();
+uchar qian,bai,ge,shi,time1,time0;
+int temp_smg,temp_led,number;
+uchar code table[]={ //共阴数码管编码表
+0x3f,0x06,0x5b,0x4f,
+0x66,0x6d,0x7d,0x07,
+0x7f,0x6f,0x77,0x7c, 
+0x39,0x5e,0x79,0x71};
+ 
+int main(void)
+{ 
+    init_systems();
+    while(1)
+    {        
+ 
+        display_shumaguan4();
+ 
+    }   
+ 
+    return 0;
+}
+ 
+//4位数码管动态显示扫描子程序
+void display_shumaguan4()
+{
+ 
+    P1=0x08;//扫描第一位数码管B
+    P0=table[temp_smg/1000];//(bcd code)拆分temp变量
+    delay(6);//稍作延时，以提高亮度
+    P0=0x00;//数码管断码清零
+ 
+    P1=0x04;
+    P0=table[temp_smg%1000/100];
+    delay(6);
+    P0=0x00;
+    
+    P1=0x02;
+    P0=table[temp_smg%100/10];
+    delay(6);
+    P0=0x00;
+ 
+    P1=0x01;
+    P0=table[temp_smg%10];
+    delay(6);
+    P0=0x00;
+}
+ 
+void delay(uint z)
+{
+    uint x,y;
+    for(x=z;x>0;x--)
+        for(y=110;y>0;y--);
+ 
+}
+void init_systems()
+{
+    TMOD=0x11;//定时器的工作方式位1
+    TH0=(65536-50000)/256;//定时器的初值装载
+    TL0=(65536-50000)%256;
+    EA=1;//开总中断
+    ET0=1;//开定时器中断
+    TR0=1;//启动定时器   
+ 
+    TMOD=0x11;//定时器的工作方式位1
+    TH1=(65536-50000)/256;//定时器的初值装载
+    TL1=(65536-50000)%256;
+    EA=1;//开总中断
+    ET1=1;//开定时器中断
+    TR1=1;//启动定时器
+    number=0;
+    temp_smg=9999;
+    temp_led=0xfe;
+}
+void timer0() interrupt 1  //定时器0的中断函数
+{
+    TH0=(65536-50000)/256;
+    TL0=(65536-50000)%256;
+    time0++;
+    if(time0==20)
+    {
+        time0=0;
+        temp_smg=number;
+        number++;
+    }
+}
+void timer1() interrupt 3 //定时器0的中断函数
+{
+    TH1=(65536-50000)/256;
+    TL1=(65536-50000)%256;
+    time1++;
+    if(time1==1)
+    {
+        time1=0;
+        temp_led=_crol_(temp_led,1);
+        P2=temp_led;
+         
+    }
+}

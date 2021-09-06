@@ -1,0 +1,40 @@
+###########################################################
+### % tmux终端复用软件
+###########################################################
+% <crtl+a>                                          #激活控制台(系统默认Ctrl+b)
+% tmux new-session -s <session_name>                #创建一个会话
+% tmux list-sessions                                #查看会话	
+% tmux detach                                       #分离会话
+% tmux attach-session -t <target_session_name>      #连接会话
+% tmux rename-session -t session_old session_new    #重命名会话
+% tmux kill-server                                  #关闭tmux服务器
+% tmux kill-server -t session_name                  #关闭指定的会话(session_name)
+% tmux kill-server -a -t session_name               #关闭所有会话，除了这个会话<session_name>
+.................................................
+.                                               . 
+. F2            ;Grub2                          .
+. F11           ;Screen Full                    .
+. Super+L       ;Lock Screen                    .
+. Super+H       ;Hide window                    .
+. Super+Up      ;Maximize window                .
+. Super+Left    ;View split on left             .
+. Super+right   ;View split on right            .
+.                                               .
+. Alt+F2        ;Show the run command prompt    .
+. Alt+F4        ;Close window                   . 
+. Alt+Tab       ;Browser Switching              .
+.                                               .
+. Ctrl+Shitf++  ;Increase font size             .
+. Ctrl+-        ;Decrease font size             .
+. Ctrl+7        ;turn terminal                  .
+. Ctrl+H        ;Display hidden files           .
+. Ctrl+C        ;Keyboard interrupt             .
+. Ctrl+D        ;echo <<-EOF                    .
+. Ctrl+Z        ;Stop the process[background]   .   
+. Ctrl+/        ;Send SIGQUIT 3 [foreground]    .
+. Ctrl+S        ;Interrupt console output       .
+. Ctrl+Q        ;Recovery console output        .
+. Ctrl+L        ;clear                          .
+. Ctrl+Tab      ;Window Switching               .
+.................................................
+

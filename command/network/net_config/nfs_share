@@ -1,0 +1,52 @@
+###########################################################
+### nfs
+###########################################################
+% ====== 服务端
+# 首先安装nfs服务
+% sudo apt-get install nfs-kernel-server
+
+# 编辑 /etc/exports
+# 文件末尾添加共享路径和开放的IP
+# 格式
+# [共享绝对路径][IP地址](选项); 注意选项内不能加空格，否则服务无法启动。
+/root/Share 192.168.16.111(rw,sync,no_subtree_check)
+
+# 两句话的脚本，用来重启rpcbind 和nfs服务
+# nfs服务启动前必需要启动rpcbind(有些linux是postmap)
+# vim ~/Documents/Startatboot/restartservice.sh
+service rpcbind restart
+service nfs-kernel-server restart
+
+% sh ~/Documents/Startatboot/restartservice.sh
+
+
+
+% ====== 客户端
+# 切换到客户端，编辑/etc/fstab挂载配置文件 
+# 注释前添加对服务端共享路径的挂载，格式为;
+# [服务端IP地址:服务端路径] [本地路径] nfs default 0 0
+192.168.16.100:/root/Share /root/Share nfs defaults 0 0
+
+% mount -a
+
+
+###########################################################
+%  客户端无法写入文件问题
+###########################################################
+% 
+1 给共享文件夹777权限; chmod -R 777 [路径]
+2 在/etc/exports配置文件选项里添加 no_root_squash 选项。
+
+# 将写好的重启服务脚本添加到 rc.local, 至此服务端配置完毕。
+# vim /etc/rc.local
+sh /root/Documents/Startatboot/restartservices.sh &
+exit 0
+
+# 在客户端编写挂载脚本，并添加到 rc.local,至此客户端配置完毕。
+# vim /etc/rc.local
+# cd ~/Documents/Startatboot
+# vim mount.sh
+sleep 30
+mount -a
+
+

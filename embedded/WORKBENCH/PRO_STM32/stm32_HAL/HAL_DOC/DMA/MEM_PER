@@ -1,0 +1,53 @@
+#define SENDBUFF_SIZE       1000
+extern uint8_t SendBuff[SENDBUFF_SIZE];
+
+
+
+
+void USART_DMA_Config(void)
+{
+    __HAL_RCC_DMA1_CLK_ENABLE();
+    
+    DMA_Handle.Instance                 = DMA1_Channel4;            //数据流选择
+    DMA_Handle.Init.Direction           = DMA_MEMORY_TO_PERIPH;     //存储器到外设
+    DMA_Handle.Init.PeriphInc           = DMA_PINC_DISABLE;         //外设地址非增量模式
+    DMA_Handle.Init.MemInc              = DMA_MINC_ENABLE;          //存储器地址增量模式
+    DMA_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;      //外设数据长度：8位
+    DMA_Handle.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;      //存储器数据长度：8位
+    DMA_Handle.Init.Moce                = DMA_NORMAL;               //外设普通模式
+    DMA_Handle.Init.Priority            = DMA_PRIORITY_MEDIUM;      //中等优先级
+    HAL_DMA_Init(&DMA_Handle);
+    
+    // 串口和DMA相连接
+    __HAL_LINKDMA(&UartHandle, hdmatx, DMA_Handle);
+}
+
+
+
+
+
+
+int main(void)
+{
+    uint16_t i;
+    
+    SystemClock_Config();
+    DEBUG_USART_Config();
+    DEBUG_DMA_Config();
+    
+    // 填充将要发送的数据
+    for (i = 0; i < SENDBUFF_SIZE; i++)
+        SendBuff[i] = 'A';
+        
+    // 为演示DMA持续运行而CUP还能处理其它事情
+    // 持续使用DMA发送数据，信息量非常大，
+    // 长时间运行可能会导至电脑端串口调试助手会卡死，
+    // 或把DMA配置中的循环模式改为单次模式
+    
+    // USART1 向 DMA发出TX请求
+    HAL_UART_Transmit_DMA(&UartHandle, (uint8_t *)SendBuff, SENDBUFF_SIZE);
+    
+    while (1)
+    {
+    }
+}

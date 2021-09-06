@@ -1,0 +1,404 @@
+############################################################
+### % DS1302 <===> __IO__
+############################################################
+/* % DS1302引脚定义 */
+/*___________________________________*/
+Pin_8   Vcc1        % 备用电池端
+Pin_1   Vcc2        % 5V电源。 当 “Vcc2 > Vcc1+0.2”时，由Vcc2向
+                    % DS1302供电。“Vcc2 < Vcc1”时，由Vcc1向DS1302供电                    
+Pin_7   SCLK        % 串行时钟，输入
+Pin_6   SDA         % 数据输入输出端口
+Pin_5   CE/RST      % 复位引脚
+Pin_4   GND         % 地
+Pin_3   x2          % 外接晶振引脚
+Pin_2   x1          % 外接晶振引脚(32.768KHz)
+
+
+/* % DS1302__IO__定义 */
+/*___________________________________*/
+sbit DS1302_IO          = P3^3  /* % 串行数据输入输出端口 */
+sbit SCLK               = P3^4  /* % 串行时钟 */
+sbit CE                 = P3^5  /* % 使能端口 */
+#define BURST_WRITE     0xBE    /* % Burst模式写 */
+#define BURST_READ      0xBF    /* % Burst模式读 */
+#define BURST_RAM_WRITE 0xFE    /* % BurstRAM模式写 */
+#define BURST_RAM_READ  0xFF    /* % BurstRAM模式读 */
+
+/* % DS1302读写寄存器定义 */
+/*___________________________________*/
+// % DS1302读寄存器指令地址
+uchar code read_rtc_cmd[7] = {0x81, 0x83, 0x85, 0x87, 0x89, 0x8b, 0x8d}; 
+// % DS1302写寄存器指令地址
+uchar code write_rtc_cmd[7] = {0x80, 0x82, 0x84, 0x86, 0x88, 0x8a, 0x8c};
+// % DS1302时钟初始化: 2013年1月1日星期二12点00分00秒
+// % 存储顺序是: [秒-分-时-日-月-周-年-None], 存储格式是用BCD码
+// % 最后一个字节为：0x00
+uchar ds1302_time[8] = {0, 0, 0x12, 0x01, 0x01, 0x02, 0x13, 0x00};
+
+
+
+############################################################
+### % DS1302 <===> 寄存器
+############################################################
+/* % DS1302  控制字 */
+/*___________________________________*/
+7     6        5   4   3   2   1       0
+1   RAM/CK     A4  A3  A2  A1  A0    RD/WR
+
+bit7    % 最高有效位，必须为“1”
+bit6    % 为“0”表示存取日历时钟数据，为“1”表示存取RAM数据
+5:1     % 指示操作单元的地址
+bit0    % 为“0”表示要进行写操作，为“1”表示要进行读操作
+
+
+/* % DS1302 操作 */
+/*___________________________________*/
+% 读数据，下降沿
+读数据进在紧跟“8”位控制字指令后的下一个SCLK脉冲的下降沿，读出
+DS1302中的数据，读出的数据是从最低位到最高位。
+% 写数据，上升沿
+控制字总是从最低位开始输出。在控制字指令输入后的下一个SCLK时钟的
+上升沿时，数据被写入DS1320，数据输入也是从最低位开始。
+
+
+
+
+############################################################
+### % DS1302 <===> 底层驱动
+############################################################
+
+/*
+ * @brief   % 向DS1302写入一个字节
+ * @param   % 0-> dat, 要写入的字节数据
+ * @retval  % None
+ *
+ */
+void ds1302_write_byte(uint8_t dat)
+{
+    uint8_t i;
+    
+    for (i = 0; i < 8; i++) 
+    {   
+        // % 数据从最低位开始传送
+        // % 单片机在时钟的下降沿要把数据先准备好                   
+        // % 把“dat”的最低位放入“DS1302_IO”端口上
+        DS1302_IO = dat & 0x01; 
+        dat >>= 1;          // % 将“dat”向右移“1”位
+        SCLK = 1;           // % DS1302在时钟的上升沿采样，单片机把数据输出到总线上
+        delay_us(1);        // % 稍作延时
+        SCLK = 0;           // % 单片机在时钟的下降沿要把数据先准备好
+        delay_us(1);        // % 稍作延时
+    }
+}
+
+
+/*
+ * @brief   % 向DS1302中读取一个字节，使用移位的方法
+ * @param   % 
+ * @retval  % dat, 读取的数据
+ *
+ */
+uint8_t ds1302_read_byte(void)
+{
+    uint8_t tmp;
+    uint8_t dat = 0;
+    
+    for (tmp = 0x01; tmp != 0; tmp<<=1)
+    {                       // % 数据从最低位开始传送
+        if (DS1302_IO != 0) // % 判断“DS1302_IO”端口上的数据是“0”还是“1”
+            dat |= tmp;     // % 为“1”则把“tmp”中的数据存储到“dat”中
+        SCLK = 1;           // % 单片机在时钟的上升沿采样，DS1302把数据输出到总线上
+        delay_us(1);        // % 稍作延时
+        SCLK = 0;           // % DS1302在时钟的下降沿要把数据准备好
+        delay_us(1);        // % 稍作延时
+    }   
+    return dat;
+}
+
+
+
+############################################################
+### % DS1302读写寄存器
+############################################################
+/*
+ * @brief   % 向DS1302写入数据
+ * @param   % 0->cmd, 写入命令数据
+ * @param   % 0->dat, 写入数据信息
+ * @retval  % None
+ *
+ */
+void ds1302_write_register(uint8_t cmd, uint8_t dat)
+{
+    CE   = 0;           // % 初始化“CE”为低“0”
+    delay_us(1);        // % 稍作延时
+    SCLK = 0;           // % 初始化“SCLK”为低“0”
+    delay_us(1);        // % 稍作延时
+    CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+    delay_us(1);        // % 稍作延时
+    ds1302_write_byte(cmd);
+    ds1302_write_byte(dat);
+    CE   = 0;           // % 先把“CE”拉低,完成一次操作
+}
+
+
+/*
+ * @brief   % wwDS1302读出数据
+ * @param   % 0->cmd, 写入命令数据
+ * @retval  % 读出的数据，读出的“dat”是BCD码格式
+ *
+ */
+uint8_t ds1302_read_register(uint8_t cmd)
+{
+    uint8_t dat;
+    
+    CE   = 0;           // % 初始化“CE”为低“0”
+    delay_us(1);        // % 稍作延时
+    SCLK = 0;           // % 初始化“SCLK”为低“0”
+    delay_us(1);        // % 稍作延时
+    CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+    delay_us(1);        // % 稍作延时
+    ds1302_write_byte(cmd);
+    dat = ds1302_read_byte();
+    CE   = 0;           // % 先把“CE”拉低,完成一次操作
+    
+    return dat;
+}
+
+
+/*
+ * @brief   % DS1302初始化
+ * @param   % 
+ * @retval  % None
+ *
+ */
+void ds1302_init(void)
+{
+    uint8_t i;
+    
+    ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+    for (i = 0; i < 7; i++)
+    {
+        ds1302_write_register(write_rtc_cmd[i], ds1302_time[i]);
+    }
+    ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+}
+
+
+/*
+ * @brief   % DS1302读出时间，放入ds1302_time[i]中
+ * @param   % 
+ * @retval  % None
+ *
+ */
+void ds1302_read_time(void)
+{
+    uint8_t i;
+    
+    for (i = 0; i < 7; i++)
+    {
+        ds1302_time[i] = ds1302_read_register(read_rtc_cmd[i]);
+    }
+}
+
+
+############################################################
+### % LCD1602_DISPLAY
+############################################################
+void lcd1602_display(void)
+{
+    uint8_t str[16];
+    
+    str[0]  = 'D';
+    str[1]  = 'A';
+    str[2]  = 'T';
+    str[3]  = 'E';
+    str[4]  = ':';
+    str[5]  = '2';
+    str[6]  = '0';
+    str[7]  = (ds1302_time[6] >> 4) + '0';   // % 年
+    str[8]  = (ds1302_time[6] & 0x0F) + '0';
+    str[9]  = '-';
+    str[10] = (ds1302_time[4] >> 4) + '0';  // % 月
+    str[11] = (ds1302_time[4] & 0x0F) + '0';
+    str[12] = '-';
+    str[13] = (ds1302_time[3] >> 4) + '0';  // % 日
+    str[14] = (ds1302_time[3] & 0x0F) + '0';
+    str[15] = '\0';                         // % 字符串结束符
+    lcd1602_string_set(0, 0, str);
+    
+    str[0]  = 'T';
+    str[1]  = 'I';
+    str[2]  = 'M';
+    str[3]  = 'E';
+    str[4]  = ':';
+    str[5]  = (ds1302_time[2] >> 4) + '0';   // % 小时
+    str[6]  = (ds1302_time[2] & 0x0F) + '0';
+    str[7]  = ':';
+    str[8]  = (ds1302_time[1] >> 4) + '0';  // % 分钟
+    str[9]  = (ds1302_time[1] & 0x0F) + '0';
+    str[10] = ':';
+    str[11] = ((ds1302_time[0] & 0x7F) >> 4) + '0';  // % 秒
+    str[12] = (ds1302_time[0] & 0x0F) + '0';
+    str[13] = ' ';
+    str[14] = ((ds1302_time[5] - 1) & 0x0F) + '0';// % 周
+    str[15] = '\0';                         // % 字符串结束符
+    lcd1602_string_set(0, 1, str);
+}
+
+
+
+############################################################
+### % DS1302 <===> Burst模式
+############################################################
+% “Burst”模式，可以进行多字节读写(在时钟模式下只能读写8个字节)
+在此模式下，最先“8”个时钟/日历寄存器可以从地址“0”的第“0”位开始连续读或写。
+
+// % Burst模式，写入 8 个字节的数据
+void ds1302_burst_write(void)
+{
+    uint8_t i;
+    CE   = 0;           // % 初始化“CE”为低“0”
+    delay_us(1);        // % 稍作延时
+    SCLK = 0;           // % 初始化“SCLK”为低“0”
+    delay_us(1);        // % 稍作延时
+    CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+    delay_us(1);        // % 稍作延时
+    
+    ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+    ds1302_write_byte(BURST_WRITE);   // % 0xBE命令，指的是Burst模式
+    for (i = 0; i < 8; i++)
+    {
+        ds1302_write_byte(ds1302_time[i]);
+    }
+    ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+}
+
+
+// % Burst模式, 连续读取8个字节,存放到 *pbuf中
+void ds1302_burst_read(uint8_t *pbuf)
+{
+    uint8_t i;
+    CE   = 0;           // % 初始化“CE”为低“0”
+    delay_us(1);        // % 稍作延时
+    SCLK = 0;           // % 初始化“SCLK”为低“0”
+    delay_us(1);        // % 稍作延时
+    CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+    delay_us(1);        // % 稍作延时
+    ds1302_write_byte(BURST_READ); // % 0xBE命令，指的是Burst模式
+    for (i = 0; i < 8; i++)
+    {
+        pbuf[i] = ds1302_read_byte();
+    }
+    CE   = 0;           // % 初始化“CE”为低“0”
+}
+
+
+void ds1302_burst_init(void)
+{
+    uint8_t status;
+    status = ds1302_read_register(0x81);    // % 读秒寄存器的值
+    // % 判断秒寄存器的最高位是“0”还是“1”
+    // % “0”表示时钟走时， “1”表示时钟停止
+    // % 是“0”的话，不进行初始化操作
+    if ((status & 0x80) != 0)
+    {   
+        ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+        ds1302_burst_write();
+        ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+    }
+}
+
+
+// % 秒寄存器设置(0x80)
+ds1302_write_register(0x80, 0x00) // % 时钟打开
+ds1302_write_register(0x80, 0x80) // % 时钟关闭
+
+
+
+############################################################
+### % DS1302 <===> RAM(31Byte)
+############################################################
+// % RAM_ADDR: 0xC0 ~ FC
+// % 最低位为“0”的时候为写， 最低位为“1”的时候为读
+// % 0xC0为写
+// % 0xC1为读
+void ds1302_write_ram(uint8_t addr, uint8_t dat)
+{
+    ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+    ds1302_write_register(addr, dat) // % 
+    ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+}
+
+// % RAM_ADDR: 0xC1 ~ FD
+// % 最低位为“0”的时候为写， 最低位为“1”的时候为读
+// % 0xC0为写
+// % 0xC1为读
+uint8_t ds1302_read_ram(uint8_t addr)
+{
+    uint8_t dat;
+    dat = ds1302_read_register(addr); 
+    return dat;
+}
+
+
+// % ds1302_RAM 从0xC1地址读出一个字节数据
+dat = ds1302_read_ram(0xC1);
+dat++;
+// % ds1302_RAM 从0xC0地址处写入一个字节数据
+ds1302_write_ram(0xC0, dat);
+
+
+
+
+############################################################
+### % DS1302 <===> RAM_Burst模式
+### % ！！！ RAM_Burst模式只能从初始的地址开始读写
+############################################################
+// % Burst_RAM模式
+// % Burst_RAM模式只能从“0xC0”地址处， 连续写入，最多写31字节
+void ds1302_burst_write_ram(uint8_t *pbuf, uint8_t len)
+{
+    uint8_t i;
+    if (len < 32)           // % RAM中只有31个字节
+    {
+        CE   = 0;           // % 初始化“CE”为低“0”
+        delay_us(1);        // % 稍作延时
+        SCLK = 0;           // % 初始化“SCLK”为低“0”
+        delay_us(1);        // % 稍作延时
+        CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+        delay_us(1);        // % 稍作延时
+        
+        ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+        ds1302_write_byte(BURST_RAM_WRITE); // % 0xFE命令，指的是BurstRam模式
+        for (i = 0; i < len; i++)
+                ds1302_write_byte(pbuf[i]);
+        ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+    }
+}
+
+
+
+// % Burst_RAM模式
+// % Burst_RAM模式只能从“0xC1”地址处， 连续读入，最多读31字节
+void ds1302_burst_read_ram(uint8_t *pbuf, uint8_t len)
+{
+    uint8_t i;
+    if (len < 32)           // % RAM中只有31个字节
+    {
+        CE   = 0;           // % 初始化“CE”为低“0”
+        delay_us(1);        // % 稍作延时
+        SCLK = 0;           // % 初始化“SCLK”为低“0”
+        delay_us(1);        // % 稍作延时
+        CE   = 1;           // % 再把“CE”拉高，使能DS1302芯片
+        delay_us(1);        // % 稍作延时
+        
+        ds1302_write_register(0x8E, 0x00) // % 关闭写保护位
+        ds1302_write_byte(BURST_RAM_READ); // % 0xFF命令，指的是BurstRam模式
+        for (i = 0; i < len; i++)
+                pbuf[i] = ds1302_read_byte();
+        ds1302_write_register(0x8E, 0x80) // % 打开写保护位
+    }
+}
+
+
+

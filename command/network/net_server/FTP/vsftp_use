@@ -1,0 +1,141 @@
+### ===========================================================================ＦＴＰ客户端的使用
+### FTP是使用系统用户，系统密码登陆FTP服务器的，它的上传的目录也是系统用户的家目录
+### FTP是明文传输密码的；tcpdump -eth0 -nnX  port 21； 这个可以看到明文密码
+### FTP默认是不能用Root登陆的，FTP只能上传和下载文件，不能对目录进行操作。
+### !!!!!!!!! Linux中服务的权限，都是用的最高权限　!!!!!!!!!
+service vsftpd start            启动FTP服务
+        ftp IP
+        help    
+        get                     下载文件
+        mget                    下载一批文件
+        put                     上传文件
+        mput                    上传一批文件
+        exit                    退出
+### ===========================================================================ＦＴＰ匿名用户访问
+### 匿名用户默认不能向上切换目录；匿名用户登陆的位置：/var/ftp/
+### 匿名用户登陆FTP服务器时，会映射为Linux系统中的ftp用户。
+anonymous_enable=YES            允许匿名用户访问
+anon_upload_enable=YES          允许匿名用户上传
+anon_mkdir_write_enable=YES     允许匿名用户建立目录
+anon_umask                      设置上传默认权限为[600]
+chown ftp /var/ftp/pub          改变ftp用户/var/ftp/pub子目录的所有者，使它可以读写执行
+用户名：anonymous
+密码：  空，或普通的一个邮箱地址
+___________________________________________________________
+注意：
+1 默认上传目录：／var／ftp／pub／
+2 如果允许上传，需要服务权限和用户权限同时允许。
+3 vsfptd服务的伪用户为：ftp，所用的匿名用户会映射成伪用户存在
+4 匿名用户的用户名和密码相对于是公开的
+### ===========================================================================ＦＴＰ本地用户访问
+### FTP登陆的用户名和密码，就是LinuxFTP服务器系统的用户名和密码
+### FTP权限和系统权限都要同时允许
+### chroot_local_user=YES,用于把用户禁锢在主目录中
+### userlist_enable=YES,用于用户访问控制的
+local_enable=YES                允许本地用户登陆
+write_enable=YES                允许本地用户上传
+local_umask=022                 本地用户上传umask的值
+local_root=/var/ftp/pub/        设置本地用户的FTP根目录(注意目录权限)，设置全局有效
+local_max_rate=0                限制最大传输速率(字节/秒)
+chroot_local_user=YES           开启用户目录限制(只有此行，把所有用户都限制在用户家目录中)
+___________________________________________________________
+加入如下3行，
+写入/etc/vsftpd/chroot_list文件中的用户可以访问任何目录，
+其它用户限制在用户家目录中，这个配置文件控制的是用户是否可以任意切换目录!!!
+1 chroot_local_user=YES
+2 chroot_list_enable=YES
+3 chroot_list_file=/etc/vsftpd/chroot_list
+___________________________________________________________
+groupadd tg                     创建一个tg组，
+gpasswd -a test1 tg             将test1用户加入tg组
+gpasswd -a test2 tg             将test1用户加入tg组
+chown root:tg /var/ftp/pub/     修改文件所属组
+chmod 775 /var/ftp/pub/         修改文件权限
+### ===========================================================================ＦＴＰ添加虚拟用户
+___________________________________________________________
+1 添加虚拟用户口令文件，这个文件可以叫任何名字，也可以在任何位置
+vim /etc/vsftpd/vuser.txt
+cangls                          ### 用户名
+123                             ### 密码
+bols                            ### 用户名
+123                             ### 密码
+___________________________________________________________
+2 生成虚拟用户口令认证文件
+＃ 如果没有安装口令认证命令，需安装：
+    yun -y install db4-utils
+＃ 把文本文档转变为认证的数据库文件
+＃ -T指定转换， -t指定算法， -f，指定文件名
+db_load　-T -t hash -f /etc/vsftpd/vuser.txt　/etc/vsftpd/vuser.db
+___________________________________________________________
+3 编辑vsftpd的PAM认证文件
+＃在此[/etc/pam.d/vsftpd]这个配置文件中注释掉其它所有的行，加入以下两行即可!!!!!!
+＃注释掉其它的行，可以禁止本地用户登陆，因为本地用户登陆时的验证依然依赖这个文件!!!
+vim /etc/pam.d/vsftpd
+auth required /lib/security/pam_userdb.so db=/etc/vsftpd/vuser
+account required /lib/security/pam_userdb.so db=/etc/vsftpd/vuser
+___________________________________________________________
+4 建立本地映射用户并设置宿主目录权限
+＃此用不需要登陆，只是映射用户。
+＃用户名必须和下一步配置文件中一致。
+useradd -d /home/vftproot -s /sbin/nologin vuser
+chmod 755 /home/vftproot
+___________________________________________________________
+5 修改配置文件
+vi /etc/vsftpd/vsftpd.conf
+guest_enable=YES                ＃开启虚拟用户
+guest_username=vuser            ＃FTP虚拟用户对应的系统用户!!!
+pam_service_name=vsftpd         ＃PAM认证文件（默认存在）
+___________________________________________________________
+6 重启vsfpd服务，并测试
+service vsftpd restart
+此时虚拟用户可以登陆，查看，能下载，不可以上传
+默认上传文件的位置是宿主用户的家目录
+根权限用的是匿名用户权限进行管理
+___________________________________________________________
+7 调整虚拟用户权限
+＃关闭匿名用户登陆，更加安全(不影响虚拟用户登陆)
+＃给虚拟用户设置权限
+vi /etc/vsftpd/vsftpd.conf
+anonymous_enable=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+___________________________________________________________
+8 此配置完成后，本地用户不允许登陆，匿名用户不允许登陆，
+  所有虚拟用户都允许登陆，下载，上传。
+### ===========================================================================ＦＴＰ虚拟用户访问
+1 修改配置文件
+vi /etc/vsftpd/vsftpd.conf
+user_config_dir=/etc/vsftpd/vusers_dir          ,指定保存虚拟用户配置文件的目录
+___________________________________________________________
+2 创建虚拟用户配置文件目录
+mkdir /etc/vsftpd/vusers_dir
+___________________________________________________________
+3 在这个[/etc/vsftpd/vusers_dir]虚拟目录下为每个虚拟用户建立自己的配置文件
+    _______________________________________________
+    用户[cangls]$ vim /etc/vsftpd/vusers_dir/cangls
+            anon_upload_enable=YES
+            anon_mkdir_write_enable=YES
+            anon_other_write_enable=YES         允许上传
+            mkdir /tmp/vcangls
+            local_root=/tmp/vcangls             给vcangls指定独立的上传目录
+___________________________________________________________
+4 所有的虚拟用户映射的都是：vuser用户
+假设不给bols这个用户指定单的配置文件，则依照(/etc/vsftp/vsftpd.conf)主配置文件!!!
+改变文件的所有者，所属组权限[所属组权限可以不改]
+chown vuser:vuser /tmp/vcangls
+___________________________________________________________
+5 虚拟用户访问配置文件如下：
+禁止匿名用户登陆(配置文件修改)
+禁止本地用户登陆(PAM文件修改)
+允许虚拟用户登陆(配置文件修改)
+cangls的上传目录是/etc/vcangls，并允许查看，下载，上传。
+bols的上传目录是虚拟用户的默认目录/home/vftproot，只能看， 下载，不能上传。
+### ===========================================================================
+    ___________________________________________       
+    用户[bols]$ vim /etc/vsftpd/vusers_dir/bols
+            anon_upload_enable=YES
+            anon_mkdir_write_enable=YES
+            anon_other_write_enable=YES         允许上传
+            mkdir /tmp/vbols
+            local_root=/tmp/vbols                给vbols指定独立的上传目录

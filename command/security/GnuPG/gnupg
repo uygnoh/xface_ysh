@@ -1,0 +1,212 @@
+###########################################################
+### % GnuPG生成密钥对
+###########################################################
+ysh@debian:~$ gpg --full-gen-key
+gpg (GnuPG) 2.1.18; Copyright (C) 2017 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Please select what kind of key you want:            请选择您要使用的密钥种类：
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+Your selection? 1                                   您的选择？
+RSA keys may be between 1024 and 4096 bits long.
+What keysize do you want? (3072) 
+Requested keysize is 3072 bits
+
+Please specify how long the key should be valid.    请设定这把密钥的有效期限
+         0 = key does not expire                    密钥永不过期
+      <n>  = key expires in n days                  密钥在 n 天后过期
+      <n>w = key expires in n weeks                 密钥在 n 周后过期
+      <n>m = key expires in n months                密钥在 n 月后过期
+      <n>y = key expires in n years                 密钥在 n 年后过期
+Key is valid for? (0)  0              
+Key does not expire at all
+Is this correct? (y/N) y                            以上正确吗？(y/n)
+
+### 用户名和电子邮件。可以给同样的密钥不同的身份，比如给同一个密钥关联多个电子邮件
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: freeysh
+Email address: 961832097@qq.com
+Comment: xfs
+You selected this USER-ID:
+    "freeysh (xfs) <961832097@qq.com>"
+    
+### 更改姓名(N)、注释(C)、电子邮件地址(E)或确定(O)/退出(Q)？
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? o
+
+
+接着，系统会让你设定一个私钥的密码.这是为了防止误操作, 或者系统被侵入时有人擅自动用私钥
+### 
+    Please Enter the passphrase to
+    protect you new key
+    Passphrase:_______________________________________
+    <OK>                                <Cancel>
+
+
+### 然后，系统就开始生成密钥了，这时会要求你做一些随机的举动，以生成一个随机数。
+    我们需要生成大量的随机字节。这个时候您可以多做些琐事(像是敲打键盘、移动鼠标、读写硬盘之类的)，
+    这会让随机数字发生器有更好的机会获得足够的熵数。
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+
+% 几分钟以后，系统提示密钥已经生成了
+
+gpg: key 70F0FA1A4101B6B2 marked as ultimately trusted          gpg: 密钥 70F0FA1A4101B6B2 被标记为绝对信任
+gpg: directory '/home/ysh/.gnupg/openpgp-revocs.d' created
+gpg: revocation certificate stored as '/home/ysh/.gnupg/openpgp-revocs.d/68110A1DA9902F20DD9EAC5770F0FA1A4101B6B2.rev'
+public and secret key created and signed.                       公钥和私钥已经生成并经签名。
+
+pub   rsa1024 2019-02-20 [SC]
+      68110A1DA9902F20DD9EAC5770F0FA1A4101B6B2
+      68110A1DA9902F20DD9EAC5770F0FA1A4101B6B2
+uid                      freeysh (xfc) <961832097@qq.com>
+sub   rsa1024 2019-02-20 [E]
+
+请注意上面的字符串"70F0FA1A4101B6B2"，这是"用户 ID"的 Hash 字符串，可以用来替代"用户 ID"。
+
+
+
+
+###########################################################
+### % GnuPG撤销证书
+###########################################################
+这时，最好再生成一张"撤销证书"，以备以后密钥作废时，可以请求外部的公钥服务器撤销你的公钥。
+gpg --gen-revoke [用户 ID]
+上面的"用户 ID"部分，可以填入你的邮件地址或者 Hash 字符串（以下同）。
+        
+
+
+###########################################################                
+### % GnuPG列出密钥
+###########################################################
+gpg --list-keys 列出密钥
+第一行显示公钥文件名（pubring.gpg），
+第二行显示公钥特征（4096 位，Hash 字符串和生成时间），
+第三行显示"用户 ID"，
+第四行显示私钥特征
+
+
+
+###########################################################
+### % GnuPG删除某个密钥
+###########################################################
+如果你要从密钥列表中删除某个密钥，可以使用 delete-key 参数
+gpg --delete-key [用户 ID]
+
+
+
+###########################################################
+### % GnuPG输出密钥
+###########################################################
+% 公钥文件（.gnupg/pubring.gpg）以二进制形式储存，armor 参数可以将其转换为 ASCII 码显示。
+% "用户 ID"指定哪个用户的公钥，output 参数指定输出文件名（public-key.txt）
+    gpg --armor --output public-key.txt --export [用户 ID]
+% 类似地，export-secret-keys 参数可以转换私钥。
+    gpg --armor --output private-key.txt --export-secret-keys
+    
+    
+    
+###########################################################
+### % GnuPG上传公钥
+###########################################################
+% 公钥服务器是网络上专门储存用户公钥的服务器。send-keys 参数可以将公钥上传到服务器。
+    gpg --send-keys [用户 ID] --keyserver hkp://subkeys.pgp.net
+    使用上面的命令，你的公钥就被传到了服务器 subkeys.pgp.net，然后通过交换机制，所有的公钥服务器最终都会包含你的公钥。
+
+    由于公钥服务器没有检查机制，任何人都可以用你的名义上传公钥，所以没有办法保证服务器上的公钥的可靠性。
+    通常，你可以在网站上公布一个公钥指纹，让其他人核对下载到的公钥是否为真。fingerprint 参数生成公钥指纹。
+    gpg --fingerprint [用户 ID]
+    
+    
+    
+###########################################################
+### % GnuPG输入密钥
+###########################################################
+% 除了生成自己的密钥，还需要将他人的公钥或者你的其他密钥输入系统。这时可以使用 import 参数。
+    gpg --import [密钥文件]
+% 为了获得他人的公钥，可以让对方直接发给你，或者到公钥服务器上寻找。
+    gpg --keyserver hkp://subkeys.pgp.net --search-keys [用户 ID]
+正如前面提到的，我们无法保证服务器上的公钥是否可靠，下载后还需要用其他机制验证．
+
+
+
+
+###########################################################
+### % GnuPG加密
+###########################################################
+% 假定有一个文本文件 demo.txt，怎样对它加密呢？ encrypt 参数用于加密
+    gpg --recipient [用户 ID] --output demo.en.txt --encrypt demo.txt
+recipient 参数指定接收者的公钥，output 参数指定加密后的文件名，
+encrypt   参数指定源文件。运行上面的命令后，demo.en.txt 就是已加密的文件，可以把它发给对方。
+
+
+
+###########################################################
+### % GnuPG解密
+###########################################################
+% 对方收到加密文件以后，就用自己的私钥解密。
+    gpg --decrypt demo.en.txt --output demo.de.txt
+decrypt 参数指定需要解密的文件，output 参数指定解密后生成的文件。运行上面的命令，demo.de.txt 就是解密后的文件。
+GPG 允许省略 decrypt 参数。
+gpg demo.en.txt
+运行上面的命令以后，解密后的文件内容直接显示在标准输出。
+
+
+
+###########################################################
+### % GnuPG对文件签名
+###########################################################
+1 有时，我们不需要加密文件，只需要对文件签名，表示这个文件确实是我本人发出的。sign 参数用来签名。
+    gpg --sign demo.txt
+    运行上面的命令后，当前目录下生成 demo.txt.gpg 文件，这就是签名后的文件。
+    这个文件默认采用二进制储存，如果想生成 ASCII 码的签名文件，可以使用 clearsign 参数。
+    gpg --clearsign demo.txt
+    运行上面的命令后 ，当前目录下生成 demo.txt.asc 文件，后缀名 asc 表示该文件是 ASCII 码形式的。
+
+2 如果想生成单独的签名文件，与文件内容分开存放，可以使用 detach-sign 参数。
+    gpg --detach-sign demo.txt
+    运行上面的命令后，当前目录下生成一个单独的签名文件 demo.txt.sig。
+    该文件是二进制形式的，如果想采用 ASCII 码形式，要加上 armor 参数。
+    gpg --armor --detach-sign demo.txt    
+
+
+
+###########################################################    
+### % GnuPG签名+加密  
+###########################################################
+上一节的参数，都是只签名不加密。如果想同时签名和加密，可以使用下面的命令。
+    gpg --local-user [发信者 ID] --recipient [接收者 ID] --armor --sign --encrypt demo.txt
+local-user  参数指定用发信者的私钥签名
+recipient   参数指定用接收者的公钥加密
+armor       参数表示采用 ASCII 码形式显示
+sign        参数表示需要签名
+encrypt     参数表示指定源文件
+
+
+
+###########################################################
+### % GnuPG验证签名
+###########################################################
+% 我们收到别人签名后的文件，需要用对方的公钥验证签名是否为真。verify 参数用来验证。
+    gpg --verify demo.txt.asc demo.txt
+    
+    
+    
+    
+###########################################################    
+### % GnuPG文件加密
+###########################################################
+% 注意：gpg只能对文件进行加密，对目录则无法完成加密！
+% GPG 对称加密, -o指定输出文件名 -d指定解密文件名 -c指定加密文件名
+# gpg -c file_name
+# ls
+  file_name.gpg
+# gpg -o file_name -d file_name.gpg
+    
+

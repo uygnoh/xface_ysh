@@ -1,0 +1,35 @@
+### =============================================================== virtualbox
+% sudo apt-get install virtualbox
+Settings->Display->Scale Factor: %200
+
+### ================================= VirtualBox的Nat模式设置及端口映射 实现共享上网
+Settings->Network
+    Adapter1
+    Enable Network Adapter1     ok
+    Attached to: NAT
+        Name:
+    Advanced->
+        Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
+        Promiscuous Mode: Deny
+        MAC Address: 08002783D346
+        Cable connected         ok
+        Port Forwarding->
+            Port Frowarding Rules
+        Name    Protocol    Host IP     Host Port   Guest IP    Guest Port
+        ysh1    TCP         127.0.0.1   2222        10.0.2.15   22
+
+ssh -p 2222 ysh@127.0.0.1
+
+
+
+### ===================================================  Virtualbox 配置 
+% 安装 Virtualbox 虚拟机
+1. 下载较新版本的Virtualbox安装
+2. 安装对应版本的Virtualbox扩展包
+
+% 把自己加入到vboxusers组。也就是在终端中输入
+% sudo adduser 你的用户名vboxusers
+% 然后退出，重新登录一次
+sudo adduser ysh vboxusers
+
+

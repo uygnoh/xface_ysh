@@ -1,0 +1,31 @@
+###########################################################
+###  seq
+###########################################################
+% seq 是Linux 中一个预设的外部命令，一般用作一堆数字的简化写法
+它有三个选项
+    -f, --format=FORMAT use printf style floating-point FORMAT (default: %g)
+    -s, --separator=STRING use STRING to separate numbers (default: \n)
+    -w, --equal-width equalize width by padding with leading zeroes
+    
+    
+% -f 最常用 , 例如一次制做 10 个名 dir001 , dir002 .. dir010 的目录，
+% 我们可以运行下面的命令便可
+seq -f 'dir%03g' 1 10 | xargs mkdir
+    或
+mkdir $(seq -f 'dir%03g' 1 10)
+它用的是 printf 的格式 , %03g' 代表以三位浮点数,以此方法，如用bash3 的 printf
+% 也可作为等价命令
+printf 'dir%03d\n' {1..10} | xargs mkdir 或 mkdir `printf 'dir%03d ' {1..10}`
+
+
+
+% awk 当然也可以
+awk 'BEGIN { while (num < 10 ) printf "dir%03d\n", ++num ; exit}' | xargs mkdir
+___________________________________________________________
+-s 选项主要改变输出的分格符, 预设是 \n , 就是 newline
+用 -s 便可改变 , 如
+seq -s ' ' 1 10
+1 2 3 4 5 6 7 8 9 10 , 以空格作为分格
+
+
+

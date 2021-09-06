@@ -1,0 +1,16 @@
+############################################################
+### % NERDTreeFind 插件配置文件
+############################################################
+""" Plug-in nerdtree Configuration
+""" Ctrl+H, Ctrl+L切换工作目录
+      
+nmap ,v :NERDTreeFind<cr>                       " 将 ,v 设置为开关NERDTree的快捷键
+nmap ,g :NERDTreeToggle<cr>                     " 将 ,v 设置为开关NERDTree的快捷键
+autocmd vimenter * NERDTree                     " 打开vim时自动打开NERDTree
+autocmd vimenter * if !argc()|NERDTree|endif    " 打开vim时如果没有文件自动打开NERDTree
+let g:NERDTreeHidden=0                          " 不显示隐藏文件
+let g:NERDTreeDirArrowExpandable = '+'          " 修改树的显示图标
+let g:NERDTreeDirArrowCollapsible = '-'
+"let g:NERDTreeSize=20                          " 窗口尺寸
+let g:NERDTreeShowLineNumbers=1                 " 窗口是否显示行号
+

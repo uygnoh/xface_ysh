@@ -1,0 +1,243 @@
+###########################################################
+###  正则表达式自定义替换定界符
+###########################################################
+% 正则表达式自定义替换定界符
+    1. s#^https://#http://#;
+    2. s{fred}{barney};
+    3. s[fred][barney};
+    4. s<fred><barney>;
+    5. s#wilma#Wilma#gi;
+% 把“fred”替换为“wilma”，并判断是否匹配成功
+$_ = "fred fintstone";
+if (s/fred/wilma/) {
+    print "Succeaafully replaced fred with wilma!\n";
+}
+
+
+
+###########################################################
+###  正则表达式替换文件中的内容
+###########################################################
+% 把“Barney”内容替换为“Fred”
+$_ = "He's out bowlig with Barney tonight.";
+s/Barney/Fred/;
+print "$_";
+
+
+% 这里用到了捕获变量，在替换时进行了反向引用 
+% $1's team <========> (\w+)'s team
+% 运行结果：He's out bowlig against Fred's team tonight.
+$_ = "He's out bowlig with Fred tonight.";
+s/with (\w+)/against $1's team/;
+print "$_\n";
+
+
+
+% one, two互换位置
+$_ = "one two three";
+s/(\w+) (\w+) /$2 $1/;
+print "$_\n";
+% s/^/huge,/;相当于在字符串前插入huge,
+s/^/huge,/;
+print "$_\n";
+
+
+
+% s/home/cave/; 默认只替换1次 
+$_ = "home sweet home";
+s/home/cave/;
+print "$_\n";
+% s/home/cave/g;全局替换
+$_ = "home sweet home";
+s/home/cave/g;
+print "$_\n";
+
+
+
+###########################################################
+###  正则表达式替换文件中的空白
+###########################################################
+% 把多个空格替换成1个
+$_ = "Input     data\t   may have       extra whitespace.";
+s/\s+/ /g;
+
+% 删除字符串开头的空白
+$_ = "        one two";
+s/^\s+//;
+print "$_\n";
+
+% 删除字符串结尾的多余的空格
+$_ = "        one two         ";
+s/\s+$//;
+print "$_\n";
+
+% 删除字符串前后的多余的空格 
+$_ = "        one two         ";
+s/^\s+|\s+$//g;
+print "$_\n";
+
+
+
+
+
+### ===================================================  绑定操作符替换
+% 如果使用的不是特殊变量($_)，那我们就要用绑定操作符来进行操作
+$content = "one another one";
+$content =~ s/one/two/g;
+print $content;
+
+
+
+
+###########################################################
+###  大小写转换
+###########################################################
+% 把捕获的(fred|barney)转换成大写字母
+$_ = "I saw Barney with Fred";
+s/(fred|barney)/\U$1/ig;
+print "$_\n";
+
+% 把捕获的(fred|barney)转换成小写字母
+$_ = "I saw Barney with Fred";
+s/(fred|barney)/\L$1/ig;
+print "$_\n";
+
+
+
+
+% 正则表达式捕获功能替换字符串
+$-_ = "this is one and two";
+s/(\w+) and (\w+)/$2 and $1/;
+
+% 正则表达式捕获功能替换字符串，并改为大写
+$-_ = "this is one and two";
+s/(\w+) and (\w+)/\U$2 and $1/;
+
+% 正则表达式捕获功能替换字符串，用E来结束大写 
+$-_ = "this is one and two";
+s/(\w+) and (\w+)/\U$2\E and $1/;
+
+
+
+
+% \U全部字母大写
+$_ = "one and two";
+s/(one|two)/\U$1/gi;
+print "$_\n";
+
+% \u第1个字母大写，其它不变
+$_ = "one and two";
+s/(one|two)/\u$1/gi;
+print "$_\n";
+
+% \L全部字母小写
+$_ = "one and two";
+s/(one|two)/\L$1/gi;
+print "$_\n";
+
+% \l第1个字母小写，其它不变
+$_ = "one and two";
+s/(one|two)/\u$1/gi;
+print "$_\n";
+
+% \u\L第1个字母大写，其它字母小写 
+$_ = "one and two";
+s/(one|two)/\u\L$1/gi;
+print "$_\n";
+
+
+% \L全部字母小写, \u第1个字母大写，其它不变
+$name = "bill";
+print "Hello, \L\u$name\E, would you like to play a game?\n";
+
+
+
+
+
+###########################################################
+###  split join
+###########################################################
+% split是用来拆分，它把一个字符串拆分成多个，放在数组里。
+% 用split来拆分，以“:”来作为分隔符
+% 用split来拆分的字符串，我们得到的是一个数组
+@fields = split /:/, "abc:def:g:h";
+foreach (@fields) {
+    print "$_\n");
+}
+
+% 这个split分割这个字符串，
+% 如果这个字符串开头有空的，中间的，它留下来
+% 如果这个字符串结尾有空的，它将去掉 
+@fields = split /:/, "::::::abc:def:g:h::::::";
+foreach (@fields) {
+    print "$_\n");
+}
+
+
+% 用任意的空白作为分隔符，这个”\t“，“\n”也是空白
+% 最后结果将会得到一个单词
+my $some_input = "This is a \t     test.\n";
+my @args = split /\s+/, $some_input;
+foreach (@args) {
+    print "$_\n";
+}
+% 我们用特殊变量 $_
+$_ = "This is a \t     test.\n";
+my @args = split /\s+/;
+foreach (@args) {
+    print "$_\n";
+}
+% 如果匹配的是任意空白的话，这个“/\s+/”也可以省掉。
+% split默认的正则表达式：/\s+/
+$_ = "This is a \t     test.\n";
+my @args = split;
+foreach (@args) {
+    print "$_\n";
+}
+
+
+
+% join函数是把一数组合并成一个大的字符串
+% ":"这里代表的是连接符，也可以是“-”或其它字符。
+my @y = (4,6,81,12);
+my $x = join ":", @y;
+print "$x\n";
+
+
+
+
+###########################################################
+###  列表上下文
+###########################################################
+% 第1个小括号捕获的内容放到第1个变量中
+% 第2个小括号捕获的内容放到第2个变量中
+% 第3个小括号捕获的内容放到第3个变量中
+$_ = "Hello there, neighbor!";
+my($first, $second, $trird) = /(\S+) (\S+), (\S+)/;
+print "$first $second $third\n";
+
+
+% 把捕获的内容放到数组中
+% 这个时候我们要使用到列表上下文 
+% 把捕获到的字符串放到数组中
+% 第1次捕获的内容放到数组中，多次捕获依次放入数组中，相当于循环捕获。
+my $text = "Fred dropped a 5 ton granite block on Mr.Slate";
+my @words = ($text =~ /([a-z]+])/ig/);
+print "@words";
+
+
+
+% 我们用一个哈希来捕获一个字符串
+% 第1次：把捕获到的第1个单词放到第1个小括号中 key
+% 第1次：把捕获到的第2个单词放到第2个小括号中 value
+% 第2次：把捕获到的第1个单词放到第1个小括号中 key
+% 第2次：把捕获到的第2个单词放到第2个小括号中 value
+% 第3次：把捕获到的第1个单词放到第1个小括号中 key
+% 第3次：把捕获到的第2个单词放到第2个小括号中 value
+% 最后全部捕获完毕，放入一个哈希中。
+my $data = "FVWM 0000 ROX-Filer 1111 debian gnome";
+my %lat_name = ($data =~ /(\w+)\s+(\w+)/g);
+while (my($key, $value) = each %last_name) {
+    print "$key => $value\n";
+}
+

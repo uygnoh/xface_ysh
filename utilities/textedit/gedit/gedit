@@ -1,0 +1,181 @@
+###########################################################
+###  % Snippets(文字片段插件)
+###########################################################
+% 插入文字片段,用 快捷键 输入常用的地址,大量文字. 
+Text Editor ->Preferences ->Plugins
+    ->Snippets
+
+
+% 在纯文本下的文字片段( Ctrl + J )
+Text Editor ->Manage Snippets ... % (Matlab 纯文本)
+% 编辑完后，直接关闭， 此时配置已生效
+    
+
+
+
+###########################################################
+###  % gedit(文本编辑器)
+###########################################################
+% ### File
+_____________________________
+Save As                 % 另存为 
+Save All                % 全部保存 
+Find                    % 查找
+Find and Replace        % 查找和替换
+Clear Highlight         % 清除高亮
+Go to line              % 跳到行
+
+
+
+% ###  View
+_____________________________
+Side Panel              % 侧边栏
+Highlight Mode          % 高亮模式
+Check spelling          % 工具拼写检查
+Set Language            % 设置语言
+Highlight Misspelled Words % 高亮显示拼写错误的单词
+Insert Date and Time    % 插入日期和时间     
+Document Statistics     % 文档统计
+Close All               % 全部关闭
+Close                   % 关闭
+
+
+% ### Matlab(纯文本)
+_____________________________
+Tab Width               % 制表符
+Ln, Col                 % 行,列 
+Automatic Indentation   % 自动缩进
+Diplay line numbers     % 显示行号 
+Diplay right margin     % 显示右侧提示线	
+Highlight current line  % 突出显示当前行
+Test Wrapping           % 文本折行
+Use Spaces              % 使用空格
+    
+    
+
+###########################################################
+###  % Preferences(首选项, 偏好设置)
+###########################################################
+% View 显示
+Display line numbers            % 显示行号                    
+display right margin at column  % 右边对齐线显示的位置(列):80   
+Display statusbar               % 显示状态栏                   
+Display overview map            % 显示概览图                   
+Display grid pattern            % 显示网格图案                 
+Text Wrapping                   % 文本折行                    
+Enable text wrapping            % 启用自动折行                 
+Do not split words over two lines % 避免在单词内换行             
+Highlighting                    % 高亮                         
+Highlight current line          % 突出显示当前行                 
+Highlight matching brackets     % 突出显示匹配的括号   
+            
+___________________________________________________________
+% Editor 编辑
+Tab Stops                       % 制表符
+Tab width                       % 制表符宽度:8
+Insert spaces instead of tabs   % 使用空格代替制表符插入
+Enable automaitc indentation    % 启用自动缩进
+File Saving                     % 文件保存
+Create a backup copy of file before saving%在保存前创建备份文件
+autosave files every 10 minutes % 自动保存间隔: 10 分钟
+
+___________________________________________________________
+% Font & Colors 字体和颜色
+Font                                    % 字体
+(U)(Monospace 11)                       % 使用系统等宽字体
+Use the system fixed width font(Monospace 11)
+Monospace Regular 12                    % 编辑器字体(F): 
+Editor font(Monospace Regular 20)
+Color Scheme                            % 配色方案
+
+
+
+###########################################################
+### % gedit_Plugins 
+###########################################################
+% + Dashboard
+新标签页的 Dashboard
+
+% + Git
+高亮最后一行提交后修改的行
+
+% + Python              ;python控制台
+位于底部面板的交互式　Python　控制台
+		
+% + SyncTeX
+使用 gedit 和 evince 在LaTex 与PDF之间同...
+
+% + Zeitgeist           ;数据供应商
+为使用 gedit的文档提供日志访问和离开事件
+
+% + Code Comment        ;代码注释, 
+添加或取消选中代码的注释
+
+% + Insert Date/Time    ;插入日期/时间
+在光标处插入当前日期和时间
+
+% + Word Completion     ;单词补全
+使用补全框架的单词补全
+
+% + Multi Edit          ;多文件编辑
+一次编辑多个地方的文档
+
+% + Join/Split Lines    ;合并拆分行
+合并多行和拆分长行
+
+% + Draw Spaces         ;绘制空白字符
+绘制空格和制表符
+
+% + Embedded Terminal   ;嵌入终端
+在底部面板中嵌入一个终端
+
+% + Bracket Completion  ;括号补全
+自动添加闭合括号
+
+% + Commander           ;命令工具
+高级编辑的命令行接口
+
+% + Quick Open          ;快速打开
+快速打开文件
+
+% + Modelines           ;模式行
+gedit　的Emacs，Kate和Vim风格的模式
+
+% + Sort                ;排序
+对文档或所选中的文本排序
+	
+% + Snippets            ;片段
+快速插入常用的文本片段
+
+% + Spell Checker       ;拼写检查器
+检查当前文档的拼写
+		
+% + Color Scheme Editor ;色彩方案编辑器
+源代码的色彩方案编辑器
+	
+% + Bookmarks           ;书签
+使用书签的简单文本导航
+		
+% + 文本大小
+方便地增大或减小文本
+		
+% + External Tools      ;外部工具
+执行外部命令和　Shell　脚本
+
+% + Document Statistics ;文档统计
+报告文档中的单词数，行数和字符数
+	
+% + File Browser Panel  ;文件浏览器面板
+从侧边栏轻松访问文件
+
+% + Color Picker        ;颜色拾取器
+从对话框中拾取一个颜色,然后插入其16进制
+		
+% + Find in Files       ;在文件中查找
+在文件夹的所有文件查找文本
+		
+% + Smart Spaces        ;智能空格
+忘记使用制表符的年代
+
+% + Character Map       ;字符映射表
+只需单击即可插入特殊字符

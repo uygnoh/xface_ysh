@@ -1,0 +1,514 @@
+###########################################################
+### % LaTex https://tug.org/texlive/
+###########################################################
+% LaTex设计思想： 格式与内容分离的思想
+~~~~    在LaTex中相当于4个空格
+
+
+1 % 安装texlive
+  % https://tug.org/texlive/
+  
+  
+2 % 在VS Code中安装插件
+    LaTex Workshop
+    
+
+3 % TeXstudio 编辑器
+  % TeXstudio支持中文,修改一个它的默认编译器
+Options ->Configure TeXstudio ->Build \
+    ->Default Compiler [XeLaTex]
+    
+  % TeXstudio支持中文,修改一个它的默认编译器
+  % Options ->Configure TeXstudio ->Build ->Default Compiler [XeLaTex]
+\documentclass{article}
+\begin{document}
+    Hello world.
+\end{document}
+
+
+6 % 文档类从 article 变为 ctexart
+\documentclass{ctexart}
+\begin{document}
+	你好，world!
+\end{document}
+
+
+7 %  定理类文档
+\documentclass{ctexart}
+\newtheorem{thm}{定理}[section]
+
+\begin{document}
+\section{节}
+    \begin{thm}
+        一个定理
+     \end{thm}     
+\end{document}
+
+
+
+
+
+
+
+
+###########################################################
+### % LaTex中内置的字体 || Linux本地系统字体
+###########################################################
+大家知道在LaTex中可以使用 {\ 字体名称正文内容} 这样的格式来实现
+类似的效果,但这一指令本质上是使用LaTex中内置的字体,不是本地系统的
+字体,因此可选的也只有 heiti、SimSun 等五六种少得可怜的中文字体,tex 系
+统内置的六大字体: 、仿宋、楷书、隶书、黑体、幼圆
+XƎLTEX 在这方面要比LaTex强大得多,毕竟它使用的是 Unicode 编码;
+但是在 XƎLTEX 中直接使用 {\ 字体名称正文内容} 这样的指令,想简单地把
+字体名称替换成本地字体名称是不行
+% 必须首先在导言区使用以下指令设定相关命令:
+% 设定中文字体指令:
+\setCJKfamilyfont {自定义的 CJKfamily 名称} 系统字体名称
+\newcommand {自定义指令名} {自定义的 CJKfamily 名称}
+
+
+1 % 举例说明,如何使用上述两条命令实现对本地系统内字体的使用:
+\setCJKfamilyfont{hwxk}{STXingkai}
+\newcommand {\stxk} {\CJKfamily{hwxk}}
+按照上面的步骤设定好之后,就可以像 LTEX 那样使用 字体名称正文内容
+命令来设定字体,你可以用这样的大括号对把整个一个章节都括起来,也可以
+只括住某个词或字母,如此就可以非常灵活方便地控制字体,可以实现在全文
+使用某一字体的前提下,在某一特定段落使用另一字体。
+
+
+
+
+2 % 英文字体，使用(fontspec宏包)设置字体
+  % 字体(Monaco.ttf)在当前要编译的.tex目录下
+\documentclass{article}
+\usepackage{ctex}			% 使用{ctex}宏包支持中文
+\usepackage{fontspec}		% 使用{fontspec}宏包设置英文字体
+\setmainfont{Monaco}
+\setsansfont{Monaco}
+\setmonofont{Monaco}
+\setsansfont{[Monaco.ttf]}	% 直接使用当前目录下的字体文件
+\begin{document}
+	0123456789\\
+	abcdefghij\\
+	klmnopqrst\\
+	uvwxyz\\
+	一地在要工\\
+	上是中国同\\
+	同了发以经\\
+	和的有人我\\
+	主产不为这\\
+\end{document}
+
+
+
+###########################################################
+### % LaTex组织文档结构
+###########################################################
+1 % LATEX文档基本结构
+以document环境为界，document环境前是导言部分(preamble);
+docunent环境之中为正文部分；环境之后的部分被忽略
+    
+    
+2 % LATEX文档部件 
+\title, \author, \data  % 这3个为标题，使用标题用(maketitle)
+\abstract               % 摘要, \abstract环境    
+\tableofcontents        % 目录        
+\chapter, \section      % 章, 节        
+\appendix               % 附录  
+\bibliography           % 文献   
+\printindex             % 索引
+
+
+3 % 文档分类
+大型文档    \frontmatter, \mainmatter, \backmatter
+一般文档    \apendix
+%  层次   名称             命令                说明
+   -1    part            \part              % 可选的最高层
+    0    chapter         \chapter           % report, book类最高层
+    1    section         \section           % article类最高层
+    2    subsection      \subsection        %
+    3    subsubsection   \subsubsection     % report, book类，默认不编号，不编目录
+    4    paragraph       \paragraph         % 默认不编号，不编目录
+    5    subparragraph   \subparagraph      % 默认不编号，不编目录
+
+
+4 % 磁盘文件组织
+\documentclass          % 读入文档类文件(.cls)
+\usepackage             % 读入一个格式文件(.sty)
+\include                % 分页，并读入章节文件(.tex)
+\input                  % 读入任意文件
+
+
+5 %%% 文档框架示例
+% language-main.tex
+\documentclass{book}
+\usepackage{makeidx}
+\makeindex
+\title{languages} \author{FreeYSH}
+\begin{document}
+    \frontmatter
+    \maketitle
+    \tableofcontents
+    \mainmatter
+    \include{intro}
+    \include{class}
+    \backmatter
+    \include{appendix}
+    \bibliography{foo}
+    \printindex
+\end{document}
+
+
+% class.tex
+\part{Introduction}
+    \chapter{Background}
+    \chapter{Commputer Languages}
+        \section{Machine Languages}
+        \section{High Level Languages}
+            \subsection(Compiled Language}
+            \subsection{Interpretative Languages}
+                subsubsection{Lisp}
+                    \paragaph{Common Lisp}
+                    \paragraph{Scheme}
+                subsubsection(Perl}
+                
+    
+% intro.tex
+\part{Classification}
+    \chapter(Natural Language)
+
+
+% appendix.tex
+\chapter{Appendix}
+
+
+
+
+
+###########################################################
+### % LaTex文档常用设置
+###########################################################
+1 % LaTex分布，断行
+\linebreak                  %断行命令
+\\                          %换行命令   
+\pagebreak                  %分页
+\newpage                    %另起一页
+
+2 % LaTex正文符号
+\#  \$  \%  \&  \{  \}      # $ % & { }
+\textbackslash              \
+
+3 % LaTex空白间距
+\hspace{2cm}    \vspace{3cm}
+
+4 % LaTex版面布局
+\usepackage{geometry}       %设置纸张
+\usepackage{fancyhdr}       %设置版面，页眉，页脚
+
+5 % 对排版的格式进行更改
+\ctexset{
+    section = {
+        
+    },
+    subsection = {
+    }
+}
+
+
+
+###########################################################
+### % LaTex例程
+###########################################################
+% 导言部分
+\documentclass{ctexart}
+
+
+% 正文部分
+\begin{document}
+
+    \chapter{}
+    \section{引言}        %构建小节
+    正文正文正文正文正文正文正文正文正文
+    正文正文正文正文正文正文正文正文正文
+    正文正文正文正文正文正文正文正文正文
+    \section{实验方法}     %构建小节
+    \section{实验结果}     %构建小节
+    \subsection{数据}     %构建子小节
+    \subsection{图表}     %构建子小节
+    \subsubsection{实验条件}
+    \subsubsection{实验过程}
+    \subsection{结果分析}  %构建子小节
+ 
+    \chapter{}
+    \section{结论}
+    \section{致谢}    
+\end{docment}
+
+
+%%% LATEX 字体编码教程
+\documentclass[UTF8]{article}
+\usepackage{ctex}
+
+\begin{document}
+	% 设置(罗马字体，无衬线字体，打字机字体)
+	\textrm{罗马字体 Roman Family}\\
+	\textsf{无衬线字体 Sans Serif Family}\\
+	\texttt{打字机字体 Typewriter Family}\\
+	% 声明字体(需要大括号确定范围，否则后续不一致)
+	{\rmfamily 罗马字体 Roman Family}\\
+	{\sffamily 无衬线字体 Sans Serif Family}\\
+	{\ttfamily 打字机字体 Typewriter Family}
+	
+	% 声明中文字体(ctex宏包下)
+	{\songti 宋体}\\
+	{\heiti 黑体}\\
+	{\fangsong 仿宋}\\
+	{\kaishu 楷书}
+	
+	%设置字体形状(直立，斜体，伪斜体，小型大写)
+	\textup{Upright Shape 直立}\\
+	\textbf{Boldface Shape 粗体}\\
+	\textit{Italic Shape 斜体}\\
+	\textsl{Slanted Shape 伪斜体}\\
+	\textsc{Small Caps Shape 小型大写}
+	% 声明字体(直立，斜体，伪斜体，小型大写)
+	{\upshape Upright Shape 直立}\\
+	{\itshape Italic Shape 斜体}\\
+	{\slshape Slanted Shape 伪斜体}\\
+	{\scshape Small Caps Shape 小型大写}
+	
+	% 声明中文字体大小
+	{\tiny Word 字}\\
+	{\scriptsize Word 字}\\
+	{\footnotesize Word 字}\\
+	{\small Word 字}\\
+	{\normalsize Word 字}\\
+	{\large Word 字}\\
+	{\Large Word 字}\\
+	{\LARGE Word 字}\\
+	{\huge Word 字}\\
+	{\Huge Word 字}
+\end{document}
+
+
+
+###########################################################
+### % LaTex字体Fonts
+###########################################################
+1 % 字体编码
+    正文字体编码  OT1, T1, EU1
+    数学字体编码  OML, OMS, OMX
+2 % 字体族
+    罗马字体，笔画起始处有装饰
+    无衬线字体，笔画起始处无装饰
+    打字机字体，每个字符宽度相同，又称等宽字体
+3 % 字体系列(粗细 宽度)
+4 % 字体形状(直立 斜体 伪斜体 小型大写)
+5 % 字体大小
+
+
+
+###########################################################
+### % LaTex图像插入
+###########################################################
+% 导言区： \usepackage{graphicx}
+% 语  法： \includeegraphics[<选项>]{<文件名>}
+% 格  式： EPS, PDF, PNG, JPEG, BMP
+\usepackage{graphicx}
+\graphicspath{{figures/}, {pic/}}  %图片在当前目录下的 figures目录下
+\begin{document}
+    \LaTex{}中的插图
+    
+    \includegraphics{lion.jpg}              %指定图片
+    \includegraphics[scale=0.3]{lion.jpg}   %指定缩放
+    \includegraphics[height=2cm}{lion.jpg}  %指定高度
+    \includegraphics[width=2cm}{lion.jpg}   %指定宽度
+    \includegraphics[angle=-45}{lion.jpg}   %指定旋转角度
+\end{document}
+
+
+
+###########################################################
+### % LaTex表格
+###########################################################
+% 本例中生成了一个5列的表格，|表示线
+% l[左对齐], c[居中对齐], c[居中对齐], c[居中对齐], r[右对齐]
+% p{1.5cm}指定列格式宽度
+\begin{tabular}{l|c|c|c|r}  
+    \hline  %产生表格横线
+    姓名 & 语文 & 数学 & 外语 & 备注 \\
+    \hline
+    张三 & 67  &  56  & 56  & 下 \\
+    \hline
+    余二 & 87  &  80  & 79  & 中 \\
+    \hline
+    李四 & 89  &  78  & 89  & 上 \\
+
+\end{tabular}
+
+
+
+###########################################################
+### % LaTex浮动体
+###########################################################
+% LaTex图表与浮动环境，使用工个生成表格代码工具
+% https://www.tablesgenerator.com/latex_tables
+
+
+% 实现灵活分页，给图表添加标题，交叉引用
+% begin{figure}[允许位置]
+% h此处，t页顶，b页底，p独立一页
+\begin{figure}[thbp]
+    \LaTex{}中的 \Tex \ref{fig-lion}
+    \centering
+    \includegraphics[scale=0.3]{lion}
+    \caption{\Tex 小小}\label{fig-lion}
+\end{figure}
+
+
+\begin{table}[thbp]
+    \centering
+    \captinon{考试成绩单}\label{tab-score}
+    \begin{tabular}{l|c|c|c|r}  
+        \hline  %产生表格横线
+        姓名 & 语文 & 数学 & 外语 & 备注 \\
+        \hline
+        张三 & 67  &  56  & 56  & 下 \\
+        \hline
+        余二 & 87  &  80  & 79  & 中 \\
+        \hline
+        李四 & 89  &  78  & 89  & 上 \\
+    \end{tabular}
+\end{table}
+
+
+
+###########################################################
+### % LaTex自定义命令和环境
+###########################################################
+% \newcommand ->定义命令
+% 命令只能由字母组成，不能以\end开头
+\newcommand<命令>[<参数个数>][<首个参数默认值>]{<具体定义>}
+
+% 使用\newcommand可以简单字符串替换，例如：
+% 使用\PRC 相当于使用 People's Republic of \emph{china} 这一串内容
+\newcommand\PRC{People's Republic of \emph{china}}
+
+
+% \newcommand也可以使用参数
+% 参数个数从 1到9，使用时用 #1，#2，...,#9表示
+\newcommand\loves[2]{#1 喜欢 #2}
+\newcommand\hatedby[2]{#2 不不 #1 式的}
+
+
+% LaTex利用自定义命令和环境
+1 为程序名称定义一个命令,为了方便修改和扩充
+\newcommand\prg[1]{\textsf{#1}}
+2 \newcommand\prg[1]{\textcolor{blue}\texttt{#1}\index{#1 程序}}
+% LaTex自定义命令例程
+% 注意：各种直接修改输出格式的命令，如字体，字号，对齐，间距的命令，
+% 都应该放在文档格式或自定义的命令环境，而避在正文中直接使用。
+\documentclass{ctexart}
+\newcommand\prg[1]{\textbf{\Huge #1}}
+
+\begin{document}
+	程序 \prg{sort} 很有用
+\end{document}
+
+
+% LaTex盒子命令
+\mbox{内容}
+\parbox{4em}{内容}
+minipage是一个环境
+
+
+
+###########################################################
+### % LaTex宏与环境
+###########################################################
+% LaTex中的宏可以分为命令与环境
+1 命令，它通常以反斜线开头，可以带0到多个参数
+  命令也可以直接输出某种结果，也可以改变一个状态
+2 环境，环境的格式为
+  \begin{env}
+    环境的内容
+  \end{env}
+  % 例如右对齐
+  \begin{flushright}
+    文字
+  \begin{flushright}
+
+% LaTex数学应用宏包  
+1 使用 LaTex宏包，树的宏包：\usepackage{forest}
+2 LaTex数字单位宏 siunitx
+    \num{-1.235e96}     % -1.235乘以10的9次方
+    \SI{299792458}{m/s} % 光速
+    \SI{2x7x3.5}{m}     % 立方
+3 LaTex算法结构宏包
+    clrscode宏包， algorithm2e宏包
+    algorithmicx宏包的algpscudocode格式
+    
+
+% LaTex数学模式
+1 数学模式下字体，符号，间距与正文都不同，
+  一切数学公式都要在数学模式下输入
+2 行内公式：使用一对符号$ $来表示。如：$a+b=c$
+3 显示公式
+% 简单的不编号公式用命令 \[ \] 标示。
+% 基本的编号公式有 equation环境。
+% 更复杂的结构，使用 mathtools宏包, amsmath宏包 提供的专门的数学环境。
+      
+% LaTex数学结构
+1 上标与下标：用^ 和_表示
+2 上下画线与花括号：\overline, \underline, \overbrace, \underbrace
+3 分式：\frac{分子}{分母}
+4 根号：\sqrt[次数]{根号下}
+5 矩阵：使用 amsmate宏包 提供的专门的矩阵环境matrix,
+  pmatrix, bmatrix.
+  特别复杂的矩阵使用array环境作为表格画出。
+      
+% LaTex数学符号
+1 数学字母a,b,c, 数学字体\mathbb, \mathcal
+2 普通符号： \infty  \angle
+3 二元运算： a + b, a - b
+4 二元关系： a = b, a > b
+5 括号：<a, b>,使用\left, \right放大
+6 标点：逗号，分号\colon
+
+% LaTex列表环境
+1 enumerate,编号
+2 itemize,不编号
+3 description,有标题
+
+% LaTex定理环境
+\newtheorem定义定理类环境，如：\newtheorem{thm}{定理}[section]
+使用定理类环境
+\begin{thm}
+    一个定理
+\end{thm}
+
+% LaTex抄录代码环境
+1 % verb命令
+    \verb|#include <stdio.h>|
+2 % verb环境
+    \begin{verbatim}
+    #include <stdio.h>
+    int main() {
+        prinf("Hello world.\n");
+    }
+    \end{verbatim}
+3 % 代码语法高亮,使用listings宏包，使用minted宏包
+    \begin{lstlisting}[lanuage=C,basicstyle=\ttfamily,stringstyle=\color{blue}]
+    int main() {
+        prinf("Hello world.\n");
+    }
+    \end{lstlisting}   
+        
+
+
+
+
+
+
+
+

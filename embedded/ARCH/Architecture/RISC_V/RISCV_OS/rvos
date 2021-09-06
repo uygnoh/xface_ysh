@@ -1,0 +1,68 @@
+###########################################################
+### % RISCV_OS
+###########################################################
+levels    Supported Modes     Intended Usage
+1         M                   Simple embedded sydtems
+2         M, U                Secure embedded systems
+3         M, S, U             Systems running Unix-like operating systems
+
+
+###########################################################
+### % RISCV_BOOT系统引导
+###########################################################
+% https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c
+static const MemMapEntry virt_memmap[] = {
+    [VIRT_DEBUG] =       {        0x0,         0x100 },
+    [VIRT_MROM] =        {     0x1000,        0xf000 },
+    [VIRT_TEST] =        {   0x100000,        0x1000 },
+    [VIRT_RTC] =         {   0x101000,        0x1000 },
+    [VIRT_CLINT] =       {  0x2000000,       0x10000 },
+    [VIRT_PCIE_PIO] =    {  0x3000000,       0x10000 },
+    [VIRT_PLIC] =        {  0xc000000, VIRT_PLIC_SIZE(VIRT_CPUS_MAX * 2) },
+    [VIRT_UART0] =       { 0x10000000,         0x100 }, //uart
+    [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
+    [VIRT_FW_CFG] =      { 0x10100000,          0x18 },
+    [VIRT_FLASH] =       { 0x20000000,     0x4000000 },
+    [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
+    [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
+    [VIRT_DRAM] =        { 0x80000000,           0x0 },     //128MB
+};
+
+0x8800-0000~0x8000-0000     % Kernel(DRAM)
+0x0000-F000~0x0000-1000     % Bootloader(ROM)
+
+0 % 系统上电会跑到(0x0000-1000)地址处执行代码，
+  初始化系统，Bootloader是固化在ROM中的
+1 % run: all
+    @${QEMU} ${QFLAGS} -kernel os.elf
+  "-kernel"告诉QEMU把程序加载到0x8800-0000处执行
+
+
+
+###########################################################
+### % mhartid寄存器, 读取CPU-ID
+###########################################################
+1 % 该“CSR”是只读
+2 % 包含当前指令的“hart”的ID
+3 % 多个“hart”的ID必须是唯一的，且必须有一个“hart”
+  的ID值为0(第1个hart的ID)
+# 判断是不是第1个hart，如果不是CPU空转(hart==CPU)
+_start:
+    # park harts with id != 0
+    csrr    t0, mhartid
+    mv      tp, t0
+    bnez    t0, park
+    ...
+    ...
+park:
+    wfi
+    j       park   
+
+
+
+###########################################################
+### % Hello, RVOS!
+###########################################################
+
+
+

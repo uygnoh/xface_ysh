@@ -1,0 +1,240 @@
+###########################################################
+###  perl 正则表达式
+###########################################################
++ 正则表达式模式匹配->量词    . * + ?
++ 正则表达式模式匹配->分组    (.)(..)\1\2
++ 正则表达式模式匹配->捕获
++ 正则表达式模式匹配->匹配    =~
++ 正则表达式模式匹配->智能匹配 ~~
++ 正则表达式模式匹配->        m//
++ 正则表达式模式匹配->修饰符   isgxm
++ 正则表达式模式替换->        s///
++ 正则表达式模式替换->修饰符   gi
+
+
+% 正则模式匹配, 当使用“//”时， m可以省略掉
+$_ = "banny and fred";
+if(/fred/){print "匹配上了！";}else{print "没有匹配上！";}
+if(m/fred/){print "匹配上了！";}else{print "没有匹配上！";}
+if(m{fred}){print "匹配上了！";}else{print "没有匹配上！";}
+if(m<fred>){print "匹配上了！";}else{print "没有匹配上！";}
+if(m(fred)){print "匹配上了！";}else{print "没有匹配上！";}
+
+
+% 重新定义一个定界符，可以不用转义，简化操作， 最常用的是大括号作为定界符
+$_ = "Welcome to our websit https://www.fvwm.org";
+if(/http:\/\//){print "匹配上了！";}else{print "没有匹配上！";}
+if(m%http://%){print "匹配上了！";}else{print "没有匹配上！";}
+if(m{http://}){print "匹配上了！";}else{print "没有匹配上！";}
+
+
+% 接收用户的输入，判断是否匹配成功
+print "would you like to play a game?\n";
+chomp($_ = <STDIN>);
+if (/yes/) {
+    print "In that case, I recommend that you go bowling.\n";
+}
+
+
+
+
+
+###########################################################
+###  正则表达式模式分组匹配
+###########################################################
+
+    $_ = 习学习学
+    if(/(.)(.)\1\2/){print "匹配上了！";}else{print "没有匹配上！";}   
+
+    $_ = 我正在我正在          
+    if(/(.)(..)\1\2/){print "匹配上了！";}else{print "没有匹配上！";}     
+
+    $_ = 我正在我正在我       
+    if(/(.)(..)\1\2\1/){print "匹配上了！";}else{print "没有匹配上！";}   
+
+    $_ = 正在我正在我我
+    if(/(.)(..)\g{1}\g{2}\g{1}/){print "匹配上了！";}else{print "没有匹配上！";}
+
+    $_ = 我学习学习(相对引用)
+    if(/(.)(..)\g{-1}/){print "匹配上了！";}else{print "没有匹配上！";}
+
+
+
+
+
+###########################################################
+###  跨行的模式匹配
+###########################################################
+% m匹配每一行的开头， g匹配所有的
+    $_ = "thie is the firse line\nthis is the second line\nthis is the third line";
+    s/^this/that/;
+    print;
+    $_ = "thie is the firse line\nthis is the second line\nthis is the third line";
+    s/^this/that/mg;
+    print;
+    
+
+% 跨行的模式匹配 example1
+1. 把要打开的文件名存储起来 $filenames
+2. 用文件句柄[FILE]来打开文件, or die 如果打开这个文件失败，输出错误信息
+3. 用行输入操作符[FILE], 把这个文件每一行都读出来，再用join把它连接成一个大大的字符串
+4. 用绑定操作符来进行替换， 在每一行的开头， 把文件名加上去 
+5. m跨行的模式匹配
+    $filenames = "stm32.c";
+    open FILE, $filenames or die "can't open '$filenames': $!";
+    my $lines = join '', <FILE>;
+    $lines =~ s/^/$filename: /gm;
+    print “$lines\n";
+
+
+
+  
+
+###########################################################
+###  列表上下文件的
+###########################################################
++ my ($first, $second, $third) = /(\S+) (\S+), (\S+)/;
++ 第1小括号它捕获到的变量放到$first,
++ 第2小括号它捕获到的变量放到$second,
++ 第3小括号它捕获到的变量放到$third
++ my @words = ($text =~ /([a-z]+/ig);
++ 使用列表上下文 
++ 第1次捕获的内容放到列表中 
++ 第1次捕获的内容放到列表中
++ 第N次捕获的内容放到列表中
++ 相当于Loop捕获
++ my %last_name = ($data =~ /(\w+)\s+(\w+)/g);
+
+    $_ = "Hello there, neighbor!";
+    my ($first, $second, $third) = /(\S+) (\S+), (\S+)/;
+    print "$first $secdond, $third";
+
+
+    my $text = "Fred dropped a 5 ton grainte block on MR.Slate";
+    my @words = ($text =~ /([a-z]+/ig);
+    print "@words\n";
+
+
+    my $data = "Barney Rubble Fred Flintstone Wilma Flintstone Bill Gates";
+    my %last_name = ($data =~ /(\w+)\s+(\w+)/g);
+    while (($key, $value) = each %last_name) {
+        print "$key => $value\n";
+    }
+
+
+
+
+###########################################################
+###  非贪婪模式 ?
+###########################################################
+% 贪婪模式, 非贪婪模式加上“?”
+
+
+    $_ = "I thought you said Fred and <BOLD>Velma</BOLD>, not <BOLD>Wilma</BOLD>.";
+    s#<BOLD>(.*)</BOLD>#$1#g;
+
+    $_ = "I thought you said Fred and <BOLD>Velma</BOLD>, not <BOLD>Wilma</BOLD>.";
+    s#<BOLD>(.*?)</BOLD>#$1#g;
+
+    $_ = "helloooooooooooooo";
+    if(/(hello+) {
+        print "$1\n";
+    }
+
+    $_ = "helloooooooooooooo";
+    if(/(hello+?) {
+        print "$1\n";
+    }
+
+
+
+
+
+###########################################################
+###  绑定操作符  =~
+###########################################################
+% 使用“$_”这个特殊变量，可以省略绑定表达式“=~”
+% 如果没有用 “$_”这个特殊变量， 用普通变量的话需要用绑定表达式“=~”
+
+$some_other = "I dream of betty rubble.";
+if ($some_other =~ /\brub/) {
+    print "match\n";
+} else {
+    print "NO-match\n";
+}
+
+
+
+
+
+###########################################################
+###  模式串中的内插(/^($wat)/)
+###########################################################
+% 把正则表达先写到一个变量中
+% while(<>)表示等待从键盘的输入, 把输入的信息存储到 ”$_“ 这个特殊变量中,
+% 然后再与(/^($wat)/)相匹配，再判断是否匹配上 
+
+my $what = "larry";
+while (<>) {
+    if (/^($wat)/) {
+        print "We saw $what in beginning of $_";
+    }
+}
+
+
+
+
+
+###########################################################
+###  匹配模式修饰符(isgx)
+###########################################################
+% 从键盘标准输入作为参数传递程序,匹配点需要加上 “\”转义字符
+%  i,不区分大小写;  
+%  s,让[.]点也可以匹配所有字符
+print "Would you like play a game? \n";
+chomp($_ = <STDIN>) 
+if (/yes/i) {
+    print "In that case, I recommend that you go bowling. \n";
+}
+
+
+$_ = "fred hello 3.1415926"
+if(/3\.1415926){print "匹配上了！";}else{print "没有匹配上！";}
+
+
+$_ = "i sae\napt Barney\nat ay\n fredls\nsot";
+if(/barney.*fred/is){print "匹配上了！";}else{print "没有匹配上！";}
+
+
+
+% 检查输入的是否为数字输入
+print "请主输入一个数";
+chomp($_ = <STDIN>);
+if(/-?\d+\.?\d+/){print "你输入的是一个数： $_\n";}
+
+
+
+% 加上“x”它通知perl的正则，它里面加的空格不是正则表达式里的字符
+% 检查输入的是否为数字
+print "请主输入一个数";
+chomp($_ = <STDIN>);
+if(/-? \d+ \.? \d+/x){print "你输入的是一个数： $_\n";}
+
+
+
+% 加上“x修饰符”它通知perl的正则，它里面加的空格不是正则表达式里的字符
+% 多个修饰符可以放到一起，它们没有顺序 
+% 检查输入的是否为数字, 这样书写方式是为了更好理解代码 
+print "请主输入一个数";
+chomp($_ = <STDIN>);
+if (/-?           #0个或1个“-”号
+ \d+              #1个或多个数字
+ \.?              #0个或1个“.”小数点 
+ \d+              #1个或多个数字
+/x){print "你输入的是一个数： $_\n";}
+
+
+
+
+
+

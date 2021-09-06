@@ -1,0 +1,312 @@
+/*******************************************************************************
+Harvard architecture (ATmega328P)
+_____________________________________________
+        | FLASH ROM  | EEPROM    | SRAM     |
+        | 32K Bytes  | 1K Bytes  | 2K Bytes |
+        |___________ |___________|__________|
+*******************************************************************************/
+// Instruction - LDI
+//loading values into the general purpose register
+_________________________________________
+| LDI Rd, k                             |
+|_______________________________________|
+// Rd = k
+// where 16 <= d <= 31,  0 <= k <=255
+
+// Instruction - ADD
+// add and store values in the general purpose register
+_________________________________________
+| ADD Rd, Rs                            |
+|_______________________________________|
+// Rd = Rd + Rs
+// where 0 <= d <= 31,  0 <= s <=255
+
+// Instruction - SUB
+// subtract and store values in the general purpose register
+_________________________________________
+| SUB Rd, Rs                            |
+|_______________________________________|
+// Rd = Rd - Rs
+// where 0 <= d <= 31,  0 <= s <=255
+
+// Instruction - INC
+// increment teh contents of a register by one
+_________________________________________
+| INC Rd                                |
+|_______________________________________|
+// Rd = Rd + 1
+// where 0 <= d <= 31
+
+
+
+//Accessing I/O Register  IN & OUT
+___________________________________________________________
+// Instruction - IN
+// load the reading from an I/O register to a GPR
+_________________________________________
+| IN Rd, A                              |
+|_______________________________________|
+// Rd = A
+// where 0 <= d <= 31, A is the name of an I/O register
+
+// Instruction - OUT
+// store the reading from a GPR to an I/O register
+_________________________________________
+| OUT A, Rd                             |
+|_______________________________________|
+// A = Rd
+// where 0 <= d <= 31, A is the name of an I/O register
+
+
+//Assembly program code:
+//PortD_Pin0 = 1;
+___________________________________________________________
+LDI     R20,   0b00000001
+OUT     DDRD,  R20
+OUT     PORTD, R20
+
+
+//LED闪烁程序
+___________________________________________________________
+        LDI  R20,   0b00000001
+        LDI  R21,   0b00000000
+        OUT  DDRD,  R20
+L1:     OUT  PORTD, R20
+        CALL DELAY
+        OUT  PORTD, R21
+        CALL DELAY
+        JMP  L1
+        
+DELAY:  LDI  R17, 12
+L2:     LDI  R18, 0xFF
+L3:     LDI  R19, 0xFF
+L4:     DEC  R19
+        BRNE L4
+        DEC  R18
+        BRNE L3
+        DEC  R17
+        BRNE L2
+        RET
+
+
+//Example: Input Mode without Pull-up
+___________________________________________________________
+1 Make all the pins of Port B input     //DDRB  = 0x00;
+2 Make all the pins of Port D output    //DDRD  = 0xFF;
+3 Send the reading form Prot B to       //PORTD = PINB + 5 
+  Port B to Prot D, after adding 
+  a value 5 to it
+LDI     R16,   0x00
+OUT     DDRB,  R16
+LDI     R17,   0xFF
+OUT     DDRD,  R17
+IN      R18,   PINB
+LDI     R19,   0x05
+ADD     R18,   R19
+OUT     PORTD, R18
+
+
+
+//Accessing Data Memory - LDS & STS
+___________________________________________________________
+// Instruction - LDS     
+// load data from space
+_________________________________________
+| LDS Rd, k                             |
+|_______________________________________|
+// where 0 <= d <= 31, k between $0000 to $FFFF
+// R1 = [0x60];
+   LDS  R1,  0x60  
+
+// Instruction - STS     
+// store data to space
+_________________________________________
+| STS k, Rd                             |
+|_______________________________________|
+// where 0 <= d <= 31, k between $0000 to $FFFF
+// [0x60] = R15;
+   STS  0x60,  R15
+
+
+
+//Assembler Directives - .EQU
+//相当于C语言中的宏定义, 只能被定义一次
+_________________________________________
+| .EQU name = value                     |
+|_______________________________________|
+//Assembler Directives - .SET
+//相当于C语言中的宏定义，和EQU的区别在于，还可以在定义
+_________________________________________
+| .SET name = value                     |
+|_______________________________________|
+
+
+
+/*******************************************************************************
+                              Machine code
+*******************************************************************************/
+// AVR机器码
+___________________________________________________________
+
+ADD-16bits
+|_____________|___|___________|_________|
+|15         9 | 8 |           | 3     0 |
+|_____________|___|___________|_________|
+| 0 0 0 0 1 1 | r | d d d d d | r r r r |
+|_____________|___|___________|_________|
+
+
+SUBI-16bits
+SUBI Rd, k      //K=0~255  Rd=16~31
+_________________________________________
+| 0 1 0 1 | k k k k | d d d d | k k k k |
+|_________|_________|_________|_________|
+
+
+OUT-16bits      //a为IO的地址， r为GPR
+________________________________________
+| 1 0 1 1 1 | a a | r r r r r | a a a a |
+|___________|_____|___________|_________|
+
+
+STS-32bits
+_______________________________________
+| 1 0 0 1 0 0 1 | d d d d d | 0 0 0 0 |
+|_______________|___________|_________|
+| a a a a  a a a a   a a a a  a a a a |
+|_____________________________________|
+
+
+
+
+// AVR - Status Register (SREG)
+_________________________________
+|   |   |   |   |   |   |   |   |
+| I | T | H | S | V | N | Z | C |
+|___|___|___|___|___|___|___|___|______________________________________________|
+|   I   //Interrupt     Enables Global Insterrupt when Set                     |
+|   T   //T Flag        Source and Destination for BLD and BST                 |
+|   H   //Half carry    Set if an Add/Sub. has Carry between Bits 4&3          |
+|   S   //Signd Flag    Used for Signed Tests                                  |
+|   V   //oVerflow      Set if an Add/Sub Results in Signed Overflow           |
+|   N   //Negative      Set if a Result is Negative                            |
+|   Z   //Zero          Set if a Add/Subtract resutl is zero                   |
+|   C   //Carry         Set if an Add/Subtract has Carry                       |
+|______________________________________________________________________________|
+| BREQ    //Branch if Equal               jump if Z = 1                        |
+| BRNE    //Branch if Not Equal           jump if Z = 0                        |
+| BRCS    //Branch if Carry Set           jump if C = 1                        |
+| BRCC    //Branch if Carry Cleard        jump if C = 0                        |
+|______________________________________________________________________________|
+|
+| //if else
+|________________________________________
+|        |   R21 < R20   |  R21 >= R20  |
+|________|_______________|______________|
+|   C    |       1       |       0      |
+|________|_______________|______________|
+|  jmp   |      NO       |      YES     |
+|________|_______________|______________|
+|                                       |
+|  if (R20 > R21)                       |
+|          R26++;                       |
+|  else                                 |
+|          R26--;                       |
+|_______________________________________|
+|          SUB     R21, R20             |
+|          BRCC    L1   //jump if C = 0 |
+|          INC     R26                  |
+|          JMP     L2                   |
+|  L1:                                  |
+|          DEC     R26                  |
+|  L2:                                  |
+|_______________________________________|
+|
+|
+|
+| // for
+|______________________________________
+|       |    R20 = 0    |  R20 != 0    |
+|_______|_______________|______________|
+|   Z   |      1        |       0      |
+|_______|_______________|______________|
+|  jmp  |      NO       |      YES     |
+|_______|_______________|______________|
+|         9+8+7+6+5+4+3+2+1            |
+| R30 = 0x00;                          |
+| for (i = 9; i >= 0; i--)             |
+|         R30 = R30 + i;               |
+|______________________________________|
+|         LDI     R30, 0x00            |
+|         LDI     R20, 0x09            |
+| L1:     ADD     R30, R20             |
+|         DEC     R20                  |
+|         BRNE    L1   //jump if Z = 0 |
+|______________________________________|
+
+
+
+//switch-case
+___________________________________________________________
+//SUB   R20, R21        //结果存储到R20中
+//CP    R20, R21        //结果不存储， 只是单纯的比较     
+//CPI   R20, 23         //一个寄存器的值和一个数作比较
+
+M_LOOP: 
+        CPI     ch, 65  //compare
+        BREQ    L1      //branch if eq
+        
+        CPI     ch, 66
+        BREQ    L2
+L1:
+        JMP     EXIT
+L2:
+        JMP     EXIT
+EXIT:
+
+
+
+/*******************************************************************************
+                                 bit
+*******************************************************************************/
+Instruction - SBI
+_________________________________________
+| SBI ioReg, bit                        |
+|_______________________________________|
+//设置寄存器PORTD的第4位 = 1
+SBI PORTD, 4
+//设置寄存器DDRC的第5位 = 1
+SBI DDRC, 5
+
+
+Instruction - CBI
+_________________________________________
+| CBI ioReg, bit                        |
+|_______________________________________|
+//清除寄存器PORTD的第6位 = 0
+SBI PORTD, 6
+//清除寄存器DDRC的第4位 = 0
+CBI DDRC, 4
+
+
+Instruction - SBIS
+//skip the next instruction if bit in I/O register set
+_________________________________________
+| SBIS ioReg, bit                       |
+|_______________________________________|
+SBIS    PIND, 5
+INC     R20
+LDI     R19, 0x23
+
+
+Instruction - SBIC
+//skip the next instruction if bit in I/O register cleared
+_________________________________________
+| SBIC ioReg, bit                       |
+|_______________________________________|
+SBIC    PIND, 5
+INC     R20
+LDI     R19, 23
+
+
+

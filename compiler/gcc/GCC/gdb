@@ -1,0 +1,92 @@
+###########################################################
+##                  // GDB-TUI //
+###########################################################
+// 打开tui模式(Text User Interface)
+  使用"gdbtui -q" 或 "gdb -tui -q"开始一个调试
+$ gdbtui -q test_struct
+(gdb) ....
+
+___________________________________________________________
+$ gcc -gdb3 simple_gdb.c -o simple_gdb
+$ gdb simple_gdb 
+(gdb) start
+"ctrl+x ctrl+a" or "ctrl+x A"
+
+___________________________________________________________
+// TUI模式下有4个窗口
+command                         命令窗口. 可以键入调试命令
+source                          源代码窗口. 显示当前行,断点等信息
+assembly                        汇编代码窗口
+register                        寄存器窗口
+% 除command 窗口外,其他三个窗口不可同时显示.其可用 layout 命令来进行选择
+% 自己需要的窗口. 可参见 `help layout`   
+
+
+
+###########################################################
+##                  // GDB指令 //
+###########################################################
+list                     //查看程序源代码
+break function          //在某函数的入口设定断点
+break 行号               //在指定行添加断点
+break 行号 if 条件       //当条件为真时，指定行号处断点生效
+info break              //查看断点
+delete                  //删除断点
+run                     //开始运行程序
+next                    //单步运行程序，不进入子函数
+step                    //单步运行程序，进入子函数
+continue               //继续运行程序
+print 变量名             //查看指定变量的值
+finish                  //运行程序，直到当前函数结束
+display                 //
+quit                    //Exit GDB
+___________________________________________________________
+list                    //显示当前行后面的源程序
+list +                  //向后显示源代码							
+list -                  //向前显示源代码
+list <first> <last>     //显示从 first到last 之间的源代码
+list <last>             //显示前行到last之间的源代码
+list <linenum>          //显示程序第linenum行周围的源代码
+list <function>         //显示函数程序的源代码
+show listsize           //查看当前listsize设定
+set listsize <count>    //设定一次显示源代码的行数
+
+___________________________________________________________
+// print
+// <expr>是一个表达式， <f>是输出格式 
+print <expr>
+print /<f> <expr>
+
+___________________________________________________________
+// display
+##//<expr>是一个表达式， <fmt>是输出格式 , <addr>表示内存地址
+##//当display设定好1个或多个表达式后，只要程序停下来，
+##//GDB就会自动显示这此参数
+
+display <expr>
+display /<fmt> <expr>
+display /<fmt> <addr>
+undisplay <dnums>       //删除自动显示，dnums为自动显示编号。
+delete display <dnums>  //如果要同时删除多个，可以用空格分隔。
+disable diaplay <dnums> //不删除自动显示而是让它失效或恢复。
+enable diaplsy <dnums>
+info display            //查看display设置的自动显示信息。
+
+___________________________________________________________
+// break
+break                           //该命令没有参数时，它表示在下一条指令个停止。
+break <function>                //在进入指定函数时停止
+break <linenum>                 //在指定行号处停止
+break +offset                   //在当前行号前面的 offset行处停止 
+break -offset                   //在当前行号后面的 offset行处停止 
+break file_name : linenum       //在源文件file_name的linenum处停止
+break function_name : linenum   //在function_name的linenum处停止
+break *address                  //在程序运行的内存处停止 
+———————————————————————————————————————————————————————————
+//info line后面可以跟，"行号，函数名，文件名:行号，文件名:函数名"
+info line                       #
+diaassemble                     //查看源程序在当前执行的机器码。
+jump <linespec>                 //可以修改程序的执行顺序
+singnal <singnal>               //产生1个信号量给被调用程序，singnal取值：1～15   
+return <expression>             //强制返回
+call <expr>                     //强制调用函数

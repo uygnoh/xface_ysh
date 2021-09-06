@@ -1,0 +1,11 @@
+""" cp ./vimrc $HOME/.vimrc
+
+let vimrc     = 0
+
+if     vimrc == 1
+    source ~/Documents/GIT_HUB/profiles/vim/my_vimrc/vimrc_ch
+elseif vimrc == 2
+    source ~/Documents/GIT_HUB/profiles/vim/my_vimrc/vimrc_en
+else
+    source ~/Documents/GIT_HUB/profiles/vim/my_vimrc/vimrc
+endif

@@ -1,0 +1,301 @@
+### ===========================================================================
+1 DHCP服务端   xuegod63.cn      IP: 192.168.1.63
+2 DHCP客户端   xuegod64.cn      IP: 192.168.1.64
+
+
+
+### ===========================================================================
+vim /etc/services               # DHCP->Port        BOOTP->DHCP
+bootps          67/tcp          # BOOTP server
+bootps          67/udp
+bootpc          68/tcp          # BOOTP client
+bootpc          68/udp
+
+BOOTP
+    含义：BOOTP Server上预设了BOOTP Client的物理地址与IP地址的绑定。
+    注意：“静态”的含义并非是指获取方式的静态性，
+    而是指BOOTP Client的物理地址和IP地址的绑定关系是
+	初始化的时候就人为地配置在BOOTP Server中，后期不再改变。
+    BOOTP用于无盘工作站的启动和配置
+
+DHCP
+    BOOTP的扩充和增强，与BOOTP向后兼容
+    在有限期间内提供临时的静态的或动态配置
+    DHCP可以依据一些策略对主机进行动态配置
+    DHCP更适用于客户端接入变化的网络，即客户端接入时间、接入地点不固定
+
+
+
+### ==============================================================DHCP工作流程
+
+1.寻找阶段(DHCPDISCOVER)  目标端口           源IP                   目标IP
+                          UDP／67          0.0.0.0             255.255.255.255
+即DHCP客户机寻找 DHCP服务器的阶段
+DHCP客户机以广播方式(因为DHCP服务器的IP地址对于客户机来说是未知的)
+发送DHCPdiscover信息包 来寻找DHCP服务器，
+即向地址255.255.255.255发送特定的广播信息。
+网络上每一台安装了TCP/IP协议的主机都会接收到这种广播信息，
+但只有DHCP服务器才会做出响应。
+
+_______________________________________________________________________________
+2.提供阶段(DHCPOFFER)     目标端口             源IP                目标IP
+                          UDP／68          DHCP服务器的IP         255.255.255.255
+即DHCP服务器的提供IP地址的阶段
+在网络中接收到DHCPdiscover的数据包，DHCP服务器都会做出响应，
+它从尚未出租的IP地址中挑选一个分配给DHCP客户机，
+向DHCP客户机发送一个包含出租的IP地址和其他设置的DHCPoffer信息。
+_______________________________________________________________________________
+3.选择阶段(DHCPREQUEST)   目标端口              源IP                目标IP
+                          UDP／67            0.0.0.0             255.255.255.255
+即DHCP客户机选择某台DHCP服务器提供的IP地址的阶段
+如果有多台DHCP服务器向DHCP客户机发来DHCPoffer信息，
+则DHCP客户机只接受第一个收到的 DHCPoffer提供信息，
+然后它就以广播方式回答一个DHCPrequest请求信息，
+该信息中包含向它所选定的DHCP服务器请求IP地址的内容。 
+之所以要以广播方式回答，是为了通知所有的DHCP服务器，
+他将选择某台DHCP服务器所提供的IP地址。
+
+_______________________________________________________________________________
+4.确认阶段(DHCPACK)       目标端口             源IP                 目标IP
+                          UDP／67            0.0.0.0             255.255.255.255
+即DHCP服务器确认提供IP地址的阶段                    
+当DHCP服务器收到DHCP客户机回答的DHCPrequest请求信息之后，
+它便向DHCP客户机发送一个包含它所提供 的IP地址和其他设置的DHCPack确认信息，
+告诉DHCP客户机可以使用它所提供的IP地址。然后DHCP客户机便将其TCP/IP协议与网卡绑定， 
+另外，除DHCP客户机选中的服务器外，其他的DHCP服务器都将收回曾提供的IP地址。
+
+_______________________________________________________________________________
+5.重新登录。
+以后DHCP客户机每次重新登录网络时，就不需要再发送DHCPdiscover发现信息了，
+而是直接发送包含前一次所分配 的IP地址的DHCPrequest请求信息。
+当DHCP服务器收到这一信息后，
+它会尝试让DHCP客户机继续使用原来的IP地址，
+并回答一个 DHCPack确认信息。
+如果此IP地址已无法再分配给原来的DHCP客户机使用时
+（比如此IP地址已分配给其它DHCP客户机使用），
+则DHCP服务器 给DHCP客户机回答一个DHCPnack否认信息。
+当原来的DHCP客户机收到此DHCPnack否认信息后，
+它就必须重新发送 DHCPdiscover发现信息来请求新的IP地址。
+_______________________________________________________________________________
+6.更新租约。
+DHCP服务器向DHCP客户机出租的IP地址一般都有一个租借期限，
+期满后DHCP服务器便会收回出租的IP地址。
+如果 DHCP客户机要延长其IP租约，则必须更新其IP租约。
+DHCP客户机启动时和IP租约期限过一半时，
+DHCP客户机都会自动向DHCP服务器发送更新 其IP租约的信息。
+
+
+
+### ============================================================DHCP服务器安装配置
+
+4.1 安装
+
+        ~# aptitude install dhcp3-server dhcp3-common
+
+当前版本 3.0.4-6
+安装过程中会自动创建 /etc/default/dhcp3-server
+
+4.2 配置文件：
+
+        /etc/dhcp3/dhcpd.conf
+        /etc/init.d/dhcp3-server
+
+        http://www.isc.org/sw/dhcp/
+
+/etc/dhcp3/dhcpd.conf通常包括三部分：parameters、declarations 、option。
+
+_______________________________________________________________________________
+parameters（参数）：表明如何执行任务，是否要执行任务，或将哪些网络配置选项发送给客户。
+      参数                            解释
+      ddns-update-style               配置DHCP-DNS 互动更新模式。
+      default-lease-time              指定确省租赁时间的长度，单位是秒。
+      max-lease-time                  指定最大租赁时间长度，单位是秒。
+      hardware                        指定网卡接口类型和MAC地址。
+      server-name                     通知DHCP客户服务器名称。
+      get-lease-hostnames flag        检查客户端使用的IP地址。                     
+      fixed-address ip                分配给客户端一个固定的地址。
+      authritative                    拒绝不正确的IP地址的要求。
+      
+      
+_______________________________________________________________________________
+declarations （声明）：用来描述网络布局、提供客户的IP地址等：
+      声明                            解释
+      shared-network                  用来告知是否一些子网络分享相同网络。
+      subnet                          描述一个IP地址是否属于该子网。
+      range 起始IP 终止IP             提供动态分配IP 的范围。
+      host                            主机名称参考特别的主机。
+      group                           为一组参数提供声明。
+      
+      
+_______________________________________________________________________________
+option（选项）：用来配置DHCP可选参数，全部用option关键字作为开始：
+      选项                            解释
+      subnet-mask                     为客户端设定子网掩码。
+      domain-name                     为客户端指明DNS名字。
+      domain-name-servers             为客户端指明DNS服务器IP地址。
+      host-name                       为客户端指定主机名称。
+      routers                         为客户端设定默认网关。
+      broadcast-address               为客户端设定广播地址。
+      ntp-server                      为客户端设定网络时间服务器IP地址。
+      time－offset                    为客户端设定和格林威治时间的偏移时间，单位是秒。
+      
+      
+### ==============================================================DHCP配置文件示例     
+_______________________________________________________________________________
+$ cat /etc/dhcp3/dhcpd.conf
+
+        ddns-update-style none;
+        authoritative;
+        log-facility local7;
+
+        subnet 192.168.100.0 netmask 255.255.255.0 {
+          range 192.168.100.129 192.168.100.200;
+          option domain-name-servers 202.98.198.168, 202.98.192.68;
+          option domain-name "mydebian.org";
+          option routers 192.168.100.1;
+          option broadcast-address 192.168.100.255;
+          default-lease-time 600;
+          max-lease-time 7200;
+        }
+
+/* IP地址绑定
+   host         主机名                    #用于定义留IP地址
+   hardware     类型      硬件地址(MAC)   #客户机的硬件信息
+   fixed-address    IP地址                #用于指定DCHP客户机的IP
+*/
+        host hostname  {
+          hardware ethernet 00:0C:29:44:73:BE;
+          fixed-address 192.168.100.128;
+        }
+        
+        
+### ======================================================DHCP服务器的启动与停止
+
+dhcp服务器的启动
+        ~# /etc/init.d/dhcp3-server start
+
+dhcp服务器的停止
+        ~# /etc/init.d/dhcp3-server stop
+
+dhcp服务器的重启
+        ~# /etc/init.d/dhcp3-server restart
+
+当出现错误时，可以通过查看日志文件/var/log/syslog来获取详细的错误信息，以找出错误所在！
+如果主机上装有多个网卡，则可以通过修改/etc/default/dhcp3-server文件，
+来指定DHCP服务器监听的接口， 比如
+        $ cat /etc/default/dhcp3-server
+        INTERFACES="eth0 eth1"
+则指定DHCP服务器仅对第一，二块网卡接口进行监听，
+也可以通过直接修改/etc/init.d/dhcp3-server服务器启动脚本的INTERFACES项来指定要监听的端口， 
+比如
+        INTERFACES="eth0"
+仅对第一块网卡接口进行监听
+
+
+
+
+### ====================================================== =DHCP租期数据库
+
+在 DHCP 服务器第一次启动时， 会自动创建 /var/lib/dhcp3/dhcpd.leases 文件， 
+用于存放DHCP 的客户租期信息。不应该对该文件进行手动修改。每分配一个IP地址， 
+相关信息就会自动写入该文件。这些信息包括租期的长度；
+IP 地址被分配的对象；租期的开始和终止日期； 以及客户机的网卡 MAC 地址。
+
+该中所用的时间是格林威治标准时间(GMT)。随着IP地址的分配，该文件不时的被重建：
+首先，所有已知的租期会被储存到一个临时的租期文件 中，dhcpd.leases 文件被重命名为 dhcpd.leases ，
+然后，临时租期数据库被写入 dhcpd.leases 文件。
+
+在租期数据被重命名为备份文件，新文件被写入之前，
+DHCP 守护进程有可能被杀死，系统也有可能会崩溃。
+如果发生了这种情况，启动服务所需的 dhcpd.leases 文件就不会存在。
+这时，请不要创建新租期文件。因为这样做会丢失所有原有的旧租期文件，从而导致更多问题。
+正确的办法是把 dhcpd.leases 备份文件重命名为 dhcpd.leases，然后再启动守护进程。
+
+        tonybox:~# ls -l /var/lib/dhcp3/
+        total 8
+        -rw-r--r-- 1 root root 1664 2006-09-13 00:36 dhcpd.leases
+        -rw-r--r-- 1 root root 1664 2006-09-12 05:36 dhcpd.leases~
+
+管理员可以通过查看/var/lib/dhcp/dhcpd.leases文件来监督IP资源的分配情况。
+dhcpd.leases文件的格式如下：
+
+        Leases address ｛statement｝
+
+下边是我的dhcpd.leases文件中的一部分：
+
+        lease 192.168.100.200 {#DHCP服务器分配的IP地址#
+          starts 1 2006/09/11 19:54:26;# lease 开始租约时间#
+          ends 1 2006/09/11 20:04:26;# lease 结束租约时间#
+          tstp 1 2006/09/11 20:04:26;
+          binding state active;
+          next binding state free;
+          hardware ethernet 00:0c:29:44:73:be;#客户机网卡MAC地址#
+        }
+
+
+
+### ===========================================================================
+4.5 DHCP 客户端的配置
+如果客户端通过DHCP服务器来获取相关的网络信息的话， 
+可以做如下操作：修改/etc/network/interfaces为如下内容：
+
+        auto lo
+        iface lo inet loopback
+
+        auto eth0
+        iface eth0 inet dhcpi
+
+完成后， 重启网络服务：
+
+        # /etc/init.d/network restart
+
+使用 ifconfig 命令， 来检查效果 
+
+
+
+
+
+
+
+
+
+
+
+
+### ===========================================================================
+动态主机设置协议,Dynamic Host Configuration Protocol，DHCP
+是一个局域网的网络协议，使用UDP协议工作，主要有两个用途：
+用于内部网或网络服务供应商自动分配IP地址；
+给用户用于内部网管理员作为对所有计算机作中央管理的手段。
+
+
+
+### ===========================================================================
+DHCP,通常被应用在大型的局域网络环境中，
+主要作用是集中的管理、分配IP地址，使网络环境中的主机动态的获得IP地址、Gateway地址、DNS服务器地址等信息，并能够提升地址的使用率。
+
+DHCP协议采用客户端/服务器模型，主机地址的动态分配任务由网络主机驱动。
+当DHCP服务器接收到来自网络主机申请地址的信息时，才会向网络主机发送相关的地址配置等信息，以实现网络主机地址信息的动态配置。
+DHCP具有以下功能：
+1. 保证任何IP地址在同一时刻只能由一台DHCP客户机所使用。
+2. DHCP应当可以给用户分配永久固定的IP地址。
+3. DHCP应当可以同用其他方法获得IP地址的主机共存（如手工配置IP地址的主机）。
+4. DHCP服务器应当向现有的BOOTP客户端提供服务。
+
+
+
+### ==================================================== DHCP有三种机制分配IP地址：
+
+1) 自动分配方式, Automatic Allocation
+   DHCP服务器为主机指定一个永久性的IP地址，
+   一旦DHCP客户端第一次成功从DHCP服务器端租用到IP地址后，就可以永久性的使用该地址。
+
+2) 动态分配方式, Dynamic Allocation
+   DHCP服务器给主机指定一个具有时间限制的IP地址，
+   时间到期或主机明确表示放弃该地址时，该地址可以被其他主机使用。
+
+3) 手工分配方式, Manual Allocation
+  客户端的IP地址是由网络管理员指定的，DHCP服务器只是将指定的IP地址告诉客户端主机。
+
+
+

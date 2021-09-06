@@ -1,0 +1,24 @@
+############################################################
+### % blink_nuttx
+############################################################
+cd nuttx_space/nuttx/tools
+./configure.sh stm32f103-minimum/userled
+
+
+cd nuttx_space/nuttx
+make menuconfig
+//
+->Board Selection
+
+//使用LED驱动程序
+->Device Drivers ->LED Support ->LED driver[*]
+                               ->Generic Lower Half LED Driver [*]
+
+//LED应用例程配置
+->Application Configuration ->Examples ->LED driver example [*]
+
+//NSH应用程序配置
+->Application Configuration ->NSH Library ->Enable built-in applications
+                                          ->Disable Individual commands ->Disable printf [ ]
+                                          
+

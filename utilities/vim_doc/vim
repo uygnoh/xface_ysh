@@ -1,0 +1,112 @@
+############################################################
+### % vim-mode
+############################################################
+-- VISUAL --        % 可视化模式( v )
+___________________________________________________
+: normal IFreeBSD   在可视化模式下，执行此操作
+                    会在所选中的块， 的最前面插入“FreeBSD”
+
+-- VISUAL LINE --   % 可视化“行”模式( Shift+v )
+___________________________________________________
+: normal IFreeBSD   在可视化“行”模式下，执行此操作
+                    会在所选中的行， 的最前面插入“FreeBSD”
+                        
+-- VISUAL BLOCK --  % 可视化“块”模式( Ctrl+v )
+___________________________________________________
+                    在可视化“块”模式下，
+                    接下“shift+i”(在前面插入字符)
+
+
+### % 字符串替换
+___________________________________________________
+:1, 5/s/old_char/new_char/g
+:1, 5#s#old_char#new_char#g
+:1,$s@^@//@g        % 从第1行到最后一行，在行首加入”//“
+:1,$s@^//@@g        % 删除行首”//“
+:n1,n2 w! /usr/t.c  % 把当前文件n1到n2行的内容,写入到“/usr/t.c”   
+:r file_name        % 导入"file_name"的内容到当前编辑的中
+
+
+### % vim_命令行模式
+___________________________________________________
+:! command                      % 执行外部命令
+:r !command                     % 执行外部命令并贴上内容
+
+
+
+############################################################
+### % vim_insert模式
+############################################################
+^                               % 跳转到行首
+$                               % 跳转到行尾
+~                               % 大小写互换
+.                               % 重做最后做的动作
+zf                              % 把所选择的文本块折叠
+zd                              % 把所选择的文本块展开
+zfip                            % 所选择文本段落折叠
+ctrl+w                          % 删除一个Word
+ctrl+u                          % 删除游标前面的内容
+ctrl+f                          % 页操作
+ctrl+b                          % 页操作
+
+
+
+############################################################
+### % vim-mapping
+############################################################
+ noremap(非递归映射)      map(递归映射)      %        
+inoremap(非递归映射)     imap(递归映射)      % INSERT
+nnoremap(非递归映射)     nmap(递归映射)      % NORMAL
+vnoremap(非递归映射)     vmap(递归映射)      % VISUAL
+
+
+
+
+### % vim_leader前缀
+___________________________________________________
+vim的默认“<leader>”为“\”
+let mapleader=','
+map <leader>w :w!<CR>
+
+
+
+###     % normal模式_映射
+___________________________________________________
+map ; :
+map S :w<CR>                % 保存文件，命令模式下
+:inoremap jk <esc>
+
+
+
+### % vim_分屏映射操作
+___________________________________________________
+map sr :set splitright<CR>:vsplit<CR>       % 右边分屏
+map sl :set nosplitright<CR>:vsplit<CR>     % 左边分屏
+map su :set nosplitbelow<CR>:split<CR>      % 上边分屏
+map se :set splitbelow<CR>:split<CR>        % 下边分屏
+map <LEADER>i <C-W>l                        % 左
+map <LEADER>u <C-W>k                        % 上
+map <LEADER>n <C-W>h                        % 右
+map <LEADER>e <C-W>j                        % 下
+map <up> :res +5<CR>                        % 上下分屏增大
+map <down> :res -5<CR>                      % 上下分屏减小
+map <left> :vertical resize-5<CR>           % 左右分屏减小
+map <right> :vertical resize+5<CR>          % 左右分屏增大
+
+
+
+############################################################
+### % vim_设定档
+############################################################
+set nocompatible
+filetype on
+filetype indent on
+filetype plugin on
+filetype plugin indent on
+
+set number                      "% 显示行号
+set clipboard=unnamed           "% 使用剪切板
+set cursorline                  "% 显示游标线
+set noswapfile                  "% 不产生“SWAP”橖
+set showmode                    "% 显示“模式状态”
+set showcmd                     "% 显示“命令状态”

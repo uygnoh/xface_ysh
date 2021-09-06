@@ -1,0 +1,90 @@
+###########################################################
+### % MacOS的默认字体Monaco字体安装
+###########################################################
+1 % 复制MacOS字体到Linux下
+mkdir ~/.local/share/fonts/
+cp Monaco.ttf ~/.local/share/fonts/Monaco.ttf
+
+
+2 % 更改Monaco字体文件权限
+sudo chmod 755 ~/.local/share/fonts/Monaco.ttf
+
+
+
+3 % 更新字体缓存,强制刷新
+sudo fc-cache
+sudo fc-cache -f -v
+
+% debian_terminal使用此字体
+cp monaco.ttf /usr/share/fonts/truetype/
+fc-cache -f -v
+
+
+###########################################################
+### % Linux 的字体管理
+###########################################################
+-1 % 检查系统使用的中文字体(DebianLinux Default)
+fc-list :lang=zh
+/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf: \
+                            Droid Sans Fallback:style=Regular
+
+
+0  % 输出当前已安装的所有字体
+➜  ~ fc-list 
+
+
+1  % 过滤输出当前已安装的字体（也可以通过grep方式）
+➜  ~ fc-list Ubuntu
+
+
+2  % 手动安装字体
+首先，下载字体文件，假设文件名为(A.ttf)，一般字体文件都是以(ttf为后缀名)
+然后，将A.ttf文件移动到~/.local/share/fonts/目录下，如果该目录不存在，
+则创建目录。最后，在命令行下执行fc-cache命令，更新字体cache文件。
+通过以上步骤，新的字体就已经安装好了。
+➜  ~ mkdir ~/.local/share/fonts
+➜  ~ cp A.ttf ~/.local/share/fonts
+➜  ~ sudo fc-cache
+➜  ~ sudo fc-cache -f -v
+
+
+
+###########################################################
+### % debianOS字体显示不正确解决办法
+###########################################################
+1 % 移出本机的系统字体(/usr/share/fonts)到$HOME目录下
+suod mv /usr/share/fonts ~/fonts.bak
+
+
+2 % 复制另一台Debian系统的字体到/usr/share/
+sudo cp -r /usr/share/fonts /usr/share/
+
+
+3 % 更新字体缓存,强制刷新
+sudo fc-cache
+sudo fc-cache -f -v
+
+
+
+###########################################################
+### % Linux字体配置文件 Fontconfig
+###########################################################
+-1 % Debian_Linux字体相关文件存放的目录位置
+   % 个人用户字体文件：  ~/.local/share/fonts
+   % 系统字体文件：     /usr/share/fonts
+   % 字体配置文件：    /etc/fonts/
+   
+   
+0 % 英文的字体分类有 serif、sans-serif 和 monospace
+
+
+1 % 中文的分类有“宋体”和“黑体”
+
+
+3 % Fontconfig 首先读取的配置文件是 /etc/fonts/fonts.conf，
+    然后，根据 /etc/fonts/fonts.conf 里面的 <include>...</include> 
+    信息来加载其它的配置文件
+
+
+
+

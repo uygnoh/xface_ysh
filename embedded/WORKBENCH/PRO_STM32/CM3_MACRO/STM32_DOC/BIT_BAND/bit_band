@@ -1,0 +1,59 @@
+############################################################
+### % stm32位带绑算法描述
+############################################################
+/* 1内存_位带绑定区域 % (0x2000 0000 ~ 0x200F FFFF) 1M  */
+AliasAddr = 0x2200 0000 + ((A - 0x2000 0000)*8 + n)*4   //以字计算(n=0~31)
+          = 0x2200 0000 + (A - 0x2000 0000)*32 + n*4    //以字节计算(n=0~7)    
+/* 2外设_位带绑定区域 % (0x4000 0000 ~ 0x400F FFFF) 1M  */
+AliasAddr = 0x4200 0000 + ((A - 0x4000 0000)*8 + n)*4   //以字计算(n=0~31)
+          = 0x4200 0000 + (A - 0x4000 0000)*32 + n*4    //以字节计算(n=0~7)  
+//以字节计算(n=0~7)            
+/* 下面的映射公式给出了别名区中的每个字是如何对应位带区的相应位的:  */
+bit_word_addr = bit_band_base + (byte_offset×32) + (bit_number×4)
+bit_word_addr   是别名存储器区中字的地址,它映射到某个目标位。
+bit_band_base   是别名区的起始地址。
+byte_offset     是包含目标位的字节在位段里的序号
+bit_number      是目标位所在位置(0~7)
+/* 面的例子说明如何映射别名区中SRAM地址为0x20000300的字节中的位2: */
+0x22006008 = 0x22000000 + (0x300×32) + (2×4).
+
+
+
+############################################################
+### % stm32位带算法
+############################################################
+/* stm32位带操作宏定义文件开始 */
+#define  GPIOA_ODR_A  (GPIOA_BASE + 0x0C)
+#define  GPIOA_IDR_A  (GPIOA_BASE + 0x08)
+#define  GPIOB_ODR_B  (GPIOB_BASE + 0x0C)
+#define  GPIOB_IDR_B  (GPIOB_BASE + 0x08)
+#define  GPIOC_ODR_C  (GPIOC_BASE + 0x0C)
+#define  GPIOC_IDR_C  (GPIOC_BASE + 0x08)
+#define  GPIOD_ODR_D  (GPIOD_BASE + 0x0C)
+#define  GPIOD_IDR_D  (GPIOD_BASE + 0x08)
+#define  GPIOE_ODR_E  (GPIOE_BASE + 0x0C)
+#define  GPIOE_IDR_E  (GPIOE_BASE + 0x08)
+#define  GPIOF_ODR_F  (GPIOF_BASE + 0x0C)
+#define  GPIOF_IDR_F  (GPIOF_BASE + 0x08)
+#define  GPIOG_ODR_G  (GPIOG_BASE + 0x0C)
+#define  GPIOG_IDR_G  (GPIOG_BASE + 0x08)
+#define BIT_BAND(ADDR, BIT_NUM)  *((volatile unsigned long *) \
+    ((ADDR & 0xF0000000) + 0x2000000 + ((ADDR & 0xFFFFF)<<5) + (BIT_NUM<<2)))
+#define PA_OUT(N)     BIT_BAND(GPIOA_ODR_A, N)
+#define PA_IN(N)      BIT_BAND(GPIOA_IDR_A, N)
+#define PB_OUT(N)     BIT_BAND(GPIOB_ODR_B, N)
+#define PB_IN(N)      BIT_BAND(GPIOB_IDR_B, N)
+#define PC_OUT(N)     BIT_BAND(GPIOC_ODR_C, N)
+#define PC_IN(N)      BIT_BAND(GPIOC_IDR_C, N)
+#define PD_OUT(N)     BIT_BAND(GPIOD_ODR_D, N)
+#define PD_IN(N)      BIT_BAND(GPIOD_IDR_D, N)
+#define PE_OUT(N)     BIT_BAND(GPIOE_ODR_E, N)
+#define PE_IN(N)      BIT_BAND(GPIOE_IDR_E, N)
+#define PF_OUT(N)     BIT_BAND(GPIOF_ODR_F, N)
+#define PF_IN(N)      BIT_BAND(GPIOF_IDR_F, N)
+#define PG_OUT(N)     BIT_BAND(GPIOG_ODR_G, N)
+#define PG_IN(N)      BIT_BAND(GPIOG_IDR_G, N)
+/* stm32位带操作宏定义文件结束 */
+
+
+
