@@ -1,112 +1,115 @@
-###########################################################
-### % Crypsetup工具加密
-###########################################################
-% Crypsetup工具加密的特点：
+/*******************************************************************************
+                              Crypsetup工具加密
+*******************************************************************************/
+// Crypsetup工具加密的特点：
 1 加密后不能直接挂载
 2 加密后硬盘丢失也不用担心数据被盗
 3 加密后必须做映射才能挂载
 
-% Ⅰ、cryptsetup常用参数：
-luksFormat      ：设定磁盘密码
-luksOpen        ：开启映射设备
-luksClose       ：关闭映射设备
-luksAddKey      ：给映射设备添加密钥文件
-luksRemoveKey   ：从映射中移除密钥文件（失效）
-luksUUID        ：打印加密设备的UUID号
-status          ：查看映射设备信息
 
-% Ⅱ、/etc/crypttab：映射关系配置文件
-在里面填入三项：映射设备名 加密设备 密钥文件
-系统启动时后会自动读取该文件中的内容
-当注释掉该文件内容时务必也要注释掉自动挂载文件(/etc/fstab)中与之相关的内容，否则系统开不机
+// cryptsetup常用参数：
+luksFormat		//设定磁盘密码
+luksOpen		//开启映射设备
+luksClose		//关闭映射设备
+luksAddKey      	//给映射设备添加密钥文件
+luksRemoveKey   	//从映射中移除密钥文件（失效）
+luksUUID		//打印加密设备的UUID号
+status          	//查看映射设备信息
 
-% LUKS硬盘加密格式
-% LUKS （Linux Unified Key Setup）是 Linux 硬盘加密的标准。 
-% 通过提供标准的磁盘格式，它不仅可以促进发行版之间的兼容性，还可以提供对多个用户密码的安全管理。 
-% 与现有解决方案相比，LUKS 将所有必要的设置信息存储在分区信息首部中，使用户能够无缝传输或迁移其数据。
+
+// LUKS硬盘加密格式
+LUKS （Linux Unified Key Setup）是 Linux 硬盘加密的标准。 通过提供标准的磁盘格式，
+它不仅可以促进发行版之间的兼容性，还可以提供对多个用户密码的安全管理。 与现有解决方案相比，
+LUKS 将所有必要的设置信息存储在分区信息首部中，使用户能够无缝传输或迁移其数据。
 
 
 
-###########################################################
-### %安装加密软件
-###########################################################
-通常的发行版已经预装了该软件包，可以直接使用，下面是 Gentoo 的安装方法
-# emerge --ask sys-fs/cryptsetup
 
 
-
-###########################################################
-###  %Crypsetup磁盘加密
-###########################################################
-% 新建磁盘分区
+/*******************************************************************************
+				【1】 创建加密分区
+*******************************************************************************/
+1 //新建磁盘分区
 [root@localhost ~]# fdisk -cu /dev/sdb
-Command (m for help): n #新建分区
+Command (m for help): n			//新建分区
 Command action
 e extended
 p primary partition (1-4)
-p #选择主分区
-Partition number (1-4): 1 #分区号为1
-First sector (2048-41943039, default 2048): #此处回车
-Using default value 2048
-Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039): +5G #给定大小为5G
-Command (m for help): w #保持存对硬盘的更改并退出
+p						//选择主分区
+Partition number (1-4): 1			//分区号为1
+First sector (2048-41943039, default 2048): 	//此处回车
+Using default value 2048			//给定大小为5G
+Last sector, +sectors or +size{K,M,G} (2048-41943039, default 41943039): +5G
+Command (m for help): w			//保持存对硬盘的更改并退出
 The partition table has been altered!
 Calling ioctl() to re-read partition table.
 Syncing disks.
-[root@localhost ~]# partx -a /dev/sdb #让系统重新读取磁盘/dev/sdb的分区表
+[root@localhost ~]# partx -a /dev/sdb		//让系统重新读取磁盘/dev/sdb的分区表
 
 
-% 创建磁盘加密分区
-% 对磁盘加密分区设置密码
+2 //创建磁盘加密分区
+  对磁盘加密分区设置密码
 [root@localhost ~] cryptsetup luksFormat /dev/sdb1
 WARNING!
 ========
 This will overwrite data on /dev/sdb1 irrevocably.
-Are you sure? (Type uppercase yes): YES  # 注意这里必须是大写的 "YES"
-Enter LUKS passphrase:                  #输入密码, 密码要足够复杂，不能过短、基于字典等
-Verify passphrase:                      #再次输入
+Are you sure? (Type uppercase yes): YES	//注意这里必须是大写的 "YES"
+Enter LUKS passphrase:			//输入密码, 密码要足够复杂，不能过短、基于字典等
+Verify passphrase:			//再次输入
 Command successful.
     
-    
-% 利用key-file加密分区 
-除了密码之外，还可以选择使用 key file 解密你的硬盘，也就是相当于一个密钥，
-当然可以也可以只使用 key file 或者同时使用密码与 key file
+
+
+/*******************************************************************************
+				【2】 创建加密密钥
+*******************************************************************************/ 
+// 利用key-file加密分区, 除了密码之外，还可以选择使用 key file 解密你的硬盘，
+// 也就是相当于一个密钥，当然可以也可以只使用 key file 或者同时使用密码与 key file
 _______________________________________________________________________________
-生成随机 key file
+// key file
 # dd if=/dev/urandom of=/root/enc.key bs=1 count=4096
 
 
-% 添加 key file 作为密码之一
+// 添加 key file 作为密码之一
 # cryptsetup luksAddKey  /dev/sdd /root/enc.key
 Enter any existing passphrase:
 
 
-% 移除解密密码
-移除普通密码
+// 移除普通密码
 # cryptsetup luksRemoveKey /dev/sdd
 Enter LUKS passphrase to be deleted: ...
 _______________________________________________________________________________
-移除 key file 密码
+// key file 密码
 # cryptsetup luksRemoveKey -d /root/enc.key /dev/sdd
 _______________________________________________________________________________
-注意：千万不要将所有密码移除，至少需要留有一个密码访问设备，移除操作不可撤销
+!!! 注意：千万不要将所有密码移除，至少需要留有一个密码访问设备，移除操作不可撤销
 
 
-% 映射并解密分区设备
-1 密码解密
-# cryptsetup luksOpen /dev/sdd myusb    #把sdb1映射为myusb
+
+
+/*******************************************************************************
+				【3】 映射并解密分区设备
+*******************************************************************************/
+1 //密码解密
+# cryptsetup luksOpen /dev/sdd myusb    //把sdb映射为myusb
 Enter passphrase for /dev/sdd:
+
+
 _______________________________________________________________________________
-2 key file 解密
+2 //key file 解密			//把sdb映射为myusb
 # cryptsetup luksOpen -d /root/enc.key /dev/sdd myusb
 
-cryptsetup status /dev/mapper/myusb    #查看加密分区的状态
+
+3 //查看加密分区的状态
+cryptsetup status /dev/mapper/myusb    
 
 
-% 创建文件系统
-% 在挂载使用之前，我们仍然需要对设备创建文件系统才可以使用，
-可以选择任何你喜欢的文件系统，
-例如 btrfs，ext4，vfat，ntfs, xfs,等
+
+/*******************************************************************************
+				【4】 创建文件系统
+*******************************************************************************/
+// 创建文件系统, 在挂载使用之前，我们仍然需要对设备创建文件系统才可以使用，可以选择任何你喜欢
+// 的文件系统，例如 btrfs，ext4，vfat，ntfs, xfs,等
 # mkfs.ext4 /dev/mapper/myusb
 mke2fs 1.43.6 (29-Aug-2017)
 Creating filesystem with 488448 4k blocks and 122160 inodes
@@ -120,17 +123,26 @@ Creating journal (8192 blocks): done
 Writing superblocks and filesystem accounting information: done
 
 
-% 挂载加密分区设备
-现在可以像正常分区一样挂载我们的加密分区设备了
+
+/*******************************************************************************
+				【5】 使用磁盘
+*******************************************************************************/
+// 挂载加密分区设备，现在可以像正常分区一样挂载我们的加密分区设备了
 # mount /dev/mapper/myusb /mnt/
 # df -h
 /dev/mapper/myusb  1.9G  5.7M  1.7G   1% /mnt
 
 
-% 卸载挂载点并关闭映射分区
+// 卸载挂载点并关闭映射分区
 # umount /mnt
 # cryptsetup luksClose myusb
-   
 
 
 
+/*******************************************************************************
+				【6】 使用磁盘 ->END
+*******************************************************************************/
+# cd /command/security/DM_Crypt/DM_CRYPT
+//key file 解密			//把sda2映射为myusb
+# cryptsetup luksOpen -d ./enc.key /dev/sda2 myusb
+# mount /dev/mapper/myusb /mnt/

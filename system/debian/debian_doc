@@ -130,6 +130,12 @@ export PATH=$PATH:$TZ
 # dpkg-reconfigure tzdata 
 
 
+// 修改配置文件来修改时区，行完上述过程后，重启机器
+1、修改/etc/timezone         ZONE=Asia/Shanghai
+2、rm /etc/localtime
+3、链接到上海时区文件       
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
 
 
 /*******************************************************************************
@@ -208,6 +214,8 @@ sudo apt-get -y install openocd
 # sudo apt-get -y install stlink
 # sudo apt-get -y install arm-none-eabi-gcc
 # sudo apt-get -y install riscv64-unknown-elf-gcc
+# sudo apt-get -y install zathura
+
 # 
 echo -e "\033[41;37mINSTALLATION IS COMPLETE--->>>\033[37;0m"
 echo "return $?"
