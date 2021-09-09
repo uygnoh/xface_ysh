@@ -106,6 +106,8 @@ __interrupt void PORT1_ISR(void)
 |
 | //串口中断程序
 |______________________________________________________________
+const uint8_t combuf[10] = {0};
+uint8_t rx_flag;
 void clock_setup(void)
 {
         DCOCTL    = CALDCO_1MHZ;        //配置DCO为1MHz
@@ -137,8 +139,8 @@ int main(void)
         P1OUT    &= ~BIT0;              //P1.0引脚配置为输出低电平
         __bis_SR_register(GIE);         //打开总中断
         while (1) {
-                if (iscomend) {
-                        iscomend = 0;   //标志位清零，防止重复执行
+                if (rx_flag) {
+                        rx_flag = 0;   //标志位清零，防止重复执行
                         execute(combuff);//执行命令
                 }
         }
@@ -156,28 +158,28 @@ __interrupt void UART_RX_ISR(void)
                 cnt %= 20;                      //导致缓冲区溢出
                 if (combuff[cnt -1 ] == '\n') { //如果检测到命令结束符（以换行作为命令结束）
                         cnt = 0;                //复位计数器
-                        iscomend = 1;           //命令接收完毕
+                        rx_flag = 1;           //命令接收完毕
                 }
         }
 }
 
 void execute(uint8_t *combuff)
 {
-        const uint8_t charbuf[5][10] = {"AB", "CD", "EF", "LED ON", "LED OFF"};
-        if (commbuf[0] == charbuff[0][0] && combuff[1] == charbuff[0][1]) {             //AB
-                uart_send_str("AB, ", 16);
-        } else if (commbuf[0] == charbuff[1][0] && combuff[1] == charbuff[1][1]) {      //CD
-                uart_send_str("CD, ", 16);
-        } else if (commbuf[0] == charbuff[2][0] && combuff[1] == charbuff[2][1]) {      //EF
-                uart_send_str("EF, ", 16);
-        } else if (commbuf[0] == charbuff[3][0] && combuff[6] == charbuff[3][6]) {      //LED ON
-                uart_send_str("LED ON, ", 16);
-                P1OUT |= BIT0;
-        } else if (commbuf[0] == charbuff[4][0] && combuff[6] == charbuff[4][6]) {      //LED OFF
-                uart_send_str("LED OFF, ", 16);
+        const uint8_t charbuf[10] = {0x11, 0x22, 0x33, 0x00, 0xFF};
+        if (combuf[0] == charbuf[0]) {         //命令码“11”
+                uart_send_str("0x11", 10);
+        } else if (combuf[1] == charbuf[1]) {  //命令码“22”
+                uart_send_str("0x22", 10);
+        } else if (combuf[2] == charbuf[2]) {  //命令码“33”
+                uart_send_str("0x33", 10);
+        } else if (combuf[3] == charbuf[3]) {  //命令码“00”，关闭LED
+                uart_send_str("0x00", 10);
                 P1OUT &= ~BIT0;
+        } else if (combuf[4] == charbuf[4]) {  //命令码“FF”，打开LED
+                uart_send_str("0xFF", 10);
+                P1OUT |= BIT0;
         } else {
-                uart_send_str("command error", 16);
+                uart_send_str("command error", 10);
         }
 }
 
@@ -254,3 +256,8 @@ int main(void)
         }
         return 0;
 }
+
+
+/*******************************************************************************
+                              MSP430-G2553-TIMER 定时器
+*******************************************************************************/
