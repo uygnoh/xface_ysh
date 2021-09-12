@@ -252,5 +252,120 @@ __interrupt void USCI_B0_ISR(void)
 
 
 
+/*******************************************************************************
+                             MSP430F5529-SPI
+*******************************************************************************/
+编程实现两块MSP430F5529单片机之间的三线制SPI通信。 其中一块单片机作为主机，另一块单片机作为从机。
+主机从“0x01”开始发送递增字节，从机接收到的字节再原封不动地发送给主机，主机判断接收到的字节与之前
+发送的字节是否一致。 若一致表示接收正确，使P1.0输出高电平，若接收错误，则使P1.0输出低电平。
+
+
+//主机程序
+___________________________________________________________
+unsigned char MST_Data, SLV_Data;
+unsigned char temp;
+int main(void)
+{
+        volatile unsigned int i;
+        WDTCTL  = WDTPW + WDTHOLD;      //Stop watchdog timer
+        
+        P1OUT   |= 0x04;                //Set p1.0 for LED
+                                        //Set P1.2 for slave reset(控制从机的复位)
+        P1DIR   |= 0x05;                //Set P1.0-2 to output direction
+        P3SEL   |= BIT3 + BIT4;         //P3.3, P3.4 option select
+        P2SEL   |= BIT7;                //P2.7 option select SPI时钟
+        
+        UCA0CTL1 |= UCSWRST;            //** Put state machine in reset **
+        UCA0CTL0 |= UCMST + UCSYNC + UCCKPL + UCMSB; //3-pin, 8-bit SPI master
+                                        //clock polarity high, MSB
+        UCA0CTL1 |= UCSSEL_2;           //SMCLK
+        UCA0BR0   = 0x02;               // /2
+        UCA0BR1   = 0x00;
+        UCA0MCTL  = 0x00;               //No modulation
+        UCA0CTL1 &= ~UCSWRST;           //** Initialize USCI state machine **
+        UCA0IE   |= UCRXIE;             //Enable USCI_A0 RX interrupt
+        
+        P1OUT    &= ~0x04;              //Now with SPI signals initialized     
+        P1OUT    |= 0x04;               //reset slave
+        
+        for (i = 50; i > 0; i--);       //Wait for slave to initialize
+        
+        MST_Data = 0x01;                //Initialize data values
+        SLV_Data = 0x00;                //
+        
+        while (!(UCA0IFG & UCTXIFG));   //USCI_A0 TX buffer ready?
+        UCA0TXBUF = MST_Data;           //Transmit first character
+        
+        __bis_SR_register(LPM0_bits + GIE);//CPU off, enable interrupt
+}
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
+{
+        volatile unsigned int i;
+        switch (__even_in_range(UCA0IV, 4) {
+        case 0: break; //Vector 0 - no interrupt
+        case 2:        //Vector 2 - RXIFG
+                while (!(UCA0IFG & UCTXIFG));   //USCI_A0 TX buffer ready?
+                if (UCA0RXBUF == SLV_Data)      //Test for correct character RX'd
+                        P1OUT |= 0x01;          //If correct, light LED
+                else
+                        P1OUT &= ~0x01;         //If incorrect, clear LED
+                
+                MST_Data++;
+                SLV_Data++;
+                UCA0TXBUF = MST_Data;           //Send next value
+                
+                for (i = 20; i > 0; i--);       //Add time between transmissions 
+                                                //to make sure slave can process
+                                                // information
+                break;
+        case 4: break; //Vector 4 - TXIFG
+        default: break;
+        }
+        
+}
+
+
+
+//从机程序
+___________________________________________________________
+int main(void)
+{
+        WDTCTL      = WDTPW + WDTHOLD;  //Stop watchdog timer
+        
+        while (!(P2IN & 0x80));         //等待spi时钟信号到来 P2.7
+        
+        P3SEL   |= BIT3 + BIT4;         //P3.3, P3.4 option select
+        P2SEL   |= BIT7;                //P2.7 option select, 设置为时钟线
+        
+        UCA0CTL1   |= UCSWRST;          //** Put state machine in reset **
+        
+                                        //3-pin, 8-bit SPI slave
+                                        //Clock polarity high, MSB
+        UCA0CTL0   |= UCSYNC + UCCKPL + UCMSB;
+        
+        UCA0CTL1   &= ~UCSWRST;         //**Initialize USCI state machine **
+        UCA0IE     |= UCRXIE;           //Enable USCI_A0 RX interrupt
+        
+        __bis_SR_register(LPM4_bits + GIE);//进入低功耗模式4，使能全局中断
+}
+//Echo character
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
+{
+        switch (__even_in_range(UCA0IV, 4) {
+        case 0: break;                       //Vector 0 - no interrupt
+        case 2:                               //Vector 2 - RXIFG
+                while (!(UCA0IFG & UCTXIFG)); //USCI_A0 TX buffer ready?
+                UCA0TXBUF = UCA0RXBUF;
+                break;
+        }
+        case 4: break;                        //Vector 4 - TXIFG
+        default: break;
+}
+
+
+
+
 
 

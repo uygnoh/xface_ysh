@@ -36,12 +36,14 @@ LFXT1_Oscillator //外部低频/高频晶振接入(32.768KHz, 450KHz~8MHz)
 XT2_Oscillator   //外部高频晶振接入(450KHz~8MHz)
 DCOCLK           //内部数控RC振荡器()
 VLOCLK           //内部低速时钟(12KHz)
+__________________________________________________________
 MCLK             //主时钟信号
 ACLK             //辅助时钟信号
 SMCLK            //子系统时钟信号
 
 
 
+|  MSP430-G2553内部数控RC振荡器时钟
 | //设置MCLK频率，使用“DCOCLK”内部数控RC振荡器，更改主时钟频率
 | //MSP430出厂自动校准了4个频率点( 1MHz, 8MHz, 12MHz, 16MHz )
 |__________________________________________________________
@@ -58,10 +60,9 @@ int main(void)
 /*******************************************************************************
                            MSP430-G2553-Interrupt
 *******************************************************************************/
-MSP430中的“一元中断”，CPU进入中断服务程序中会自动清除相应的中断标志位
-MSP430中的“多元中断”，CPU进入中断服务程序需要用户根据需要清除相应的中断标志位
-
-“GIE”全局中为控制位，当CPU进入中断服务程序中会自动关闭它，即出中断服务程序会自动打开它
+MSP430中的“一元中断”  //CPU进入中断服务程序中会自动清除相应的中断标志位
+MSP430中的“多元中断”  //CPU进入中断服务程序需要用户根据需要清除相应的中断标志位
+“GIE”全局中为控制位   //当CPU进入中断服务程序中会自动关闭它，即出中断服务程序会自动打开它
 
 
 
@@ -101,9 +102,9 @@ __interrupt void PORT1_ISR(void)
                 P1OUT ^= BIT6;  //翻转P1.6引脚上的电平
         }
 }
-|
-|
-|
+
+
+
 | //串口中断程序
 |______________________________________________________________
 const uint8_t combuf[10] = {0};
@@ -117,7 +118,7 @@ void clock_setup(void)
 }
 void uart_setup(void)
 {
-        UCA0CTL1 |= UCSWRST;            //复位USCI_Ax
+        UCA0CTL1 |= UCSWRST;            //** 复位USCI_Ax **
         UCA0CTL0 &= ~UCSYNC;            //选择USCI_Ax为UART模式(8N1)
         UCA0CTL1 |= UCSSEL1;            //配置UART时钟源为“SMCLK”
         UCA0BR0   = 0x68;               //9600@1MHz
@@ -125,7 +126,7 @@ void uart_setup(void)
         UCA0MCTL  = 1 << 1;
         P1SEL    |= BIT1 + BIT2;        //使能端口复用功能 
         P1SEL2   |= BIT1 + BIT2;
-        UCA0CTL1 &= ~UCSWRST;           //清除复位位，使能UART
+        UCA0CTL1 &= ~UCSWRST;           //** 清除复位位，使能UART **
         
         IE2      |= UCA0RXIE;           //接收中断使能
         IFG2     &= ~UCA0RXIFG;         //清除接收中断标志位
@@ -185,12 +186,10 @@ void execute(uint8_t *combuff)
 
 
 
-
 /*******************************************************************************
                               MSP430-G2553-UART
 *******************************************************************************/
 #include <msp430g2553.h>
-
 int main(void)
 {
         WDTCTL    = WDTPW | WDTHOLD;    //关闭看门狗定时器
@@ -198,17 +197,18 @@ int main(void)
         BCSCTL1   = CALBC1_1MHZ;
         BCSCTL2  &= ~SELS;              //配置SMCLK的时钟源为DCO
         BCSCTL2  &= ~(DIVS0 | DIVS1);   //配置SMCLK的分频系数为“1”
-        UCA0CTL1 |= UCSWRST;            //复位USCI_Ax
+        
+        UCA0CTL1 |= UCSWRST;            //** 复位USCI_Ax **
         UCA0CTL0  = 0x00;               //8位数据位，无校验，1位停止位
         UCA0CTL1 |= UCSSEL1;            //配置UART时钟源为SMCLK
         UCA0BR0   = 0x68;               //9600@1MHz
         UCA0BR1   = 0x00;
         UCA0MCTL  = 1 << 1;
-        
         P1SEL    |= BIT1 + BIT2;        //使能端口利用功能
         P1SEL2   |= BIT1 + BIT2;
-        UCA0CTL1 &= ~UCSWRST;           //清除复位位，使能UART
+        UCA0CTL1 &= ~UCSWRST;           //** 清除复位位，使能UART **
         
+        //使用串口发送“0x55”
         while (1) {
                 UCA0TXBUF = 0x55;
                 __delay_cycles(500000);
@@ -218,13 +218,10 @@ int main(void)
 
 
 
-
-
 /*******************************************************************************
                               MSP430-G2553-GPIO 点灯程序 
 *******************************************************************************/
 #include <msp430g2553.h>
-
 /*
     x->代表端口, y->指的是具体的IO管脚
     
@@ -238,7 +235,6 @@ int main(void)
     | PxOUT.y (0->下拉模式, 1->上拉模式)        |
     |________________________________________|
 */
-
 int main(void)
 {
         WDTCTL = WDTPW | WDTHOLD;       //关闭看门狗定时器
@@ -258,6 +254,80 @@ int main(void)
 }
 
 
+
 /*******************************************************************************
-                              MSP430-G2553-TIMER 定时器
+                           MSP430-G2553-TIMER 定时器
 *******************************************************************************/
+//使用中断方法，定时1秒时间，定时器时钟频率为“1MHz”
+int main(void)
+{
+        WDTCTL   = WDTPW | WDTHOLD;     //Stop watchdog timer
+        P1DIR   |= BIT6;                //设置P1.6为输出
+        TA1CTL  |= TASSEL_2;            //设置时钟源为SMCLK
+        TA1CTL  |= MC_1;                //设置工作模式为向上计数
+        TA1CCR0  = 4999;                //设置定时时间
+        TA1CTL  |= TAIE;                //打开TAIFG中断
+        __bis_SR_register(GIE);         //打开全局中断
+        while (1) {
+                if (flag = 1) {
+                        flag = 0;
+                        P1OUT ^= BIT6;
+                }
+        }
+}
+#pragma vector=TIMER1_A1_VECTOR
+__interrupt void Time_Tick(void)
+{
+        static uint8_t cnt = 0;
+        switch (TAIV) {         //定时器A中断向量
+        case 0x02: break;
+        case 0x04: break;
+        case 0x0A:              //定时器A1溢出中断标志位
+                cnt++;
+                if (cnt == 20) {
+                        cnt = 0;
+                        flag = 1;
+                }
+                break;
+        }
+        default: break;
+}
+
+
+
+
+/*******************************************************************************
+                           MSP430-G2553-TIMER PWM 呼吸灯
+*******************************************************************************/
+int main(void)
+{
+        unsigned int cnt = 0;
+        WDTCTL     = WDTPW + WDTHOLD;   //Stop watchdog timer
+        DCOCTL     = CALDCO_1MHZ;       //配置DCO频率为1MHz
+        DCSCTL1    = CALBC1_1MHZ;
+        P1DIR     &= ~BIT6;             //初始化P1.6为输入
+        TA1CTL    |= TASSEL1;           //设置时钟源为“SMCLK”
+        TA1CTL    |= MCO | MC1;         //设置工作模式为“Up/Down”
+        
+        //占空比: (TACCR0 - TACCR2) / TACCR0
+        //输出信号频率: SMCLK / (TACCR0 + 1) / 2
+        
+        TA1CCR0    = 0x00FF;            //设置TA1CCR0为“0x00FF”，保存计数值最大值
+        TA1CCR2    = 0x00FF;            //设置TA1CCR2为“0x00FF”，设置比较值
+        TA1CCTL0  &= ~CAP;              //设置为比较模式
+        TA1CCTL2  &= ~CAP;
+        TA1CCTL2  |= OUTMOD_6;          //设置比较输出模式，模式6
+        P2SEL     |= BIT5;              //设置IO复用，P2.5输出PWM波
+        P2DIR     |= BIT5;
+        while (1) {
+                for (cnt = 0; cnt < 0x00FF; cnt++) {
+                        TA1CCR2 = cnt;
+                        __delay_cycles(5000);
+                }
+                for (cnt = 0x00FF; cnt > 0; cnt--) {
+                        TA1CCR2 = cnt;
+                        __delay_cycles(5000);
+                }
+        }
+        return 0;   
+}
