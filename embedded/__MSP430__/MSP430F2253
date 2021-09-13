@@ -331,3 +331,126 @@ int main(void)
         }
         return 0;   
 }
+
+
+
+/*******************************************************************************
+                          MSP430-G2553-GPIO 定时器测频率 
+*******************************************************************************/
+float freq = 0;
+void clock_setup(void)
+{
+        DCOCTL   = CALDC0_1MHZ;         //配置DCO为1MHz
+        BCSCTL1  = CALBC1_1MHZ;
+        BCSCTL2 &= ~SELS;               //配置SMCLK的时钟源为DCO
+        BCSCTL2 &= ~(DIVS0 | DIVS1);    //SMCLK的分步系数为1
+}
+void uart_setup(void)
+{
+        UCA0CTL1 |= UCSWRST;    //复位USCI_Ax
+        UCA0CTL0 &= ~UCSYNC;    //选择USCI_Ax为UART模式
+        UCA0CTL1 |= UCSSEL1;    //配置UART时钟源为SMCLK
+        UCA0BR0   = 0x68;       //9600@1MHz
+        UCA0BR1   = 0x00;
+        UCA0MCTL  = 1 << 1;
+        P1SEL    |= BIT1 + BIT2;//使能端口复用
+        P1SEL2   |= BIT1 + BIT2;
+        UCA0CTL1 &= ~UCSWRST;   //清除复位，使能UART
+}
+//*pbuf 指向要发送字符串的指针
+//num   要发送的字符数
+void uart_tx(uint8_t *pbuf, uint8_t num)
+{
+        uint8_t cnt = 0;
+        for (cnt = 0; cnt < num; cnt++) {
+                while (UCA0STAT & UCBUSY);
+                UCA0TXBUF = *(pbuf + cnt);
+        }
+}
+
+//通过串口发送字符，遇到‘\0’停止发送
+void uart_print(uint8_t *pbuf)
+{
+        uint8_t cnt = 0;
+        while (*(pbuf + cnt) != '\0') {
+                while (UCA0STAT & UCBUSY);
+                UCA0TXBUF = *(pbuf + cnt);
+                cnt++;
+        }
+}
+void print_freq(flost freq)
+{
+        uint32_t tmp = (uint32_t)(freq * 1000);
+        uint8_t charbuf[] = {0,0,0,0,0,0,0,0,0};//最大999999.999Hz
+        uint8_t cnt = 0;
+        for (cnt = 0; cnt >= 0; cnt--) {
+                charbuf[cnt} = (uint8_t)(tmp % 10) + '0';
+                tmp /= 10;
+        }
+        uart_tx(charbuf, 6);
+}
+int main(void)
+{
+        WDTCTL    = WDTPW + WDTHOLD;
+        clock_setup();
+        uart_setup();
+//使用定时器1的第“0”通道设置定时器1的定时时间为“5000”个脉冲数
+        TA1CTL   |= TASSEL_2;   //设置时钟源为“SMCLK”
+        TA1CTL   |= MC_1;       //设置工作模式为“Up Mode”
+        TA1CCR0   = 4999;       //设置定时间隔
+        TA1CTL   |= TAIE;       //开启TAIFG中断
+        
+//使用定时器1的第“2”通道来捕获输入的脉冲数
+        TA1CCTL2 |= CAP;        //TA1，CCR2用于捕获功能
+        TA1CCTL2 |= CM0;        //上升沿捕获
+        TA1CCTL2 |= CCIS0;      //P2.5作为捕获输入
+        P2SEL    |= BIT5;       //
+        TA1CCTL2 |= CCIE;       //允许捕获比较中断
+        
+//使用定时器0，来产生输出测试信号 
+        TA0CTL   |= TASSEL1;    //设置时钟源为“SMCLK”
+        TA0CTL   |= MC0 | MC1;  //设置工作模式为“Up/Down”
+        TA0CCR0   = 0x0AAA;     //设置TA0CCR0为“”，频率：SMCLK / (TACCR0) / 2
+        TA0CCR1   = 0x0555;     //设置TA0CCR1为“”，占空比：(TACCR0 - TACCR1) / TACCR0
+        TA0CCTL0 &= ~CAP;       //设置比较模式
+        TA0CCTL1 &= ~CAP;
+        TA0CCTL1 |= OUTMOD_6;   //设置比较输出模式
+        P1SEL    |= BIT6;       //设置IO复用
+        P1DIR    |= BIT6;
+        
+        __bis_SR_register(GIE);
+        while (1) {
+                __delay_cycles(500000);
+                freq = (float)(1000000.0) / totaltime;
+                print_freq(freq);
+        }
+}
+#pragma vector=TIMDR1_A1_VECTOR
+__interrupt void TIME_TICK(void)
+{
+        static uint8_t cnt = 0;
+        __bis_SR_register(GIE);  //允许中断嵌套
+        switch (TA1IV) {
+        case 0x02:              //捕获比较中断1
+                break;
+        case 0x04:              //捕获比较中断2
+                if (cnt == 0) {
+                        capvalue_1 = TA1CCR2; //保存第一次捕获值
+                        timestamp_1 = timestamp;//保存第一次时间标记
+                        cnt++;
+                } else {
+                        capvalue_2 = TA1CCR2;//保存第2次捕获值
+                        timestamp_2 = timestamp;//保存第2次时间标记
+                        cnt = 0;
+                        totaltime = (timestamp_2 - timestam_1) * 50000 + capvalue2 - capvalue_1;
+                }
+                break;
+        case 0x0A:              //溢出中断
+                timestamp++;
+                break;
+        default:
+                break;
+        }
+}
+
+
