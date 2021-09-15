@@ -1,0 +1,41 @@
+//set up global variables
+//a single "=" sets the value of the variable
+
+//variables for the LEDs
+const int redLed1  = 5;
+const int redLed2  = 4;
+const int greenLed = 3;
+
+//variable for the switch
+const int switchPin = 2;
+
+
+void setup() {
+        //declare the LED pins as outputs
+        pinMode(redLed1, OUTPUT);
+        pinMode(redLed2, OUTPUT);
+        pinMode(greenLed, OUTPUT);
+        
+        //declare the switch pin as on input
+        pinMode(switchPin, INPUT);
+}
+
+void loop() {
+        int switchState;
+        switchState = digitalRead(switchPin);
+        if (switchState == LOW) {
+                digitalWrite(greeLed, LOW);
+                digitalWrite(redLed1, HIGH);
+                digitalWrite(redLed2, LOW);
+                
+                delay(250);
+                
+                digitalWrite(redLed1, Low);
+                digitalWrite(redLed2, HIGH);
+                delay(250);
+        } else {
+                digitalWrite(redLed1, LOW);
+                digitalWrite(redLed2, LOW);
+                digitalWrite(greenLed, HIGH);
+        }
+}
