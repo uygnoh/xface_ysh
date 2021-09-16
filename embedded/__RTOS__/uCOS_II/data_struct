@@ -1,6 +1,6 @@
-############################################################
-###                 // 任务控制块 //
-############################################################
+/*******************************************************************************
+                                 任务控制块
+*******************************************************************************/
 typedef struct os_tcb {
         OS_STK          *OSTCBStkPtr;   // Pointer to current top of stack
         
@@ -18,7 +18,7 @@ typedef struct os_tcb {
         
         // Nbr ticks to delay task or, timeout waiting for event
         INT32U           OSTCBDly;      
-        INT8U            OSTCBStat;     // Task status
+        INT8U            OSTCBStat;     // Task status 任务状态
         INT8U            OSTCBStatPend; // Task PEND status (任务请求状态)
         INT8U            OSTCBPrio;     // Task priortity (0 == 最高)
         
@@ -29,12 +29,8 @@ typedef struct os_tcb {
         OS_PRIO          OSTCBBitY;     //行位号
 
 } OS_TCB;
-
-
-
-############################################################
-###              // uCOS-II 任务状态 //
-############################################################
+                          // uCOS-II 任务状态 //
+________________________________________________________________________________
 #define OS_STAT_RDY             0x00u   //Ready to run 就绪
 #define OS_STAT_SEM             0x01u   //Pending on semaphore
 #define OS_STAT_MBOX            0x02u   //Pending on mailbox
@@ -44,37 +40,36 @@ typedef struct os_tcb {
 #define OS_STAT_FLAG            0x20u   //Pending on event flag group
 #define OS_STAT_MULTI           0x80u   //Pending on multiple events 多事件
 
-#define OS_STAT_PEND_ANY        (OS_STAT_SEM | OS_STAT_MBOX | OS_STAT_Q |   \
+#define OS_STAT_PEND_ANY        (OS_STAT_SEM | OS_STAT_MBOX | OS_STAT_Q |\
                                               OS_STAT_MUTEX | OS_STAT_FLAG)
+________________________________________________________________________________
 
 
 
-############################################################
-###          // uCOS-II 空闲链表和就绪链表 //
-############################################################
-uCOS-II将任务控制块分成两个链表来管理，这就是空闲任务链表和就绪任务链表
-其中，空闲任务链表包含了所有空闲的任务控制块。所谓空闲任务控制块，是指未
-分配给某个任务的任务控制块。创建一个新任务，前提条件就是系统里还有这样的
-空闲任务块。就绪链表则是将所有的就绪任务拴在一起，如果有新的任务就绪，就
-将任务控制块从空闲链表中取出，加入到就绪链表中。
-1 % 任务空闲链表(OSTCBFreeList)使用单向链表
-OS_EXT OS_TCB           *OSTCBFreeList; // Pointer to list of free TCBs
+/*******************************************************************************
+                            uCOS-II 空闲链表和就绪链表
+*******************************************************************************/
+uCOS-II将任务控制块分成两个链表来管理，这就是空闲任务链表和就绪任务链表其中，空闲任务链表包含了
+所有空闲的任务控制块。所谓空闲任务控制块，是指未分配给某个任务的任务控制块。创建一个新任务，前提条
+件就是系统里还有这样的空闲任务块。就绪链表则是将所有的就绪任务拴在一起，如果有新的任务就绪，就将任
+务控制块从空闲链表中取出，加入到就绪链表中。
 
-2 % 任务就绪链表(OSTCBList)使用双向链表
-OS_EXT OS_TCB           *OSTCBList      // Pointer to doubly linked list of TCBs
+1 // 任务空闲链表(OSTCBFreeList) 使用单向链表
+OS_EXT OS_TCB   *OSTCBFreeList; // Pointer to list of free TCBs
+
+2 // 任务就绪链表(OSTCBList) 使用双向链表
+OS_EXT OS_TCB   *OSTCBList      // Pointer to doubly linked list of TCBs
 
 
 
-############################################################
-###          // uCOS-II 任务控制块 //
-###      // uCOS-II 任务控制块优先级指针表 //
-############################################################
-任务优先级指针表也就是( 任务优先级指针数组 ), 在UCOS-II任务管理中频繁
-使用，代码中随处可见。它是用来获取某优先的任务的任务控制块地址。它的定义
-为：     // OS_LOWEST_PRIO为最低优先级的任务的优先级
-        OS_TCB *OSTCBPrioTbl[OS_LOWEST_PRIO + 1]
+/*******************************************************************************
+                             uCOS-II 任务控制块变量
+*******************************************************************************/
+//任务优先级指针表也就是( 任务优先级指针数组 )
+//OS_LOWEST_PRIO为最低优先级的任务的优先级
+OS_TCB *OSTCBPrioTbl[OS_LOWEST_PRIO + 1]       
 因为最低优先级的任务数值最大，而任务优先级从0开始的，所以其实
-        [OS_LOWEST_PRIO + 1]就是任务的数量。
+// [OS_LOWEST_PRIO + 1]就是任务的数量。
 指针数组(OSTCBPrioTbl)，它的每个数据元素的类型是指向任务控制块的指针
 
 1 //uCOS-II 任务控制块
@@ -85,31 +80,47 @@ OS_EXT OS_TCB    OSTCBTbl[OS_MAX_TASKS + OS_N_SYS_TASKS];
 //Table of pointers to created TCBs
 OS_EXT OS_TCB    *OSTCBPrioTbl[OS_LOWEST_PRIO + 1] 
 
-//Pointer to currently running TCB
+3 //Pointer to currently running TCB
 OS_EXT OS_TCB    *OSTCBCur;
-//Pointer to highest priority TCB R-to-R
+
+4 //Pointer to highest priority TCB R-to-R
 OS_EXT OS_TCB    *OSTCBHighRdy;
 
 
+ // uCOS-II 任务堆栈 //
+_____________________________________________________________
+所谓堆栈，就是在存储器中按数据“后进先出LIFO(Last In First Out)”的原
+则组织的连续存储空间。因此，堆栈这种数据结构最大的特点就是最后进去的最先
+出来。 % 任务堆栈的定义
+#define TASK_STK_SIZE           512
+OS_STK TaskStk[OS_MAX_TASKS][TASK_STK_SIZE];
+// OS_MAX_TASKS是用户任务的数量
+// TASK_STK_SIZE是每个任务堆栈的大小，这里设置为512
+_____________________________________________________________
 
-############################################################
-###      // EVENT CONTROL BLOCK 事件控制块 //
-############################################################
+
+
+/*******************************************************************************
+                           EVENT CONTROL BLOCK 事件控制块
+*******************************************************************************/
 #if OS_LOWEST_PRIO <= 63u
 typedef INT8U           OS_PRIO
 #else
 typedef INT16U          OS_PRIO
 #endif
 
-
 #if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
 typedef struct OS_EVENT {
-        INT8U    OSEventType; //用来表示事件控制块的类型
-        void    *OSEventPtr; //它是用来指向消息或队列的结构体
-        INT16U   OSEventCnt; //这个事件计数器是针对信号量的计数(对其它的事件不起作用)
+        INT8U    OSEventType; //事件类型
+        void    *OSEventPtr;  //它是用来指向消息或队列的结构体
+        INT16U   OSEventCnt;  //这个事件计数器是针对信号量的计数(对其它的事件不起作用)
         
-        //事件就绪组，事件就绪表
+        //事件就绪组，事件就绪表( 用于任务和事件之间登记 )
+        //使用就绪组和就绪表这种数据结构，表示所有的任务都可以关注这个事件
+        //“1”个事件对应一个就绪组和就绪表， 而任务的就绪组和就绪表是唯一的
+        //Group corresponding to tasks waiting for event to occur
         OS_PRIO  OSEventGrp;
+        //List of tasks waiting for event to occur
         OS_PRIO  OSEventTbl[OS_EVENT_TBL_SIZE];
 
         #if OS_EVENT_NAME_EN > 0u
@@ -119,19 +130,21 @@ typedef struct OS_EVENT {
 #endif
 
 
-1 // uCOS-II 事件类型 -----------------------------
+            // uCOS-II 事件类型 //
+___________________________________________________
 #define OS_EVENT_TYPE_UNUSED    0u      //没有使用
 #define OS_EVENT_TYPE_MBOX      1u      //消息邮箱
 #define OS_EVENT_TYPE_Q         2u      //消息队列
 #define OS_EVENT_TYPE_SEM       3u      //信号量
 #define OS_EVENT_TYPE_MUTEX     4u      //互斥信号量
 #define OS_EVENT_TYPE_FLAG      5u      //事件标志
+___________________________________________________
 
 
 
-############################################################
-### // 信号量数据结构 //
-############################################################
+/*******************************************************************************
+                           信号量数据结构
+*******************************************************************************/
 typedef struct os_sem_data {
         INT16U  OSCnt;                          //信号量数量
         OS_PRIO OSEvnetTbl[OS_EVENT_TBL_SIZE];  //事件就绪表
@@ -140,10 +153,9 @@ typedef struct os_sem_data {
 
 
 
-
-############################################################
-###                  // 事件标志控制块 //
-############################################################
+/*******************************************************************************
+                                事件标组志控制块
+*******************************************************************************/
 #if OS_FLAGS_NBITS == 8u
         typedef INT8U OS_FLAGS;
 #endif
@@ -189,22 +201,13 @@ typedef struct os_flag_node {
 
 
 
-############################################################
-### // uCOS-II 任务堆栈 //
-############################################################
-所谓堆栈，就是在存储器中按数据“后进先出LIFO(Last In First Out)”的原
-则组织的连续存储空间。因此，堆栈这种数据结构最大的特点就是最后进去的最先
-出来。 % 任务堆栈的定义
-#define TASK_STK_SIZE           512
-OS_STK TaskStk[OS_MAX_TASKS][TASK_STK_SIZE];
-// OS_MAX_TASKS是用户任务的数量
-// TASK_STK_SIZE是每个任务堆栈的大小，这里设置为512
 
 
 
-############################################################
-### // uCOS-II os_core.c 任务优先级判定表 //
-############################################################
+
+/*******************************************************************************
+                       uCOS-II os_core.c 任务优先级判定表
+*******************************************************************************/
 INT8U  const  OSUnMapTbl[256] = {
 0u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, 3u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, /* 0x00 to 0x0F                   */
 4u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, 3u, 0u, 1u, 0u, 2u, 0u, 1u, 0u, /* 0x10 to 0x1F                   */
@@ -237,10 +240,10 @@ OSPrioHighRdy = (INT8U)((y << 3) + OSUnMapTbl[OSRdyTbl[y]]);
 
 
 
-############################################################
-### //  uCOS-II 任务就绪表和就绪组 //
-############################################################
-% 任务就绪表和任务就绪组定义
+/*******************************************************************************
+                       uCOS-II 任务就绪表和就绪组
+*******************************************************************************/
+//任务就绪表和任务就绪组定义
 __________________________________________________________
 typedef unsigned char INT8U;
 #define OS_RDY_TBL_SIZE         ((OS_LOWEST_PRIO) / 8 + 1)
