@@ -7,8 +7,10 @@
 需求。 不同于软件模拟，PIO并不会占用内核时间，因为每个PIO都有4个独立的“状态机”，可以实现超高速且
 可编程的输入输出。 “状态机”可以理解为一个极简的内核，只能用于处理特定的指令实现特定的功能。
 
+
 //RP2040有两个PIO块，每个块都有四个状态机和指令寄存器组成。 它位可以独立地执行顺序程序来操作
 //GPIO和传输数据，与通用处理器不同，PIO状态机高度专注于IO控制和精确的时钟控制。
+
 
 //每个状态机都配置了一个32位的PC寄存器，用于指向正在执行的指令地址
 //两个32位移位寄存器（ISR和OSR）， ISR->RXFIFO(数据输入)   OSR->TXFIFO(数据输出)
@@ -78,14 +80,15 @@ again:
         set pins, 1 [1] ;//Drive pin high ang then delay for one cycle
         set pins, 0     ;//Drive pin low
         jmp again       ;//Set PC to label 'again'
+
         
 //将一个引脚设置为输出并循环输出占空比为50%，且周期为4个时钟周期的方波
 //当程序运行到.wrap时，程序将会返回到.wrap_target并运行，与前一个程序
 //的区别，就不需要使用jmp指令进行跳转，可以节省一个指令
         set pindirs, 1  ;//Set pin to output
 .wrap_target
-        set pins, 1 [1] ;Drive pin high and then delay for one cycle
-        set pins, 0 [1] ;Drive pin low and then delay for one cycle
+        set pins, 1 [1] ;//Drive pin high and then delay for one cycle
+        set pins, 0 [1] ;//Drive pin low and then delay for one cycle
 .wrap
 
 
@@ -241,8 +244,9 @@ ___________________________________________________________
 1 程序定义，包括使用了多少个引脚，使用到的引脚都可以使用装饰器完成
 2 程序设置，设置状态机的频率，将引脚映射绑定到某一个引脚并指定一个状态机来运行特定的程序
 
+
 //@asm_pio装饰器
-装饰器的本质是一个函数， 站其它函数不需要任何代码上的改动的前提下，添加额外的功能
+//装饰器的本质是一个函数， 站其它函数不需要任何代码上的改动的前提下，添加额外的功能
 @asm_pio(
         out_init=None,          //输出引脚初始化(rp.PIO.OUT_HIGH rp.PIO.OUT_LOW)
         set_init=None,          //设置引脚初始化(rp.PIO.OUT_HIGH rp.PIO.OUT_LOW)
@@ -252,10 +256,12 @@ ___________________________________________________________
                                 则OSR的低位先时行输出，若向左移动则高位先时行输出
         out_shiftdir=0,         //数据输出方向(PIO.SHIFT_LEFT)
                                 则OSR的高位先进行输出，若向右移动则低位先时行输出
-        autopush=False,         //
-        autopull=False,         //
-        push_thresh=32,         //
-        pull_thresh=32,         //
+                                
+        autopush=False,         //自动推送
+        autopull=False,         //自动拉取
+        push_thresh=32,         //推送阈值
+        pull_thresh=32,         //拉取阈值
+        
         fifo_join=0             //
 )
 
@@ -317,6 +323,10 @@ import time
 form machine import Pin
 improt rp2
 
+max_lum = 100
+r=0
+g=0
+b=0
 
 //通过adm_pio装饰器初始化PIO
 //初始化了侧置引脚, 因为这里只有一个初始化信息，说明侧置引脚的数量为“1”
@@ -344,9 +354,34 @@ def ws2812()
         wrap()          //程序包装结束
         
         
-        
+//状态机初始化
 sm = rp2.StateMachine(0, ws2812, freq=8_000_000, sideset_base=Pin(4))
 //打开状态机
 sm.active(1)       
+
+//在循环中，我们不断的改变RGB数值，并通过sm.put()函数将数值传输给TXFIFO
+//TXFIFO会自动被状态机拉取到OSR寄存器中，并执行WS2812驱动程序实现不同颜色的呼吸灯
+while (Ture)
+        for i in range(0, max_lum):
+                r=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)
         
-wh  
+        for i in range(0, max_lum):
+                g=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)
+        
+        for i in range(0, max_lum):
+                b=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)
