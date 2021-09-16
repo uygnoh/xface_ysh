@@ -1,41 +1,33 @@
-//set up global variables
-//a single "=" sets the value of the variable
-
-//variables for the LEDs
-const int redLed1  = 5;
-const int redLed2  = 4;
-const int greenLed = 3;
-
-//variable for the switch
-const int switchPin = 2;
+const int LED_RED    = 5;
+const int LED_GREEN  = 4;
+const int LED_BLUE   = 3;
+const int IN_PIN_2   = 2;
 
 
 void setup() {
-        //declare the LED pins as outputs
-        pinMode(redLed1, OUTPUT);
-        pinMode(redLed2, OUTPUT);
-        pinMode(greenLed, OUTPUT);
-        
-        //declare the switch pin as on input
-        pinMode(switchPin, INPUT);
+        //GPIO输出引脚配置
+        pinMode(LED_RED,   OUTPUT);
+        pinMode(LED_GREEN, OUTPUT);
+        pinMode(LED_BLUE,  OUTPUT);
+        //GPIO输入引脚配置
+        pinMode(IN_PIN_2,  INPUT);
 }
 
 void loop() {
-        int switchState;
-        switchState = digitalRead(switchPin);
-        if (switchState == LOW) {
-                digitalWrite(greeLed, LOW);
-                digitalWrite(redLed1, HIGH);
-                digitalWrite(redLed2, LOW);
-                
+        int switch_state;
+        //读取GPIO_Pin2状态
+        switch_state = digitalRead(IN_PIN_2);
+        if (switch_state == LOW) {
+                digitalWrite(LED_RED,   LOW);
+                digitalWrite(LED_GREEN, HIGH);
+                digitalWrite(LED_BLUE,  LOW);
                 delay(250);
-                
-                digitalWrite(redLed1, Low);
-                digitalWrite(redLed2, HIGH);
+                digitalWrite(GREEN, Low);
+                digitalWrite(BLUE,  HIGH);
                 delay(250);
         } else {
-                digitalWrite(redLed1, LOW);
-                digitalWrite(redLed2, LOW);
-                digitalWrite(greenLed, HIGH);
+                digitalWrite(LED_RED,   LOW);
+                digitalWrite(LED_GREEN, HIGH);
+                digitalWrite(LED_BLUE,  LOW);
         }
 }
