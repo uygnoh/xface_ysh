@@ -13,6 +13,7 @@ _________________________________________
 // Rd = k
 // where 16 <= d <= 31,  0 <= k <=255
 
+
 // Instruction - ADD
 // add and store values in the general purpose register
 _________________________________________
@@ -20,6 +21,7 @@ _________________________________________
 |_______________________________________|
 // Rd = Rd + Rs
 // where 0 <= d <= 31,  0 <= s <=255
+
 
 // Instruction - SUB
 // subtract and store values in the general purpose register
@@ -29,6 +31,7 @@ _________________________________________
 // Rd = Rd - Rs
 // where 0 <= d <= 31,  0 <= s <=255
 
+
 // Instruction - INC
 // increment teh contents of a register by one
 _________________________________________
@@ -36,7 +39,6 @@ _________________________________________
 |_______________________________________|
 // Rd = Rd + 1
 // where 0 <= d <= 31
-
 
 
 //Accessing I/O Register  IN & OUT
@@ -48,6 +50,7 @@ _________________________________________
 |_______________________________________|
 // Rd = A
 // where 0 <= d <= 31, A is the name of an I/O register
+
 
 // Instruction - OUT
 // store the reading from a GPR to an I/O register
