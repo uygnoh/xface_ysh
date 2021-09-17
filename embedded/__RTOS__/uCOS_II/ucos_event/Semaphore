@@ -1,6 +1,7 @@
 /*******************************************************************************
-                               信号量的创建
+                                  信号量的创建
 *******************************************************************************/
+//cnt 表示创建信号量的最大个数
 OS_EVENT *OSSemCreate(INT16U cnt)
 {
         OS_EVENT *pevent;
@@ -33,7 +34,7 @@ OS_EVENT *OSSemCreate(INT16U cnt)
                 pevent->OSEvnetPtr      = (void *)0;
         
                 #if OS_EVENT_NAME_EN > 0u
-                pevent->OSEventName             = (INT8U *)(void *)"?";
+                pevent->OSEventName     = (INT8U *)(void *)"?";
                 #endif 
                 
                 OS_EventWaitListInit(pevent);
@@ -44,7 +45,7 @@ OS_EVENT *OSSemCreate(INT16U cnt)
 
 
 /*******************************************************************************
-                               信号量请求
+                                 信号量申请
 *******************************************************************************/
 void OSSemPend(
         OS_EVENT        *pevent,        
@@ -93,7 +94,7 @@ void OSSemPend(
                 *perr = OS_ERR_NONE;
                 return;
         }
-        
+        //没有可用的信号量资源
         OSTCBCur->OSTCBStat     |= OS_STAT_SEM;
         OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
         OSTCBCur->OSTCBDly       = timeout;
@@ -116,9 +117,9 @@ void OSSemPend(
                 *perr = OS_ERR_TIMEOUT;
                 break;
         }
-        OSTCBCur->OSTCBStat     = OS_STAT_RDY;
-        OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
-        OSTCBCur->OSTCBEventPtr = (OS_EVENT *)0;
+        OSTCBCur->OSTCBStat     = OS_STAT_RDY;  //Set task statuc to ready
+        OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;//clear pend status
+        OSTCBCur->OSTCBEventPtr = (OS_EVENT *)0;//clear event pointers
         
         #if (OS_EVETNT_MULTI_EN > 0u)
         OSTCBCur->OSTCBEventMultiPtr = (OS_EVENT **)0;
@@ -129,7 +130,7 @@ void OSSemPend(
 
 
 /*******************************************************************************
-                               信号量归还
+                                  信号量归还
 *******************************************************************************/
 INT8U OSSemPost(OS_EVENT *pevent)
 {
@@ -145,8 +146,14 @@ INT8U OSSemPost(OS_EVENT *pevent)
         if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {
                 return (OS_ERR_EVENT_TYPE);
         }
+        
+        
         OS_ENTER_CRITICAL();
+        //事件控制块的指针所指向的事件就绪组 != 0, 
+        //说明当前还有任务在申请你要还的那个信号量
+        //See if any task waiting for semaphore
         if (pevent->OSEventGrp != 0) {
+                //系统中可能有多个任务在申请这个信号量，找最高优先级的任务，让它就绪
                 (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_OK);
                 OS_EXIT_CRITICAL();
                 OS_Sched();
@@ -164,40 +171,48 @@ INT8U OSSemPost(OS_EVENT *pevent)
 
 
 /*******************************************************************************
-                               信号量删除
+                                   信号量删除
+opt: Possible values for 'opt' argument of OSSemDel(), OSMboxDel(), OSQdel(), OSMutexDel()
+        OS_DEL_NO_PEND :只有在没有任务等待这个信号量的时候，才进行删除操作
+        OS_DEL_ALWAYS  :不管有没有任务在申请这个信号量，直接删除
+ 
 *******************************************************************************/
 OS_EVENT *OSSemDel(
         OS_EVENT        *pevent,
         INT8U            opt,
         INT8U           *perr)
 {
+        //
         #if OS_CRITICAL_METHOD == 3u
         OS_CPU_SR cpu_sr = 0u
         #endif
-        
+        //安全检查
         #ifdef OS_SAFETY_CRITICAL
         if (perr == (INT8U *)0) {
                 OS_SAFETY_CRITICAL_EXCEPTION();
         }
         #endif
-        
+        //参数检查
         #if OS_ARG_CHK_EN > 0u
         if (pevent == (OS_EVENT *)0) {
                 *perr = OS_ERR_PEVENT_NULL;
                 return (pevent);
         }
         #endif
-        
+        //事件类型是否为信号量
         if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {
                 *perr = OS_ERR_PEVENT_TYPE;
                 return (pevent);
         }
+        //在中断程序中不允许删除
         if (OSIntNesting > 0u) {
                 *perr = OS_ERR_DEL_ISR;
                 return (pevent);
         }
-        OS_ENTER_CRITICAL();
         
+        OS_ENTER_CRITICAL();
+        //判断当前有没有任务在申请这个信号量
+        //如果有的话中 tasks_waiting = OS_TRUE;
         if (pevent->OSEventGrp != 0) {
                 tasks_waiting = OS_TRUE;
         } else {
@@ -206,12 +221,13 @@ OS_EVENT *OSSemDel(
         
         switch (opt) {
         case OS_DEL_NO_PEND:
-                //只有任务在没有申请信号量的情况下，才删除操作
+                //如果没有任务在申请信号量的情况下，才删除操作
                 if (tasks_waiting == OS_FALSE) {
                 
                 #if OS_EVENT_NAME_EN > 0u
                         pevent->OSEventType     = (INT8U *)(void *)"?";
                 #endif
+                        //归还事件控制块
                         pevent->OSEventType     = OS_EVENT_TYPE_UNUSED;
                         pevent->OSEventPtr      = OSEventFreeList;
                         pevent->OSEventCnt      = 0u;
@@ -219,21 +235,24 @@ OS_EVENT *OSSemDel(
                         OS_EXIT_CRITICAL();
                         *perr                   = OS_ERR_NONE;
                         pevent_return           = (OS_EVENT *)0;
+                //否则，表明有任务在等待这个信号量，就不删除这个信号量
                 } else {
                         OS_EXIt_CRITICAL();
                         *perr                   = OS_ERR_TASK_WAITING;
                         pevnet_return           = pevent;
                 }
                 break;
-        case OS_DEL_ALWAYS:
-                while (pevent->OSEventGrp != 0) {
-                        //解除任务与事件的关系
+        //不管有没有任务在等待信号量，都删除
+        case OS_DEL_ALWAYS:                      //Always delete the semaphore
+                while (pevent->OSEventGrp != 0) {//Ready ALL tasks waiting for semaphore
+                        //解除任务与事件的关系，单向解除事件那方面的关系，任务方面没有解除
+                        //让所有申请这个信号量的任务，让它处于就绪态
                         (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_OK);
                 }
                 #if OS_EVENT_NAME_EN > 0u
                 pevent->OSEventType     = (INT8U *)(void *)"?";
                 #endif
-                
+                //归还事件控制块
                 pevnet->OSEventType     = OS_EVENT_TYPE_UNUSED;
                 pevent->OSEventPtr      = OSEventFreeList;
                 pevent->OSEventCnt      = 0u;
@@ -258,15 +277,17 @@ OS_EVENT *OSSemDel(
 
 
 /*******************************************************************************
-###            // OSSemAccept()//
+                         OSSemAccept() 
 ### // 检查这个信号量对应的那个资源是否可用 //
 ### // 或者这个信号量对应的那个事件是否发生 //
 *******************************************************************************/
-//如果申请的这个信号量不可用，那么往下走，也就是说这个函数所申请的信号量
-//是可有可无的。这个函数不影响程序向下执行。它不会发生任务的切换。
+OSSemAccept()   //可能申请信号量，可以申请消息邮箱
+如果申请的这个信号量可用，那么直接用就好了，如果申请的这个信号量不可用，那么往下走，
+也就是说这个函数所申请的信号量是可有可无的。这个函数不影响程序向下执行。它不会发生任务的切换。
 return: 
         >  0 申请到了
         == 0 没有申请到
+
 
 #if OS_SEM_ACCEPT_EN > 0u
 INT16U OSSemAccept(OS_EVNET *pevent)
@@ -287,8 +308,8 @@ INT16U OSSemAccept(OS_EVNET *pevent)
         }
         OS_ENTER_CRITICAL();
         cnt = pevnet->OSEventCnt;
-        if (cnt > 0u) {
-                pevnet->OSEventCnt--;
+        if (cnt > 0u) {                 //如果这个信号量大于0
+                pevnet->OSEventCnt--;   //那我取一个就好了
         }
         OS_EXIT_CRITICAL();
         return (cnt);
@@ -298,8 +319,9 @@ INT16U OSSemAccept(OS_EVNET *pevent)
 
 
 /*******************************************************************************
-                               OSSEMPendAbort()
+                               OSSemPendAbort()
 *******************************************************************************/
+//这个函数强制终止这个信号量
 INT8U OSSemPendAbort(
         OS_EVENT        *pevent,
         INT8U            opt,
@@ -335,13 +357,14 @@ INT8U OSSemPendAbort(
                 case OS_PEND_OPT_BROADCAST:     //广播模式
                         while (pevent->OSEventGrp != 0u) {
                                 //它只在事件那里和信号量解除
-                                (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
+                                (void)OS_EventTaskRdy(
+                                        pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
                                 nbr_tasks++;
                         }
                         break;
                 case OS_PEND_OPT_NONE:          //单播模式
                 default:
-                        //它只在事件那里和信号量解除
+                        //它只在事件那里和信号量解除， 只执行一次
                         (void)OS_EvnetTaskRdy(pevnet, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
                         nbr_tasks++;
                         break;
@@ -351,9 +374,11 @@ INT8U OSSemPendAbort(
                 *perr = OS_ERR_PEND_ABORT:
                 return (nbr_tasks);
        }
+       
+       //没有任务在申请这个信号量, 强制这种关系解除没有意义
        OS_EXIT_CRITICAL();
        *perr = OS_ERR_NONE;
-       return (0u); //没有任务在申请这个信号量
+       return (0u); 
 }
 
 
@@ -436,4 +461,3 @@ void OSSemSet(OS_EVENT *pevent, INT16 cnt, INT8U *perr)
         }
         OS_EXIT_CRITICAL();
 }
-

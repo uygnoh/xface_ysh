@@ -2,7 +2,7 @@
                               OS_FlagInit()
 *******************************************************************************/
 //构建一个数组形式的单链表结构，相当于任务中的空闲链表
-void OS_Init(void)
+void OS_FlagInit(void)
 {
         #if OS_MAX_FLAGS == 1u
         OSFlagFreeList                 = (OS_FLAG_GRP *)&OSFlagTbl[0];
@@ -150,16 +150,3 @@ static void OS_FlagBlock(
                 OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
         }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
