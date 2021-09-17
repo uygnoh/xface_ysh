@@ -1,0 +1,452 @@
+/*******************************************************************************
+                               互斥信号量的创建
+*******************************************************************************/
+OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
+{
+        OS_EVENT *pevent;
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0u
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL_IEC61508
+        if (OSSafetyCriticalStartFlag == OS_TRUE) {
+                OS_SAFETY_CRITICAL_EXCEPTiON();
+        }
+        #endif
+        
+        #if OS_ARG_CHK_EN > 0u
+        if (prio >= OS_LOWEST_PRIO) {   //Vlidate PIP进程继承优先级
+                *perr = OS_ERR_PRIO_INVALID;
+                return ((OS_EVENT *)0);
+        }
+        #endif
+        if (OSIntNesting > 0u) {
+                *perr = OS_ERR_CREATE_ISR;
+                return ((OS_EVENT *)0);
+        }
+        
+        OS_ENTER_CRITICAL();
+        
+        //prirority inheritance priority (PIP), 为了防止优先级反转
+        //如果OSTCBPrioTbl[prio]不为“0”，表示这个优先级一定存在，那么返回
+        if (OSTCBPrioTbl[prio] != (OS_TCB *)0) {
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_PRIO_EXIST;
+                return ((OS_EVENT *)0);
+        }
+        //OS_TCB_RESERVED先占个位置
+        OSTCBPrioTbl[prio] = OS_TCB_RESERVED;
+        pevent             = OSEventFreeList;
+        //判断事件空闲链表是否为空
+        if (pevent == (OS_EVENT *)0) {
+                OSTCBPrioTbl[prio] = (OS_TCB *)0;
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_PEVENT_NULL;
+                retun (pevent);
+        }
+        
+        //从事件控制块的空闲链表中摘一个TCB
+        OSEventFreeList     = (OS_EVENT *)OSEventFreeList->OSEvetPtr;
+        OS_EXIT_CRITICAL();
+        pevent->OSevnetType = OS_EVENT_TYPE_MUTEX;
+        pevent->OSEvnetCnt  = (INT16U)((INT16U)prio << 8u) | OS_MULTEX_AVAILABLE;
+        pevent->OSEventPtr  = (void *)0;
+        #if OS_EVENT_NAME_EN > 0u
+        pevent->OSEvnetName = (INT8U *)(void *)"?";
+        #endif
+        
+        //初始化事件控制块的就绪表和就绪组
+        OS_EventWaitListInit(pevnet);
+        *perr               = OS_ERR_NONE;
+        return (pevent);
+}
+
+
+
+/*******************************************************************************
+                               互斥信号量的申请
+*******************************************************************************/
+#define OS_MUTEX_KEEP_UPPER_8   ((INT16U)0xFF00u) //存放进程提升优先级
+#define OS_MUTEX_KEEP_LOWER_8   ((INT16U)0x00FFu) //
+
+#define OS_MUTEX_AVAILABLE      ((INT16U)0x00FFu)
+
+
+void OSMutexPend(
+        OS_EVENT   *pevent,
+        INT32U      timeout,
+        INT8U      *perr)
+{
+        INT8U            pip;   //Priority Inheritance Priority (PIP)
+        INT8U            mprio; //Mutex owner priority
+        BOOlEAN          rdy;   //Flag indicating task was ready
+        OS_TCB          *ptcb;
+        OS_EVENT        *pevent2;
+        INT8U            y;
+        
+        #if OS_CRITICAL_METHOD == 3
+        OS_CPU_SR cpu_sr = 0;
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL()
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTiON():
+        }
+        #endif
+        
+        #if OS_ARG_CHK_EN > 0u
+        if (pevent == (OS_EVENT *)0) {
+                *perr = OS_ERR_PVENT_NULL;
+                return;
+        }
+        #endif
+        
+        if (pevent->OSEVentType != OS_EVENT_TYPE_MUTEX) {
+                *perr = OS_ERR_EVENT_TYPE;
+                return;
+        }
+        if (OSIntNesting > 0u) {
+                *perr = OS_ERR_PEND_ISR;
+                return;
+        }
+        if (OSLockNesting > 0u) {
+                *perr = OS_ERR_PEND_LOCKED;
+                return;
+        }
+        
+        OS_ENTER_CRITICAL();
+        //高8位存放进程提升优先级
+        pip = (INT8U)(pevent->OSEventCnt >> 8u); //Get PIP from mutex
+        
+        //把高8位去掉，低8位留下。互斥信号量在系统中只能有一个。
+        if ((INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8) == OS_MUTEX_AVAILABLE) {
+                pevnet->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8; //Yes, Acquire the resource
+                //高8位存放PIP，低8位保存当前正在运行任务的优先级号码。
+                pevent->OSEventCnt |= OSTCBCur->OSTCBPrio;   //Save priority of owning task
+                //在这个事件控制块作登记，登记它所对应的那个任务的TCB的指针。
+                pevent->OSEventPtr  = (void *)OSTCBCur;
+                if (OSTCBCur->OSTCBPrio <= pip) {
+                        OS_EXIT_CRITICAL();
+                        *perr = OS_ERR_PIP_LOWER;
+                } else {
+                        OS_EXIT_CRITICAL();
+                        *perr = OS_ERR_NONE;
+                }
+                return;
+        }
+        
+        
+        // NO, Get priority of mutex owner
+        mprio = (INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8);
+        ptcb  = (OS_TCB *)(pevnet->OSEvnetPtr);
+        
+        
+        //防止优先级反转，需要用优先级提升
+        if (ptcb->OSTCBPrio > pip) {
+                if (mprio > OSTCBCur->OSTCBPrio) {
+                        y = ptcb->OSTCBY;
+                        //如果在就绪态的话
+                        //操作的是任务的就绪表和就绪组
+                        if ((OSRdyTbl[y] & ptcb->OSTCBBitX) != 0u) {
+                        //See if mutex owner iready? Yes, Remove owner form rdy...
+                                OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitx;
+                                if (OSRdyTbl[y] == 0u) {
+                                        OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                                }
+                                rdy = OS_TRUE;
+                        //如果在阻塞态的话
+                        //操作的是事件的就绪表和就绪组
+                        } else {
+                                pevent2 = ptcb->OSTCBEventPtr;
+                                if (pevent2 != (OS_EVENT *)0) { //Remove form event wait list
+                                        y = ptcb->OSTCBY;
+                                        pevnet2->OSEventTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;
+                                        if (pevnet2->OSEventTbl[y] == 0u) {
+                                                pevent2->OSEventGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
+                                        }
+                                }
+                                rdy = OS_FALSE;
+                        }
+                        
+                        //进行优先级提升，把持有这个互斥信号量的这个任务优先级改掉
+                        //Change owner tsk prio to PIP
+                        ptcb->OSTCBPrio = pip;
+                        
+                        #if OS_LOWEST_PRIO <= 63u
+                        ptcb->OSTCBY    = (INT8)(ptcb->OSTCBPrio >> 3u);
+                        ptcb->OSTCBX    = (INT8)(ptcb->OSTCBPrio & 0x07u);
+                        #endif
+                        
+                        ptcb->OSTCBBity = (OS_PRIO)(1uL << ptcb->OSTCBY);
+                        ptcb->OSTCBBitX = (OS_PRiO)(1ul << ptcb->OSTCBX);
+                        
+                        
+                        //使用新的优先级进行登记
+                        if (rdy == OS_TRUE) {
+                                OSRdyGrp               |= ptcb->OSTCBBitY;
+                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                        //Add to event wait list
+                        } else {
+                                pevent2 = ptcb->OSTCBEventPtr;
+                                if (pevent2 != (OS_EVENT *)0) {
+                                        pevent2->OSEventGrp               |= ptcb->OSTCBBitY;
+                                        pevent2->OSEventTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                                }
+                        }
+                        
+                        //把持有互斥信号量的任务，优先级号码进行优先级提升
+                        OSTCBPrioTbl[pip] = ptcb;
+                }
+        }
+        OSTCBCru->OSTCBStat     |= OS_STAT_MUTEX;
+        OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
+        OSTCBCur->OSTCBDly       = timeout;
+        OS_EventTaskWait(pevent);
+        OS_EXIT_CRITICAL();
+        OS_Sched();
+        OS_ENTER_CRITAL();
+        switch (OSTCBCur->OSTCBStatPend) {
+        case OS_STAT_PEND_OK:
+                *perr = OS_ERR_NONE;
+                break;
+        case OS_STAT_PEND_ABORT:
+                *perr = OS_ERR_PEND_ABORT;
+                break;
+        case OS_STAT_PEND_TO:
+        default:
+                OS_EventTaskRemove(OSTCBCur, pevent);
+                *perr = OS_ERR_TIMEOUT;
+                break;
+        }
+        OSTCBCur->OSTCBStat     = OST_STAT_RDY;
+        OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
+        OSTCBCur->OSTCBEventPtr = (OS_EVENT *)0;
+        
+        #if (OS_EVENT_MULTI_EN > 0)
+        OSTCBCur->OSTCBEventmultiPtr = (OS_EVENT **)0;
+        #endif
+        
+        OS_EXIT_CRITICAL();
+}
+
+
+
+/*******************************************************************************
+                               互斥信号量的释放
+*******************************************************************************/
+INT8U OSMutexPost(OS_EVENT *pevnet)
+{
+        INT8U pip;
+        INT8U prio;
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0;
+        #endif
+        
+        if (OSIntNesting > 0u) {
+                return (OS_ERR_POST_ISR);
+        }
+        #if OS_ARG_CHK_EN > 0u) 
+        if (pevent == (OS_EVENT *)0) {
+                return (OS_ERR_PEVENT_NULL;
+        }
+        #endif
+        if (pevent->OSEvnetType != OS_EVENT_TYPE_MUTEX) {
+                return (OS_ERR_EVENT_TYPE);
+        }
+        
+        
+        OS_ENTER_CRITICAL();
+        //Get priority inheritance priority of mutex
+        pip  = (INT8U)(pevent->OSEventCnt >> 8u);
+        //Get owner's original priority
+        prio = (INT8U_(Pevent->OSEvnetCnt & OS_MUTEX_KEEP_LOWER_8);
+        
+        //See if posting task owns the MUTEX
+        //如果当前任务没有持有互斥信号量，就不能删除它，因为系统中只有一个互斥信号量。
+        if (OSTCBCur != (OS_TCB *)pevent->OSEventPtr) {
+                OS_EXIT_CRITICAL();
+                return (OS_ERR_NOT_MUTEX_OWNER);
+        }
+        //Dif we have to raise current task's priority?
+        //Rsstore the task's original priority
+        if (OSTCBCur->OSTCBPrio == pip) {
+                OSMutex_RdyAtPrio(OSTCBCur, prio);
+        }
+        OSTCBPrioTbl[pip] = OS_TCB_RESERVED;
+        
+        //如果系统中还有任务需要这个互斥信号量
+        if (pevent->OSEventGrp != 0u) {
+                prio    = OS_EventTaskRdy(pevent, (void *)0, OS_STAT_MUTEX, OS_STAT_PEND_OK);
+                pevnet->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8;
+                pevnet->OSEventCnt |= prio;
+                pevnet->OSEventPtr  = OSTCBPrioTbl[prio];
+                if (prio <= pip) {
+                        OS_EXIT_CRITICAL();
+                        OS_Sched();
+                        return (OS_ERR_PIP_LOWER);
+                } else {
+                        OS_EXIT_CRITICAL();
+                        OS_Sched();
+                        return (OS_ERR_NONE);
+                }
+        }
+        //NO, 系统中没有任务在等待互斥信号量
+        pevnet->OSEVentCnt |= OS_MUTEX_AVAILABLE;
+        pevent->OSEvntPtr   = (void *)0;
+        OS_EXIT_CRITICAL();
+        return (OS_ERR_NONE);
+}
+
+
+
+/*******************************************************************************
+                                
+*******************************************************************************/
+ // 持有互斥信号量的那个任务，让它回到原来的优先级继续运行 //
+
+static void OSMutex_RdyAtPrio(OS_TCB *pcb, INT8U prio)
+{
+        INT8U   y;
+        
+        y            = ptcb->OSTCBY;
+        OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitX;
+        if (OSRdyTbl[y] == 0) {
+                OSRdyGrp &= (OS_PRIO)~ptcb->OsTCBBitY;
+        }
+        ptcb->OSTCBPrio = prio;
+        OSPrioCur       = prio;
+        #if OS_LOWEST_PRIO <= 63
+        ptcb->OSTCBY    = (INT8U)((INT8U)(prio >> 3u) & 0x07u);
+        ptcb->OSTCBX    = (INT8U)(prio & 0x07u);
+        #endif
+        
+        ptcb->OSTCBBitY         = (OS_PRIO)(1uL << ptcb->OSTCBY);
+        ptcb->OSTCBBitX         = (OS_PRIO)(1uL << ptcb->OSTCBX);
+        OSRdyGrp               |= (ptcb->OSTCBBitY;
+        OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitY;
+        OSTCBPrioTbl[prio]      = ptcb;
+}
+
+
+
+/*******************************************************************************
+                                互斥信号量的删除
+*******************************************************************************/
+OS_EVENT *OSMutexDel(
+        OS_EVENT        *pevent,
+        INT8U            opt,
+        INT8U           *perr)
+{
+        BOOLEAN         tasks_waiting;
+        OS_EVENT       *pevnet_return;
+        INT8U           pip;
+        INT8U           prio;
+        OS_TCB         *ptcb;
+        
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0;
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        
+        #if OS_ARG_CH_EN > 0u
+        if (pevent == (OS_EVENT *)0) {
+                *perr = OS_ERR_PEVENT_NULL;
+                return (peventt);
+        }
+        #endif
+         
+        if (pevnet->OSEventType != OS_EVENT_TYPE_MUTEX) {
+                *perr = OS_ERR_EVENT_TYPE;
+                return (pevent);
+        }
+        if (OSIntNesting > 0u) {
+                *perr = OS_ERR_DEL_ISR;
+                return (pevent);
+        }
+        
+        OS_ENTER_CRITICAL();
+        if (pevent->OSEventGrp != 0u) {
+                tasks_waiting = OS_TRUE;
+        } else {
+                tasks_waiting = OS_FALSE;
+        }
+        
+        switch (opt) {
+        //当没有任务在申请互斥信号量的时候，再作删除
+        case OS_DEL_NO_PEND:
+                //没有任务在等待这个互斥信号量，才删除
+                if (tasks_waiting == OS_FALSE) {
+                        #if OS_EVENT_NAME_EN > 0u
+                        pevent->OSEventName = (INT8U *)(void *)"?";
+                        #endif
+                        
+                        //释放互斥信号量
+                        pip                 = (INT8U)(pevent->OSEventCnt >> 8u);
+                        OSTCBPrioTbl[pip]   = (OS_TCB *)0;
+                        pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+                        
+                        //插入到事件空闲链表的头部
+                        pevent->OSEventPtr  = OSEventFreeList;
+                        pevent->OSEventCnt  = 0u;
+                        pevent->OSEventFreeList = pevent;
+                        
+                        OS_EXIT_CRITICAL();
+                        *perr               = OS_ERR_NONE;
+                        pevent_return       = (OS_EVENT *)0;
+                } else {
+                        OS_EXIT_CRITICAL();
+                        *perr               = OS_ERR_TASK_WAITING;
+                        pevent_return       = pevent;
+                }
+                break;
+        //不管有没有任务在申请互斥信号量，我都作删除        
+        case OS_DEL_ALWAYS:
+                pip  = (INT8U)(pevnet->OSEventCnt >> 8u);
+                prio = (INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8);
+                ptcb = (OS_TCB *)pevent->OSEvnetPtr;
+                if (ptcb != (OS_TCB *)0) {
+                        if (ptcb->OSTCBPrio == pip) {
+                                //重新回到自己的优先级
+                                OSMutex_RdyAtPrio(ptcb, prio);
+                        }
+                }
+                //让持有互斥信号量的任务都就绪，因为互斥信号量就要删除了。
+                while (pevent->OSEventGrp != 0u) {
+                        (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_MUTEX, OS_STAT_PEND_OK);
+                }
+                #if OS_EVENT_NAME_EN > 0u
+                pevent->OSEvetnName = (INT8U *)(void *)"?";
+                #endif
+                pip = (INT8U)(pevent->OSEventCnt >> 8u);
+                OSTCBPrioTbl[pip]   = (OS_tCB *)0;
+                pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+                pevnet->OSEventPtr  = OSEventFreeList;
+                pevent->OSEventCnt  = 0u;
+                OSEventFreeList     = pevent;
+                OS_EXIT_CRITICAL();
+                if (tasks_waiting == OS_TRUE) {
+                        OS_Sched();
+                }
+                *perr = OS_ERR_NONE;
+                pevent_return = (OS_EVENT *)0;
+                break;
+                
+        default:
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_INVALID_OPT;
+                pevent_return = pevent;
+                break;
+        }
+        return (pevent_return);
+}
