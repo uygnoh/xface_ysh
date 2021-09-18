@@ -14,6 +14,7 @@
 
 
 // Configure the package manager 配置包管理
+___________________________________________________________
 重要的一步来了，很多安装慢就是因为这里。首先问你要不要使用
 网络镜像，按照默认不要使用，因为这些我们安装好之后都可以更新配置。
 Configure the package manager
@@ -22,7 +23,8 @@ Scan another CD or DVD?
 [ No ]
 
 
-//统计软件包流行度的。会定期上报本机安装了哪些软件包。
+//统计软件包流行度的。会定期上报本机安装了哪些软件包
+___________________________________________________________
 % 是可选安装。包名是 popularity-contest。
 Configuring popularity-contest
 This choice can be later modified by running "dpkg-reconfigure popularity-contest".
@@ -53,29 +55,22 @@ deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security/ buster/updates mai
 
 //把debian 10 buster更新为国内的中国科学技术大学的源，速度快稳定。
 ___________________________________________________________
-
 1 //先备份源
-  mv /etc/apt/sources.list /etc/apt/sources.list.bak
-
+mv /etc/apt/sources.list /etc/apt/sources.list.bak
 
 2 //增加国内的新源 
-  nano /etc/apt/sources.list
-
+vim /etc/apt/sources.list
 
 3 //输入以下的源地址
 deb http://mirrors.ustc.edu.cn/debian/ buster main
 deb-src http://mirrors.ustc.edu.cn/debian/ buster main
-
 deb http://mirrors.ustc.edu.cn/debian-security buster/updates main
 deb-src http://mirrors.ustc.edu.cn/debian-security buster/updates main
-
 deb http://mirrors.ustc.edu.cn/debian/ buster-updates main
 deb-src http://mirrors.ustc.edu.cn/debian/ buster-updates main
 
-
-
 4 //更新
- apt-get update
+apt-get update
 
 
 
@@ -83,15 +78,17 @@ deb-src http://mirrors.ustc.edu.cn/debian/ buster-updates main
 /*******************************************************************************
                                      安装sudo 
 *******************************************************************************/
-1 //默认状态是没有sudo命令的，需要安装。
-  apt-get update
-  apt-get install sudo
+1 //dibian默认状态是没有sudo命令的，需要安装
+___________________________________________________________
+apt-get update
+apt-get install sudo
 
 
-2 //编辑sudoers文件, gedit /etc/sudoers在 
-  //其中 ysh 为自己的用户名
-  %sudo ALL=(ALL:ALL) ALL //下面添加如下内容
-  ysh  ALL=(ALL:ALL) ALL
+2 //编辑sudoers文件, vim /etc/sudoers
+  //其中  “ysh” 为本机的用户名
+___________________________________________________________
+%sudo ALL=(ALL:ALL) ALL         //在下面添加如下内容
+ysh   ALL=(ALL:ALL) ALL
 
 
 
@@ -116,6 +113,8 @@ locale -a                       //语系字符集查看
 /*******************************************************************************
                                debain时区设置
 *******************************************************************************/
+//debian时区设置
+___________________________________________________________
 1 su -
 2 tzselect
 3 选择Asia
@@ -127,10 +126,12 @@ export PATH=$PATH:$TZ
 
 
 //适用于Debian 命令, Asia,亚洲
+___________________________________________________________
 # dpkg-reconfigure tzdata 
 
 
 // 修改配置文件来修改时区，行完上述过程后，重启机器
+___________________________________________________________
 1、修改/etc/timezone         ZONE=Asia/Shanghai
 2、rm /etc/localtime
 3、链接到上海时区文件       
@@ -142,27 +143,31 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
                                Debian 安装输入法
 *******************************************************************************/
 0 //英文版(gnu/debian10), 设置中文语言环境
+___________________________________________________________
 sudo dpkg-reconfigure locales
 *zh_CN.UTF-8      //选择( *zh_CN.UTF-8 )中文语言环境
 *en_US.UTF-8      //最后选择( en_US.UTF-8), 然后点击OK
 
 
 1 //安装( fcitx )输入法框架
+___________________________________________________________
 $sudo apt-get install fcitx
 
 
-2 //fcitx安装失败解决
-  //自动修复安装出现broken的package
-  //但是，如果还是失败的话，就需要手动进行干预了。
+2 //fcitx安装失败解决: 安装包缺少依赖关系时，系统提示 
+  //“您也许需要运行 apt --fix-broken install” 
+  //来修正上面的错误, 一般运行这句命令可以顺利完成，但也有失败的案例
+___________________________________________________________
 sudo apt --fix-broken install
 
 
-3 安装搜狗输入法
-//http://pinyin.sogou.com/linux/
+3 安装搜狗输入法//http://pinyin.sogou.com/linux/
+___________________________________________________________
 $ sudo dpkg -i sogoupinyin_xxx_amd64.deb
 
 
 4 //安装完后，需要重启系统，然后在终端中输入
+___________________________________________________________
 $ fcitx-config-gtk3
 //在Input Method 栏中，点击+，然后选择搜狗输入法（Sogou Pinyin）。
 //设置好后，采用快捷键Ctrl+Space 即可调出搜狗输入法。
@@ -170,11 +175,12 @@ $ fcitx-config-gtk3
 
 
 /*******************************************************************************
-                              debian software packages
+                           debian-software-packages
 *******************************************************************************/
 #!/bin/bash
 # 
 echo -e "\033[41;37m--->>>BEGING INSTALL UTILITIES\033[37;0m"
+#//______________________________________________//#
 sudo apt-get -y install gcc
 sudo apt-get -y install gdb
 sudo apt-get -y install git
@@ -182,40 +188,40 @@ sudo apt-get -y install vim
 sudo apt-get -y install curl
 sudo apt-get -y install wget
 sudo apt-get -y install tmux
-sudo apt-get -y install ranger 
 sudo apt-get -y install make
 sudo apt-get -y install cmake
+sudo apt-get -y install ranger 
 sudo apt-get -y install automake
 sudo apt-get -y install autoconf
 sudo apt-get -y install libtool 
-# sudo apt-get -y install cryptsetup
-# 
+sudo apt-get -y install cryptsetup
+#//______________________________________________//#
 sudo apt-get -y install sdcc
 sudo apt-get -y install kicad
 sudo apt-get -y install freecad
 sudo apt-get -y install openscad
 sudo apt-get -y install mcu8051ide
-# 
-sudo apt-get -y install fvwm
-sudo apt-get -y install rox-filer
-sudo apt-get -y install smplayer
-sudo apt-get -y install xchm
+#//______________________________________________//#
 sudo apt-get -y install dia
 sudo apt-get -y install cmus 
+sudo apt-get -y install fvwm
+sudo apt-get -y install xchm
+sudo apt-get -y install thunar
 sudo apt-get -y install openocd
-# _____________________________
-# //以下的软件需要手动安装(2020/06/06)
-# sudo apt-get -y install qemu
-# sudo apt-get -y install vscode
-# sudo apt-get -y install platformio
-# sudo apt-get -y install stm32cubeide
-# sudo apt-get -y install java
-# sudo apt-get -y install eclipse
-# sudo apt-get -y install stlink
-# sudo apt-get -y install arm-none-eabi-gcc
-# sudo apt-get -y install riscv64-unknown-elf-gcc
-# sudo apt-get -y install zathura
-
-# 
+sudo apt-get -y install zathura
+sudo apt-get -y install smplayer
+sudo apt-get -y install rox-filer
+|_________________________________________________|
+| //(2021/09/18)                                  |
+| sudo apt-get -y install qemu                    |
+| sudo apt-get -y install vscode                  |
+| sudo apt-get -y install platformio              |
+| sudo apt-get -y install stm32cubeide            |
+| sudo apt-get -y install java                    |
+| sudo apt-get -y install eclipse                 |
+| sudo apt-get -y install stlink                  |
+| sudo apt-get -y install arm-none-eabi-gcc       |
+| sudo apt-get -y install riscv64-unknown-elf-gcc |
+|_________________________________________________|
 echo -e "\033[41;37mINSTALLATION IS COMPLETE--->>>\033[37;0m"
 echo "return $?"
