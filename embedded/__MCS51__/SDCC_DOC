@@ -1,0 +1,82 @@
+/*******************************************************************************
+                                    STM8单片机
+*******************************************************************************/
+//安装sdcc编译器(SDCC - Small Device C Compiler)
+___________________________________________________________
+sudo apt-get install sdcc
+
+
+//安装stm8flash
+___________________________________________________________
+https://github.com/ududouyt/stm8flash
+sudo mv stm8flash /usr/local/bin
+
+
+//加入stm8头文件 stm8s.h, 到工做目录
+___________________________________________________________
+https://github.com/erno-szabados/sdcc-stm8s/stm8s.h
+
+
+//sdcc编译源码
+___________________________________________________________
+touch main.c
+sdcc -mstm8 --out-fmt-ihx -o main.ihx main.c
+
+
+//烧写程序 $ sudo stm8flash -c stlinkv2  -p stm8s103f3 -w main.ihx
+___________________________________________________________
+sudo stm8flash -c stlinkv2 -d /dev/ttyUSB0 -p stm8s103f3 -w main.ihx
+Determine FLASH area
+Due to its file extension (or lack thereof), "main.ihx" is considered as INTEL HEX format!
+71 bytes at 0x8000... OK
+Bytes written: 71
+
+
+
+/*******************************************************************************
+                                   STC单片机
+*******************************************************************************/
+
+// stcflash python-serial
+___________________________________________________________
+//stcflash可以中github直接下载到本地，加入环境变量即可
+wget https://github.com/laborer/stcflash/archive/master.zip
+unzip stcflash-master.zip
+cd stcflash-master
+mv stcflash.py stcflash
+sudo mv stcflash /usr/local/bin
+// 然后安装stcflash的依赖包, 因为需要串口支持
+sudo apt install python-serial
+
+
+
+//sdcc-stc89c51-project
+___________________________________________________________
+//STC8051单片机例程, 需要注意的是:sdcc中所有非C标准关键字都以两个下划
+//线开头单个引脚的表示使用下划线表示，例如P3_2，与keil的^不同引用的头文
+//件为mcs51/8051.h
+
+#include <mcs51/8051.h>
+void main()
+{
+        __bit status = 1;
+        while (1) {
+                P0_0   = status;
+                status = !status;
+                delay(1000);
+        }
+}
+
+
+
+1 //编译程序和生成hex文件
+___________________________________________________________
+sdcc main.c -o main.ihx
+
+2 //packihx命令转码
+___________________________________________________________
+packihx main.ihx > main.hex
+
+3 //烧写程序到单片机, 烧写的时候需要重新给单片机上电
+___________________________________________________________
+sudo stcflash --port /dev/ttyUSB0 main.hex
