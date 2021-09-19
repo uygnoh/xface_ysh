@@ -327,7 +327,7 @@ INT8U OSSemPendAbort(
         INT8U            opt,
         INT8U           *perr)
 {
-        INT8U   nbr_tasks; //任务个数
+        INT8U   nbr_tasks;              //任务个数
         #if OS_CRITICAL_METHOD == 3u
         OS_CPU_SR cpu_sr = 0;
         #endif
@@ -350,11 +350,12 @@ INT8U OSSemPendAbort(
         }
        OS_ENTER_CRITICAL();
        
-       //如果不等于“0”，说明有任务在申请这个信号量
+       //如果不等于“0”，说明系统中有任务在申请这个信号量
        if (pevnet->OSEvntGrp != 0) {
                 nbr_tasks = 0u;
                 switch (opt) {
-                case OS_PEND_OPT_BROADCAST:     //广播模式
+                //广播模式, 告诉所有申请这个信号量的任务都就绪
+                case OS_PEND_OPT_BROADCAST:     
                         while (pevent->OSEventGrp != 0u) {
                                 //它只在事件那里和信号量解除
                                 (void)OS_EventTaskRdy(
@@ -362,7 +363,8 @@ INT8U OSSemPendAbort(
                                 nbr_tasks++;
                         }
                         break;
-                case OS_PEND_OPT_NONE:          //单播模式
+                //单播模式， 只就绪申请这个信号量的最高优先级任务
+                case OS_PEND_OPT_NONE:          
                 default:
                         //它只在事件那里和信号量解除， 只执行一次
                         (void)OS_EvnetTaskRdy(pevnet, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
@@ -375,7 +377,7 @@ INT8U OSSemPendAbort(
                 return (nbr_tasks);
        }
        
-       //没有任务在申请这个信号量, 强制这种关系解除没有意义
+       //否则， 没有任务在申请这个信号量, 强行终止这种关系没有意义
        OS_EXIT_CRITICAL();
        *perr = OS_ERR_NONE;
        return (0u); 
@@ -384,8 +386,16 @@ INT8U OSSemPendAbort(
 
 
 /*******************************************************************************
-                               信号量查询
+                                 信号量查询
 *******************************************************************************/
+typedef struct os_sem_data {
+        INT16U  OSCnt;                          //信号量数目
+        OS_PRIO OSEventTbl[OS_EVENT_TBL_SIZE];  //信号量事件就绪表
+        OS_PRIO OSEventGrp;                     //信号量事件就绪组
+} OS_SEM_DATA;
+
+
+
 INT8U OSSemQuery(OS_EVENT *pevent, OS_SEM_DATA *p_sem_data)
 {
         INT8U   i;
@@ -446,14 +456,19 @@ void OSSemSet(OS_EVENT *pevent, INT16 cnt, INT8U *perr)
         #endif
         if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {
                 *perr = OS_ERR_EVENT_TYPE;
-                return ;
+                return;
         }
+        
+        
         OS_ENTER_CRITICAL();
         *perr = OS_ERR_NONE;
+        
+        //See if semaphore already has a count
         if (pevent->OSEventCnt > 0u) {
-                pevent->OSEvnetCnt = cnt;
+                pevent->OSEvnetCnt = cnt; //Yes, set it to the new value specified
         } else {
-                if (pevnet->OSEventGrp == 0u) {
+                //See if task(s) waiting?
+                if (pevnet->OSEventGrp == 0u) { // No, OK to set the value
                         pevent->OSEventCnt = cnt;
                 } else {
                         *perr = OS_ERR_TASK_WAITING;

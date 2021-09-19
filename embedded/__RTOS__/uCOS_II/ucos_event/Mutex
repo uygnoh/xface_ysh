@@ -4,6 +4,7 @@
 OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
 {
         OS_EVENT *pevent;
+        
         #if OS_CRITICAL_METHOD == 3u
         OS_CPU_SR cpu_sr = 0u
         #endif
@@ -21,11 +22,12 @@ OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
         #endif
         
         #if OS_ARG_CHK_EN > 0u
-        if (prio >= OS_LOWEST_PRIO) {   //Vlidate PIP进程继承优先级
+        if (prio >= OS_LOWEST_PRIO) {
                 *perr = OS_ERR_PRIO_INVALID;
                 return ((OS_EVENT *)0);
         }
         #endif
+        
         if (OSIntNesting > 0u) {
                 *perr = OS_ERR_CREATE_ISR;
                 return ((OS_EVENT *)0);
@@ -33,14 +35,17 @@ OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
         
         OS_ENTER_CRITICAL();
         
-        //prirority inheritance priority (PIP), 为了防止优先级反转
+        //prirority inheritance priority (PIP)进程继承优先级, 是为了防止优先级反转
+        
         //如果OSTCBPrioTbl[prio]不为“0”，表示这个优先级一定存在，那么返回
+        //表示你所指定的优先级一定不能存在，如果存在，那么就不对了
         if (OSTCBPrioTbl[prio] != (OS_TCB *)0) {
                 OS_EXIT_CRITICAL();
                 *perr = OS_ERR_PRIO_EXIST;
                 return ((OS_EVENT *)0);
         }
-        //OS_TCB_RESERVED先占个位置
+        
+        //使用“OS_TCB_RESERVED”这个宏， 先占个位置
         OSTCBPrioTbl[prio] = OS_TCB_RESERVED;
         pevent             = OSEventFreeList;
         //判断事件空闲链表是否为空
@@ -55,7 +60,10 @@ OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
         OSEventFreeList     = (OS_EVENT *)OSEventFreeList->OSEvetPtr;
         OS_EXIT_CRITICAL();
         pevent->OSevnetType = OS_EVENT_TYPE_MUTEX;
+        
+        //高“8位”保存进程提升优先级(PIP)，低“8位”保存这个互斥信号量的资源是可用的
         pevent->OSEvnetCnt  = (INT16U)((INT16U)prio << 8u) | OS_MULTEX_AVAILABLE;
+        
         pevent->OSEventPtr  = (void *)0;
         #if OS_EVENT_NAME_EN > 0u
         pevent->OSEvnetName = (INT8U *)(void *)"?";
@@ -71,11 +79,11 @@ OS_EVENE *OSMutexCreate(INT8U prio, INT8U *perr)
 
 /*******************************************************************************
                                互斥信号量的申请
+这外函数对可能出现优先级反转的情况进行处理
 *******************************************************************************/
 #define OS_MUTEX_KEEP_UPPER_8   ((INT16U)0xFF00u) //存放进程提升优先级
-#define OS_MUTEX_KEEP_LOWER_8   ((INT16U)0x00FFu) //
-
-#define OS_MUTEX_AVAILABLE      ((INT16U)0x00FFu)
+#define OS_MUTEX_KEEP_LOWER_8   ((INT16U)0x00FFu) //存放互斥信号量
+#define OS_MUTEX_AVAILABLE      ((INT16U)0x00FFu) //表示互斥信号量可用
 
 
 void OSMutexPend(
@@ -124,13 +132,17 @@ void OSMutexPend(
         //高8位存放进程提升优先级
         pip = (INT8U)(pevent->OSEventCnt >> 8u); //Get PIP from mutex
         
-        //把高8位去掉，低8位留下。互斥信号量在系统中只能有一个。
+        //把高8位去掉，低8位留下。互斥信号量在系统中只能有一个。 看一下互斥信号量是否可用？
+        //_______________________________________________________________________________
         if ((INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8) == OS_MUTEX_AVAILABLE) {
+                //把“高8位”留下，“低8位”去除
                 pevnet->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8; //Yes, Acquire the resource
                 //高8位存放PIP，低8位保存当前正在运行任务的优先级号码。
                 pevent->OSEventCnt |= OSTCBCur->OSTCBPrio;   //Save priority of owning task
                 //在这个事件控制块作登记，登记它所对应的那个任务的TCB的指针。
                 pevent->OSEventPtr  = (void *)OSTCBCur;
+                
+                //PIP(进程提升优先级)必需要大于当前任务的优先级， 这样才能作优先级的提升
                 if (OSTCBCur->OSTCBPrio <= pip) {
                         OS_EXIT_CRITICAL();
                         *perr = OS_ERR_PIP_LOWER;
@@ -138,21 +150,30 @@ void OSMutexPend(
                         OS_EXIT_CRITICAL();
                         *perr = OS_ERR_NONE;
                 }
+                
+                //执行到此处说明这个函数已经执行结束了
                 return;
         }
         
         
+        //互斥信号量不可用
+        //_______________________________________________________________________________
         // NO, Get priority of mutex owner
+        //“mprio”持有这个互斥信号量任务的优先级号码
         mprio = (INT8U)(pevent->OSEventCnt & OS_MUTEX_KEEP_LOWER_8);
+        //“ptcb”此时存放的是持有这个互斥信号量的任务的“TCB”指针
         ptcb  = (OS_TCB *)(pevnet->OSEvnetPtr);
         
         
-        //防止优先级反转，需要用优先级提升
+        //防止优先级反转，需要进行优先级提升，把持有这个互斥信号量，比较低的任务临时提升到“PIP”
         if (ptcb->OSTCBPrio > pip) {
+                //如果持有这个互斥信号量任务的优先级 > 当前正在运行任务的优先级
                 if (mprio > OSTCBCur->OSTCBPrio) {
+                        //查找持有这个互斥信号量任务就绪表的行号
                         y = ptcb->OSTCBY;
-                        //如果在就绪态的话
-                        //操作的是任务的就绪表和就绪组
+                        
+                        //如果持有这个互斥信号量的任务在就绪态的话
+                        //如果在就绪态的话， 操作的是任务的就绪表和就绪组， 抹掉任务的就绪表和就绪组
                         if ((OSRdyTbl[y] & ptcb->OSTCBBitX) != 0u) {
                         //See if mutex owner iready? Yes, Remove owner form rdy...
                                 OSRdyTbl[y] &= (OS_PRIO)~ptcb->OSTCBBitx;
@@ -160,8 +181,9 @@ void OSMutexPend(
                                         OSRdyGrp &= (OS_PRIO)~ptcb->OSTCBBitY;
                                 }
                                 rdy = OS_TRUE;
-                        //如果在阻塞态的话
-                        //操作的是事件的就绪表和就绪组
+                                
+                        //如果持有这个互斥信号量的任务不在就绪态的话
+                        //一定处于阻塞态， 操作的是事件的就绪表和事件的就绪组， 抹掉事件的就绪表和事件的就绪组
                         } else {
                                 pevent2 = ptcb->OSTCBEventPtr;
                                 if (pevent2 != (OS_EVENT *)0) { //Remove form event wait list
@@ -182,12 +204,11 @@ void OSMutexPend(
                         ptcb->OSTCBY    = (INT8)(ptcb->OSTCBPrio >> 3u);
                         ptcb->OSTCBX    = (INT8)(ptcb->OSTCBPrio & 0x07u);
                         #endif
-                        
                         ptcb->OSTCBBity = (OS_PRIO)(1uL << ptcb->OSTCBY);
                         ptcb->OSTCBBitX = (OS_PRiO)(1ul << ptcb->OSTCBX);
                         
                         
-                        //使用新的优先级进行登记
+                        //使用“PIP”新的优先级进行重新登记
                         if (rdy == OS_TRUE) {
                                 OSRdyGrp               |= ptcb->OSTCBBitY;
                                 OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
@@ -199,17 +220,22 @@ void OSMutexPend(
                                         pevent2->OSEventTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
                                 }
                         }
-                        
-                        //把持有互斥信号量的任务，优先级号码进行优先级提升
+                        //把持有互斥信号量的任务的“TCB指针”重新写到提升后的优先级表中
                         OSTCBPrioTbl[pip] = ptcb;
                 }
-        }
+        }//进程提升优先级结束
+        
+        
         OSTCBCru->OSTCBStat     |= OS_STAT_MUTEX;
         OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
         OSTCBCur->OSTCBDly       = timeout;
         OS_EventTaskWait(pevent);
         OS_EXIT_CRITICAL();
+        
+        //系统调度
+        //_______________________________________________________________________________
         OS_Sched();
+        
         OS_ENTER_CRITAL();
         switch (OSTCBCur->OSTCBStatPend) {
         case OS_STAT_PEND_OK:
