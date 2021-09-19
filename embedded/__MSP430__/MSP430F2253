@@ -1,7 +1,7 @@
 /*******************************************************************************
                                 MSP430 复位系统
 *******************************************************************************/
-| POR(Power On Reset) //上电复位信号, 一定会产生上电清除信号
+| POR(Power-On Reset) //上电复位信号, 一定会产生上电清除信号
 |_____________________________________________________________|
 | 1 上电                                                       |
 | 2 RST低电平                                                  |
@@ -452,5 +452,120 @@ __interrupt void TIME_TICK(void)
                 break;
         }
 }
+
+
+
+/*******************************************************************************
+                                MSP430 10bit-ADC
+*******************************************************************************/
+pbuf    //指向要发送字符串的指针
+num     //要发送的字符个数
+//通过串口发送字符串
+void uart_send_string(uint8_t *pbuf, uint8_t num)
+{
+        uint8_t cnt = 0;
+        for (cnt = 0; cnt < num; cnt++) {
+                while (UCA0STAT & UCBUSY);
+                UCA0TXBUF = *(pbuf + cnt);
+        }
+}
+
+//初始化系统时钟
+void init_system_clock(void)
+{
+        DCOCTL   = CALDCO_1MHZ;         //配置DCO为“1MHZ”
+        DCSCTL1  = CALBC1_1MHZ;         //
+        BCSCTL2 &= ~SELS;               //配置“SMCLK”的时钟源为DCO
+        BCSCTL2 &= ~(DIVS0 | DIVS1);    //SMCLK的分频系数为“1”
+}
+
+void PrintNumber(uint16_t num)
+{
+        uint16_t buf[6] = {0, 0, 0, 0, 0, '\n'};
+        uint8_t cnt = 0;
+        for (cnt = 0; cnt < 5; cnt++) {
+                buf[4 - cnt] = (uint8_t)(num % 10 +'0');
+                num /= 10;
+        }
+        uart_send_string(buf, 6);
+}
+
+//通过串口发送浮点数，可以发送1位整数位 + 3位小数位
+void PrintFloat(float num)
+{
+        uint8_t char_buf[] = {0, '.', 0, 0, 0);
+        uint16_t tmp       = (uint16_t)(num * 1000);
+        char_buf[0] = (uint8_t)( tmp / 1000)         + '0';
+        char_buf[2] = (uint8_t)((tmp % 1000)  / 100) + '0';
+        char_buf[3] = (uint8_t)((tmp % 100 )  / 10 ) + '0';
+        char_buf[4] = (uint8_t)( tmp % 10  )         + '0';
+        uart_send_string(char_buf, 5);
+        
+}
+
+
+//UART初始化
+void init_uart(void)
+{
+        UCA0CTL1 |= UCSWRST;    //复位USCI—Ax
+        UCA0CTL0 &= ~UCSYNC;    //选择USCI_Ax为UART模式
+        UCA0CTL1 |= UCSSEL1;    //配置UART时钟源为“SMCLK”
+        UCA0BR0   = 0x68;       //9600@1MHZ
+        UCA0BR1   = 0x00;       //
+        UCA0MCTL  = 1 << 1;     //
+        P1SEL    |= BIT1 + BIT2;//使能端口利用功能
+        P1SEL2   |= BIT1 + BIT2;//
+        UCA0CTL1 &= ~UCSWRST;   //清除复位，使能UART
+}
+void init_adc(void)
+{
+        ADC10CTL1 |= ADC10SSEL_2;       //设置ADC时钟为“MCLK”
+        ADC10CTL1 |= ADC10DIV_0;        //ADC为“2分频”
+        ADC10CTL0 |= SREF_1;            //设置ADC基准源，为内部电压基准源
+        ADC10CTL0 |= ADC10SHT_3;        //设置ADC采样保持时间“64CLK”
+        ADC10CTL0 &= ~ADC10SR;          //设置ADC采样率为“200k”
+        ADC10CTL0 |= REF2_5V;           //选择ADC基准源为“2.5V”，并且是内部的
+        ADC10CTL0 |= REFON;             //开启基准源电压
+        ADC10CTL1 |= INCH_0;            //选择ADC输入通道“A0”
+        ADC10AE0  |= 0x0001;            //允许“A0”模拟输入
+        ADC10CTL0 |= ADC10ON;           //打开ADC
+}
+
+
+//ADC转换结果为“10位”， 以uint16_t类型返回，低10位为有效数据位
+uint16_t get_adc_value(void)
+{
+        ADC10CTL0 |= ADC10SC | ENC;     //开始转换
+        while (ADC10CTL1 & ADC10BUSY);
+        return ADC10MEM;                //返回结果
+}
+
+
+int main(void)
+{
+        float voltage = 0;
+        uint16_t adc_value = 0;
+        WDTCTL = WDTPW | WDTHOLD;
+        init_system_clock();
+        init_uart();
+        init_adc();
+        while (1) {
+                adc_value = get_adc_value();
+                voltage   = adc_value * 2.5 / 1023;
+                uart_send_string("ADC10转换结果为： ", 17);
+                PrintNumber(adc_value);
+                uart_send_string("ADC10相应电压为： ", 14);
+                PrintFloat(volatage);
+                __delay_cycles(300000);
+        }
+        return 0;
+}
+
+
+
+/*******************************************************************************
+                               ADC-DTC数据搬运工
+*******************************************************************************/
+
 
 
