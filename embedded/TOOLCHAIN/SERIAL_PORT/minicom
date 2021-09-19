@@ -7,11 +7,11 @@ sudo minicom -s
 
 //(每个选项前面都有一字母，输入该字母就可以改变这些选项)
 (按选项前面相应的字母就可以到达选项) {
-	Serial Device           :/dev/ttyUSB0	%设置串口“ttyUSB0”
-	Lockfile Location       :/var/lock	
-	Bps/Par/Bits            :115200 8N1	%设置波特率“115200”
-	Hardware Flow Control   :NO		%关闭硬件流控
-	Software Flow Control   :NO		%关闭软件流控
+	Serial Device           :/dev/ttyUSB0	//设置串口“ttyUSB0”
+	Lockfile Location       :/var/lock	//
+	Bps/Par/Bits            :115200 8N1	//设置波特率“115200”
+	Hardware Flow Control   :NO		//关闭硬件流控
+	Software Flow Control   :NO		//关闭软件流控
 }
 
 //最后回车, 选择保存 “Save setup as dfl”, 然后可以选择 “Exit” (进入 minicom) 
