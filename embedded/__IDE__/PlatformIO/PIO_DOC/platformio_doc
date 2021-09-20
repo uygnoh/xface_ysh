@@ -1,0 +1,36 @@
+/*******************************************************************************
+                            paltformIO-pyton3.x-venv
+*******************************************************************************/
+// python的(venv模块) 可以创建一个独立的虚拟的python运行环境
+___________________________________________________________
+sudo apt-get install python3.7-venv
+
+
+
+/*******************************************************************************
+                             PlatformIO Error
+*******************************************************************************/
+//此处出错解决办法
+___________________________________________________________
+Building in release mode
+Linking .pio/build/genericSTM32F103C8/firmware.elf
+.pio/build/genericSTM32F103C8/src/user/system_stm32f10x.o: In function `SystemInit':
+system_stm32f10x.c:(.text.SystemInit+0x0): multiple definition of `SystemInit'
+.pio/build/genericSTM32F103C8/FrameworkCMSIS/system_stm32f1xx.o:system_stm32f1xx.c:(.text.SystemInit+0x0): first defined here
+.pio/build/genericSTM32F103C8/src/user/system_stm32f10x.o: In function `SystemCoreClockUpdate':
+system_stm32f10x.c:(.text.SystemCoreClockUpdate+0x0): multiple definition of `SystemCoreClockUpdate'
+.pio/build/genericSTM32F103C8/FrameworkCMSIS/system_stm32f1xx.o:system_stm32f1xx.c:(.text.SystemCoreClockUpdate+0x0): first defined here
+.pio/build/genericSTM32F103C8/src/user/system_stm32f10x.o:(.data.AHBPrescTable+0x0): multiple definition of `AHBPrescTable'
+.pio/build/genericSTM32F103C8/FrameworkCMSIS/system_stm32f1xx.o:(.rodata.AHBPrescTable+0x0): first defined here
+.pio/build/genericSTM32F103C8/src/user/system_stm32f10x.o:(.data.SystemCoreClock+0x0): multiple definition of `SystemCoreClock'
+.pio/build/genericSTM32F103C8/FrameworkCMSIS/system_stm32f1xx.o:(.data.SystemCoreClock+0x0): first defined here
+collect2: error: ld returned 1 exit status
+*** [.pio/build/genericSTM32F103C8/firmware.elf] Error 1
+//重命名“system_stm32f1xx.c” 这个文件，或者直接删除它 
+___________________________________________________________ 
+/home/ysh/.platformio/packages/framework-cmsis-stm32f1/Source/Templates/system_stm32f1xx.c
+cd /home/ysh/.platformio/packages/framework-cmsis-stm32f1/Source/Templates/
+mv system_stm32f1xx.c system_stm32f1xx.c.bak
+
+   
+    

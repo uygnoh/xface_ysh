@@ -1,0 +1,29 @@
+/*******************************************************************************
+                             PlatformIO 开发51单片机 
+*******************************************************************************/
+ //使用“SDCC编译器”开发51单片机, PlatformIO for vscode
+|_________________________________________________________|
+|   Name:           pio_stc_blink                         |
+|   Board:          Generic STC89C52RC                    |
+|   Framework:      None                                  |
+|   Location:       Usedefault location                   |
+|_________________________________________________________|
+
+
+
+
+/*******************************************************************************
+                             PlatformIO Libraries 
+*******************************************************************************/
+
+
+//platformio.ini
+[env.uno]
+paltform  = atmelavr
+board     = uno
+framework = arduino
+lib_deps  =
+            adafruit/Adafruit PWM Library@^2.4.0
+            mathertel/LiquidCrystal_PCF8574@1.2.0
+
+monitor_speed = 19200

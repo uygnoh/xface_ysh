@@ -1,0 +1,31 @@
+/*******************************************************************************
+                                python3-pip
+*******************************************************************************/
+sudo apt install python3-pip
+pip3 --version
+
+
+
+//pip - python包管理器
+___________________________________________________________
+pip -V                          //版本确认
+pip list                        //列出本地安装包
+pip --help                      //帮助信息
+pip freeze                      //输出安装包的详细信息
+pip install --upgrade pip       //pip自身更新
+pip install    [package_name]   //包安装
+pip install -U [package_name]   //包更新
+pip uninstall  [package_name]   //包卸载
+pip show       [package_name]   //显示本地安装包的详细信息
+pip search     [package_keyword]//包检索(服务器端)
+
+
+
+/*******************************************************************************
+                             python3-venv 虚拟环境
+*******************************************************************************/
+//sudo apt-get install python3.7-venv
+___________________________________________________________
+python3 -m venv my_venv         //在“python3”中创建虚拟环境
+source my_venv/bin/activate     //激活“my_venv”虚拟环境
+deactivate                      //删除“my_venv”虚拟环境
