@@ -1,47 +1,50 @@
-############################################################
-### VSCODE_MAKEFILE_STM32     ("Ctrl+Alt+T")
-############################################################
-“Ctrl+Shift+P”              % vscode调出命令面板
-“Ctrl+Alt+T”                % 运行任务
+/*******************************************************************************
+                            vscode <===> 用户配置文件 
+*******************************************************************************/
+//VSCODE_MAKEFILE_STM32     ("Ctrl+Alt+T")
+___________________________________________________________
+“Ctrl+Shift+P”              //vscode调出命令面板
+“Ctrl+Alt+T”                //运行任务
 
 
 
-############################################################
-### % vscode_settings
-############################################################
-% /home/freeysh/.config/Code/User/settings.json
-____________________________________________________________
+//用户配置文件位置(/home/ysh/.config/Code/User/settings.json)
+___________________________________________________________
 {
-    // % 字体相关设置
-    "editor.fontFamily": "Monaco",  
-    "window.zoomLevel": 1,
-    "editor.fontWeight": "normal",
-    "editor.fontSize":14,
+        "workbench.colorTheme": "Default Dark+"
+        
+	//控制字体家族
+	"editor.fontFamily": "Monaco",
+	"window.zoomLevel": 1,
+	"editor.fontWeight": "normal",
+	//控制字体大小
+	"editor.fontSize":14,
 
-    // % 在vscode中显示空格和tab符
-    //"editor.renderControlCharacters": true,
-    //"editor.renderWhitespace":"all",
+	//显示空格和“tab”符
+	//"editor.renderControlCharacters": true,
+	//"editor.renderWhitespace":"all",
 
-    // % 一个制表符等于的空格数
-    "editor.tabSize": 4,
-    // % 必须指定！！否则指定的tab大小将不起效果
-    "editor.detectIndentation":false,
+	//一个制表符等于的空格数
+	"editor.tabSize": 8,
+	//必须指定!!!(否则指定的tab大小将不起效果)
+	"editor.detectIndentation":false,
 
-    // % 颜色主题设置
-    "workbench.colorTheme": "Monokai",
+	//颜色主题设置
+	"workbench.colorTheme": "Monokai",
 
-    // % 自动换行设置方法(默认Editor:WordWrap为off关闭状态)
-    //"editor.wordWrap": "on",
+	//按 “Tab” 禁止插入“空格”
+	"editor.insertSpaces": false,
+
+	//自动换行打开(默认: 关闭状态)
+	//"editor.wordWrap": "on"
 }
 
 
 
-
-############################################################
-### % 工程文件中的vscode的配置($Projece/.vscode)
-############################################################
-% /home/freeysh/Documents/GitHub/embedded/STM32_REG \
-% /STM32F103C8T6_MAKEFILE/.vscode/tasks.json
+/*******************************************************************************
+                    工程文件中的vscode的配置($Projecet/.vscode)
+*******************************************************************************/
+// $pio.stm32f103/.vscode/tasks.json
 ____________________________________________________________
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
@@ -68,8 +71,8 @@ ____________________________________________________________
 
 
 
-% /home/freeysh/Documents/GitHub/embedded/STM32_REG \
-% /STM32F103C8T6_MAKEFILE/.vscode/launch.json
+
+// $pio.stm32f103/.vscode/launch.json
 ____________________________________________________________
 {
     // Use IntelliSense to learn about possible attributes.
@@ -96,8 +99,8 @@ ____________________________________________________________
 
 
 
-% /home/freeysh/Documents/GitHub/embedded/STM32_REG
-% /STM32F103C8T6_MAKEFILE/.vscode/c_cpp_properties.json
+
+// $pio.stm32f103/.vscode/c_cpp_properties.json
 ____________________________________________________________
 {
     "configurations": [
@@ -122,11 +125,11 @@ ____________________________________________________________
 
 
 
-
-###############################################################
-### % STM32_SDT_V3.5.0 宏定义
-###############################################################
-0 % ->stm32f10x.h
+/*******************************************************************************
+                            STM32_SDT_V3.5.0 宏定义
+*******************************************************************************/
+//stm32f10x.h
+___________________________________________________________
 #if !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && \
     !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && \
     !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && \
@@ -139,8 +142,9 @@ ____________________________________________________________
 #endif
 
 
-1 % 这里边包含一个条件编译，如果我们要把中断向量表存储在RAM或者FLASH就要定义相关的宏
-  % 文件位置 system_stm32f10x.c ->SystemInit();
+//这里边包含一个条件编译，如果我们要把中断向量表存储在RAM或者FLASH
+//就要定义相关的宏文件位置 system_stm32f10x.c ->SystemInit();
+___________________________________________________________
 #ifdef VECT_TAB_RAM
     NVIC_SetVectorTable(NVIC_VectTab_RAM, 0x0000000);
 #else
@@ -148,13 +152,15 @@ ____________________________________________________________
 #endif
 
 
-2 % 头文件相关 ->stm32f10x.h
+//头文件相关 ->stm32f10x.h
+___________________________________________________________
 #ifdef USE_STDPERIPH_DRIVER
   #include "stm32f10x_conf.h"
 #endif
 
 
-3 % Makefile.common
+//Makefile.common
+___________________________________________________________
 TypeOfMCU       =STM32F10X_MD
 CFLAGSlib       +=-D $(TypeOfMCU)
 CFLAGSlib       +=-D VECT_TAB_FLASH
@@ -162,6 +168,28 @@ CFLAGSlib       +=-D USE_STDPERIPH_DRIVER
 
 
 
+/*******************************************************************************
+                    此配置参数针对 STM32F10X标准固件函数库  V3.5.0
+*******************************************************************************/
+// STM32F10X_HD
+USE_STDPERIPH_DRIVER
+### stm32f10x_conf.h >>此文件的定义位于 >>stm32f10x.h 文件中
+### 此文件定义所有库函数的头文件定义部分
+
+//启动文件后缀名改为大写 =>[.S]
+
+//修改 core_cm3.c文件，针对STM32F10x_StdPeriph_Lib_V3.5.0库函数, 文件在 736 行处
+//打开工程文件STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport/core_cm3.c
+//在此文件的最后几行的位置，找到
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );	  
+//以下两行，并更改如下 _________________________________________________________________________
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+	 
+	 
+	 
+	 
 ###############################################################
 ### % gcc编译参数详解一 (-ffunction-sections -fdata-sections)
 ###############################################################
@@ -233,31 +261,3 @@ init.c:(.text.__libc_init_array+0x20): undefined reference to `_init'
 % 要使用newlib-nano，用户应提供额外的gcc链接时间选项：–specs=nano.specs
 Nano.specs还处理两个额外的gcc库：libstdc ++ _ s.a和libsupc ++ _ s.a，
 它们针对代码大小进行了优化。
-
-
-
-
-
-
-###############################################################
-### % 此配置参数针对 STM32F10X标准固件函数库  V3.5.0
-###############################################################
-1 STM32F10X_HD
-USE_STDPERIPH_DRIVER
-### stm32f10x_conf.h >>此文件的定义位于 >>stm32f10x.h 文件中
-### 此文件定义所有库函数的头文件定义部分
-
-2 启动文件后缀名改为大写 >>[.S]
-
-3 修改 core_cm3.c文件，针对STM32F10x_StdPeriph_Lib_V3.5.0库函数, 文件在 736 行处
-% 打开工程文件STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport/core_cm3.c
-% 在此文件的最后几行的位置，找到
-	 __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
-	 __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );	  
-% 以下两行，并更改如下 ___________________________________________________________________
-	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
-	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
-
-
-
-
