@@ -1,0 +1,70 @@
+############################################################
+### % STM32优先级(core_cm3.h)
+############################################################
+% 设置优先级分组
+__STATIC_INLINE void __NVIC_SetPriorityGrouping(uint32_t PriorityGroup)
+{
+    uint32_t reg_value;
+    /* % 优先级分组只能是：0~7 */
+    uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07UL); 
+    
+    /* % 读取以前寄存器的配置信息 */
+    reg_value  =  SCB->AIRCR;
+    /* % 清除需要改变的位 */
+    reg_value &= ~((uint32_t)(SCB_AIRCR_VECTKEY_Msk | SCB_AIRCR_PRIGROUP_Msk));
+    /* % 写入密钥和“3”位分组信息 */
+    reg_value  =  (reg_value                                   |
+                  ((uint32_t)0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
+                  (PriorityGroupTmp << SCB_AIRCR_PRIGROUP_Pos) );
+    SCB->AIRCR =  reg_value;
+}
+% 设置抢占优先级，响应优先级
+__STATIC_INLINE void __NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+{
+    if ((int32_t)(IRQn) >= 0)
+    {
+        NVIC->IP[((uint32_t)IRQn)]               = 
+        (uint8_t)((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
+    }
+    else
+    {
+        SCB->SHP[(((uint32_t)IRQn) & 0xFUL)-4UL] = 
+        (uint8_t)((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
+    }
+}
+
+
+
+############################################################
+### % NVIC优先级设置
+############################################################
+% 设置优先级分组
+void HAL_NVIC_SetPriorityGrouping(uint32_t PriorityGroup);
+NVIC_SetPriorityGrouping(PriorityGroup);
+#define NVIC_SetPriorityGrouping    __NVIC_SetPriorityGrouping
+__STATIC_INLINE void __NVIC_SetPriorityGrouping(uint32_t PriorityGroup);
+
+
+
+% 设置抢占优先级，响应优先级
+void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority);
+NVIC_SetPriority(IRQn, NVIC_EncodePriority(prioritygroup, PreemptPriority, SubPriority));
+__STATIC_INLINE uint32_t NVIC_EncodePriority (uint32_t PriorityGroup, \
+                                               uint32_t PreemptPriority, uint32_t SubPriority);
+
+
+
+############################################################
+### % 中断
+############################################################
+void HAL_NVIC_EnableIRQ(IRQn_Type IRQn);
+NVIC_EnableIRQ(IRQn);
+#define NVIC_EnableIRQ              __NVIC_EnableIRQ
+__STATIC_INLINE void __NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  if ((int32_t)(IRQn) >= 0)
+  {
+    NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] = (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
+  }
+}
+

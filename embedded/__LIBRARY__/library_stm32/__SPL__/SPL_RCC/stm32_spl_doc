@@ -1,0 +1,284 @@
+###########################################################
+### % gpio
+###########################################################
+% General-purpose and alternate-function I/O
+% /* GPIOx_CRL和GPIOx_CRH 配置表 */
+%           %               CNF1   CNF0  MODE1  MODE0   PxODR  
+Input       Analog            0     0     0      0      x     模拟输入
+Input       Input floating    0     1     0      0      x     浮空输入
+Input       Input pull-down   1     0     0      0      0     下拉输入
+Input       Input pull-up     1     0     0      0      1     上拉输入
+Output      Push-pull         0     0     01-10-11      0 or 1通用推完输出 
+Output      Open-drain        0     1     01-10-11      0 or 1通用开漏输出
+Output      Push-pull         1     0     01-10-11      x     推挽式复用功能
+Output      Open-drain        1     1     01-10-11      x     开漏式复用功能
+% 注意：下拉输入和上拉输入是通过端口输出寄存器 GPIOxODR 来区分。
+% 01-10-11  输出最大速度分别是： 10 MHz, 2 MHz, 50 MHz.
+
+
+
+% /* GPIOx 端口配置 */
+/* 设置GPIOA引脚的工作模式 [ GPIOA.0 GPIO.1, 推挽式输出，50MHz ] */
+	GPIOA->CRL = 0x00000033
+/* 在GPIOA.0，GPIO.1引脚输出一个高电平 */
+	GPIOA->ODR = 0x00000003
+
+
+
+% /* AFIO 复用功能输入输出 */
+AFIO_EVCR       事件控制寄存器
+AFIIO_MAPR      复用重映射和调试 I/O 配置寄存器
+AFIO_EXTICR1    外部中断配置寄存器 1
+AFIO_EXTICR2    外部中断配置寄存器 2
+AFIO_EXTICR3    外部中断配置寄存器 3
+AFIO_EXTICR4    外部中断配置寄存器 4
+
+
+
+% /* GPIO 通用功能输入输出寄存器 */
+2个32位配置寄存器	GPIOx_CRL, GPIOx_CRH
+2个32位数据寄存器	GPIOx_IDR, GPIOx_ODR
+1个32端口位设置/清除寄存器	GPIOx_BSRR
+1个32位端口位清除寄存器	GPIOx_BRR
+1个32位锁定寄存器	GPIOx_LCKR
+
+
+
+% /* 端口复用功能和重映射功能 */
+1.端口复用功能 AFIO
+	如果一个端口配置成复用功能，将使引脚和输出寄存器断开，并和片上外设的输出信号连接。
+	复用功能最好配置成 浮空输入模式， 模拟输入不支持复用功能
+	开启复用功能相关端口
+
+2.重映射
+	将芯片内部的外设模块固定分配的端口重新映射到其他端口的功能。
+	没有重映射， 部分重映射， 完全重映射
+	重映射功能可以额外的增加资源
+
+% /* USART1 端口重映射启用 */
+GPIO_PinRemapConfig(GPIO_Remap_USART1, ENABLE);
+
+							
+	
+###########################################################
+### % STM32中断系统
+###########################################################					
+% NVIC嵌套向量中断控制器
+
+% 外部中断/事件控制器(EXTI)
+% External interrupt/event controller (EXTI)
+对于互联型产品,外部中断/事件控制器由20个产生事件/中断请求的边沿检测器组成,对于其它
+产品,则有19个能产生事件/中断请求的边沿检测器。每个输入线可以独立地配置输入类型(脉冲
+或挂起)和对应的触发事件(上升沿或下降沿或者双边沿都触发)。每个输入线都可以独立地被屏
+蔽。挂起寄存器保持着状态线的中断请求。
+1 中断屏蔽寄存器(EXTI_IMR),       Interrupt mask register (EXTI_IMR)
+2 事件屏蔽寄存器(EXTI_EMR),       Event mask register (EXTI_EMR)
+3 上升沿触发选择寄存器(EXTI_RTSR), Rising trigger selection register (EXTI_RTSR)
+4 下降沿触发选择寄存器(EXTI_FTSR), Falling trigger selection register (EXTI_FTSR)
+5 软件中断事件寄存器(EXTI_SWIER),  Software interrupt event register (EXTI_SWIER)
+6 挂起寄存器(EXTI_PR),           Pending register (EXTI_PR)
+
+
+
+###########################################################
+### % STM32定时器
+###########################################################
+% 用定时器2实现1S中断一次
+RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //开启定时器2时钟
+NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);      //Nvic
+NVIC_InitTypeDef NVIC_InitStructure;
+NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQChannel;
+NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+NVIC_InitStructure.NVIC_IRQChannelcmd = ENABLE;
+NVIC_Init(&NVIC_InitStructure);
+
+TIM_DeInit(TIM2);
+TIM_InternalClockConfig(TIM2);  //选择内部时钟=72MHz
+
+TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+TIM_OCInitTypeDef TIM_OCInitStructure;
+TIM_TimeBaseStructure.TIM_Period = 2000;    //自动重装载寄存器值
+//CK_PSC预分频值为35999，则时钟分频为35999+1=36000
+//CK_PSC=72MHz, CK_CNT=(72MHz/36000=2000Hz), 自动重装载寄存器值(2000), 1S更新
+TIM_TimeBaseStructure.TIM_Prescaler = 35999;
+TIM_TimeBaseStructure.TIM_clockDivsion = 0x00;
+TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+TIM_Cmd(TIM2, ENABLE);
+
+TIM_PrescalerConfig(TIM2, 35999, TIM_PSCReloadMode_Immediate); //让定时器预分频值立即装入
+TIM_ClearFlag(TIM2, TIM_FLAG_Update); //清除中断标志
+TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE); //使能定时器中断
+
+
+
+###########################################################
+### % usart通用异步同步收发器
+###########################################################
+/* 串口1(USART1)初始化配置(寄存器版)
+ * 2018.10.29
+ * @freeysh
+ * 设置 USART1模块，UE使能位，M位来定义字长， 
+ * 停止位位数，TE位，BRR寄存器选择波特率 
+ */
+USART1->CR1 |= (1<<13);
+USART1->CR1 &= ~(1<<12);
+USART1->CR2 &= ~(3<<12);	/* USART->CR2 &= ~((1<<12) | (1<<13)); */
+USART1->CR1 |= (1<<3);
+
+/*
+ * USART 波特率配置 
+ * 波特率 9600, 系统时钟 72MHz,
+ * Tx/Rx波特率 = ƒck/(16*USARTDIV)
+ * 9600 = 72*1000*1000/(16*U)
+ * U = 72000000/(9600*16)
+ */
+float Div;
+u16 M,F,BRR;
+u32 Bound;
+Bound = 9600;
+Div = (float)(72*1000*1000)/(Bound*16);
+M = Div;	// 取整数部分
+F = (Div-M)*16; // 小数部分
+% /* 整合整数部分和小数部分 */
+BRR = M<<4 + F;
+USART1->BRR = BRR;
+
+
+/* 发送一个字符 'A' 到 USART的DR寄存器 */
+	int i, data,;
+	data = 'A';
+	USART->DR = data;
+	for (i = 0; i < 30; i++) 
+	{
+		data++;
+		while ((USART1->SR & (1<<6) == 0);
+	}
+	
+	
+	
+	
+% usart通信过程	
+/* 数据发送过程 */
+	1. 设置 USART_CR1寄存器中 UE位置位 来激活USART
+	2. 设置 USART_CR1寄存器中 的M位    来定义字长
+	3. 设置 USART_CR2寄存器中 编写停止位位数
+	*  如果采用多缓冲器通信，配置 USART_CR3寄存器中的 DMA使能位(DMAT)
+	4. 设置 USART_CR1中的 TE位，发送一个空闲帧作为第一次数据的发送
+	5. 设置 USART_BRR寄存器，设定要求的波特率
+	6. 把发送的数据写进 USART_DR寄存器 (此动作自动清除 TXE位)。
+	   -----在只有一个缓冲器的情况下，对每个待发送的数据重复此步骤
+
+/* 数据接收过程 */
+	1. 设置 USART_CR1寄存器中 UE位置位 来激活USART
+	2. 设置 USART_CR1寄存器中 的M位    来定义字长
+	3. 设置 USART_CR2寄存器中 编写停止位位数
+	*  如果采用多缓冲器通信，配置 USART_CR3寄存器中的 DMA使能位(DMAT)
+	4. 设置 USART_BRR寄存器，设定要求的波特率
+	5. 设置 USART_CR1中的 RE位，激活接收器，使他开始寻找起始位
+
+/* 当一个字符被接收时 */
+	RXNE位被置位。它表明移位寄存器的内容被转移到 RDR.
+	RXNEIE位被置位。则产生中断信号.
+	在接收期间如果检测到帧错误，噪音或溢出错误，错误标志将被置起.
+
+
+
+% /* usart寄存器 */
+USART_SR	状态寄存器
+USART_DR	数据寄存器
+USART_BRR	波特比率寄存器
+USART_CR1	控制寄存器 1
+USART_CR2	控制寄存器 2
+USART_CR3	控制寄存器 3
+1. 起始位
+2. 数据位 (8, 9)
+3. 奇偶校验位 (9 bit)
+4. 停止位 (1, 1.5, 2)
+5. 波特率设置 (速度)
+
+
+
+###########################################################
+### % ADC模拟数字转换器
+###########################################################
+被控制对象 --->非电量 --->模拟传感器 --->模拟电量 --->A/D转换器 --->数字量 --->单片机
+单片机 ---> 数字量 --->D/A转换器 --->模拟电量 --->执行元件 --->控制操作 --->被控制对象
+% 将模拟量转换为数字量的过程称为模数转换，完成这一转换的器件称为ADC
+% 将数字量转换为模拟量的过程称为数模转换，完成这一转换的器件称为DAC
+
+
+
+% ADC转换器主要参数
+1 分辨率
+% 分辨率是指AD转换器输出数字量的最低有效位变化一个数码时，对应输入模拟量的变化
+% 最大输入电压为5V，8位的A/D转换器，它分辨最小的输入电压变体化量为[5V/2^8=19.53mV]
+2 相对精度
+% 相对精度是指A/D转换器实际输出数字量与理论输出数字量之间的最大差值
+% 通常用最低有效位LSB的倍数来表示
+3 转换速度
+% 转换速度是指A/D转换器完成一次转换所需要的时间
+% 即从转换开始到输出端出现的稳定的数字信号所需要的时间
+
+
+
+% STM32的ADC功能描述
+1 STM32的ADC是12位逐次逼近型的模数转换器
+2 它有18个通道，可以测量16个外部和2个内部信号源
+3 各通道的AD转换可以 单次，连续，扫描，间断，模式执行
+4 ADC的结果可以左对齐或右对齐方式存储在16位数据寄存器中
+5 模拟看门狗特性允许应用程序检测输入电压是否超出用户定义的高/低阀值
+6 STM32的ADC最大转换速率为1MHz，也就是1uS(在ADCCLK=14M,采样周期为1.5个ADC时钟下得到)
+7 不要让ADC的时钟超过14MHz，否则将导致结果准确度下降
+
+
+
+% ADC模数转换器配置流程
+{
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1,  ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    
+    //将PC5引脚配置为模拟输入模式
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    
+    //ADC1的配置
+    ADC_InitTypeDef   ADC_InitStructure;
+    ADC_InitStructure.ADC_Mode               = ADC_Mode_Independent; //独立模式
+    ADC_InitStructure.ADC_ScanConvMode       = ENABLE; //连续多通道模式
+    ADC_InitStructure.ADC_ContinuousConVMode = ENABLE; //连续转换模式
+    ADC_InitStructure.ADC_ExternalTrigConv   = ADC_ExternalTrigConv_None;//不受外界决定 
+    ADC_InitStructure.ADC_DataAlign          = ADC_DataAlign_Right;//数据右对齐
+    ADC_InitStructure.ADC_NBrOfChannel       = 1;      //扫描通道数1
+    
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15, 1, ADC_SampleTime_55Cycles5)
+    ADC_Cmd(ADC1, ENABLE);
+    ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+}
+% 获得ADC1中的数据，并转换
+u32 conresult;
+u32 Test_ConverisonResult(void)
+{
+    if (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == SET)
+    {
+        conresult = ADC_GetConversionValue(ADC1);
+        //2^12=4096 VDDA=3.3V=3300mV
+        conresult = conresult * 3300;
+        conresult = conresult / 4096;
+    }
+    ADC_ClearITPendingBit(ADC1, ADC_IT_EOC); //清除ADC中断
+    return(conresult);
+}
+//数码管显示转换结果，显示在4位数码管上
+while (1)
+{
+    conversionValue = Test_ConversionResult();
+    ConversionValue = ConversionValue * 1000;
+    NumbTube_Display(conversionValue, 4);
+}
+
+

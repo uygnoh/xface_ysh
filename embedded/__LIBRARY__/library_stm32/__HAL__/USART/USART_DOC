@@ -1,0 +1,43 @@
+############################################################
+### % UART_HAL
+############################################################
+1 HAL_Init();
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  HAL_InitTick(TICK_INT_PRIORITY);
+  HAL_MspInit();
+  
+  
+2 SystemClock_Config();
+
+
+3 UART1_Config();
+  /* 初始化(选择使用的串口，波特率，数据字长，停止位，校验位，硬件流控制) */
+  HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart);
+  /* Init the low level hardware : GPIO, CLOCK */
+  HAL_UART_MspInit(huart);
+  /* Set the UART Communication parameters */
+  UART_SetConfig(huart);
+
+
+
+############################################################
+### % USART_HAL库配置流程
+############################################################
+一， 定义一个 UART_HandlerTypeDef 结构体句柄
+    1 % UART_HandleTypeDef huart1;
+二， 通过 HAL_UART_MspInit 函数来实现串口外设底层初始化
+    1 % 使能 UART 外设时钟
+    2 % 配置 UART 使用的引脚模式
+    3 % 如果要用中断，就配置中断
+    4 % 如果在用DMA，就配置DMA
+三， 通过前面定义的结构体句柄
+    1 % 选择使用的串口
+    2 % 波特率
+    3 % 数据字长
+    4 % 停止位
+    5 % 校验位
+    6 % 硬件流控制    
+四， 通过 HAL_UART_Init() 函数来将串口配置为异步模式
+
+
+

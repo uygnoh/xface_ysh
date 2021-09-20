@@ -1,0 +1,94 @@
+DMA_HandleTypeDef DMA_Handle;
+
+#define BUFFER_SIZE     32
+
+// 定义aSRC_Const_Buffer数组作为DMA传输数据源
+// const关键字将aSRC_Const_Buffer数组变量定义为常量类型
+const uint32_t aSRC_Const_Buffer[BUFFER_SIZE] = {
+    0x12345678, 0x87654321, 0x111111111, 0x222222222,
+};
+// 定义DMA传输目标存储器
+uint32_t aDST_Buffer[BUFFER_SIZE];
+
+
+
+
+static void DMA_Config(void)
+{
+    HAL_StatusTypeDef DMA_status = HAL_ERROR;
+    
+    // 打开DMA时钟
+    __HAL_RCC_DMA1_CLK_ENABLE();
+    
+    // 数据流选择
+    DMA_Handle.Instance = DMA1_Channel6
+    // 存储器到存储器
+    DMA_Handle.Init.Direction = DMA_MEMORY_TO_MEMORY;
+    // 外设地址增量模式
+    DMA_Handle.Init.PeriphInc = DMA_PINC_ENABLE;
+    // 存储器地址增量模式
+    DMA_Handle.Init.MemInc    = DMA_MINC_ENABLE;
+    // 外设数据长度：32
+    DMA_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    // 存储器数据长度：32
+    DMA_Handle.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    // DMA模式
+    DMA_Handle.Init.Mode = DMA_NORMAL;
+    // 中断优先级
+    DMA_Handle.Init.Priority = DMA_PRIORITY_MEDIUM;
+    HAL_DMA_Init(&DMA_Hadle);
+    
+    
+    DMA_stauts = HAL_DMA_Start( &DMA_Handle, (uint32_t)aSRC_Const_Buffer, \
+                 (uint32_t)aDST_Buffer, BUFFER_SIZE );
+    // 判断DMA状态
+    if (DMA_status != HAL_OK)
+    {
+        DMA_Error;
+    }
+}
+
+// 判断指定长度的两个数据泊是否完全相等
+// 如果相等返回“1”， 不相等返回“0”
+uint8_t buffercmp( const uint32_t *pBuffer, uint32_t *pBuffer1, 
+                   uint16_t BufferLength)
+{
+    while (BufferLength--)
+    {
+        if (*pBuffer != *pBuffer1)
+            return 0;
+         pBuffer++;
+         pBuffer1++;
+         return 1;
+    }
+}
+
+
+
+int main(void)
+{
+    // 定义存放比较结果变量
+    uint8_t TransferStatus;
+    
+    SystemClock_Config();
+    
+    DMA_Config();
+    
+    // 等待DMA传输完成
+    while (__HAL_DMA_GET_FLAG(&DMA_Handle, DMA_FLAG_TC6) == DISABLE)
+    {
+    }
+    
+    // 比较源数据与传输后数据
+    TransferStatus = Buffercmp(aSRC_Const_Buffer, aDST_Buffer, BUFFER_SIZE);
+    // 判断源数据与传输后数据比较结果
+    if (TransferStatus == 0)
+    {   // 源数据与传输数据不相等时LED显示红色
+        LED_RED();
+    }
+    else
+    {
+        
+    }
+    
+}

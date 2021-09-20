@@ -1,8 +1,0 @@
-void KEY2_IRQHandler(void)
-{
-    // 确保是否产生了EXTI_Line中断
-    if (__HAL_GPIO_EXTI_GET_IT(KEY2_INT_GPIO_PIN) != RESET)
-        LED2_TOOGLE();
-    // 清除中断标志
-    __HAL_GPIO_EXTI_CLEAR_IT(KEY2_INT_GPIO_PIN);
-}

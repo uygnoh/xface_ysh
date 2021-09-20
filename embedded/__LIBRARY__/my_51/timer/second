@@ -1,0 +1,59 @@
+#include <reg51.h>
+#define uchar unsiged char
+
+uchar count;	//用于记录发生了多少此中断的记录
+uchar second;
+/* 共阳极数码管编码表 */
+uchar code table[] = {0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,
+			0x80,0x90,0x88,0x83,0xc6,0xa1,0x86,0x8e};
+
+int main(void)
+{
+	TMOD = 0x01;	//启用定时器0，工作模式1
+	TH0  = (65536-50000)/256;	//装初值
+	TL0  = (65536-50000)%256;	//装初值
+	EA   = 1;	//打开总中断
+	ET0  = 1;	//打开定时器0
+	TR0  = 1;	//启动定时器0		
+	while (1)
+	{
+		if (count == 20)
+		{
+			count = 0;
+			second++;
+			if (second > 100)
+				second = 0;
+		}
+		display(second);
+	}
+	
+}
+
+void display(uchar dat)
+{
+	uchar shi, ge;
+	shi = dat/10;
+	ge  = dat%10;
+	
+	wei0 = 0;
+	P0 = tab[shi];
+	delay_ms(3);
+	wei0 = 1;
+	
+	wei1 = 0;
+	P0 = tab[shi];
+	delay_ms(3);
+	wei1 = 1;
+	
+}
+
+void timer0() interrupt 1	//定时器0的中断优先等级是1
+{
+
+/* 因为定时器1不具有自动重装载功能，所以每次自动记满数就会自动清零，从 0 开始计数*/
+	TH0  = (65536-50000)/256;	//重新装初值
+	TL0  = (65536-50000)%256;	//重新装初值
+	count++;
+	
+	
+}
