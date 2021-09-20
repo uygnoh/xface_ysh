@@ -378,7 +378,7 @@ void uart_print(uint8_t *pbuf)
                 cnt++;
         }
 }
-void print_freq(flost freq)
+void print_freq(float freq)
 {
         uint32_t tmp = (uint32_t)(freq * 1000);
         uint8_t charbuf[] = {0,0,0,0,0,0,0,0,0};//最大999999.999Hz
@@ -394,6 +394,7 @@ int main(void)
         WDTCTL    = WDTPW + WDTHOLD;
         clock_setup();
         uart_setup();
+//使用定时器1的第“0”通道作为溢出中断功能
 //使用定时器1的第“0”通道设置定时器1的定时时间为“5000”个脉冲数
         TA1CTL   |= TASSEL_2;   //设置时钟源为“SMCLK”
         TA1CTL   |= MC_1;       //设置工作模式为“Up Mode”
@@ -407,7 +408,7 @@ int main(void)
         P2SEL    |= BIT5;       //
         TA1CCTL2 |= CCIE;       //允许捕获比较中断
         
-//使用定时器0，来产生输出测试信号 
+//使用定时器0，来产生输出测试信号，(P1.6 使用跳线连接 P2.5）
         TA0CTL   |= TASSEL1;    //设置时钟源为“SMCLK”
         TA0CTL   |= MC0 | MC1;  //设置工作模式为“Up/Down”
         TA0CCR0   = 0x0AAA;     //设置TA0CCR0为“”，频率：SMCLK / (TACCR0) / 2
@@ -418,6 +419,7 @@ int main(void)
         P1SEL    |= BIT6;       //设置IO复用
         P1DIR    |= BIT6;
         
+        
         __bis_SR_register(GIE);
         while (1) {
                 __delay_cycles(500000);
@@ -425,7 +427,7 @@ int main(void)
                 print_freq(freq);
         }
 }
-#pragma vector=TIMDR1_A1_VECTOR
+#pragma vector=TIMER1_A1_VECTOR
 __interrupt void TIME_TICK(void)
 {
         static uint8_t cnt = 0;
@@ -435,17 +437,18 @@ __interrupt void TIME_TICK(void)
                 break;
         case 0x04:              //捕获比较中断2
                 if (cnt == 0) {
-                        capvalue_1 = TA1CCR2; //保存第一次捕获值
+                        capture_1 = TA1CCR2; //保存第一次捕获值
                         timestamp_1 = timestamp;//保存第一次时间标记
                         cnt++;
                 } else {
-                        capvalue_2 = TA1CCR2;//保存第2次捕获值
+                        capture_2 = TA1CCR2;//保存第2次捕获值
                         timestamp_2 = timestamp;//保存第2次时间标记
                         cnt = 0;
-                        totaltime = (timestamp_2 - timestam_1) * 50000 + capvalue2 - capvalue_1;
+                        //计算总时间
+                        totaltime = (timestamp_2 - timestamp_1) * 50000 + capture2 - capture_1;
                 }
                 break;
-        case 0x0A:              //溢出中断
+        case 0x0A:              //定时器1溢出中断
                 timestamp++;
                 break;
         default:
@@ -566,6 +569,6 @@ int main(void)
 /*******************************************************************************
                                ADC-DTC数据搬运工
 *******************************************************************************/
-
+DTC(data transfer control)这个控制器可以将“ADC10MEM转换数据的结果”，自动存入到片上内存地址中
 
 
