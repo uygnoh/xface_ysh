@@ -6,6 +6,16 @@ pip3 --version
 
 
 
+//软件版本管理命令 update-alternatives
+___________________________________________________________
+//如果有多个python环境
+sudo update-alternatives --instll /usr/bin/python python /usr/bin/python3.7
+sudo update-alternatives --config python
+//如果串口访问权限的问题
+sudo usermod -a -G dialout $USER
+
+
+
 //pip - python包管理器
 ___________________________________________________________
 pip -V                          //版本确认

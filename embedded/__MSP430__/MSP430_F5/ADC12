@@ -156,3 +156,131 @@ __interrupt void ADC12_ISR(void)
         default: break;
 }
 
+
+
+/*******************************************************************************
+                              ADC12 单通道多次转换
+*******************************************************************************/
+#define Num_of_Reaults  8
+volatile unsigned int results[Num_of_Results];
+
+int main(void)
+{
+        WDTCTL     = WDTPW + WDTHOLD;           //Stop watchdog timer
+        P6SEL     |= 0x01;                      //Enable A/D channel A0
+                                //Turn on ADC12, set sampling time
+                                //set multiple sample conversion
+        ADC12CTL0  = ADC12ON + ADC12SHT0_8 + ADC12MSC;
+        ADC12CTL1  = ADC12SHP + ADC12CONSEQ_2;  //Use sampling, set mode
+        ADC12IE    = 0x01;                      //Enable ADC12IFG.0
+        ADC12CTL0 |= ADC12ENC;                  //Enable conversions
+        ADC12CTL0 |= ADC12SC;                   //Start conversion
+        
+        __bis_SR_register(LPM4_bits + GIE);     //Enter LPM4, Enable interrupts
+        __no_operation();                       //For debugger
+}
+#pragma vector=ADC12_VECTOR
+__interrupt void ADC12_ISR(void)
+{
+        static unsigned char index = 0;
+        switch (__evnent_in_range(ADC12IV, 34)) {
+        case 6:
+                results[index] = ADC12MEM0;     //Move results
+                index++;
+                if (index == 8) {
+                        index = 0;
+                }
+        }
+        default break;
+}
+
+
+
+/*******************************************************************************
+                              ADC12 序列通道多次转换
+*******************************************************************************/
+#define Num_of_Results 8
+volatile unsigned int A0results[Num_of_Results];
+volatile unsigned int A1results[Num_of_Results];
+volatile unsigned int A2results[Num_of_Results];
+volatile unsigned int A3results[Num_of_Results];
+
+int main(void)
+{
+        WDTCTL     = WDTPW + WDTHOLD;           //Stop watchdog timer
+        P6SEL      = 0x0F;                      //Enable A/D channel inputs
+                                //Turn ON ADC12, extend sampling time
+                                //to avoid overflow of results
+        ADC12CTL0  = ADC12ON + ADC12MSC + ADC12SHT0_8;
+        ADC12CTL1  = ADC12SHP + ADC12CONSEQ_3;  //Use sampling timer, repeated sequence
+        ADC12MCTL0 = ADC12INCH_0;               //ref+=AVcc, channel = A0
+        ADC12MCTL1 = ADC12INCH_1;               //ref+=AVcc, channel = A1
+        ADC12MCTL2 = ADC12INCH_2;               //ref+=AVcc, channel = A2
+        ADC12MCTL3 = ADC12INCH_3 + ADC12EOS;    //ref+=AVcc, channel = A3, end seq.
+        ADC12IE    = 0x08;                      //Enable ADC12IFG.3
+        ADC12CTL0 |= ADC12ENC;                  //Enable conversions
+        ADC12CTL0 |= ADC12SC;                   //Start convn - software trigger
+        
+        __bis_SR_register(LPM0_bits + GIE);     //Enter LPM0, Enable interrupts
+        __no_operation();                       //For debugger
+}
+#pragma vector=ADC12_VECTOR
+__interrupt void ADC12_ISR(void)
+{
+        static unsigned int index = 0;
+        switch (__event_in_range(ADC12IV, 34)) {
+        case 12:
+                A0results[index] = ADC12MEM0;   //Move A0 results, IFG is cleared
+                A0results[index] = ADC12MEM1;   //Move A1 results, IFG is cleared
+                A0results[index] = ADC12MEM2;   //Move A2 results, IFG is cleared
+                A0results[index] = ADC12MEM3;   //Move A3 results, IFG is cleared
+                if (index == 8)
+                        index = 0;
+                default: break;
+        }
+
+}
+
+
+
+/*******************************************************************************
+                                      比较器
+*******************************************************************************/
+比较器B输入通道“CB0”接外部模拟信号，并引至比较器“+”输入端。
+内部参考电压发生器利用共享电压源产生“2.0V参考电压”，并引至“—”输入端。
+最终产生结果：当CB0输入模拟信号电压高于“2.0V”时，CBOUT输出高电平；
+当CBO输入模拟信号电压低于“2.0V”时， CBOUT输出低电平。
+
+
+int main(void)
+{
+        WDTCTL = WDTPW + WDTHOLD;       //Stop WDT
+        P1DIR |= BIT6;          //P1.6 ouput direction
+        P1SEL |= BIT6;          //Select CBOUT function on P1.6/CBOUT
+        
+//Setup copartorB
+        CBCTL0 |= CBIPEN + CBIPSEL_0;   //Enable V+, input channel CB0
+        CBCTL1 |= CBPWRMD_1;            //normal power mode
+        CBCTL2 |= CBRSEL;               //VREF is applided to “-”termianl
+        CBCTL2 |= CBRS_3 + CBREFL_2;    //R-ladder off; bandgap ref voltage (1.2)
+                                        //supplied ref amplifier t get Vcref=2.0V (CBREFL_2);
+                                        
+        CBCTL3 |= BIT0;                 //Input Buffer Disable @P6.0/CB0
+        CBCTL3 |= CBON;                 //Turn On Comparator8
+        __delay_cycles(75);
+        __bis_SR_register(LPM4_bits)    //Enter LPM4
+        __no_operation();               //For debugger
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
