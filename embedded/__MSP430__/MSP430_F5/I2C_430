@@ -1,0 +1,116 @@
+/*******************************************************************************
+                             MSP430F5529-IIC
+*******************************************************************************/
+A单片机作为“主机，工作在主接收模式”， B单片机为为“从机，工作在从发送模式”。
+从机接收到起始信号后，从“0x00”开始发送缓冲器中的数据，当单字节发送完毕后，会接收到主机发送的停止
+信号。 在停止条件中断服务程序中，将下次发送的单字节数据自动加“1”，这样从机会不断发递增单字节数据。
+主机接收从机发送的单字节数据，并且判断接收到的数据是否正确。 若正确一直接收，直到数据接收错误为止。
+在数据接收错误后，置高P1.0引脚，程序while()死循环。
+
+p3.0 sda
+p3.1 scl
+
+
+
+//程序B， 从机处于发送模式
+___________________________________________________________
+unsigned char TXData;
+unsigned char i = 0;
+int main(void)
+{
+        WDTCTL     = WDTPW + WDTHOLD;   //stop WDT
+        
+        P3SEL     |= 0x03;              //Assign IIC pins to USCI_B0
+        UCB0CTL1  |= UCSWRST;           //** Enable SW reset **
+        UCB0CTL0   = UCMODE_3 + UCSYNC; //IIC Slave, synchronous mode
+        UCB0I2COA  = 0x48;              //Own Address is 048H
+        UCB0CTL1  &= ~UCSWRST;          //** Clear SW reset, resume operation **
+        UCB0IE    |= UCTXIE + UCSTTIE + UCSTPIE; //Enable TX interrupt
+                                        //Enable Start condition interrupt
+                                        //Enable Stop condition interrupt
+                                        
+        TXData     = 0;                 //Used to hold TX data
+        
+        __bit_SR_register(LPM0_bits + GIE);//Enter LPM0 w/ interrupts
+        __no_operation();               //for debugger                                    
+}
+//USCI_B0 State ISR
+#pragma vector=USCI_B0_VECTOR
+__interrupt void USCI_B0_ISR(void)
+{
+        switch (__even_in_range(UCB0IV, 12) {
+        case 0: break;                  //Vector 0: No interrupts
+        case 2: break;                  //Vector 2: ALIFG
+        case 4: break;                  //Vector 4: NACKIFG
+        case 6:                         //Vector 6: STTIFG
+                UCB0IFG &= ~UCSTTIFG;   //Clear start condition int flag
+                break;
+        case 8:                         //Vector 8: STPIFG
+                TXData++;               //Increment TXData
+                UCB0IFG &= ~UCSTPIFG;   //Clear stop condition int flag
+                break;
+        case 10: break;                //Vector 10: RXIFG
+        case 12:                        //Vecotr 12: TXIFG
+                UCB0TXBUF = TXData;     //TX data
+                break;
+        default: break;
+        }
+}
+
+
+
+
+//程序A， 主机处于接收模式
+___________________________________________________________
+unsigned char RXData;
+unsigned char RXCompare;
+int main(void)
+{
+        WDTCTL    = WDTPW + PDTHOLD;    //Stop WDT
+        P1OUT    &= ~0x01;              //P1.0=0
+        P1DIR    |= 0x01;               //P1.0 output
+        P3SEL    |= 0x03;               //Assign I2C pins to USCI_B0( P3.0, P3.1)
+        UCB0CTL1 |= UCSWRST;            //** Enable SW reset **
+        UCB0CTL0  = UCMST + UCMODE_3 + UCSYNC;//I2C Master, synchronous mode
+        UCB0CTL1  = UCSSEL_2 + UCSWRST; //Use SMCLK
+        UCB0BR0   = 12;                 //fsCL = SMCLK/12=~~100KHz
+        UCB0BR1   = 0;
+        UCB0I2CSA = 0x48;               //Slave Address is 048H
+        UCB0CTL1 &= ~UCSWRST;           //** Clear SW reset, resume operation **
+        UCB0IE   |= UCRXIE;             //Enable RX interrupt
+        RXCompare = 0x00;               //Used to check incoming data
+        while (1) {
+                while (UCB0CTL1 & UCTXSTP);     //等待上一次停止位是否发送完成
+                UCB0CTL1 |= UCTXSTT;            //IIC start condition
+                while (UCB0CTL1 & UCTXSTT);     //Start condition sent?
+                UCB0CTL1 |= UCTXSTP;            //I2C stop condition
+                
+                __bis_SR_register(LPM0_bits + GIE);//Enter LPM0, enable interrupts
+                __no_operation();               //For debugger
+                
+                if (RXData != RXCompare) {      //Trap CPU if wrong
+                        P1OUT |= 0x01;          //P1.0 = 1
+                        while (1);
+                }
+                RXCompare++;                    //Increment correct RX value
+        }
+}
+//USCI_B0 Data ISR
+#pragma vector=USCI_B0_VECTOR
+__interrupt void USCI_B0_ISR(void)
+{
+        switch (__even_in_range(UCB0IV, 12) {
+        case 0: break;  //Vector 0: No interrupts
+        case 2: break;  //Vector 2: ALIFG
+        case 4: break;  //Vector 4: NACKIFG
+        case 6: break;  //Vector 6: STTIFG
+        case 8: break;  //Vector 8: STPIFG
+        case 10:
+                RXData = UCB0RXBUF; //Get RX data
+                __bic_SR_register_on_exit(LPM0_bits); //Exit active CPU
+                break;
+        case 12: break; //Vector 12: TXIFG
+        default: break;
+        }
+        
+}

@@ -1,0 +1,158 @@
+/*******************************************************************************
+                               MSP430-F5529-ADC12
+*******************************************************************************/
+|_________________________________________________________|
+|  模拟电压信号  =>采样  =>保持  =>量化  =>编码  =>数字信号      |
+|_________________________________________________________|
+
+
+ //12bit-ADC 计算公式
+ //Vin          输入电压的幅值
+ //V_R负        负的参考电压
+ //V_R正        正的参考电压
+|_________________________________________________________|
+|  N_ADC = 4095 * (Vin - V_R负) / (V_R正 - V_R负)          |
+|_________________________________________________________|
+
+
+
+//采样周期
+__________________________________________________________
+采样周期是指每两次采样的时间间隔
+
+
+//采样频率
+__________________________________________________________
+采样频率，定义每秒人连续信号中提取组成离散信号的采样个数，单位为（Hz）
+采样频率是“采样周期的倒数”。 为了确定对一个模拟信号的采样频率，在此简单
+介绍“香农定理”， 即在进行模数转换过程中， 当采样频率Fs大于信号中最高
+频率分量Fmax的“2倍”时（Fs >= 2Fmax）， 采样后的数字信号能保留原始
+信号中的信息。 在一般应用中， 采样频率应为被采样信号中最高频率的“5~10”倍。
+
+
+//ADC12寄存器
+__________________________________________________________
+ADC12CTL0       //ADC12控制寄存器“0”
+ADC12CTL1       //ADC12控制寄存器“1”
+ADC12CTL2       //ADC12控制寄存器“2”
+ADC12IFG        //ADC12中断标志寄存器
+ADC12IE         //ADC12中断使能寄存器
+ADC12IV         //ADC12中断向量寄存器
+ADC12MEM        //ADC12(0~15)缓冲寄存器
+ADC12MCT        //ADC12(0~15)存储控制寄存器
+
+
+
+/*******************************************************************************
+                               ADC12转换模式
+*******************************************************************************/
+
+1 单通道单次
+__________________________________________________________
+        //一个通道转换一次      （ADC12CONSEQx =00）
+        
+2 序列通道单次转换
+__________________________________________________________
+        //一个序列多个通道转换一次（ADC12CONSEQx =01）
+3 单通多次转换
+__________________________________________________________
+        //一个通道重复转换       （ADC12CONSEQx =10）
+        
+4 序列通道多次转换
+__________________________________________________________
+        //一个序列多个通道重复转换（ADC12CONSEQx =01）
+
+
+
+
+/*******************************************************************************
+                              ADC12单通道单次转换
+*******************************************************************************/
+int man(void)
+{
+        WDTCTL     = WDTPW + WDTHOLD;           //Stop WDT
+        ADC12CTL0  = ADC12SHT02 + ADC12ON;      //Sampling time, ADC12 On
+        ADC12CTL1  = ADC12SHP;                  //Use samping timer
+        ADC12IE    = 0x01;                      //Use interrupt
+        
+        //以上配置必需在“ADC12ENC=0”时，才可以进行配置
+        ADC12CTL0 |= ADC12ENC;
+        P6SEL     |= 0x01;                      //P6.0 ADC option select
+        P1DIR     |= 0x01;                      //P1.0 output
+        
+        while (1) {
+                ADC12CTL0 |= ADC12SC            //Start sampling/conversion
+                __bis_SR_register(LPM0_bits + GIE);
+                __no_operation();
+        }
+}
+#pragma vector=ADC12_VECTOR
+__interrupt ADC12_ISR(void)
+{
+        switch (__even_in_range(ADC12IV, 34)) {
+        case 0: break;                  //Vector 0: No interrupt
+        case 2: break;                  //Vector 2: ADC overflow
+        case 4: break;                  //Vector 4: ADC timing overflow
+        case 6:                         //Vector 6: ADC12IFG0
+                if (ADC12MEM0 >= 0x7ff) //ADC12MEM = (A0 > 0.5AVcc ?)
+                        P1OUT |= BIT0;  //P1.0 = 1
+                else
+                        P1OUT &= ~BIT0; //P1.0 = 0
+        __bic_SR_register_on_exit(LPM0_bits);   //Exit active CPU
+        case 8:  break                 //Vector 8:  ADC12IFG1
+        case 10: break                 //Vector 10: ADC12IFG2   
+        case 12: break                 //Vector 12: ADC12IFG3
+        case 14: break                 //Vector 12: ADC12IFG4
+        case 16: break                 //Vector 12: ADC12IFG5
+        case 18: break                 //Vector 12: ADC12IFG6
+        case 20: break                 //Vector 12: ADC12IFG7
+        case 22: break                 //Vector 12: ADC12IFG8
+        case 24: break                 //Vector 12: ADC12IFG9
+        case 26: break                 //Vector 12: ADC12IFG10
+        case 28: break                 //Vector 12: ADC12IFG11
+        case 30: break                 //Vector 12: ADC12IFG12
+        case 32: break                 //Vector 12: ADC12IFG13
+        case 34: break                 //Vector 12: ADC12IFG14              
+        }
+}
+
+
+
+/*******************************************************************************
+                              ADC12序列通道单次转换
+*******************************************************************************/
+volatile unsigned int results[4];
+
+int main(void)
+{
+        WDTCTL     = WDTPW + WDTHOLD;           //Stop WDT
+        P6SEL      = 0x0F;                      //Enbale A/D channel inputs
+        ADC12CTL0  = ADC12ON + ADC12MSC + ADC12SHT0_2;//Turn on ADC12, set sampling time
+        ADC12CTL1  = ADC12SHP + ADC12CONSEQ_1;  //Use sampling timer, single sequence
+        ADC12MCTL0 = ADC12INCH_0;               //ref+=AVcc, channel = A0
+        ADC12MCTL1 = ADC12INCH_1;               //ref+=AVcc, channel = A1
+        ADC12MCTL2 = ADC12INCH_2;               //ref+=AVcc, channel = A2
+        ADC12MCTL3 = ADC12INCH_3 + ADC12EOS;    //ref+=AVcc, channel = A3, end seq.
+        ADC12IE    = 0x80;                      //Enable ADC12IFG.3
+        ADC12CtL0 |= ADC12ENC;                  //Enable conversions
+        while (1) {
+                ADC12CTL0 |= ADC12ENC;          //Enable conversions
+                ADC12CTL0 |= ADC12SC;           //start convert ->sofware trigger
+                __bis_SR_register(LPM4_bits + GIE); //Enter LPM4, Enable interrupts
+                __no_operation();               //For debugger
+        }
+}
+#pragma vector=ADC12_VECTOR
+__interrupt void ADC12_ISR(void)
+{
+        switch (__event_in_ranger(ADC12IV, 34)) {
+        case 12:
+                results[0] = ADC12MEM0; //Move results, IFG is cleared
+                results[1] = ADC12MEM1; //Move results, IFG is cleared
+                results[2] = ADC12MEM2; //Move results, IFG is cleared
+                results[3] = ADC12MEM3; //Move results, IFG is cleared
+                __bic_SR_register_on_exit(LPM4_bits);//Exit active CPU, SET BREADPOINt HER
+        }
+        default: break;
+}
+

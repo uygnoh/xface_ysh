@@ -1,0 +1,141 @@
+/*******************************************************************************
+                             MSP430F5529-UART 波特率配置
+*******************************************************************************/
+//初始化USCI模块分为五步
+_________________________________________________________________________
+【1】 置位“UCSWRST”控制位
+【2】 在“UCSWRST=1”时，初始化所有USCI寄存器（包括UCTxCTL1）
+【3】 将相应的引脚端口配置为UART通信功能
+【4】 软件清除“UCSWRST=0”控制位， 使能相关模块
+【5】 通过设置接收或发送中断使能控制寄存器（UCRXIE和UCTXIE）或两者之一
+
+
+
+//UCSI低频波特率
+_________________________________________________________________________
+【1】 “UCOS16=0”产生低频波特率模式
+使用“ACLK”作为串口时钟源，波特率设置为4800bps， 在ACLK=32768Hz时产生4800波特率，
+则需要的分频系数是（32768/4800）=6.83 因此整数部分为“6”，小数部分断“0.83”，将整数
+部分赋给UCA0BR寄存器，调制器分频余数为（0.83 * 8）=6.64，取得接近的整数为“7”，因此
+将“7”赋给UCBRS控制位。
+UCA0CTL1 |= UCSSEL_1;           //串口时钟源为ACLK
+UCA0BR0   = 0x06;               //整数分频系数为6
+UCA0BR1   = 0x00;
+UCA0MCTL |= UCBRS_7 + UCBRF_0;  //调制器分频UCBRSx=7，UCBRFx=0
+
+
+
+//UCSI高频波特率
+_________________________________________________________________________
+【2】“UCOS16=1”产生高频波特率模式
+使用SMCLK作为串口时钟源，波特率设置为9600bps，在SMCLK=1048576Hz时产生9600bps
+需要分频系数N=104857/9600=109.23, 大于16分频，因此选择高频波特率模式，预分频
+UCBR应设置为INT（N/16）=INT(6.83)=6. 调制器UCBRF应设置为（0.83*16）=13.28
+取近似的整数“13”，因此将13赋给UCBRF控制位。
+UCA0CTL1 |= UCSSEL_2;   //SMCLK
+UCA0BR0   = 0x06;       //整数分频系数为6
+UCA0BR1   = 0x00;
+//调制器分频UCBRFx=13，选择高频波特率模式
+UCA0MCTL  = UCBRS_0 + UCBRF_13 +UCOS16;
+
+
+
+/*******************************************************************************
+                           UART 采用查询方法发送和接收数据
+*******************************************************************************/
+void uart_tx(char chr)
+{
+        UCA0TXBUF = chr;
+        //等待该字节发送完成
+        while (!(UCA0IFG & UCTXIFG));
+}
+char uart_rx(void)
+{
+        while (!(UCA0IFG & UCRXIFG)); //等待接收1个字节
+        return(UCA0RXBUF);            //返回接收到的数据
+}
+
+
+
+/*******************************************************************************
+                             UART 采用中断方法发送和接收数据
+*******************************************************************************/
+#include <msp430f5529.h>
+int main(void)
+{
+        P3SEL     = BIT3 + BIT4;        //P3.3， p3.4 选择串口收发功能 
+        UCA0CTL1 |= UCSWRST;            //** 复位寄存器配置 **
+        UCA0CTL1 |= UCSSEL_1;           //波特率发生器参考时钟选择ACLK
+        UCA0BR0   = 0x0D;               //波特率设置为2400bps
+        UCA0BR1   = 0x00;
+        UCA0MCTL |= UCBRS_6 + UCBRF_0;  //调制器配置
+        UCA0CTL1 &= ~UCSWRST;           //** 完成UCSI初始化 **
+        UCA0IE    = UCRXIE + UXTXIE;    //使能接收和发送中断
+        _EINT();                        //打开全局中断
+        while (1) {
+        }
+        
+        return 0;
+}
+#pragma vector=USCI_A0_VECTOR
+__interrupt void UCSI_A0_ISR(void)
+{
+        switch (__even_in_range(UCA0IV, 4)) {
+        case 0:
+                /* 中断向量0，无中断 */
+                break;
+        case 2:
+                /* 中断向量2，接收中断 */
+                break;
+        case 4:
+                /* 中断向量4，发送中断 */
+                break;
+         default:
+                break;
+        }
+}
+
+
+
+/*******************************************************************************
+                          MSP430F5529-UART
+*******************************************************************************/
+MSP430与PC上位机通信的波特率为9600bps，无校验位，数据位为8位，停止位1位，采用低频波特率模式
+
+
+#include <msp430.h>
+int main(void)
+{
+        unsigned char i;
+        WDTCTL    = WDTPW + WDTHOLD;    //stop WDT
+        P3SEL     = BIT3 + BIT4;        //P3.3, P3.4 = USCI_A0 TXD/RXD
+        
+        UCA0CTL1 |= UCSWRST;            //** Put state machine in reset **
+        UCA0CTL1 |= UCSSEL_1;           //CLK = ACLK
+        UCA0BR0   = 0x03;               //32KHz/9600=3.41 (see User's Guide)
+        UCA0BR1   = 0x00;
+        UCA0MCTL  = UCBRS_3 + UCBRF_0;  //Modulation UCBRSx=3, UCBRFx=0
+        UCA0CTL  &= ~UCSWRST;           //** Initialize USCI state machine **
+        UCA0IE   |= UCRXIE;             //Enable USCI_A0 interrupt
+        
+        __bis_SR_register(LPM3_bits + GIE);//Enter LPM3, interrupts enabled
+        __no_operation();               //For debugger
+}
+// Echo back RXed character, cofirm TX buffer is ready first
+#pragma vector=USCI_A0_VECTOR
+__interrupt void USCI_A0_ISR(void)
+{
+        switch (__even_in_range(UCA0IV, 4) {
+        case 0:
+                break;
+        case 2:                                 //Vector 2 ->RXIFG
+                while (!(UCA0IFG & UCTXIFG));   //USCI_A0 TX buffer ready?
+                UCA0TXBUF = UCA0RXBUF;          //TX -> RXed character
+                break;
+        case 4:                                 //Vector 4 ->TXIFG
+                break;
+        default:
+                break;
+        }
+}
+
