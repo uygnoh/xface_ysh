@@ -1,0 +1,179 @@
+/*******************************************************************************
+                                FreeRTOS-动态内存创建
+*******************************************************************************/
+xTaskCreate()
+        1 申请任务堆栈内存
+        2 申请任务控制块内存
+        3 把“任务堆栈内存的首地址”存储到“任务控制块中”
+        4 调用prvInitialiseNewTask(),初始化新的任务
+        5 调用prvAddNewTaskToReadyList(),添加新的任务到就绪列表中
+
+prvInitialiseNewTask()
+        1 初始化堆栈为“0xA5”，作堆栈溢出检查（可选功能）
+        2 获取栈顶地址，保存到栈顶指针中
+        3 保存任务名称到“pxNewTCB->pcTaskName[x]”
+        4 保存任务优先级到“pxNewTCB->uxPriority”
+        5 初始化状态列表项和事件列表项
+        6 初始化各种任务控制块成员变量
+        7 调用pxPortInitialiseStack()， 初始化堆栈， 返回值保存到“pxNewTCB->pxTopOfStack”
+        8 保存/记录任务句柄，其实就是任务控制块
+
+prvAddNewTaskReadyList(TCB_t *pxNewTCB)
+        1 uxCurrentNumberOfTasks++; 记录系统中有多少个任务
+        2 如果创建的是“第1个任务”，初始化相关列表prvInitialiseTaskLists();
+        3 调用prvAddTaskToReadyList(); 将任务添加到就绪列表中
+        4 如果新创建的任务优先级比当前任务优先级高，那么调用taskYIELK_IF_USING_PREMPTION();进行任务切换
+prvAddTaskToReadyList();
+        1 将uxTopReadyPriority()相应的bit位置“1”，表示相应优先级有就绪任务
+        2 将新创建的任务添加到对应的就绪列表中，末尾插入。       
+        3 例如：“优先级5”，pxReadyTasksLists[5]
+
+
+
+/*******************************************************************************
+                           FreeRTOS-任务删除， 挂起， 恢复
+*******************************************************************************/
+//任务删除 vTaskDelete()
+———————————————————————————————————————————————————————————
+1 根据任务句柄获取任务控制块，如果任务句柄为“NULL”表示删除任务自身
+2 将要删除的任务从就绪列表中移除，并且如果相应的优先级下只有这一个任务，那么复位相应的优先级位。
+3 如果任务等待某些事件的话，那么就将此任务从相应的事件中移出。
+3.5     如果删除的是任务自身，那么将任务添加到列表xTasksWaitingTermination中
+        如果删除的是任务自身，任务堆栈和任务控制的释放是在空闲任务中完成的。
+4 --uxCurentNumberOfTasks;表示当前系统任务减1，如果删除的不是自身
+5 释放任务控制块和任务堆栈内存
+6 如果删除的是任务自身，需要主动发起任务切换
+
+
+
+//任务挂起
+———————————————————————————————————————————————————————————
+1 根据任务句柄获取任务控制块，如果任务句柄为NULL，表示删除任务自身
+2 将要挂起的任务从相应的状态列表和事件列表中移出
+3 将要挂起的任务添加到挂起任务列表中
+4 如果挂起的是任务自身，而且任务调度器运行正常，那么发起一次任务调度。
+
+
+//任务恢复
+———————————————————————————————————————————————————————————
+1 判断要恢复的任务为挂起任务？
+2 将要恢复的任务从挂起列表中移出
+3 调用prvAddTaskToReadyList(pxTCB);将任务添加到就绪列表中
+4 如果刚刚恢复的任务比正在运行的任务的优先级高，那么进行一次任务切换
+
+
+
+/*******************************************************************************
+                                FreeRTOS 任务切换
+*******************************************************************************/
+// PendSV异常触发
+___________________________________________________________
+        1) 任务切换具体过程是在PendSV中断服务函数里面进行
+        2) 如何进入PendSV中断，通过设置 ICSR寄存器Bit28置“1”
+
+
+  
+// FreeRTOS 任务切换场合
+___________________________________________________________
+        1) taskYILED()
+           vTaskDelay()->portYIELD_WITHIN_API()->portYIELD
+        2) SysTick中断任务函数
+
+
+// PendSV_Handler() 或 xPortPendSVHandler()
+___________________________________________________________
+        0) 进入异常之前CPU自动压入( xPSR, PC, LR, R12, R3-R0)
+        1) 判断是否使用FPU。 如果使用的话将S16-S31入栈。
+ //(当处理异常的时候R14-EXC_RETURN寄存器的“bit4”位) 会被 {CONTROL寄存器的FPCA位替代}
+ //如果EXC_RETURN的bit4这个位为“1”的话，  则表示需要保存浮点寄存器。
+        2) 手动把{R4-R11, R14}入栈，并保存PSP的值到 pxCurrentTCB
+        3) 关闭中断
+        4) 调用vTaskSwitchContext, 获取下一个要运行的任务
+        5) 打开中断
+        6) 获取要切换的任务的栈顶指针
+        7) 手动把{R4-R11, R14}出栈
+        8) 判断是否使用FPU。 如果使用的话将S16-S31出栈。
+ //EXC_RETURN当处理异常的时候bit4会被CONTROL寄存器的FPCA位替代。
+ //当断断EXC_RETURN的bit4是否为1，如果为“1”需要保存浮点寄存器。
+        9) 把要切换任务的入口地址给PSP
+__asm void xPortPendSVHandler( void )
+{
+        extern uxCriticalNesting;
+        extern pxCurrentTCB;
+        extern vTaskSwitchContext;
+
+        PRESERVE8
+
+        mrs r0, psp
+        isb
+        /* Get the location of the current TCB. */
+        ldr	r3, =pxCurrentTCB
+        ldr	r2, [r3]
+
+ //TST比较指令， 测试按位与， 计算 (Rn & #iMM), APSR寄存器的N位和Z位会被更新
+ //it equ, 如果Z位置“1”， 则执行下一条语句
+        /* Is the task using the FPU context?  If so, push high vfp registers. */
+        tst r14, #0x10
+        it eq
+        vstmdbeq r0!, {s16-s31}
+
+        /* Save the core registers. */
+        stmdb r0!, {r4-r11, r14}
+
+        /* Save the new top of stack into the first member of the TCB. */
+        str r0, [r2]
+
+        stmdb sp!, {r3}
+        mov r0, #configMAX_SYSCALL_INTERRUPT_PRIORITY
+        msr basepri, r0
+        dsb
+        isb
+        
+        //获取下一个要运行的任务
+        bl vTaskSwitchContext
+        mov r0, #0
+        msr basepri, r0
+        ldmia sp!, {r3}
+
+        /* The first item in pxCurrentTCB is the task top of stack. */
+        ldr r1, [r3]
+        ldr r0, [r1]
+
+        /* Pop the core registers. */
+        ldmia r0!, {r4-r11, r14}
+
+        /* Is the task using the FPU context?  If so, pop the high vfp registers
+        too. */
+        tst r14, #0x10
+        it eq
+        vldmiaeq r0!, {s16-s31}
+
+        msr psp, r0
+        isb
+        #ifdef WORKAROUND_PMU_CM001 /* XMC4000 specific errata */
+          #if WORKAROUND_PMU_CM001 == 1
+	          push { r14 }
+	          pop { pc }
+	          nop
+          #endif
+        #endif
+
+        bx r14
+}        
+
+
+
+/*******************************************************************************
+                                FreeRTOS 任务切换
+*******************************************************************************/
+1 判断uxSchedulerSuspended是否为pdFALSE, 也就是任务调度器没有被挂起
+2 如果任务调度器没有被挂起，查找下一个要运行的任务
+3 更新当前任务运行时间
+4 调用 taskSELECT_HIGHEST_PRIORITY_TASK()获取下一个要运行的任务
+  通用方法
+    1）
+    2）
+  硬件方法
+    1）
+    2）
+

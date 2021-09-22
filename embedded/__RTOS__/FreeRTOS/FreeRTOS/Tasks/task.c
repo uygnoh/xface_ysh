@@ -1,0 +1,567 @@
+#include "list.h"
+/*******************************************************************************
+                               任务创建例程 静态方法
+*******************************************************************************/
+// 定义任务栈
+#define TASK1_STACK_SIZE			20
+StackType_t Task1Stack[TASK1_STACK_SIZE];
+#define TASK2_STACK_SIZE			20
+StackType_t Task2Stack[TASK2_STACK_SIZE];
+
+// 定义任务控制块
+TCB_t Task1TCB;
+TCB_t Task2TCB;
+
+// 定义任务句柄
+typedef void * TaskHandle_t;
+TaskHandle_t Task1_Handle;
+TaskHandle_t Task2_Handle;
+
+// 定义当前正在运行的任务控制块
+TCB_t * volatile pxCurrentTCB = NULL;
+int main(void)
+{
+        // 初始化任务列表
+        prvInitialiseTaskLists();
+        
+        // 创建任务1
+        Task1_Handle = xTaskCreateStatic(
+                Task1_Entry,            //任务函数
+                "Task1",                //任务名称
+                TASK1_STACK_SIZE,       //任务栈大小 
+                NULL,                   //任务参数
+                Task1Stack,             //任务栈起始地址
+                &Task1TCB);             //任务控制块指针
+        // 核心函数是 vListInsert(), 将任务控制块的列表项插入到就绪列表中
+        vListInsert(&pxReadyTasksLists[1], &Task1TCB.xStateListItem);
+
+        // 创建任务2
+        Task2_Handle = xTaskCreateStatic(
+                Task2_Entry,            //任务函数
+                "Task2",                //任务名称
+                TASK1_STACK_SIZE,       //任务栈大小 
+                NULL,                   //任务参数
+                Task2Stack,             //任务栈起始地址
+                &Task2TCB);             //任务控制块指针
+        // 核心函数是 vListInsert(), 将任务控制块的列表项插入到就绪列表中
+        vListInsert(&pxReadyTasksLists[1], &Task1TCB.xStateListItem);
+
+        // 启动任务调度器
+        vTaskStartScheduler();
+}
+
+
+// 定义任务函数 1
+void Task1_Entry(void *p_arg)
+{
+		for (;;) {
+				flag1 = 1;
+				delay(100);
+				flag1 = 0;
+				delay(100);
+				taskYIELD();
+		}
+}
+// 定义任务函数 2
+void Task2_Entry(void *p_arg)
+{
+		for (;;) {
+				flag2 = 1;
+				delay(100);
+				flag2 = 0;
+				delay(100);
+				taskYIELD();
+		}
+}
+
+
+
+/*******************************************************************************
+                               静态任务创建函数
+*******************************************************************************/
+TaskHandle_t xTaskCreateStatic(
+        TaskFunction_t pxTaskCode,           //任务入口
+        const char * const pcName,          //任务名称
+        const uint32_t ulStackDepth,        //任务栈大小
+        void * const pvParameters,          //任务形参
+        StackType_t * const puxStackBuffer, //任务栈起始地址
+        TCB_t * const pxTaskBuffer)         //任务控制块指针
+{
+        TCB_t *pxNewTCB;
+        TaskHandle_t xReturn;
+
+        if ((pxTaskBuffer != NULL) && (puxStackBuffer != NULL)) {
+	        pxNewTCB = (TCB_T*)pxTaskBuffer;
+	        pxNewTCB->pxStack = (StackType_t *)puxStackBuffer;
+	        
+	        //创建新的任务
+	        prvInitialiseNewTask(
+	                pxTaskCode,     //任务入口
+                        pcName,         //任务名称
+                        ulStackDepth,   //任务栈大小 
+                        pvParameters,   //任务形参
+                        &xReturn,       //任务句柄
+                        pxNewTCB);      //任务栈起始地址
+        } else {
+                xRetrun = NULL;
+        }
+
+        //返回任务句柄，如果任务创建成功，此时xRetrun应该指向任务控制块
+        return xReturn;
+}
+
+// 初始化新的任务
+static void prvInitialiseNewTask(
+        TaskFunction_t pxTaskCode,          //任务入口		
+        const char * const pcName,         //任务名称
+        const uint32_t ulStackDepth,       //任务栈大小
+        void * const pvParameters,         //任务参数
+        TaskHandle_t * const pxCreatedTask, //任务句柄
+        TCB_t *pxNewTCB)                   //任务控制块指针
+{
+        StackType_t *pxTopOfStack;
+        UBaseType_t x;
+
+        //获取栈顶指针
+        pxTopOfStack = pxNewTCB->pxStack + (ulStackDepth - (uint32_t)1);
+        //向下做8字节对齐
+        pxTopOfStack = (StackType_t *)(((uint32_t)pxTopOfStack) & (~((uint32_t)0x0007)));
+
+        //将任务的名称存储在TCB中
+        for (x = (UBaseType)0; x < (UBaseType_t)configMAX_TASK_NAMe_LEN; x++) {
+                pxNewTCB->pcTaskName[x] = pcName[x];
+	        
+                if (pcName[x] == 0x00)
+                        break;
+        }
+
+        //任务名字的长度不能超过configMAX_TASK_NAME_LEN
+        pxNewTCB->pcTaskName[configMAX_TASK_NAME_LEN - 1] = "\0";
+
+        //初始化TCB中的“xStateListItem节点”
+        vListInitialiseItem(&(pxNewTCB->xStateListItem));
+
+        //设置“xStateListItem节点”的拥有者
+        listSET_LIST_ITEM_OWNER(&(pxNewTCB->xStateListItem), pxNewTCB);
+
+        //初始化任务栈
+        pxNewTCB->pxTopOfStack = pxPortInitialiseStack(pxTopOfStack, pxTaskCode, pvParameters);
+
+        //让任务句柄指向任务控制块
+        if ((void *)pxCreatedTask != NULL)
+                *pxCreatedTask = (TaskHandle_t)pxNewTCB;
+}
+
+
+
+// 初始化任务栈
+StackType_t *pxPortInitialiseStack(
+        stackType_t *pxTopOfStack, 
+        TaskFunction_t pxCode,
+        void *pvParameters)
+{
+        //异常发生时，CPU自动从栈中加载到CPU寄存器的内容。
+        //包括8个寄存器，分别为R0、 R1、R2、R3、R12、R14、R15和xPSR的位24，且顺序不能变。
+        pxTopOfStack--;
+        //xPSR的bit24必须置1，即0x01000000
+        *pxTopOfStack = portINITIAL_XPSR;
+        pxTopOfStack--;
+        //任务的入口地址_R15(PC)
+        *pxTopOfStack = ((StackType_t)pxCode) & portSTART_ADDRESS_MASK;
+        pxTopOfStack--;
+        //任务的返回地址，通常任务是不会返回的，
+        //如果返回了就跳转到prvTaskExitError， 该函数是一个无限循环
+        *pxTopOfStack = (StackType_t)prvTaskExitError;
+        // r12, r3, r2, r1 默认初始化为“0”
+        pxTopOfStack -= 5;
+        //r0, 保存的是任务形参
+        *pxTopOfStack = (StackType_t)pvParameters;
+
+        //异常发生时，需要手动加载到CPU寄存器的内容，总共有8个，
+        //分别为R4、R5、R6、 R7、R8、R9、R10和R11，默认初始化为0。
+        pxTopOfStack -= 8;
+        //返回栈顶指针，此时pxTopOfStack指向空闲栈
+        return pxTopOfStack;
+}
+
+
+
+// 就绪列表实际上就是一个 List_t类型的数组，数组的大小由决定最大任务
+// 优先级的宏configMAX_PRIORITIES决定
+List_t pxReadyTasksLists[configMAX_PRIORITIES];
+// 初始化任务相关的列表
+void prvInitialiseTaskLists(void)
+{
+        UBaseType_t uxPriority;
+
+        for (uxPriority = (UBaseType_t)0U; 
+          uxPriority < (UBaseType_t)configMAX_PRIORITIES;
+            uxPriority++)
+                vListInitialise(&(pxReadyTaskLists[uxPriority]));
+}
+// 将任务插入到就绪列表中
+任务控制块里面有一个xStateListItem成员，数据类型为 ListItem_t,
+我们将任务插入到就绪列表里面，就是通过将任务控制块的ListItem_t
+这个节点插入到就绪列表中来实现的。
+
+
+
+
+
+/*******************************************************************************
+                                   动态任务创建
+*******************************************************************************/
+int main(void)
+{
+        //创建开始任务
+        xTaskCreate( (TaskFunction_t )start_task,        //任务函数
+                     (const char *  )"start_task",      //任务名称
+                     (uint16_t      )START_STK_SIZE,    //任务堆栈大小
+                     (void *        )NULL,              //传递级任务参数
+                     (UBaseType_t   )START_TASK_PRIO,   //任务优先级
+                     (Taskhandle_t *)&StartTask_Handler);//任务句柄
+        vTaskStartScheduler();    //开启任务调度
+}
+
+
+
+#if (configSUPPORT_DYNAMIC_ALLOCATION = 1)
+BaseType_t xTaskCreate( TaskFunction_t pxTaskCode, 
+                        const char * const pcName,
+                        const uint16_t usStackDepth,
+                        void * const pvParameters,
+                        UBaseType_t uxPriority,
+                        TaskHandle_t * const pxCreatedTask )
+{
+        TCB_t *pxNewTCB;
+        BaseType_t xReturn;
+        
+        //使用向下增长堆栈指针(portSTACK_GROWTH = -1)
+        StackType_t *pxStack;
+        //使用动态内存分配申请堆栈
+        pxStack = (StackType_t *)pvProtMalloc((((size_t)usStackDepth) * sizeof(StackType_t)))
+        
+        //如果任务堆栈申请成功， 再申请任务控制块
+        if (pxStack != NULL) {
+                pxNewTCB = (TCB_t *)pvPortMalloc(sizeof(TCB_t));
+                //如果任务控制块申请成功，把“任务堆栈的首地址”存储到“任务控制块中”
+                if (pxNewTCB != NULL) {
+                        pxNewTCB->pxStack = pxStack;
+                } else {
+                        vPortFree(pxStack);
+                }
+        } else {
+                pxNewTCB = NULL;
+        }
+        
+        if (pxNewTCB != NULL) {
+                //在这里标记是任务控制块是动态申请的还是静态申请的
+                #if (tskSTATIC_AND_DYNMIC_ALLOCATION_POSSIBLE !=0)
+                pxNewTCB->ucStaticallyAllocated = tskDYNAMICALLY_ALLOCATED_STACK_AND_TCB;
+                #endif
+                
+                prvInitialiseNewTask(pxTaskCode, pcName, 
+                        (uint32_t)usStackDepth, pvParameters, uxPriority,
+                                pxCreatedTask, pxNewTCB, NULL);
+                prvAddNewTaskToReadyList(pxNewTCB);
+                xReturn = pdPASS;
+        } else {
+                xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
+        }
+        
+        return xReturn;
+}
+
+
+// 初始化新的任务
+static void prvInitialiseNewTask(
+        TaskFunction_t pxTaskCode,          //任务入口		
+        const char * const pcName,         //任务名称
+        const uint32_t ulStackDepth,       //任务栈大小
+        void * const pvParameters,         //任务参数
+        TaskHandle_t * const pxCreatedTask, //任务句柄
+        TCB_t *pxNewTCB)                   //任务控制块指针
+{
+        StackType_t *pxTopOfStack;
+        UBaseType_t x;
+
+        //获取栈顶指针
+        pxTopOfStack = pxNewTCB->pxStack + (ulStackDepth - (uint32_t)1);
+        //向下做8字节对齐
+        pxTopOfStack = (StackType_t *)(((uint32_t)pxTopOfStack) & (~((uint32_t)0x0007)));
+
+        //将任务的名称存储在TCB中
+        for (x = (UBaseType)0; x < (UBaseType_t)configMAX_TASK_NAMe_LEN; x++) {
+                pxNewTCB->pcTaskName[x] = pcName[x];
+	        
+                if (pcName[x] == 0x00)
+                        break;
+        }
+        //任务名字的长度不能超过configMAX_TASK_NAME_LEN
+        pxNewTCB->pcTaskName[configMAX_TASK_NAME_LEN - 1] = "\0";
+
+        //初始化状态列表项和事件列表项
+        vListInitialiseItem(&(pxNewTCB->xStateListItem));
+        vListInitialiseItem(&(pxNewTCB->xEventListItem));
+
+        //设置状态列表项的拥有者
+        listSET_LIST_ITEM_OWNER(&(pxNewTCB->xStateListItem), pxNewTCB);
+        
+        //设置事件列表项的值（最大优先级 - 当前任务优先级）
+        //是为了方便任务优先级排序，FreeRTOS在插入列表项中是按照“从小到大排序”，
+        //而任务优先级是“优先级号码越大，优先级越高”， 它在这里做了简单的处理
+        listSET_LIST_ITEM_VALUE(&(pxNewTCB->xEventListItem), 
+                (TickType_t)configMAX_PRIORITIES - (TickType_t)uxPriority);
+                      
+        //设置事件列表项的拥有者
+        listSET_LIST_ITEM_OWNER(&(pxNewTCB->xEventListItem), pxNewTCB);
+
+        //初始化任务栈
+        pxNewTCB->pxTopOfStack = pxPortInitialiseStack(pxTopOfStack, pxTaskCode, pvParameters);
+
+        //让任务句柄指向任务控制块， （任务句柄 == 任务控制块）
+        //也就是它保存的是“任务控制块的首地址”
+        if ((void *)pxCreatedTask != NULL)
+                *pxCreatedTask = (TaskHandle_t)pxNewTCB;
+}
+
+
+
+// 初始化任务栈
+StackType_t *pxPortInitialiseStack(
+        stackType_t *pxTopOfStack, 
+        TaskFunction_t pxCode,
+        void *pvParameters)
+{
+        //异常发生时，CPU自动从栈中加载到CPU寄存器的内容。
+        //包括8个寄存器，分别为R0、 R1、R2、R3、R12、R14、R15和xPSR的位24，且顺序不能变。
+        pxTopOfStack--;
+        //xPSR的bit24必须置1，即0x01000000
+        *pxTopOfStack = portINITIAL_XPSR;
+        pxTopOfStack--;
+        //任务的入口地址_R15(PC)
+        *pxTopOfStack = ((StackType_t)pxCode) & portSTART_ADDRESS_MASK;
+        pxTopOfStack--;
+        //任务的返回地址，通常任务是不会返回的，
+        //如果返回了就跳转到prvTaskExitError， 该函数是一个无限循环
+        *pxTopOfStack = (StackType_t)prvTaskExitError;
+        // r12, r3, r2, r1 默认初始化为“0”
+        pxTopOfStack -= 5;
+        //r0, 保存的是任务形参
+        *pxTopOfStack = (StackType_t)pvParameters;
+        
+        
+        /* A save method is being used that requires each task to 
+        maintin its own exec return value */
+        pxTopOfStack--;
+        *pxTopOfStack = protINITIAL_EXEC_RETURN;
+
+        //异常发生时，需要手动加载到CPU寄存器的内容，总共有8个，
+        //分别为R4、R5、R6、 R7、R8、R9、R10和R11，默认初始化为0。
+        pxTopOfStack -= 8;
+        //返回栈顶指针，此时pxTopOfStack指向空闲栈
+        return pxTopOfStack;
+}
+
+
+static void prvAddNewTaskReadyList(TCB_t *pxNewTCB)
+{
+        taskENTER_CRITICAL();
+        //当前任务数量加“1”
+        uxCurrentNumberOfTasks++;
+        //pxCurrentTCB为当前获取CPU执行权的任务的“任务控制块”，
+        //判断是否为第一个任务
+        if (pxCurrentTCB == NULL) {
+                pxCurrentTCB = pxNewTCB;
+                if (uxCurrentNumberOfTasks == (UBaseType)1)
+                        prvInitialiseTaskLists();
+        } else {
+                //如果等于pdFALSE的话，说明任务没有运行
+                if (xSchedulerRunning == pdFALSE) {
+                        if (pxCurrentTCB->uxPriority <= pxNewTCB->uxPriority)
+                                pxCurrentTCB = pxNewTCB;
+                }
+        }
+        
+        //任务标号
+        uxTaskNumber++;
+        #if (configUSE_TRACE_FACILITY == 1)
+        pxNewTCB->uxTCBNumber = uxTaskNumber;
+        #endif
+        
+        prvAddTaskToReadyList(pxNewTCB);
+        taskEXIT_CRITICAL();
+        
+        //如果这个任务调度器在运行的话
+        if (xSchedulerRunning != pdFALSE) {
+                //如果当前任务优先级小于新创建的任务，那么就进行任务切换
+                if (pxCurrentTCB->uxPriority < pxNewTCB->uxPriority)
+                        taskYIELK_IF_USING_PREMPTION();
+        }
+}
+
+
+
+/*******************************************************************************
+                                   动态任务删除
+*******************************************************************************/
+void vTaskDelete(TaskHandle_t xTaskToDelete)
+{
+        TCB_t *pxTCB;
+        taskENTER_CRITICAL();
+        //根据任务句柄获取任务的“任务控制块”， 如果这个参数是“NULL”，表示删除的是任务自己
+        pxTCB = prvGetTCBFromHandle(xTaskToDelite);
+        
+        //从就绪列表中移除任务
+        if (uxListRemove(&(pxTCB->xStateListItem)) == (UBaseType_t)0)
+                taskRESET_READY_PRIORITY(pxTCB->uxPriority);
+                
+        //如果任务正在等待某个事件？
+        if (listLIST_ITEM_CONTAINER(&(pxTCB->EventListItem)) != NULL)
+                (void)uxListRemove(&(pxTCB->EventListItem));
+                
+        //这个标号主要用于调试
+        uxTaskNumber++;
+        
+        //如果删除的是当前正在运行的任务
+        if (pxTCB == pxCurrentTCB) {
+                //把要删除的任务添加到&xTasksWaitingTermination
+                vListInsertEnd(&xTasksWaitingTermination, &(pxTCB->xStateListItem));
+                ++uxDeletedTasksWaitingCleanUp;
+                protPRE_TASK_DELETE_HOOK(pxTCB, &xYieldPending);
+                
+        } else {
+                --uxCurentNumberOfTasks;
+                prvDeleteTCB(pxTCB);
+                prvResetNextTaskUnblockTime();
+        }
+        taskEXIT_CRITICAL();
+        
+        if (xSchedulerRunning != pdFALSE) {
+                //如果删除的是任务的自身，需要进行一次任务的切换
+                if (pxTCB == pxCurrentTCB)
+                        protYIELD_WITHIN_API();
+        }
+}
+#define prvGetTCBFromHandle(pxHandle) (((pxHandle) == NULL) ?   \
+                                      (TCB_t *)pxCurrentTCB :   \
+                                      (TCB_t *)(pxHandle))
+//如果 ==0， 说明这个优先级下只有一个任务
+#define taskRESET_READY_PRIORITY(uxPriority) {                  \
+        if (listCURRENT_LIST_LENGTH(                            \
+        &(pxReadyTaskLists[(uxPriority)])) == (UBaseType_t )0)  \
+                portRESET_READY_PRIORITY((uxPriority), (uxTopReadyPriority));\
+}
+
+
+
+/*******************************************************************************
+                                   动态任务挂起
+*******************************************************************************/
+void vTaskSupend(TaskHandle_t xTaskToSuspend)
+{
+        TCB_t *pxTCB;
+        taskENTER_CRITRICAL();
+        //获取要挂起任务的“任务句柄” 给 pxTCB
+        pxTCB = prvGetTCBFromHandle(xTaskToSuspend);
+        
+        //Remove task from the ready/delayed list an place
+        //in the suspended list
+        //从状态列表项中移出
+        if (uxListRemove(&(pxTCB->xStateListItem)) == (UBaseType_t)0)
+                taskRESET_READY_PRIORITY(pxTCB->uxPriority);
+        //Is the task waiting on an event also?
+        //从事件列表项中移出
+        if (listLIST_ITEM_CONTAINER(&(pxTCB->xEventListItem)) != NULL)
+                (void)uxListRemove(&(pxTCB->xEventListItem));
+        //插入到挂起列表项中
+        vListInsertEnd(&xSuspendedTaskList, &(pxTCB->xStateListItem));
+        taskEXIT_CRITICAL();
+        
+        if (xSchedulerRunning != pdFALSE） {
+                taskENTER_CRITICAL();
+                prvResetNextUnblockTime();
+                taskEXIT_CRITICAL();
+        }
+        
+        //如果挂起的是自己
+        if (pxTCB == pxCurrentTCB) {
+                if (xSchedulerRunning != pdFALSE)
+                        //发起一次任务调度
+                        portYIELD_WITHIN_API();
+        } else {
+                //如果把所有任务都挂起了, 这里为了安全起见
+                if (listCURRENT_LIST_LENGTH(&xSuspendedTaskList) == uxCurrentNumberOfTasks)
+                        pxCurrentTCB = NULL;
+                else    //查找下下个要运行的任务
+                        vTaskSwitchContext();
+        }
+}
+
+
+
+/*******************************************************************************
+                                   动态任务恢复
+*******************************************************************************/
+void vTaskResume(TaskHandle_t xTaskToResume)
+{
+        TCB_t *const pxTCB = (TCB_t *)xTaskToResume;
+        if ((pxTCB != NULL) && (pxTCB != pxCurentTCB)) {
+                taskENTER_CRITICAL();
+                //如果要恢复的任务被挂起
+                if (prvTaskIsTaskSuspended(pxTCB) != pdFALSE) {
+                        (void)uxListRemove(&(pxTCB->xStateListItem));
+                        prvAddTaskToReadyList(pxTCB);
+                        
+                        if (pxTCB->uxPriority >= pxCurrentTCB->uxPriority)
+                                taskYIELD_IF_USING_PREEMPTION();
+                }
+        }
+}
+
+
+
+/*******************************************************************************
+                                   查找优先级
+*******************************************************************************/
+//硬件方法
+———————————————————————————————————————————————————————————
+硬件方法就是使用处理器自带的硬件指令来实现的，比如Cortex-M处理器就自带
+有计算前导“0”个数指令：CLZ， 函数如下
+#define taskSELECT_HIGHEST_PRIORITY_TASK() {                            \
+        UBaseType_t uxTopPriority;                                      \
+        portGET_HIGHEST_PRIORITY(uxTopPriority, uxTopReadyPriority);    \
+        listGET_OWNER_OF_NEXT_ENTRY(pxCurrentTCB,                       \
+                &(pxReadyTasksList[uxTopPriority]));                    \
+}
+1 通过函数“portGET_HIGHEST_PRIORITY()”获取处于就绪态的最高优先级，它本质是一个宏
+#define protGET_HIGHEST_PRIORITY(uxTopPriorities) uxTopPriority =       \
+        (31UL - (uint32_t)__clz((uxReadyPriorities)))
+使用硬件方法“uxTopReadyPriority”就不代表处于就绪态最高优先级了， 而是使用每个 bit 代表
+一个优先级， bit0代表优先级“0”， bit31代表优先级“31”， 当某个优先级有就绪任务的话就将其
+对应的bit置“1”。 从这里可以看出使用硬件方法最多只能有32个优先能。 __clz(uxReadyPriorities)
+就是计算“uxReadyPrioritiesr的前导零个数”， 前导零个数就是指从高高位开始（bit31）到第“1”个
+为“1的bit”， 其间“0”的个数。
+|—————————————————————————————————————————————————————————|
+|    1000 0000 0000 0000        //前导零个数为“0”           |
+|    0000 1000 1111 0001        //前导零个数为“4”           |
+|—————————————————————————————————————————————————————————|
+得到uxTopReadyPriority的前导零个数以后， 再用“31 - 前导零个数”，
+得到的就是处于最高优先级的任务了。 比如“优先级为30”为此时处于就绪态
+最高优先级的任务，30的前导零个数为“1”，那么得到的最高优先级任务就是（31-1=30）
+
+
+//通用方法
+———————————————————————————————————————————————————————————
+#define taskSELECT_HIGHEST_PRIORITY_TASK() {                            \
+        UBaseType_t uxTopPriority = uxTopReadyPriority;                 \
+        while (listLIST_IS_EMPTY(&(pxReadyTaskList[uxTopPriority])))    \
+                --uxTopPriority;                                        \
+        listGET_OWNER_OF_NEXT_ENTRY(pxCurrentTCB,                       \
+                &(pxReadyTasksLists[uxTopPriority]));                   \
+        uxTopReadyPriority = uxTopPriority;                             \
+}
+pxReadyTasksLists[]为就绪任务列表数组，一个优先级一个列表，同优先级的任务挂到相应的
+列表中。 uxTopReadyPriority代表处于最高优先级值，每次创建任务的时候都会判断新任务的优先级
+是否大于“uxTopReadyPriority”, 如果大于的话就将这个新任务的优先级赋值给变量“uxTopReadyPriority”
+
