@@ -33,9 +33,8 @@ void usart_setup(void)
 	/* usart1—gpio基本配置(uint32_t)类型数据 */
 	/* Tx(PA.09)_复用推挽输出(50MHz)   Rx(PA.10)_浮空输入 */
 	GPIOA->CRH &= (uint32_t)(0xFFFFF00F);
-	GPIOA->CRH |= (uint32_t)(0x000000B0);
-	GPIOA->CRH |= (uint32_t)(0x00000400);
-	
+	GPIOA->CRH |= (uint32_t)(0x000004B0);
+
 	/* usart1基本配置(uint16_t)类型数据 */
 	USART1->CR1 |= m16_set_bit_13;      /* USART模块使能 */
 	USART1->CR1 &= ~m16_set_bit_12;     /* 1个起始位, 8个数据位 */
