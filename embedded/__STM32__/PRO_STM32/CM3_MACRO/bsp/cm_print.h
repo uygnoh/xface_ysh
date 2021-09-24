@@ -1,27 +1,28 @@
 #ifndef __CM_PRINT_H__
 #define __CM_PRINT_H__
-//#define UART_SERIAL	1
 
-#ifdef UART_SERIAL
 /******************************************************************************/
 /*                                                                            */
 /*                     STM32CubeIDE使用串口调式程序                              */
 /*                                                                            */
 /******************************************************************************/
-#include <string.h>
-#include <stdio.h>
+//#include <string.h>
+//#include <stdio.h>
 
 #ifdef __GNUC__
 	#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
 	#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif
+
+/*
 PUTCHAR_PROTOTYPE
 {
-    /* 注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的 */
+    //注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的 
     HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
+*/
 /* 这是一个测试程序
 int main(void)
 {
@@ -33,15 +34,16 @@ int main(void)
 	}
 }
 */
-#endif
 
 
-#ifdef UART_ITM
+
+
 /******************************************************************************/
 /*                                                                            */
 /*                     STM32CubeIDE使用ITM调式调式程序                           */
 /*                                                                            */
 /******************************************************************************/
+/*
 #include "stdio.h"
 int _write(int file, char *ptr, int len)
 {
@@ -50,7 +52,7 @@ int _write(int file, char *ptr, int len)
         ITM_SendChar((*ptr++));
     return len;
 }
-
+*/
 /* 这是一个测试程序
 int main(void)
 {
@@ -64,6 +66,6 @@ int main(void)
 
 }
 */
-#endif
+
 
 #endif
