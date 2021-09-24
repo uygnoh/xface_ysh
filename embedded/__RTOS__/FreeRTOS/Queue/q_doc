@@ -1,9 +1,0 @@
-/*******************************************************************************
-                              
-*******************************************************************************/
-QueueHandle_t xQueueGenericCreate(
-        const UBaseType_t uxQueueLength, 
-        const UBaseType_t uxItemSize, 
-        uint8_t *pucQueueStorage, 
-        StaticQueue_t *pxStaticQueue, 
-        const uint8_t ucQueueType )

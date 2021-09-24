@@ -1,0 +1,125 @@
+/*******************************************************************************
+                                FreeRTOS 二值信号量
+*******************************************************************************/
+xSemaphoreCreateBinary()        //动态方法创建二值信号量
+xSemaphoreCreateBinaryStatic()  //静态方法创建二值信号量
+XSemaphoreGive()                //释放信号量（任务级）
+xSemaphoreGiveFormISR()         //释放信号量（中断级）
+xSemaphoreTake()                //获取信号量（任务级）
+xSemaphoreTakeFromISR()         //获取信号量（中断级）
+
+
+
+/*******************************************************************************
+                                    二值信号量
+*******************************************************************************/
+//xSemaphoreCreateBinary() 创建二值信号量（新版本）
+___________________________________________________________
+1 通过xQueueGenericCreate()创建一个队列
+  队列长度为“1”， 队列项长度为“0”， 队列类型为“queueQUEUE_TYPE_BINARY_SEMAPHORE”
+2 和创建队列的区别就是不需要消息存储区， 信号量只关心队列存了多少数据， 不关心存了什么数据！！！
+
+//xSemaphoreCreateBinary() 创建二值信号量（旧版本）
+___________________________________________________________
+1 同新版本一样调用xQueueGenericCreate()来创建二值信号量
+  队列长度为“1”， 队列项长度为“0”， 队列类型为“queueQUEUE_TYPE_BINARY_SEMAPHORE”
+2 与新版本不同的是， 一旦二值信号量创建成功立即调用xSemaphoreGive()来释放这个二值信号量
+
+
+
+//XSemaphoreTake() 获取信号量（任务级）
+___________________________________________________________
+1 获取信号量， （它适用于二值信号量， 计数型信号量， 互斥信号量）
+2 调用函数xQueueGenericReceive()获取信号量， 本质是将
+  pxQueue->uxMessagesWaiting“减一”， 也就是信号量值减一。
+
+
+
+//XSemaphoreGive() 释放信号量（任务级）
+___________________________________________________________
+1 释放信号量， （它适用于二值信号量， 计数型信号量， 互斥信号量）
+2 调用函数xQueutGenericSend()来释放信号量， 本质是将
+  pxQueue->uxMessagesWaiting“加一”， 也就是信号量值“加1操作”
+3 如果函数xQueueGenericSend()用于信号量的话， 阻塞时间为semGIVE_BLOCK_TIME, 即为“0”
+
+
+
+/*******************************************************************************
+                                    计数型信号量
+*******************************************************************************/
+//xSemaphoreCreateCounting()创建计数型信号量
+___________________________________________________________
+1 调用xQueueCreateCountingSemaphore()创建计数型信号量， 此函数调用
+  xQueueGenericCreate()创建一个队列， 队列长度“uxMaxCount(由用户自己设定)”
+  队列项长度为“queueSEMAPHORE_QUEUE_ITEM_LENGTH”即为“0”， 队列类型为
+  “queueQUEUE_TYPE_COUNTING_SEMAPHORE”
+2 如果计数型信号量创建成功， 计数型信号量赋初值“xHandle->uxMessagesWaitingg = uxInitialCount”
+  uxInitialCount由用户自己设定。
+  
+  
+  
+/*******************************************************************************
+                                    互斥信号量
+*******************************************************************************/
+//xSemaphoreCreateMutex() 创建互斥信号量
+___________________________________________________________
+1 调用函数xQueueCreateMutex()创建互斥信号量，此函数通过xQueueCenericCreate()创建队列，
+  队列长度为“1”， 队列项长度为“0”， 队列类型为“queueQUEUE_TYPE_MUTEX”
+2 互斥信号量创建成功以后调用“prvInitialiseMutex()”初始化互斥信号量
+3 互斥信号量有专门定义了2个宏（queue.c）
+  #define pxMutexHolder         pcTail
+  #define uxQueueType           pcHead
+  #define queueQUEUE_IS_MUTEX   NULL
+  当Queue_t用于表示队列的时候pcHead和pcTail指向队列的存储区域，
+  当Queue_t用于表示互斥信号量的时候就不需要pcHead和pcTail了。
+  当用于互斥信号量的时候将pcHead指向“NULL”来表示pcTail保存着互斥信号量的所有者，
+  pxMutexHolder指向拥有互斥信号量的那个任务的任务控制块。
+4 函数prvInitialiseMutex()最终会调用xQueueGenericSend()来释放一次信号量。
+  说明默认创建的这个互斥信号量是有效的
+  
+  
+  
+//互斥信号量的优先级继承（获取互斥信号量的优先级继承处理）xSemaphoreTake()
+___________________________________________________________
+1 优先级继承在xQueueGenericReceive完成
+2 如果互斥信号量有效，直接获取互斥信号量。 标记pxQueue->pxMutexHolder = pxCurrentTCB
+  并且pxCurrentTCB->uxMutexesHeld加1， 表示当闪任务获取了一个互斥信号量。 此过程由函数
+  pvTaskIncrenmentMutexHeldCount()完成 
+3 如果互斥信号量无效， 调用函数vTaskPriorityInherit()处理优先级继承。
+  如果获取互斥信号量的任务优先级比当前任务的优先级低， 那么将获取到互斥信号量的任务的优先级暂时
+  提升到当前任务的优先级。
+
+
+//互斥信号量的优先级继承（释放互斥信号量的优先级继承处理） xSemaphoreGive()
+___________________________________________________________
+1 优先级继承在函数xQueueGenericSend()中的函数prvCopyDataToQueue()中完成
+2 调用函数xTaskPriorityDisinherit()处理优先级继承问题
+  当任务释放的是最后一个互斥信号量的时候才会解决优先级继承的问题
+  将任务的优先级恢复为基优先级。
+3 pxQueue->pxMutexHolder = NULL清“0”， 表示没有任务获取互斥信号量
+
+
+
+/*******************************************************************************
+                                    递归互斥信号量
+*******************************************************************************/
+//创建递归互斥信号量 xSemaphoreCreateRecursiveMutex()
+___________________________________________________________
+1 调用函数xQueueCreateMutex()创建递归互斥信号量
+类型为“queueQUEUE_TYPE_RECURSIVE_MUTEX”
+
+
+//获取递归互斥信号量 xSemaphoreTakeRecursive()
+___________________________________________________________
+1 调用函数xQueueTakeMutexRecursive()来获取递归互斥信号量
+2 判断当前任务是否已经获取到了递归互斥信号量，如果获取到了的话就将“u.uxRecursiveCallCount加1”
+3 如果没有获取到递归互斥信号量，也就是说明本次是第一次获取递归互斥信号量， 那么调用函数
+  xQueueGenericReceive()完成一次真正的获取递归互斥信号量！！！
+  
+  
+//释放递归互斥信号量 xSemaphoreGiveRecursive()
+___________________________________________________________
+1 调用函数xQueueGiveMutexRecursive()释放递归互斥信号量
+2 判断当前任务是否获取了递归互斥信号量， 如果当前任务已经获取到了递归互斥信号的的话，
+  就将“u.uxRecursiveCallCount减1”
+3 如果是最后一次释放递归互斥信号量， 那么就调用函数xQueueGenericSend()来真正的释放。  
