@@ -170,7 +170,7 @@
 #define configTIMER_QUEUE_LENGTH                        10
 
 //软件定时器任务堆栈大小
-#define configTIMER_TASK_STACK_DEPTH                    (configMINIMAL_STACK_SIZE*2)
+#define configTIMER_TASK_STACK_DEPTH                (configMINIMAL_STACK_SIZE*2)
 
    
 

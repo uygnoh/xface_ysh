@@ -166,6 +166,7 @@ BaseType_t xTaskGenericNotifyFromISR(
   如果为pdFALSE的话就“减1”， 否则清零
 4 修改任务通知状态为taskNOT_WAITING_NOTIFICATION, 表示不等待任务通知。
 5 如果任务通知有效， 返回任务通知 
+________________________________________________________________________________
 uint32_t ultaskNotifyTake(
         BaseType_t xClearCountOnExit, 
         TickType_t xTicksToWait,)       //阻塞时间
@@ -201,10 +202,48 @@ uint32_t ultaskNotifyTake(
 
 
 
+________________________________________________________________________________
+1 如果任务通知状态不为taskNOTIFICATION_RECEIVED的话， 那么就根据参数ulBitsToClearOnEntry
+  来清除指定的Bit。 修改任务通知状态为taskWAITING_NOTIFICATION, 表示等待任务通知。
+2 如果设置了阻塞时间的话， 那么就处理阻塞相关问题
+3 如果任务通知有效， 那么保存任务通知到参数pulNotificationValue中
+4 再次确认任务通知状态是否为taskWAITING_NOTIfIFICATION，如果是的话 xReturn=pdFALSE
+5 如果经过（4） 确认得到任务通知状态不为taskWAITING_NOTIFICATION, 
+  那么根据参数ulBitsToClearOnExit清除任务通知指定的Bit
+6 修改任务通知状态为taskNOT_WAITING_NOTIFICATION; 返回pdTRUE
+________________________________________________________________________________
 BaseType_t xTaskNotifyWait(
         uint32_t ulBitsToClearOnEntry,
         uint32_t ulBitsToClearOnExit,
+        uint32_t *pulNotificationValue,
+        TickType_t xTicksToWait,
+{
+        BaseType_t xReturn;
+        taskENTER_CRITICAL();
+        if (pxCurrentTCB->uxNotifyState != taskNOTIFICATION_RECEIVED) {
+                pxCurrentTCB->ulNotifiedValue &= ~ulBitsToClearOnEntry;
+                pxCurrentTCB->ucNotifyState = taskWAITING_NOTIFICATION;
+                if (xTicksToWait > (TickType_t)0) {
+                        prvAddCurrentTaskToDelayedList(xTicksToWait, pdTRUE);
+                        protYIELD_WITHIN_API();
+                }
+        }
+        taskEXIT_CRITICAL();
         
+        taskENTER_CRITICAL();
+        if (pulNotificationValue != NULL) {
+                *pulNotificationValue = pxCurrentTCB->ulNotifiedValue;
+        }
+        if (pxCurrentTCB->ucNotifyState == taskWAITING_NoTIFICATION) {
+                xReturn = pdFALSE;
+        } else {
+                pxCurrentTCB->ulNotifiedValue &= ~ulBitsToClearOnExit;
+                xReturn = pdTRUE;
+        }
+        pxCurrentTCB->ucNotifyState = taskNOT_WAITING_NOTIFICATION;
+        taskEXIt_CRITICAL();
+        return xReturn; 
+}      
 
 
 

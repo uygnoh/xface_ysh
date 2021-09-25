@@ -1,0 +1,76 @@
+/*******************************************************************************
+                                heap_1
+1 适用于那些一旦创建好的任务， 信号量和队列就再也不会删除的应用，
+  实际上大多数的FreeRTOS应用都是这样的
+2 具有可确定性（执行所花费的时间大多数都是一样的），而且不会产生
+  内存碎片。
+3 代码实现和内存分配过程都非常简单，内存是从一个静态数组中分配到
+  的， 也就是适合于那些不需要动态内存分配的应用
+*******************************************************************************/
+//字节对齐后可用内存大小
+#define configADJUSTED_HEAP_SIZE (configTOTAL_HEAP_SIZE - protBYTE_ALIGNMENE)
+
+//内存堆大小由用户配置， 内存堆地址由编译器自动分配
+extern uint8_t ucHeap[configTOTAL_HEAP_SIZE]; 
+void *pvPortMalloc(size_t xWantedSize)
+{
+        void *pvReturn = NULL;
+        static uint8_t *pucAlignedHeap = NULL;
+        
+        //1 对应用所申请的内存大小xWantedSize做字节对齐， FreeRTOS默认做8字节对齐
+        #if (portBYTE_ALIGNMENT != 1)
+        if (xWantedSize & portBYTE_ALIGNMENT_MASK)
+                xWantedSize += (portBYTE_ALIGNMENE - (xWantedSize & portBYTE_ALIGNMENT_MASK
+        #endif
+        
+        vTaskSupendAll();
+        //2 确保内存堆的可用起始地址也是 8 字节对齐的， 是任务在第一次申请内存时
+        if (pucAlignedHeap == NULL) {
+                pucAlignedHeap = (uint8_t *)(((portPOINTER_SIZE_TYPE)&ucHeap[portBYTE_ALIGNMENT]
+                                  
+        }
+        
+        //判断是否有足够的内存
+        if (((xNextFreeByte + xWantedSize) < configADJUSTED_HEAP_SIZE) &&
+            ((xNextFreeByte + xWantedSize) > xNextFreeByte)) {
+                pvReturn = pucAlignedHeap + xNextFreeByte;
+                xNextFreeByte += xWantedSize;
+        }
+        (void)xTaskResumeAll();
+        
+        //内存申请失败构子函数， 这个构子函数需要用户自己编写
+        #if (configUSE_MALLOC_FAILED_HOOK == 1)
+        if (pvReturn == NULL) {
+                extern void vapplictionMallocFailedHook(void);
+                vApplicationMallocFailedHook();
+        }
+        #endif
+        
+        return pvReturn;
+}
+
+
+
+/*******************************************************************************
+                                heap_2
+*******************************************************************************/
+typedef struct A_BLOCK_LINK {
+        struct A_BLOCK_LINK *pxNextFreeBlock;//指向链表中下一个空闲内存块
+        size_t xBlockSize; //当前空闲内存块大小
+} BlockLink_t;
+
+static const uint16_t heapSTRUCT_SIZE = ((sizeof(BlockLink_t) + (protBYTE_ALIGNMENT
+#define heapMINIMUM_BLOCK_SIZE((size_t)(heapSTRUCT_SIZE * 2))
+static BlockLink_t xStart, xEnd;
+static size_t xFreeBytesRemaining = configADJUsTED_HEAAP_SIZE;
+
+
+
+
+
+
+
+
+
+
+
