@@ -1,8 +1,9 @@
-/*                 FreeRTOS动态任务创建框架
-        1. 设计 3 个任务， start_task, task1, task2
-        2. start_task用来创建（task1, task2）
-        3. start_task调用函数vTaskDelete()删除自己
-*/
+/******************************************************************************/
+/*                    FreeRTOS动态任务创建框架                                   */
+/*                   1. 设计 3 个任务， start_task, task1, task2                */
+/*                   2. start_task用来创建（task1, task2）                      */
+/*                   3. start_task调用函数vTaskDelete()删除自己                  */
+/******************************************************************************/
 
 // start_task(起始任务)
 //_______________________________________________________//
@@ -89,16 +90,18 @@ void task2(void *pvParameters)
                 vTaskDelay(800);
         }
 }
-/*******************************************************************************
 
 
 
 
-*******************************************************************************/
-/*                 FreeRTOS静态任务创建框架
-        1. 配置configSUPPORT_STATIC_ALLICATION == 1
-        2. start_task创建（task1, task2）
-*/
+/******************************************************************************/
+/*                          FreeRTOS静态任务创建框架                             */
+/*                                                                            */
+/*                   1. 配置configSUPPORT_STATIC_ALLICATION == 1               */
+/*                   2. start_task创建（task1, task2）                          */
+/*                                                                            */
+/******************************************************************************/
+
 // start_task(起始任务)
 //_______________________________________________________//
 #define START_TASK_PRIORITY      (1)    //定义任务优先级
@@ -145,8 +148,8 @@ vodi vApplicationGetIdleTaskMemory(
         uint32_t      *pulIdleTaskStackSize)   //堆栈大小
 {
         *ppxIdleTaskTCBBuffer   = &IdleTaskTCB;
-        *ppxIdleTaskStackBuffer = IdleTaskStack;
-        *pulIdleTaskStackSize   = configMINIMAL_STACK_SIZE;
+        *ppxIdleTaskStackBuffer =  IdleTaskStack;
+        *pulIdleTaskStackSize   =  configMINIMAL_STACK_SIZE;
 }
 //_______________________________________________________//
 //                  定时器任务所需内存                      //
@@ -157,12 +160,9 @@ vodi vApplicationGetTimerTaskMemory(
         uint32_t      *pulTimerTaskStackSize)   //堆栈大小
 {
         *ppxTimerTaskTCBBuffer   = &TimerTaskTCB;
-        *ppxTimerTaskStackBuffer = TimerTaskStack;
-        *pulTimerTaskStackSize   = configTIMER_TASK_STACK_DEPTH;
+        *ppxTimerTaskStackBuffer =  TimerTaskStack;
+        *pulTimerTaskStackSize   =  configTIMER_TASK_STACK_DEPTH;
 }
-
-
-
 int main(void)
 {
         start_task_handle = xTaskCreateStatic(
@@ -173,6 +173,7 @@ int main(void)
                 (UBaseType_t    )START_TASK_PRIORITY,   //任务优先级
                 (StackType_t *  )START_TASK_STACK,      //任务堆栈内存分配
                 (StaticTask_t * )&START_TASK_TCB);      //任务控制块内存分配
+        vTaskStartScheduler(); //打开任务调度器
 }
 /*******************************************************************************
   函数名称: start_task()
@@ -199,7 +200,6 @@ void start_task(void *pvParameters)
                 (StackType_t *  )TASK2_STACK,           //任务堆栈内存分配
                 (StaticTask_t * )&TASK2_TCB);           //任务控制块内存分配
         vTaskDelete(start_task);
-
 }
 
 /*******************************************************************************
