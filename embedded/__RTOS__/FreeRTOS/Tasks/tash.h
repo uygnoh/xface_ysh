@@ -8,6 +8,12 @@ typedef struct tskTaskControlBlock {
         UBaseType_t             uxPriority;     //任务优先级
         StackType_t             *pxStack;       //任务栈起始地址
         char                    pcTaskName[configMAX_TASK_NAME_LEN];//任务名称
+        
+        //任务通知功能
+        #if (configUSE_TASK_NOTIFICATIONS == 1)
+        volatile uint32_t ulNotifiedValue;
+        volatile uint8_t  ucNotifyState;
+        #endif
 } tskTCB;
 typedef tskTCB TCB_t;
 
