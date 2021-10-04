@@ -30,12 +30,12 @@ void task2(void *pvParameters);    //开始任务函数声明
 //_______________________________________________________//
 int main(void)
 {
-        xTaskCreate((TaskFunction_t )start_task,            //任务函数入口
-                    (char *         )"start_task",          //任务名称
-                    (uint16_t       )START_TASK_STACK_SIZE, //任务堆栈大小
-                    (void *         )NULL,                  //任务参数
-                    (UBaseType_t    )START_TASK_PRIORITY,   //任务优先级
-                    (TaskHandle_t * )&start_task_handle);   //任务句柄
+        xTaskCreate((TaskFunction_t       )start_task,           //任务函数入口
+                    (const char * const   )"start_task",          //任务名称
+                    (const uint16_t       )START_TASK_STACK_SIZE, //任务堆栈大小
+                    (void * const         )NULL,                  //任务参数
+                    (UBaseType_t          )START_TASK_PRIORITY,   //任务优先级
+                    (TaskHandle_t * const )&start_task_handle);   //任务句柄
 
         vTaskStartScheduler(); //打开任务调度器
 }
@@ -47,18 +47,18 @@ int main(void)
 *******************************************************************************/
 void start_task(void *pvParameters)
 {
-        xTaskCreate((TaskFunction_t )task1,            //任务1函数入口
-                    (char *         )"task1",          //任务1名称
-                    (uint16_t       )TASK1_STACK_SIZE, //任务1堆栈大小
-                    (void *         )NULL,             //任务1参数
-                    (UBaseType_t    )TASK1_PRIORITY,   //任务1优先级
-                    (TaskHandle_t * )&task1_handle);   //任务1句柄
-        xTaskCreate((TaskFunction_t )task2,            //任务2函数入口
-                    (char *         )"task2",          //任务2名称
-                    (uint16_t       )TASK2_STACK_SIZE, //任务2堆栈大小
-                    (void *         )NULL,             //任务2参数
-                    (UBaseType_t    )TASK2_PRIORITY,   //任务2优先级
-                    (TaskHandle_t * )&task2_handle);   //任务2句柄
+        xTaskCreate((TaskFunction_t       )task1,            //任务1函数入口
+                    (const char * const   )"task1",          //任务1名称
+                    (const uint16_t       )TASK1_STACK_SIZE, //任务1堆栈大小
+                    (void * const         )NULL,             //任务1参数
+                    (UBaseType_t          )TASK1_PRIORITY,   //任务1优先级
+                    (TaskHandle_t * const )&task1_handle);   //任务1句柄
+        xTaskCreate((TaskFunction_t       )task2,            //任务2函数入口
+                    (const char * const   )"task2",          //任务2名称
+                    (const uint16_t       )TASK2_STACK_SIZE, //任务2堆栈大小
+                    (void * const         )NULL,             //任务2参数
+                    (UBaseType_t          )TASK2_PRIORITY,   //任务2优先级
+                    (TaskHandle_t * const )&task2_handle);   //任务2句柄
 
         vTaskDelete(start_task_handle); //删除任务自己也可以用“NULL”
 }
@@ -166,13 +166,13 @@ vodi vApplicationGetTimerTaskMemory(
 int main(void)
 {
         start_task_handle = xTaskCreateStatic(
-                (TaskFunction_t )start_task,            //任务函数入口   
-                (char *         )"start_task",          //任务名称
-                (uint32_t       )START_TASK_STACK_SIZE, //任务堆栈大小
-                (void *         )NULL,                  //任务参数
-                (UBaseType_t    )START_TASK_PRIORITY,   //任务优先级
-                (StackType_t *  )START_TASK_STACK,      //任务堆栈内存分配
-                (StaticTask_t * )&START_TASK_TCB);      //任务控制块内存分配
+                (TaskFunction_t       )start_task,            //任务函数入口   
+                (const char * const   )"start_task",          //任务名称
+                (const uint32_t       )START_TASK_STACK_SIZE, //任务堆栈大小
+                (void * const         )NULL,                  //任务参数
+                (UBaseType_t          )START_TASK_PRIORITY,   //任务优先级
+                (StackType_t * const  )START_TASK_STACK,      //任务堆栈内存分配
+                (StaticTask_t * const )&START_TASK_TCB);      //任务控制块内存分配
         vTaskStartScheduler(); //打开任务调度器
 }
 /*******************************************************************************
@@ -184,21 +184,21 @@ int main(void)
 void start_task(void *pvParameters)
 {
         task1_handle = xTaskCreateStatic(
-                (TaskFunction_t )task1,                 //任务函数入口
-                (char *         )"task1",               //任务名称
-                (uint32_t       )TASK1_STACK_SIZE,      //任务堆栈大小
-                (void *         )NULL,                  //任务参数
-                (UBaseType_t    )TASK1_PRIORITY,        //任务优先级
-                (StackType_t *  )TASK1_STACK,           //任务堆栈内存分配
-                (StaticTask_t * )&TASK1_TCB);           //任务控制块内存分配
+                (TaskFunction_t       )task1,                 //任务函数入口
+                (const char * const   )"task1",               //任务名称
+                (const uint32_t       )TASK1_STACK_SIZE,      //任务堆栈大小
+                (void * const         )NULL,                  //任务参数
+                (UBaseType_t          )TASK1_PRIORITY,        //任务优先级
+                (StackType_t * const  )TASK1_STACK,           //任务堆栈内存分配
+                (StaticTask_t * const )&TASK1_TCB);           //任务控制块内存分配
         task2_handle = xTaskCreateStatic(
-                (TaskFunction_t )task2,                 //任务函数入口
-                (char *         )"task2",               //任务名称
-                (uint32_t       )TASK2_STACK_SIZE,      //任务堆栈大小
-                (void *         )NULL,                  //任务参数
-                (UBaseType_t    )TASK2_PRIORITY,        //任务优先级
-                (StackType_t *  )TASK2_STACK,           //任务堆栈内存分配
-                (StaticTask_t * )&TASK2_TCB);           //任务控制块内存分配
+                (TaskFunction_t       )task2,                 //任务函数入口
+                (const char * const   )"task2",               //任务名称
+                (const uint32_t       )TASK2_STACK_SIZE,      //任务堆栈大小
+                (void * const         )NULL,                  //任务参数
+                (UBaseType_t          )TASK2_PRIORITY,        //任务优先级
+                (StackType_t * const  )TASK2_STACK,           //任务堆栈内存分配
+                (StaticTask_t * const )&TASK2_TCB);           //任务控制块内存分配
         vTaskDelete(start_task);
 }
 
@@ -230,3 +230,13 @@ void task2(void *pvParameters)
                 vTaskDelay(800);
         }
 }
+
+
+
+/******************************************************************************/
+/*                          FreeRTOS任务挂起和恢复                               */
+/*      1. vTaskSuspend()     挂起一个任务                                      */
+/*      2. VtaskResume()      恢复一个任务                                      */                                
+/*      3. xTaskResumeFromISR 从中断中恢复一个任务                                */
+/*                                                                            */
+/******************************************************************************/

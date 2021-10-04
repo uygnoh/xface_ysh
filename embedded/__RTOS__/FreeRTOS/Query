@@ -1,0 +1,28 @@
+/*******************************************************************************
+                FreeRTOS任务查询
+*******************************************************************************/
+uxTaskPriorityGet()             //查询某个任务的优先级
+vTaskPrioritySet()              //改变某个任务的优先级
+uxTaskGetSystemState()          //获取系统中任务状态
+vTaskGetInfo()                  //获取某个任务信息
+xTaskGetApplicationTaskTag()    //获取某个任务的标签值
+xTaskGetCurrentTaskHandle()     //获取当前正在运行的任务的任务句柄
+xTaskGetHandle()                //根据任务名称查询某个任务句柄
+xTaskGetIdleTaskHandle()        //获取空闲任务的任务句柄
+uxTaskGetStackHighWaterMark()   //获取任务的堆栈的历史剩余最水值，FreeRTOS中叫作“高水位线”
+eTaskGetState()                 //获取某个任务的状态，这个状态是“eTaskState”类型
+pcTaskGetName()                 //获取某个任务的名称
+xTaskGetTickCount()             //获取系统时间计数器值
+xTaskGetTickCountFromISR()      //在中断服务函数中获取时间计数器值
+xTaskGetSchedulerState()        //获取任务调度器状态（打开或关闭）
+uxTaskGetNumberOfTasks()        //获取当前系统中存在的任务数量
+vTaskList()                     //以一种表格的方式输出当前系统中所有任务的详细信息
+vTaskGetRunTimeStats()          //获取每个任务的运行时间
+vTaskSetApplicationTaskTag()    //设置任务标签值
+SetThreadLocalStoragePointer()  //设置线程本地存储指针
+GetThreadLocalStoragePointer()  //获取线程本地存储指针
+
+
+
+
+

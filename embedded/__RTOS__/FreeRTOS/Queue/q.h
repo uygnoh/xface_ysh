@@ -92,14 +92,3 @@ ucQueueType     //类型。可能的值为
         queueQUEUE_TYPE_COUNTING_SEMAPHORE      //表示计数信号量
         queueQUEUE_TYPE_BINARY_SEMAPHORE        //表示二进制信号量
         queueQUEUE_TYPE_RECURSIVE_MUTEX         //表示递归互斥量
-
-
-
-
-
-
-
-
-
-
-
