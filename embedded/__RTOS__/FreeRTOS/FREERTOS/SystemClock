@@ -1,23 +1,26 @@
 /*******************************************************************************
-  函数名称: task2()
-  输入参数: pvParameters
+  函数名称: vTaskDelay()
+  输入参数: xTicksToDelay，延时时间
   输出参数: 无
-  函数功能: 点灯程序
+  函数功能: 相对延时函数
 *******************************************************************************/
 #if (INCLUDE_vTaskDelay == 1)
 void vTaskDelay(const TickType_t xTicksToDelay)
 {
         BaseType_t xAlreadyYielded = pdFALSE;
+        
         if (xTicksToDelay > (TickType_t)0U) {
-                vTaskSupendAll();
+                vTaskSupendAll();                       //任务挂起
                 //添加当前任务到延时列表中
                 prvAddCurrentTaskToDelayedList(xTicksToDelay, pdFALSE);
-                xAlreadyYielded = xTaskResumAll();
+                xAlreadyYielded = xTaskResumAll();      //任务恢复
         }
+        
         if (xAlreadyYielded == pdFALsE)
                 protYIELD_WITHIN_API();
 }
 
+//添加当前任务到延时列表中
 static void prvAddCurrentTaskToDelayList(
         TickType_t xTicksToWait, 
         const BaseType_t xCanBlockIndefinitely)
@@ -41,3 +44,10 @@ static void prvAddCurrentTaskToDelayList(
                 }
         }
 }
+
+/*******************************************************************************
+  函数名称: vTaskDelayUntil()
+  输入参数: xTicksToDelay，延时时间
+  输出参数: 无
+  函数功能: 绝对延时函数
+*******************************************************************************/
