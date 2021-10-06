@@ -12,6 +12,8 @@ __IO MOTOR_STATE motor_state = STOP;    //电机状态
 __IO MOTOR_DIR   motor_direction = CW;  //电机方向
 __IO uint8_t    time_over = 0;          //卡住超时溢出计数
 
+
+
 void system_clock_setup(void)
 {
         1 使用外部调整晶体振荡器-8MHz
@@ -89,10 +91,11 @@ int main(void)
 |               C <===> PWM_CH3 <===> W                   |
 |________________________________________________________*/
 //无刷驱动换相, 上桥臂PWM, 下桥臂ON
-void BLDC_PHASE_CHANGE(uint8_t step)
+//step(4, 5, 1, 3, 2, 6) <===> pwm六步换相法
+void bldc_phase_change(uint8_t step)
 {
         switch (step) {
-        case 4:         //****************** B+ C- ******************//
+        case 4:                 //****************** B+ C- ******************//
                 HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
                 HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
                 
@@ -104,7 +107,7 @@ void BLDC_PHASE_CHANGE(uint8_t step)
                 HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH3, TIM_CHANNEL_3);
                 HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_3);
                 break;
-        case 5:         //****************** B+ A- ******************//
+        case 5:                 //****************** B+ A- ******************//
                 HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
                 HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
                 
@@ -116,15 +119,55 @@ void BLDC_PHASE_CHANGE(uint8_t step)
                 HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH1, TIM_CHANNEL_1);
                 HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_1);
                 break;
-        case 1:         //****************** ******************//
+        case 1:                 //****************** C+ A- ******************//
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                
+                PWM_CH3.Pulse = TIM1_PERIOD * speed_duty / 100;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH3, TIM_CHANNEL_3);
+                HAL_TIM_PWM_Start(&TIMER_BLDC, TIM_CHANNEL_3);
+                
+                PWM_CH1.Pulse = TIM1_PERIOD;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH1, TIM_CHANNEL_1);
+                HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_1);
                 break;
-        case 3:         //****************** ******************//
+        case 3:                 //****************** C+ B- ******************//
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                
+                PWM_CH3.Pulse = TIM1_PERIOD * speed_duty / 100;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH3, TIM_CHANNEL_3);
+                HAL_TIM_PWM_Start(&TIMER_BLDC, TIM_CHANNEL_3);
+                
+                PWM_CH2.Pulse = TIM1_PERIOD;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH2, TIM_CHANNEL_2);
+                HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_2);
                 break;
-        case 2:         //****************** ******************//
+        case 2:                 //****************** A+ B- ******************//
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
+                HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
+                
+                PWM_CH1.Pulse = TIM1_PERIOD * speed_duty / 100;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH1, TIM_CHANNEL_1);
+                HAL_TIM_PWM_Start(&TIMER_BLDC, TIM_CHANNEL_1);
+                
+                PWM_CH2.Pulse = TIM1_PERIOD;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH2, TIM_CHANNEL_2);
+                HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_2);
                 break;
-        case 6:         //****************** ******************//
+        case 6:                 //****************** A+ C- ******************//
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIM_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                
+                PWM_CH1.Pulse = TIM1_PERIOD * speed_duty / 100;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH1, TIM_CHANNEL_1);
+                HAL_TIM_PWM_Start(&TIMER_BLDC, TIM_CHANNEL_1);
+                
+                PWM_CH3.Pulse = TIM1_PERIOD;
+                HAL_TIM_PWM_ConfigChannel(&TIMER_BLDC, &PWM_CH3, TIM_CHANNEL_3);
+                HAL_TIMEx_PWMN_Start(&TIMER_BLDC, TIM_CHANNEL_3);
                 break;
-        default:        //****************** OFF ******************//
+        default:                  //****************** OFF ******************//
                 HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
                 HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
                 HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
@@ -174,7 +217,7 @@ void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
         
         if (motor_direction == CW)
                 pinstate = 7 - pinstate;
-        BLDC_PHASE_CHANGE(pinstate);
+        bldc_phase_change(pinstate);
         time_over = 0;
 }
 
