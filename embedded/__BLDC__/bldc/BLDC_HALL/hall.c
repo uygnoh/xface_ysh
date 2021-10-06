@@ -1,4 +1,4 @@
-void HALL_TIMx_Init(void)
+void hall_sensor_init(void)
 {
         GPIO_InitTypeDef                PORT;
         //使用“定时器3”的通道“4”，用于超时检测

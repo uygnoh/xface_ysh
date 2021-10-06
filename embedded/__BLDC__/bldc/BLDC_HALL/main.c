@@ -12,7 +12,7 @@ __IO MOTOR_STATE motor_state = STOP;    //电机状态
 __IO MOTOR_DIR   motor_direction = CW;  //电机方向
 __IO uint8_t    time_over = 0;          //卡住超时溢出计数
 
-void SystemClock_Config(void)
+void system_clock_setup(void)
 {
         1 使用外部调整晶体振荡器-8MHz
         2 9倍频，得到72MHz主频
@@ -24,10 +24,10 @@ int main(void)
         uint8_t key_count = 1;
         
         HAL_Init();             //复位所有外设，初始化Flash接口和系统滴答定时器
-        SystemClock_Config();   //配置系统时钟
-        KEY_GPIO_Init();        //按键初始化
-        HALL_TIMx_Init();       //霍尔传感器接口初始化
-        ADVANCED_TIMx_Init();   //高级定时器初始化并配置PWM输出功能
+        system_clock_setup();   //配置系统时钟
+        key_init();             //按键初始化
+        hall_sensor_init();     //霍尔传感器接口初始化
+        timer1_init();          //高级定时器“1”初始化并配置PWM输出功能
         
         
         while (1) {
@@ -124,7 +124,57 @@ void BLDC_PHASE_CHANGE(uint8_t step)
                 break;
         case 6:         //****************** ******************//
                 break;
-        default:
+        default:        //****************** OFF ******************//
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_3); 
                 break;
         }
 }
+
+
+//电机卡住超过一定时间的话， 让电机停止
+void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+{
+        time_over++;
+        //电机卡住超时
+        if (time_over > 6) {
+                motor_state = STOP;
+                HAL_TIMEx_HallSensor_Stop(&TIMER_HALL);
+                __HAL_TIM_DISABLE_IT(&TIMER_HALL, TIM_IT_TRIGGER | TIM_IT_CC4);
+                __HAL_TIM_CLEAR_IT(&TIMER_HALL, TIM_IT_TRIGGER | TIM_IT_CC4);
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_1);
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_2);
+                HAL_TIM_PWM_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
+                HAL_TIMEx_PWMN_Stop(&TIMER_BLDC, TIM_CHANNEL_3);
+        }
+}
+
+
+//定时器触发中断服务函数
+//输入参数: GPIO_Pin，中断引脚
+void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+{
+        uint8_t pinstate = 0;
+        if (motor_state == STOP)
+                return;
+        
+        //霍尔传感器状态获取
+        if (HALL_TIM_CH1_GPIO->IDR &HALL_TIM_CH1_PIN) != GPIO_PIN_RESET)
+                pinstate |= 0x01;
+        if (HALL_TIM_CH2_GPIO->IDR &HALL_TIM_CH2_PIN) != GPIO_PIN_RESET)
+                pinstate |= 0x02;
+        if (HALL_TIM_CH3_GPIO->IDR &HALL_TIM_CH3_PIN) != GPIO_PIN_RESET)
+                pinstate |= 0x04;
+        
+        if (motor_direction == CW)
+                pinstate = 7 - pinstate;
+        BLDC_PHASE_CHANGE(pinstate);
+        time_over = 0;
+}
+
