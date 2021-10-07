@@ -1,4 +1,13 @@
 /*******************************************************************************
+                              RP2040 环境变量设置
+*******************************************************************************/
+https://www.digikey.com/en/maker/projects/raspberry-pi-pico-and-rp2040-cc-part-2-debugging-with-vs-code/470abc7efb07432b82c95f6f67f184c0
+echo $PICO_SDK_PATH
+~/VSARM/sdk/pico/pico-sdk
+
+
+
+/*******************************************************************************
                               https://pico.org.cn/
 *******************************************************************************/
 pico sdk doxygen        //Pico函数库
@@ -27,6 +36,7 @@ int main(void)
 
 //touch CMakeList.txt
 ___________________________________________________________
+# Set minimum required version of CMake
 cmake_minimum_required(VERSION 3.12)
 
 # Include build functions from Pico SDK
