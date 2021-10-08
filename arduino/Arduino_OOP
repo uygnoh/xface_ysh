@@ -1,0 +1,316 @@
+/*******************************************************************************
+                => 构造函数 ~析构函数 类的成员函数
+*******************************************************************************/
+class Led {
+        public: //“public”中的函数称为：公共成员函数（通过类的外部调用的函数）
+                Led();      //构造函数，构造函数是在这个对象建立时立即执行
+               ~Led();      //析构函数，析构函数是在这个对象删除之前立即执行
+               void on();   //类的成员函数
+               void off();  //类的成员函数
+};
+
+
+//构造函数(类::构造函数名称)
+Led::Led() {
+        Serial.println("Led Object Created.");
+        pinMode(2, OUTPUT);     //设置“2号引脚”为输出模式
+}
+//析构函数(类::析构函数名称)
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+//类的成员函数
+void Led::on() {
+        digitalWrite(2, HIGH);
+}
+void Led::off() {
+        digitalWrite(2, LOW);
+}
+
+
+void setup() {
+        Serial.begin(9600);     //启动串口监视器
+        Led myLed;              //建立一个LED类的对象（局部对象）
+                                //此时它会调用构造函数 =>Led::Led()
+        Serial.println("Hello, this is from Setup()");
+        
+        
+        for (int i = 0; i < 3; i++) {
+                myLed.on();
+                delay(1000);
+                myLed.off();
+                delay(1000);
+        }
+}
+/********************************* 程序运行结果 *********************************/
+/* 1=> Led Object Created. */
+/* 2=> Hello, this is from Setup() */
+/* 3=> Led Object Deleted. */
+
+
+
+/*******************************************************************************
+                => 多构造函数
+*******************************************************************************/
+class Led {
+        public: //“public”中的函数称为：公共成员函数（通过类的外部调用的函数）
+                Led();          //构造函数，构造函数是在这个对象建立时立即执行
+                Led(int userLedPin);//创建一种新的构造函数，它提供输入参数
+               ~Led();          //析构函数，析构函数是在这个对象删除之前立即执行
+               void on();       //类的成员函数
+               void off();      //类的成员函数
+               int ledPin = 2;  //类的成员变量, 设置初始值为“2”
+};
+
+
+//构造函数(类::构造函数名称)，定义构造函数
+Led::Led() {
+        Serial.println("Led Object Created.");
+        pinMode(2, OUTPUT);     //设置“2号引脚”为输出模式
+}
+//构造函数(类::构造函数名称)， 新的构造函数重新定义
+Led::Led(int userLedPin) {
+        Serial.println("Led Object Created.");
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+/* 等同于上面的方法
+Led::Led(int userLedPin) : ledPin (userLedPin) {
+        Serial.println("Led Object Created.");
+        pinMode(ledPin, OUTPUT);
+}*/
+//析构函数(类::析构函数名称)，定义析构函数
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+//类的成员函数
+void Led::on() {
+        digitalWrite(ledPin, HIGH);
+}
+void Led::off() {
+        digitalWrite(ledPin, LOW);
+}
+
+
+void setup() {
+        Serial.begin(9600);     //启动串口监视器
+        Led myLed;              //建立第一个LED类的对象（局部对象）
+                                //此时它会调用构造函数 =>Led::Led()
+        Led myLed2(7);          //建立第二个LED类的对象（局部对象）
+        
+        Serial.println("Hello, this is from Setup()");
+        
+        
+        for (int i = 0; i < 3; i++) {
+                myLed.on();
+                myLed2.on();
+                delay(1000);
+                myLed.off();
+                myLed2.off();
+                delay(1000);
+        }
+}
+/********************************* 程序运行结果 *********************************/
+//Led Object Created.
+//Led Object Created.
+//Hello, this is from Setup()
+//Led Object Deleted.
+//Led Object Deleted.
+
+
+
+/*******************************************************************************
+                => 类的封装
+*******************************************************************************/
+class Led {
+        public: //“public”中的函数称为：公共成员函数（通过类的外部调用的函数）
+                Led();          //构造函数，构造函数是在这个对象建立时立即执行
+                Led(int userLedPin);//创建一种新的构造函数，它提供输入参数
+               ~Led();          //析构函数，析构函数是在这个对象删除之前立即执行
+               void on();       //类的成员函数
+               void off();      //类的成员函数
+               int getLedPin();
+               void setLedPin(int userLedPin);
+        private: //“private”中的函数称为：私有成员函数（只能在公有成员函数内部使用）
+               int ledPin = 2;  //类的成员变量, 设置初始值为“2”
+};
+
+
+//构造函数(类::构造函数名称)，定义构造函数
+Led::Led() {
+        Serial.println("Led Object Created.");
+        pinMode(2, OUTPUT);     //设置“2号引脚”为输出模式
+}
+//构造函数(类::构造函数名称)， 新的构造函数重新定义
+Led::Led(int userLedPin) {
+        Serial.println("Led Object Created.");
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+/* 等同于上面的方法
+Led::Led(int userLedPin) : ledPin (userLedPin) {
+        Serial.println("Led Object Created.");
+        pinMode(ledPin, OUTPUT);
+}*/
+//析构函数(类::析构函数名称)，定义析构函数
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+//类的成员函数
+void Led::on() {
+        digitalWrite(ledPin, HIGH);
+}
+void Led::off() {
+        digitalWrite(ledPin, LOW);
+}
+
+
+//获取LED引脚数值
+int Led::getLedPin() {
+        return ledPin;
+}
+//设置LED引脚数值
+void Led::setLedPin(int userLedPin) {
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+
+
+void setup() {
+        Serial.begin(9600);     //启动串口监视器
+        Led myLed;              //建立第一个LED类的对象（局部对象）
+                                //此时它会调用构造函数 =>Led::Led()
+        myLed.setLedPin(3);     //修改myLed对象引脚
+        int myLedPin = myLed.getLedPin();
+        Serial.print("int myLedPin = ");
+        Serial.println(myLedPin);
+        
+        
+        Led myLed2(7);          //建立第二个LED类的对象（局部对象）
+        int myLed2Pin = myLed2.getLedPin();
+        Serial.print("int myLed2Pin");
+        Serial.println(myLed2Pin);
+        
+        
+        Serial.println("Hello, this is from Setup()");
+        for (int i = 0; i < 3; i++) {
+                myLed.on();
+                myLed2.on();
+                delay(1000);
+                myLed.off();
+                myLed2.off();
+                delay(1000);
+        }
+}
+
+
+
+/*******************************************************************************
+                => arduino_oop.ino    led.h    led.cpp
+*******************************************************************************/
+|_________________________________________________________|
+|       //lde.h                                           |
+|_________________________________________________________|
+#ifndef __LED_H__
+#define __LED_H__
+
+#include <Arduino.h>
+
+class Led {
+        public:
+                Led();
+               ~Led();
+               void on();
+               void off();
+               int getLedPin();
+               void setLedPin(int userLedPin);
+        private:
+                int ledPin = 2;
+};
+#endif
+
+
+|_________________________________________________________|
+|       //led.cpp                                         |
+|_________________________________________________________|
+
+#include "led.h"
+
+Led::Led() {
+        Serial.println("Led Object Created. ");
+        pinMode(2, OUTPUT);
+}
+Led::Led(int userLedPin) {
+        Serial.println("Led Object Created. ");
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+void Led::on() {
+        digitalWrite(ledPin, HIGH);
+}
+void Led::on() {
+        digitalWrite(ledPin, LOW);
+}
+
+
+int Led::getLedPin() {
+        return ledPin;
+}
+void Led::setLedPin(int userLedPin) {
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+
+
+|_________________________________________________________|
+|       //arduino_oop.ino                                 |
+|_________________________________________________________|
+#include "led.h"
+
+void setup() {
+        Serial.begin(9600);
+        Led myLed;
+        myLed.setLedPin(3);
+        int myLedPin = myLed.getLedPin();
+        Serial.print("int myLedPin = ");
+        Serial.println(myLedPin);
+        
+        Led myLed2(7);
+        int myLed2Pin = myLed2.getLedPin();
+        Serial.print("int myLed2Pin = ");
+        Serial.println(myLed2Pin);
+        
+        Serial.println("Hello, this is from Setup()");
+        for (int i = 0; i < 3; i++) {
+                myLed.on();
+                myLed2.on();
+                delay(1000);
+                myLed.off();
+                myLed2.off();
+                delay(1000);
+        }
+}
+//Led Object Created.
+//int myLedPin = 3
+//Led Object Created.
+//int myLed2Pin = 7
+//Hello, this is from Setup()
+//Led Object Deleted.
+//Led Object Deleted.
+
+
+
+/*******************************************************************************
+                => 类的继承
+*******************************************************************************/
