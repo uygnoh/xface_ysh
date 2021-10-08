@@ -79,7 +79,7 @@
 
 
 /*******************************************************************************
-                             STM32 工程主文件
+                             STM32CubeMX 工程主文件
 *******************************************************************************/
 | //USER_CODE
 |_________________________________________________________________________|
@@ -92,3 +92,74 @@
 |               system_stm32h7xx.h                        |
 |               stm32h7xx_hal_conf.h                      |
 |_________________________________________________________|
+//ProjectManager ->Code Generator 
+        Generate peripheral initialization as a pair of '.c/.h' files per peripheral
+        Keep User Code when re-generating    //重新成代码时，保留代码（不删除你的代码）
+//自己的代码在“BEGIN”和“END”之内
+//【__weak】这个关键字，它有“弱”的意思
+  这里的意思就是说：如果你自己写一个同样的函数（HAL_UART_MspDeInit），
+  那么，这里带有weak关键字的函数就不起作用
+//STM32CubeMX打开“SWD”功能
+System Core ->SYS ->Debug: Serial Wire
+
+
+
+/*******************************************************************************
+                => ProjectManager ->Code Generator 
+*******************************************************************************/
+|_________________________________________________________|
+|       //STM32Cube Firmware Library Package 固件包拷贝     |
+|_________________________________________________________|
+1. Copy all used libraries into the project folder 
+//将所有使用过的库复制到项目文件夹中。 
+//不管你用，还是没有用到，都拷贝到你工程目录下。这样一来，你工程下文件就比较多。
+
+2. Copy only the necessary library files 
+//只复制必要的库文件。
+//这个相比上一个减少了很多文件。比如你没有使用CAN、SPI...等外设，就不会拷贝相关库文件到你工程下。
+
+3. Add necessary library files as reference in the toolchain project configuration file 
+//在工具链项目配置文件中添加必要的库文件作为参考。
+//这里没有复制HAL库文件，只添加了必要文件（如main.c）。相比上面，没有Drivers相关文件。
+|
+|
+|_________________________________________________________|
+|       //Generated files 生成文件                         |
+|_________________________________________________________|
+//这里可以多选，每项可选择：是or不是。
+
+1. Generate peripheral initialization as a pair of'.c/.h' files per peripheral 
+//每个外设生成独立的'.c/.h'文件
+//不勾：所有初始化代码都生成在main.c
+//勾选：初始化代码生成在对应的外设文件。 如UART初始化代码生成在uart.c中。
+
+2. Backup previously generated files when re-generating 
+//在重新生成时备份以前生成的文件
+//重新生成代码时，会在相关目录中生成一个Backup文件夹，将之前源文件拷贝到其中。
+
+3.Keep User Code when re-generating 
+//在重新生成时保留用户代码
+//比如：我在main.c中添加了一段代码，重新生成时，会在main.c中保留你之前自己添加的这段代码。
+//注意：前提是这段代码写在规定的位置。 也就是BEGIN和END之间。 否则同样会删除。
+
+4. Delete previously generated files when not re-generated
+//删除以前生成，但现在没有生成的文件 比如：之前生成了spi.c，
+//现在重新配置没有spi.c，则会删除之前的spi.c文件。
+|
+|
+|_________________________________________________________|
+|       //HAL SettingsHAL 库设置                           |
+|_________________________________________________________|
+1. Set all free pins as analog (to optimize the power consumption) 
+//将所有空闲引脚设置为模拟(以优化功耗),这个做低功耗产品时这个选项有必要勾选。
+
+2. Enable Full Assert 
+//使能所有断言, 也就是参数检查。
+|
+|
+|_________________________________________________________|
+|       //Template Settings 模板设置                       |
+|_________________________________________________________|
+1. Select a template to generate customized code 
+//选择一个模板来生成自定义代码
+//代码自定义生成模板可以参看最新（V28版）用户手册6.3节 Custom code generation内容。
