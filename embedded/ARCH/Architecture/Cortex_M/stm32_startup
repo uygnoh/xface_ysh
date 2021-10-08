@@ -108,7 +108,8 @@ Reset_Handler   PROC
               
 %;检查系统要从那个位置启动， flash, ram， systems
     LDR R0, =0x00000004
-    LDR R1, [R0]            ;[R0]存放的就是reset_handler的地址，取出的地址送给R1，这个地址有可能是0x20000000左右 0x08000004左右。
+    LDR R1, [R0]            ;[R0]存放的就是reset_handler的地址，取出的地址送给R1，
+                            ;这个地址有可能是0x20000000左右 0x08000004左右。
     LSRS R1, R1, #24        ;将reset_handler的地址向右移动24位，就剩高8位移动到低8位。
     LDR R2, =0x1F
     CMP R1, R2              ;如果相等， 则说明是串口启动
