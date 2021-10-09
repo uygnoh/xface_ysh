@@ -314,3 +314,227 @@ void setup() {
 /*******************************************************************************
                 => 类的继承
 *******************************************************************************/
+|_________________________________________________________|
+|       //lde.h                                           |
+|_________________________________________________________|
+#ifndef __LED_H__
+#define __LED_H__
+
+#include <Arduino.h>
+
+class Led {
+        public:
+                Led();
+               ~Led();
+               void on();
+               void off();
+               int getLedPin();
+               void setLedPin(int userLedPin);
+        private:
+                int ledPin = 2;
+};
+
+
+        //PwmLed（子类） => 继承Led（父类）的所有特性//
+//_______________________________________________________//
+class PwmLed : public Led {
+        public:
+                void on(int userPwmVal);        //它称为函数的重载
+                int gePwmVal();                 //子类的成员函数
+        private:
+                int pwmVal = 0;                 //子类的私有成员变量
+};
+#endif
+
+
+|_________________________________________________________|
+|       //led.cpp                                         |
+|_________________________________________________________|
+
+#include "led.h"
+
+Led::Led() {
+        Serial.println("Led Object Created. ");
+        pinMode(2, OUTPUT);
+}
+Led::Led(int userLedPin) {
+        Serial.println("Led Object Created. ");
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+void Led::on() {
+        digitalWrite(ledPin, HIGH);
+}
+void Led::on() {
+        digitalWrite(ledPin, LOW);
+}
+
+
+int Led::getLedPin() {
+        return ledPin;
+}
+void Led::setLedPin(int userLedPin) {
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+
+
+//--------------------------------------------------------//
+void PwmLed::on(int userPwmVal) {
+        pwmVal = userPwmVal;
+        //在子类中调用从父类中继承的函数
+        analogWrite(getLedPin(), pwmVal);
+}
+
+int PwmLed::getPwmVal() {
+        return pwmVal;
+}
+//--------------------------------------------------------//
+
+
+|_________________________________________________________|
+|       //arduino_oop.ino                                 |
+|_________________________________________________________|
+#include "led.h"
+
+PwmLed myPwmLed;        //建立一个myPwmLed对象（全局）
+
+void setup() {
+        Serial.begin(9600);
+        myPwmLed.setLedPin(3);                  //设置LED引脚数值
+        int myPwmLedPin = myPwmLed.getLedPin(); //获取LED引脚数值
+        Serial.print("int myPwmLedPin = ");
+        Serial.println(myPwmLedPin);
+}
+void loop() {
+        for (int i = 0; i < 255; i++) {
+                myPwmLed.on(i);
+                Serial.print("myPwmLed.getPwmVal() = ");
+                Serial.println(myPwmLed.getPwmVal());
+                delay(10);
+        }
+        
+}
+
+
+
+/*******************************************************************************
+                => 建立Arduino库
+*******************************************************************************/
+|_________________________________________________________|
+|                 Arduino/libraries/LED                   |
+|_________________________________________________________|
+|       //led.h                                           |
+|_________________________________________________________|
+#ifndef __LED_H__
+#define __LED_H__
+
+#include <Arduino.h>
+
+class Led {
+        public:
+                Led();
+               ~Led();
+               void on();
+               void off();
+               int getLedPin();
+               void setLedPin(int userLedPin);
+        private:
+                int ledPin = 2;
+};
+
+
+        //PwmLed（子类） => 继承Led（父类）的所有特性//
+//_______________________________________________________//
+class PwmLed : public Led {
+        public:
+                void on(int userPwmVal);        //它称为函数的重载
+                int gePwmVal();                 //子类的成员函数
+        private:
+                int pwmVal = 0;                 //子类的私有成员变量
+};
+#endif
+|_________________________________________________________|
+|                 Arduino/libraries/LED                   |
+|_________________________________________________________|
+|       //led.cpp                                         |
+|_________________________________________________________|
+
+#include "led.h"
+
+Led::Led() {
+        Serial.println("Led Object Created. ");
+        pinMode(2, OUTPUT);
+}
+Led::Led(int userLedPin) {
+        Serial.println("Led Object Created. ");
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+Led::~Led() {
+        Serial.println("Led Object Deleted.");
+}
+
+
+void Led::on() {
+        digitalWrite(ledPin, HIGH);
+}
+void Led::on() {
+        digitalWrite(ledPin, LOW);
+}
+
+
+int Led::getLedPin() {
+        return ledPin;
+}
+void Led::setLedPin(int userLedPin) {
+        ledPin = userLedPin;
+        pinMode(ledPin, OUTPUT);
+}
+
+
+//--------------------------------------------------------//
+void PwmLed::on(int userPwmVal) {
+        pwmVal = userPwmVal;
+        //在子类中调用从父类中继承的函数
+        analogWrite(getLedPin(), pwmVal);
+}
+
+int PwmLed::getPwmVal() {
+        return pwmVal;
+}
+//--------------------------------------------------------//
+
+
+
+|_________________________________________________________|
+|                     Arduino/Pro_led                     |
+|_________________________________________________________|
+|       //arduino_oop.ino                                 |
+|_________________________________________________________|
+
+#include "led.h"
+
+PwmLed myPwmLed;        //建立一个myPwmLed对象（全局）
+
+void setup() {
+        Serial.begin(9600);
+        myPwmLed.setLedPin(3);                  //设置LED引脚数值
+        int myPwmLedPin = myPwmLed.getLedPin(); //获取LED引脚数值
+        Serial.print("int myPwmLedPin = ");
+        Serial.println(myPwmLedPin);
+}
+void loop() {
+        for (int i = 0; i < 255; i++) {
+                myPwmLed.on(i);
+                Serial.print("myPwmLed.getPwmVal() = ");
+                Serial.println(myPwmLed.getPwmVal());
+                delay(10);
+        }
+        
+}

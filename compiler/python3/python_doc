@@ -1,19 +1,8 @@
 /*******************************************************************************
-                                python3-pip
+                => python3-pip
 *******************************************************************************/
 sudo apt install python3-pip
 pip3 --version
-
-
-
-//软件版本管理命令 update-alternatives
-___________________________________________________________
-//如果有多个python环境
-sudo update-alternatives --instll /usr/bin/python python /usr/bin/python3.7
-sudo update-alternatives --config python
-//如果串口访问权限的问题
-sudo usermod -a -G dialout $USER
-
 
 
 //pip - python包管理器
@@ -32,10 +21,28 @@ pip search     [package_keyword]//包检索(服务器端)
 
 
 /*******************************************************************************
-                             python3-venv 虚拟环境
+                => 软件版本管理命令( update-alternatives )
 *******************************************************************************/
-//sudo apt-get install python3.7-venv
+//如果有多个python环境
 ___________________________________________________________
+sudo update-alternatives --instll /usr/bin/python python /usr/bin/python3.7
+sudo update-alternatives --config python
+
+
+//如果串口访问权限的问题
+___________________________________________________________
+sudo usermod -a -G dialout $USER
+
+
+
+/*******************************************************************************
+                => python3-venv 虚拟环境
+*******************************************************************************/
+//python的(venv模块) 可以创建一个独立的虚拟的python运行环境
+___________________________________________________________
+sudo apt-get install python3.7-venv
+
+
 python3 -m venv my_venv         //在“python3”中创建虚拟环境
 source my_venv/bin/activate     //激活“my_venv”虚拟环境
 deactivate                      //删除“my_venv”虚拟环境
