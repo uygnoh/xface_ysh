@@ -15,7 +15,7 @@ Led::Led() {
         Serial.println("Led Object Created.");
         pinMode(2, OUTPUT);     //设置“2号引脚”为输出模式
 }
-//析构函数(类::析构函数名称)
+//~析构函数(类::析构函数名称)
 Led::~Led() {
         Serial.println("Led Object Deleted.");
 }
