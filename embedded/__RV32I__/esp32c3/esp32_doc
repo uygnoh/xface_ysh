@@ -1,0 +1,64 @@
+/*******************************************************************************
+                                ESP32-IDF C/C++开发环境
+*******************************************************************************/
+https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32c3/get-started/index.html
+https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/toc.md
+
+
+1 //安装（ubuntu/debian）环境依赖
+___________________________________________________________
+sudo apt-get install git wget flex bison gperf python3 python3-pip python3-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+  //访问权限问题，将用户添加至 Linux Dialout 组， 以便使用串口
+  //退出重新登录，上述修改就生效了
+___________________________________________________________
+sudo usermod -a -G dialout $USER
+
+
+2 //从 GitHub 上获取 ESP-IDF 仓库
+___________________________________________________________
+mkdir -p ~esp
+cd ~esp
+git clone -b v4.3-beta2 --recursive https://github.com/espressif/esp-idf.git
+
+
+3 //安装 ESP-IDF 使用的各种工具
+  //编译器， 调试器， Python包， ......
+___________________________________________________________
+cd ~esp/esp-idf
+./install.sh esp32c3
+
+
+4 //设置环境变量
+___________________________________________________________
+. $HOME/esp/esp-idf/export.sh
+
+
+5 //开始创建工程
+___________________________________________________________
+cd ~/esp
+cp -r $IDF_PATH/examples/get-started/hello_world .
+cd hello_world
+
+
+6 //连接设备
+  //打开一个新项目后，在ESP-IDF上设置( ESP32-C3 )为“目标芯片”
+  //（第一次构建）  $ cd ~/esp/hello_world
+___________________________________________________________
+cd ~/esp/hello_world
+idf.py set-target esp32c3
+idf.py menuconfig
+
+
+7 //使用“idf.py build”命令编译工程
+  //运行以上命令可以编译应用程序和所有 ESP-IDF 组件，
+  //接着生成 bootloader、分区表和应用程序二进制文件。
+___________________________________________________________
+idf.py build
+
+
+8 //将工程文件 => 烧录到目标设备 | 监视工程运行情况
+       idf.py -p PORT [-b BAUD] flash
+  //请将 PORT 替换为 ESP32-C3 开发板的串口名称
+  //您还可以将 BAUD 替换为您希望的烧录波特率。 默认波特率为 460800
+___________________________________________________________
+idf.py -p /dev/ttyUSB0 flash monitor
