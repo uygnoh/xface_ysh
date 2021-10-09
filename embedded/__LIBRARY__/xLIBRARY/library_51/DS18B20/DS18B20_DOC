@@ -133,7 +133,7 @@ ___________________________________________________________
 #define WRITE_REGISTER      0x4e    //写暂存器指令
 #define READ_REGISTER       0xbe    //读暂存器指令
 #define COPY_REGISTER       0x48    //拷贝暂存器指令
-#define RECALL_E2           0xb8    //召回EEPROM指令
+#define RECALL_EEPROM       0xb8    //召回EEPROM指令
 #define READ_POWER_SUPPLY   0xb4    //读取电源模式指令
 
 
@@ -158,7 +158,7 @@ ds18b20_init();                 //初始化ds18b20
 ds18b20_write_dat(0xcc);        //SKIP ROM
 ds18b20_write_dat(0xbe);        //read scratchpad
 low_value = ds18b20_read_dat(); //read byte_0
-hig_value = ds18b20_read_dat(); //read byte_1
+high_value = ds18b20_read_dat(); //read byte_1
 
 
 
