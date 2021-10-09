@@ -1,0 +1,18 @@
+/*******************************************************************************
+                => dpkg---package manager for Debian
+*******************************************************************************/
+dpkg --root=<directory> -i xx.deb       安装DEB包（指定根目录）
+dpkg -i xx.deb                          安装DEB包	
+dpkg -I xx.deb                          显示DEB包信息	
+dpkg -c xx.deb                          显示DEB包文件列表		
+dpkg -l                                 显示所有已安装软件	
+dpkg -s foo                             显示已安装包信息	
+dpkg -L foo                             显示已安装包文件列表	
+dpkg -r foo                             卸载包	
+dpkg -P foo                             卸载软件包并删除其配置文件	
+dpkg-reconfigure foo                    重新配置已安装程序
+dpkg -i <package>                       安装一个在本地文件系统上存在的 debian软件包
+dpkg -r <package>                       移出一个已经安装的软件包
+dpkg -P <package>                       移出一个已安装的软件包及配置文件
+dpkg -L <package>                       列出安装软件包的清单
+dpkg -s <package>                       显示软件包的安装状态
