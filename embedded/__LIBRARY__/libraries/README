@@ -1,0 +1,38 @@
+/*******************************************************************************
+        => LIBRARIES
+*******************************************************************************/
+1 些函数库中所有的读写数所都是“8”位的
+2 单总线， I2C， SPI， 通信都是模拟这些总线进行通信的
+3 xxx_read, xxx_write都是“1个字节”读取的
+
+
+
+/*******************************************************************************
+        => VSCODE_CONFIGRATION:    ~/.config/Code/User/settings.json
+*******************************************************************************/
+{   
+	// 控制字体家族
+        "editor.fontFamily": "Monaco",
+	"editor.fontWeight": "normal",
+	// 控制字体大小
+	"editor.fontSize":18,
+
+	// 显示空格和“tab”符
+	//"editor.renderControlCharacters": true,
+	//"editor.renderWhitespace":"all",
+
+	// 一个制表符等于的空格数
+	"editor.tabSize": 8,
+	// 必须指定!!!(否则指定的tab大小将不起效果)
+	"editor.detectIndentation":false,
+
+	// 颜色主题设置
+        "workbench.colorTheme": "Monokai",
+        "C_Cpp.updateChannel": "Insiders",
+
+	// “Tab”禁止插入“空格”
+	//"editor.insertSpaces": false,
+
+	// 自动换行打开(默认: 关闭状态)
+	//"editor.wordWrap": "on"
+}
