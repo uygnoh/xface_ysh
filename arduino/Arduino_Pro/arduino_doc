@@ -1,0 +1,70 @@
+/*******************************************************************************
+        => Arduino_Blink
+*******************************************************************************/
+const int LED_RED    = 5;
+const int LED_GREEN  = 4;
+const int LED_BLUE   = 3;
+const int IN_PIN_2   = 2;
+
+
+void setup() {
+        //GPIO输出引脚配置
+        pinMode(LED_RED,   OUTPUT);
+        pinMode(LED_GREEN, OUTPUT);
+        pinMode(LED_BLUE,  OUTPUT);
+        //GPIO输入引脚配置
+        pinMode(IN_PIN_2,  INPUT);
+}
+
+void loop() {
+        int switch_state;
+        //读取GPIO_Pin2状态
+        switch_state = digitalRead(IN_PIN_2);
+        if (switch_state == LOW) {
+                digitalWrite(LED_RED,   LOW);
+                digitalWrite(LED_GREEN, HIGH);
+                digitalWrite(LED_BLUE,  LOW);
+                delay(250);
+                digitalWrite(GREEN, Low);
+                digitalWrite(BLUE,  HIGH);
+                delay(250);
+        } else {
+                digitalWrite(LED_RED,   LOW);
+                digitalWrite(LED_GREEN, HIGH);
+                digitalWrite(LED_BLUE,  LOW);
+        }
+}
+
+/*******************************************************************************
+        => 使用Arduino的模拟输入信号
+        => 可变电阻（电位器）的模拟信号输入
+        => 之后用可变电阻来控制LED的亮度
+        ___________________________________________________
+        Arduino 10-bit ADC
+        2.5V / 5.0V = 0.5;      1024 x 0.5 = 512;
+        ___________________________________________________
+        //当模拟输入引脚的输入电压为“2.5V”的时候，该引脚的数值为“512”
+
+        analogReference()
+        //引脚输入范围以及解析度可以使用这个指令时行调整
+*******************************************************************************/
+int sensor     = A0;    //设置sensor这个变量，就是指arduino上的“A0”引脚
+int sensorRead = 0;     //设置sensorRead读到的数值为“0”
+int newdata;            //变化后的数值
+
+void setup() {
+        Serial.begin(9600);                     //打开串口
+}
+
+void loop() {
+        sensorRead = analogRead(sensor); //由A0的引脚读取模拟信号
+        //使用“map”这个方法可以将“0~1023”对应到“0~100”
+        newdata    = map(sensorRead, 0, 1023, 0, 255);
+        Serial.println(newdata); //将读到的数据发送到串口
+        analogWrite(3, newdata); //使用模拟信号(设置“3号引脚”，设置亮度为“newdata”)
+        delay(200);
+}
+
+/*******************************************************************************
+        => Arduino_IR
+*******************************************************************************/

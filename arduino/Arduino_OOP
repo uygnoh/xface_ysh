@@ -5,8 +5,8 @@ class Led {
         public: //“public”中的函数称为：公共成员函数（通过类的外部调用的函数）
                 Led();      //构造函数，构造函数是在这个对象建立时立即执行
                ~Led();      //析构函数，析构函数是在这个对象删除之前立即执行
-               void on();   //类的成员函数
-               void off();  //类的成员函数
+                void on();  //类的成员函数
+                void off(); //类的成员函数
 };
 
 
@@ -59,9 +59,9 @@ class Led {
                 Led();          //构造函数，构造函数是在这个对象建立时立即执行
                 Led(int userLedPin);//创建一种新的构造函数，它提供输入参数
                ~Led();          //析构函数，析构函数是在这个对象删除之前立即执行
-               void on();       //类的成员函数
-               void off();      //类的成员函数
-               int ledPin = 2;  //类的成员变量, 设置初始值为“2”
+                void on();      //类的成员函数
+                void off();     //类的成员函数
+                int ledPin = 2; //类的成员变量, 设置初始值为“2”
 };
 
 
@@ -131,12 +131,12 @@ class Led {
                 Led();          //构造函数，构造函数是在这个对象建立时立即执行
                 Led(int userLedPin);//创建一种新的构造函数，它提供输入参数
                ~Led();          //析构函数，析构函数是在这个对象删除之前立即执行
-               void on();       //类的成员函数
-               void off();      //类的成员函数
-               int getLedPin();
-               void setLedPin(int userLedPin);
+                void on();      //类的成员函数
+                void off();     //类的成员函数
+                int getLedPin();
+                void setLedPin(int userLedPin);
         private: //“private”中的函数称为：私有成员函数（只能在公有成员函数内部使用）
-               int ledPin = 2;  //类的成员变量, 设置初始值为“2”
+                int ledPin = 2;  //类的成员变量, 设置初始值为“2”
 };
 
 
@@ -212,7 +212,7 @@ void setup() {
 
 
 /*******************************************************************************
-                => arduino_oop.ino    led.h    led.cpp
+                => ( arduino_oop.ino    led.h    led.cpp )
 *******************************************************************************/
 |_________________________________________________________|
 |       //lde.h                                           |
@@ -226,10 +226,10 @@ class Led {
         public:
                 Led();
                ~Led();
-               void on();
-               void off();
-               int getLedPin();
-               void setLedPin(int userLedPin);
+                void on();
+                void off();
+                int getLedPin();
+                void setLedPin(int userLedPin);
         private:
                 int ledPin = 2;
 };
@@ -326,10 +326,10 @@ class Led {
         public:
                 Led();
                ~Led();
-               void on();
-               void off();
-               int getLedPin();
-               void setLedPin(int userLedPin);
+                void on();
+                void off();
+                int getLedPin();
+                void setLedPin(int userLedPin);
         private:
                 int ledPin = 2;
 };
@@ -440,10 +440,10 @@ class Led {
         public:
                 Led();
                ~Led();
-               void on();
-               void off();
-               int getLedPin();
-               void setLedPin(int userLedPin);
+                void on();
+                void off();
+                int getLedPin();
+                void setLedPin(int userLedPin);
         private:
                 int ledPin = 2;
 };
