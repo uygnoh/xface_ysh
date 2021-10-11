@@ -1,0 +1,431 @@
+############################################################
+### % 按键__IO__
+############################################################
+#define KEY_1   P2^0
+#define KEY_2   P2^1
+#define KEY_3   P2^2
+#define KEY_4   P2^3
+#define LED_1   P2^4
+#define LED_2   P2^5
+#define LED_3   P2^6
+#define LED_4   P2^7
+
+
+############################################################
+### % 独立按键(__IO__初始化为高电平)
+############################################################
+// % 一键无锁开关
+// % uint8_t key_value = 0; 它每次进入函数体都会进行初始化
+// % uint8_t key_value; 相当于定义了一个静态的局部变量，它只初始化一次
+uint8_t key_scan(void)
+{
+    uint8_t key_value = 0;
+    if (!KEY_1)
+    {
+        key_value = 1;
+    }
+    return key_value;
+}
+
+
+
+// % 一键锁定开关
+// % 机械开关的抖动一般为: 5~10ms
+uint8_t key_scan(void)
+{
+    uint8_t key_value = 0;  
+    if (!KEY_1)             // 1 % 判断是否有键按下    
+    {
+        delay_ms(10);       // 2 % 延时消抖
+        if (!KEY_1)         // 3 % 再次判断是否有键按下
+        {
+            key_value = 1;  // 4 % 键值的软件编码
+        }
+        while(!KEY_1);      // 5 % 松手等待，如果按键没有松开继续等
+    }
+    return key_value;
+}
+
+
+
+############################################################
+### % 数码管显示按键键值
+############################################################
+// % 判断是那一个按键按下，并返回键值
+uint8_t key_scan(void)
+{
+    uint8_t key_value = 0;  
+    KEY_1 = 1;
+    KEY_2 = 1;
+    
+    if (!KEY_1)             // 1 % 判断是否有键按下    
+    {
+        delay_ms(10);       // 2 % 延时消抖
+        if (!KEY_1)         // 3 % 再次判断是否有键按下
+        {
+            key_value = 1;  // 4 % 键值的软件编码
+        }
+        while(!KEY_1);      // 5 % 松手等待，如果按键没有松开继续等
+    }
+    
+    if (!KEY_2)             // 1 % 判断是否有键按下    
+    {
+        delay_ms(10);       // 2 % 延时消抖
+        if (!KEY_2)         // 3 % 再次判断是否有键按下
+        {
+            key_value = 2;  // 4 % 键值的软件编码
+        }
+        while(!KEY_2);      // 5 % 松手等待，如果按键没有松开继续等
+    }
+    
+    return key_value;
+}
+
+
+
+############################################################
+### % 独立按键，更高效的方法
+### % 数码管显示按键键值
+############################################################
+// % 判断是那一个按键按下，并返回键值
+uint8_t key_scan(void)
+{
+    uint8_t key_value = 0;  
+    KEY_1 = 1;
+    KEY_2 = 1;
+    KEY_1 = 1;
+    KEY_2 = 1;   
+    
+    if (!KEY_1 || !KEY_2 || !KEY_3 || !KEY_4)
+    {   // % 延时消抖
+        delay_ms(10);       
+        if (!KEY_1 || !KEY_2 || !KEY_3 || !KEY_4)
+        {
+            if(!KEY_1)
+                key_value = 1;
+            if(!KEY_2)
+                key_value = 2;
+            if(!KEY_3)
+                key_value = 3;
+            if(!KEY_4)
+                key_value = 4;
+        }// % 松手检测
+        while(!KEY_1 || !KEY_2 || !KEY_3 || !KEY_4);
+    }
+    
+    return key_value;
+}
+// % 第一个按键按下显示“1”
+// % 第二个按键按下显示“2”
+switch (key_scan())
+{
+    case 0:
+        break;
+    case 1:
+        led_buf[0] = 1;
+        break;
+    case 2:
+        led_buf[1] = 2;
+        break;
+    default:
+        break;
+}
+
+
+
+############################################################
+### % 按键功能函数
+############################################################
+// % 第一个按键设置功能: KEY_1, 加1
+// % 第二个按键设置功能: KEY_2, 减1
+// % 第三个按键设置功能: KEY_3, num_cnt=0
+// % 第四个按键设置功能: KEY_3, num_cnt=8080
+led_buf[0] = num_cnt/1000;      // % 四位十进制数分离出“千位”
+led_buf[1] = num_cnt/100%10;    // % 四位十进制数分离出“百位”
+led_buf[2] = num_cnt/10%10;     // % 四位十进制数分离出“十位”
+led_buf[3] = num_cnt%10;        // % 四位十进制数分离出“个位”
+// % 按键功能函数
+void key_function()
+{
+    switch (key_scan())
+    {
+        case 0:
+            break;
+        case 1:
+            num_cnt++;
+            if (num_cnt > 9999)
+                num_cnt = 0;
+            break;
+        case 2:
+            num_cnt--;
+            if (num_cnt > 9999)
+            break;
+        case 3:
+            num_cnt = 0;
+            break;
+        case 4:
+            num_cnt = 8080;
+            break;
+        default:
+            break;
+    }
+}
+
+
+
+
+
+
+############################################################
+### % 距阵按键(4*4)___列扫描___
+############################################################
+/*__________________________________________
+#defiend KEY_IN1    P2^0 // % 第一行 0
+#defiend KEY_IN2    P2^1 // % 第二行 1
+#defiend KEY_IN3    P2^2 // % 第三行 2 
+#defiend KEY_IN4    P2^3 // % 第四行 3
+#defiend KEY_OUT1   P2^4 // % 第一列 4
+#defiend KEY_OUT2   P2^5 // % 第二列 5
+#defiend KEY_OUT3   P2^6 // % 第三列 6
+#defiend KEY_OUT4   P2^7 // % 第四列 7
+____________________________________________
+        COL1    COL2    COL3    COL4
+ROW1    K0|     K4|     K8|     KC|
+ROW2    K1|     K5|     K9|     KD|
+ROW3    K2|     K6|     KA|     KE|
+ROW4    K3|     K7|     KB|     KF|
+___________________________________________*/
+
+
+// 1  第一列输出低电平“0”，检测第一列的四行 (0xEF)
+KEY_OUT1 = 0;   // % 设置第一列的IO管脚为低电平“0” __IO__4
+KEY_OUT2 = 1;   // % 设置第二列的IO管脚为高电平“1” __IO__5
+KEY_OUT3 = 1;   // % 设置第三列的IO管脚为高电平“1” __IO__6
+KEY_OUT4 = 1;   // % 设置第四列的IO管脚为高电平“1” __IO__7
+______________________________________________________
+KEY_IN1 = 1;   // % 设置第一行的IO管脚为高电平“1” __IO__0
+KEY_IN2 = 1;   // % 设置第二行的IO管脚为高电平“1” __IO__1
+KEY_IN3 = 1;   // % 设置第三行的IO管脚为高电平“1” __IO__2
+KEY_IN4 = 1;   // % 设置第四行的IO管脚为高电平“1” __IO__3
+
+
+// 2  第二列输出低电平“0”，检测第二列的四行 (0xDF)
+KEY_OUT1 = 1;   // % 设置第一列的IO管脚为低电平“0” __IO__4
+KEY_OUT2 = 0;   // % 设置第二列的IO管脚为高电平“1” __IO__5
+KEY_OUT3 = 1;   // % 设置第三列的IO管脚为高电平“1” __IO__6
+KEY_OUT4 = 1;   // % 设置第四列的IO管脚为高电平“1” __IO__7
+______________________________________________________
+KEY_IN1 = 1;   // % 设置第一行的IO管脚为高电平“1” __IO__0
+KEY_IN2 = 1;   // % 设置第二行的IO管脚为高电平“1” __IO__1
+KEY_IN3 = 1;   // % 设置第三行的IO管脚为高电平“1” __IO__2
+KEY_IN4 = 1;   // % 设置第四行的IO管脚为高电平“1” __IO__3
+
+
+// 3  第三列输出低电平“0”，检测第三列的四行 (0xBF)
+KEY_OUT1 = 1;   // % 设置第一列的IO管脚为低电平“0” __IO__4
+KEY_OUT2 = 1;   // % 设置第二列的IO管脚为高电平“1” __IO__5
+KEY_OUT3 = 0;   // % 设置第三列的IO管脚为高电平“1” __IO__6
+KEY_OUT4 = 1;   // % 设置第四列的IO管脚为高电平“1” __IO__7
+______________________________________________________
+KEY_IN1 = 1;   // % 设置第一行的IO管脚为高电平“1” __IO__0
+KEY_IN2 = 1;   // % 设置第二行的IO管脚为高电平“1” __IO__1
+KEY_IN3 = 1;   // % 设置第三行的IO管脚为高电平“1” __IO__2
+KEY_IN4 = 1;   // % 设置第四行的IO管脚为高电平“1” __IO__3
+
+
+// 4  第四列输出低电平“0”，检测第四列的四行 (0x7F)
+KEY_OUT1 = 1;   // % 设置第一列的IO管脚为低电平“0” __IO__4
+KEY_OUT2 = 1;   // % 设置第二列的IO管脚为高电平“1” __IO__5
+KEY_OUT3 = 1;   // % 设置第三列的IO管脚为高电平“1” __IO__6
+KEY_OUT4 = 0;   // % 设置第四列的IO管脚为高电平“1” __IO__7
+______________________________________________________
+KEY_IN1 = 1;   // % 设置第一行的IO管脚为高电平“1” __IO__0
+KEY_IN2 = 1;   // % 设置第二行的IO管脚为高电平“1” __IO__1
+KEY_IN3 = 1;   // % 设置第三行的IO管脚为高电平“1” __IO__2
+KEY_IN4 = 1;   // % 设置第四行的IO管脚为高电平“1” __IO__3
+
+
+
+uint8_t key_scan(void)
+{
+    // % 使key_value为局部静态变量
+    static uint8_t key_value = 0;  
+    
+    
+    // % 第一列输出低电平，检测第一列的4行
+    KEY_IN1  = 1;  KEY_IN2  = 1;  KEY_IN3  = 1;  KEY_IN4  = 1;
+    KEY_OUT1 = 0;  KEY_OUT1 = 1;  KEY_OUT1 = 1;  KEY_OUT1 = 1;
+    
+    if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+    {   // % 延时消抖
+        delay_ms(10);       
+        if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+        {
+            if(!KEY_IN1)
+                key_value = 0;
+            if(!KEY_IN2)
+                key_value = 1;
+            if(!KEY_IN3)
+                key_value = 2;
+            if(!KEY_IN4)
+                key_value = 3;
+        }// % 松手检测
+        while(!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4);
+    }
+    
+    
+    // % 第二列输出低电平，检测第二列的4行
+    KEY_IN1  = 1;  KEY_IN2  = 1;  KEY_IN3  = 1;  KEY_IN4  = 1;
+    KEY_OUT1 = 1;  KEY_OUT1 = 0;  KEY_OUT1 = 1;  KEY_OUT1 = 1;
+    
+    if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+    {   // % 延时消抖
+        delay_ms(10);       
+        if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+        {
+            if(!KEY_IN1)
+                key_value = 4;
+            if(!KEY_IN2)
+                key_value = 5;
+            if(!KEY_IN3)
+                key_value = 6;
+            if(!KEY_IN4)
+                key_value = 7;
+        }// % 松手检测
+        while(!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4);
+    }
+    
+
+    // % 第三列输出低电平，检测第三列的4行
+    KEY_IN1  = 1;  KEY_IN2  = 1;  KEY_IN3  = 1;  KEY_IN4  = 1;
+    KEY_OUT1 = 1;  KEY_OUT1 = 1;  KEY_OUT1 = 0;  KEY_OUT1 = 1;
+    
+    if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+    {   // % 延时消抖
+        delay_ms(10);       
+        if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+        {
+            if(!KEY_IN1)
+                key_value = 8;
+            if(!KEY_IN2)
+                key_value = 9;
+            if(!KEY_IN3)
+                key_value = A;
+            if(!KEY_IN4)
+                key_value = B;
+        }// % 松手检测
+        while(!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4);
+    }
+
+    // % 第四列输出低电平，检测第四列的4行
+    KEY_IN1  = 1;  KEY_IN2  = 1;  KEY_IN3  = 1;  KEY_IN4  = 1;
+    KEY_OUT1 = 1;  KEY_OUT1 = 1;  KEY_OUT1 = 1;  KEY_OUT1 = 0;
+    
+    if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+    {   // % 延时消抖
+        delay_ms(10);       
+        if (!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4)
+        {
+            if(!KEY_IN1)
+                key_value = C;
+            if(!KEY_IN2)
+                key_value = D;
+            if(!KEY_IN3)
+                key_value = E;
+            if(!KEY_IN4)
+                key_value = F;
+        }// % 松手检测
+        while(!KEY_IN1 || !KEY_IN2 || !KEY_IN3 || !KEY_IN4);
+    }    
+    
+    return key_value;
+}
+
+
+
+int main(void)
+{
+    while (1)
+    {
+       led_buf[0] = key_scan();
+       display();
+    }
+
+}
+
+
+############################################################
+### % 距阵按键(4*4)___线反转法___
+############################################################
+#define KEY_PORT    P2
+/*__________________________________________
+#defiend KEY_IN1    P2^0 // % 第一行 0
+#defiend KEY_IN2    P2^1 // % 第二行 1
+#defiend KEY_IN3    P2^2 // % 第三行 2 
+#defiend KEY_IN4    P2^3 // % 第四行 3
+#defiend KEY_OUT1   P2^4 // % 第一列 4
+#defiend KEY_OUT2   P2^5 // % 第二列 5
+#defiend KEY_OUT3   P2^6 // % 第三列 6
+#defiend KEY_OUT4   P2^7 // % 第四列 7
+____________________________________________
+        COL1    COL2    COL3    COL4
+ROW1    K0|     K4|     K8|     KC|
+ROW2    K1|     K5|     K9|     KD|
+ROW3    K2|     K6|     KA|     KE|
+ROW4    K3|     K7|     KB|     KF|
+___________________________________________*/
+
+
+### % 距阵按键(4*4)___线反转法___
+uint8_t key_scan(void)
+{
+    static uint8_t key_value = 16;
+    
+    uint8_t temp, temp2;
+    
+    // % 低4位做输出(4行做输出, 输出写“0”)
+    // % 高4位做输入(4列做输入, 输入写“1”)
+    KEY_PORT = 0xF0;
+    
+    temp = KEY_PORT;                // % 读入KEY_PORT输入输出端口的数据
+    
+    if (temp != 0xF0)               // % 判断是否有键被按下
+    {                       
+        delay_ms(10);               // % 延时消抖
+        if (temp != 0xF0)           // % 再次判断是否有键被按下
+        {
+            temp = KEY_PORT & 0xF0; // % 取出高4位, 确定列号
+            KEY_PORT = 0x0F;        // % 4行做输入， 4列做输出 
+            temp2 = KEY_PORT & 0x0F;// % 读入，并取出低4位, 确定行号 
+        }
+        switch (temp + temp2)
+        {
+            case 0xEE: key_value = 0;  break;
+            case 0xED: key_value = 1;  break;
+            case 0xEB: key_value = 2;  break;
+            case 0xE7: key_value = 3;  break;
+            
+            case 0xDE: key_value = 4;  break;
+            case 0xDD: key_value = 5;  break;
+            case 0xDB: key_value = 6;  break;
+            case 0xD7: key_value = 7;  break;
+            
+            case 0xBE: key_value = 8;  break;
+            case 0xBD: key_value = 9;  break;
+            case 0xBB: key_value = 10; break;
+            case 0xB7: key_value = 11; break;
+            
+            case 0x7E: key_value = 12; break;
+            case 0x7D: key_value = 13; break;
+            case 0x7B: key_value = 14; break;
+            case 0x77: key_value = 15; break;
+            
+            default: break;
+        }
+    }
+    
+    return key_value;
+}
+
+
+

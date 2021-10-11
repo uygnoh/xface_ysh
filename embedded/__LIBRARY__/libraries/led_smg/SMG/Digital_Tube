@@ -1,0 +1,57 @@
+/*  晶振 12MHz ->80C51
+    数码管线路布局与 IO端口对应关系
+    8   4   2   1   8   4   2   1
+    D7  D6  D5  D4  D3  D2  D1  D0
+    h   g   f   e   d   c   b   a
+*/
+
+#include <reg51.h>
+#define uchar unsigned char
+sbit WEI0 = P1^0;
+sbit WEI1 = P1^1;
+sbit WEI2 = P1^2;
+sbit WEI3 = P1^3;
+
+/* 共阳极数码管编码表 */
+/* 注意！ 用 code 是把后面的数据存储到程序存储区 */
+uint8_t code table[] = { 
+    0xc0,0xf9,0xa4,0xb0,
+    0x99,0x92,0x82,0xf8,
+    0x80,0x90,0x88,0x83,
+    0xc6,0xa1,0x86,0x8e
+};
+/* 共阴极数码管编码表 
+uint8_t code table[] = { 
+    0x3f,0x06,0x5b,0x4f,
+    0x66,0x6d,0x7d,0x07,
+    0x7f,0x6f,0x77,0x7c,
+    0x39,0x5e,0x79,0x71
+};
+*/
+
+int main(void)
+{
+	uchar i;
+	WEI0 = 1;
+	WEI1 = 1;
+	WEI2 = 1;
+	WEI3 = 1;
+	P0 = 0x00;
+	while (1) 
+	{
+		for (i = 0; i <16; i++) 
+		{
+			P0 = table[i];
+			delay_ms(200);
+		}	
+	}
+	return 0;
+}
+
+void delay_ms(int x)
+{
+	int y, z;
+	for (y = x; y > 0; y--)
+		for (z = 110; z > 0; z--)
+}
+
