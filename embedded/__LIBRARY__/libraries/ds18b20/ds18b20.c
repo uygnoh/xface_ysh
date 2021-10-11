@@ -108,21 +108,23 @@ int16_t ds18b20_temperature_data(void)
 }
 
 /*******************************************************************************
-  函数名称: ds18b20_rom_data()
-  输入参数: 无
+  函数名称: ds18b20_rom_code()
+  输入参数: (uint8_t *romcode), 需要传入数组中的地址
   输出参数: 无
   函数功能: 从ds18b2020中读出64位ROM码（64位ROM码，低位在前，高位在后读出）
 *******************************************************************************/
-void ds18b20_rom_data(void)
+void ds18b20_read_rom(uint8_t *romcode)
 {
         uint8_t falg = 0;
         uint8_t i    = 0;
         if (!ds18b20_init()) {
                 ds18b20_write(READ_ROM);        //读取ROM指令
                 for (i = 0; i < 8; i++) {       //读取64位ROM代码
-                        rom_code[i] = ds18b20_read();
+                        *romcode++ = ds18b20_read();
                 }
         } else {
+                #ifdef PRINTF
                 printf("ds18b20_initialize_failed!\r\n");
+                #endif
         }
 }

@@ -668,13 +668,14 @@ int main(void)
 
 
 /*******************************************************************************
-        => 串口中断中即时解析数据帧头的通信程序(6Bytes)
+        => 串口中断中即时解析数据帧头的通信程序(6Bytes), 可以进行实时处理
            +________________+
-           |  [0xAA 0x55]   | ->(帧头占一个字节) 
-           |  [0x01]        | ->(数据类型占一个字节) 
+           |  [0xAA 0x55]   | ->(帧头占2个字节) 
+           |  [0x01]        | ->(数据类型占1个字节) 
            |  [0x22 0x33]   | ->(2字节数据)
            |  [0x0D]        | ->(帧尾)
            |________________|
+        => 0xAA 0x55 0x01 0x22 0x33 0x0D
 *******************************************************************************/
 
 #define RX_BUF_SIZE  10         //定义接收数据缓冲区数组个数
@@ -684,13 +685,86 @@ uint8_t start_soft_timer = 0;   //定义软件定时器
 uint8_t rx_soft_timer_cnt;      //每接收到一帧数据后，就开始计时
 uint8_t rx_flag;                //定义一包数据接收完成标志
 uint8_t rx_buf[RX_BUF_SIZE];    //定义一个接收缓冲区
-uint8_t rx_dat_index = 0;       //定义接收缓冲区个数
+uint8_t rx_counter = 0;         //定义接收缓冲区的数据计数器
 uint8_t machine_step = 0;       //定义一个状态机步骤变量
 
-uint8_t led_data;
-uint8_t beep_data;
-uint8_t led_cnt;
+uint16_t led_data;              //定义LED亮度
+uint16_t beep_data;             //定义蜂鸣器响的时间
+uint16_t led_cnt;
+uint16_t beep_cnt;
 
+//串行口中断服务程序
+//使用状态机方式 ->machine_step
+=> 0xAA 0x55 0x01 0x22 0x33 0x0D
+//_________________________________________________________
+void UART_ISR(void) interrupt 4
+{
+        //接收到数据中断处理
+        //_________________________________________________________
+        if (RI) {
+                RI = 0;
+                switch (machine_step) {
+                case 0: 
+                        rx_buf[0] = SBUF;       //先把数据接收过来
+                        if (rx_buf[0] == 0xAA) {//判断是不是帧头的第一个字符
+                                machine_step = 1;//切换到下一个状态
+                        } else {                //不是“0xAA”，把它清零
+                                machine_step = 0;
+                        }
+                        break;
+                case 1: 
+                        rx_buf[1] = SBUF;         //先把数据接收过来
+                        if (rx_buf[1] == 0x55) {  //判断是不是帧头的第二个字符
+                                machine_step = 2; //切换到下一个状态
+                                rx_counter = 2; //表示已经接收到“2帧数据了”0xAA 0x55
+                        } else {
+                                machine_step = 0;
+                        }
+                        break;
+                case 2:                       
+                        rx_buf[rx_counter] = SBUF; 
+                        rx_counter++;            //“0xAA 0x55 0x01 0x22 0x33”//
+                        if (rx_counter > 4) {    // @ 表示“0x01 0x22 0x33”接收完成
+                                machine_step = 3;  // @ 切换到下一个状态
+                        } else {                   // @ 否则继续接收数据
+                                machine_step = 2;
+                        }
+                        break;
+                case 3: 
+                        rx_buf[rx_counter] = SBUF;       //接收到“0x0D”
+                        if (rx_buf[rx_counter] == 0x0D) {//判断是不是接收到了帧尾?
+                                switch (rx_buf[2]) {
+                                case 0x00:          //如果rx_buf[2]=0x00(功能码)
+                                        led_data = rx_buf[3];
+                                        led_data = led_data << 8;
+                                        led_data = led_data + rx_buf[4];
+                                        //led_data=LED点亮时间
+                                        led_cnt = 0;
+                                        break;
+                                case 0x01:          //如果rx_buf[2]=0x01(功能码)
+                                        deep_data = rx_buf[3];
+                                        deep_data = deep_data << 8;
+                                        deep_data = deep_data + rx_buf[4];
+                                        //deep_data=蜂鸣器响的时间
+                                        beep_cnt = deep_data;
+                                        break;
+                                default: 
+                                        break;
+                                }
+                                machine_step = 0;//清除状态机数据
+                                rx_counter   = 0;//清除数据缓冲区个数
+                                rx_flag      = 1;//接收完成一包数据，标志位置“1”
+                        }
+                        break;
+                default: break;     
+                }
+        }
+        //发送数据中断处理
+        //_________________________________________________________
+        if (TI) {
+                TI = 0;
+        }
+}
 
 // 11.0592MHz@9600bp
 //1位起始位， 1位停止位， 8位数据位， 共10位数据
@@ -709,88 +783,8 @@ void uart_init(void)
         TR1   = 1;      //启动定时器1
 }
 
-//串行口中断服务程序
-//使用状态机方式 ->machine_step
-//_________________________________________________________
-void UART_ISR(void) interrupt 4
-{
-    //接收到数据中断处理
-    if (RI) {
-        RI = 0;
-        switch (machine_step) {
-            case 0: 
-                rx_buf[0] = SBUF; 
-                if (rx_buf[0] == 0xAA) {  //判断是不是帧头的第一个字符
-                    machine_step = 1;
-                } else {
-                    machine_step = 0;
-                }
-                break;
-            case 1: 
-                rx_buf[1] = SBUF; 
-                if (rx_buf[1] == 0x55) { //判断是不是帧头的第二个字符
-                    machine_step = 2;
-                    rx_dat_index = 2;
-                } else {
-                    machine_step = 0;
-                }
-                break;
-            case 2: 
-                rx_buf[rx_dat_index] = SBUF; //接收1个字节的功能码和2个字节的数据
-                rx_dat_index++;
-                if (rx_dat_index > 4) {
-                    machine_step = 3;
-                } else {
-                    machine_step = 2;
-                }
-                break;
-            case 3: 
-                rx_buf[rx_dat_index] = SBUF; 
-                if (rx_buf[rx_dat_index] == 0x0D) {//判断是不是接收到了帧尾
-                
-                    switch (rx_buf[2]) {
-                        case 0x00:              //如果rx_buf[2]=0x00
-                            led_data = rx_buf[3];
-                            led_data = led_data << 8;
-                            led_data = led_data + rx_buf[4];
-                            //deep_data=LED点亮时间
-                            led_cnt = 0;
-                            break;
-                       case 0x01:               //如果rx_buf[2]=0x01
-                            deep_data = rx_buf[3];
-                            deep_data = deep_data << 8;
-                            deep_data = deep_data + rx_buf[4];
-                            //deep_data=蜂鸣器响的时间
-                            beep_cnt = deep_data;
-                            break;
-                        default: 
-                            break;
-                    }
-                    //清除状态机数据
-                    machine_step = 0;
-                    //清除数据缓冲区个数
-                    rx_dat_index = 0;
-                    //接收完成一包数据，标志位置“1”
-                    //在主程序中判断这个标志位
-                    rx_flag = 1;
-                }
-                break;
-
-            default:
-                break;   
-        }
-    }
-    //发送数据中断处理
-    if (TI)
-    {
-        TI = 0;
-    }
- 
-}
-
-
-//定时器0，16位的定时方式
-//1毫秒@11.05926MHz
+//定时器0， 16位的定时方式
+//11.05926MHz@1MS （定时器0，1毫秒定时）
 //_________________________________________________________
 void timer0_init(void)
 {
@@ -807,24 +801,20 @@ void timer0_init(void)
 //_________________________________________________________
 void TIMER0_ISR(void) interrupt 1
 {
-    TR0   = 0;      //关闭定时器0
-    if (led_cnt < led_data)
-    {
-        led_cnt++;
-        LED = ON;
-    }
-    else
-    {
-        LED = OFF;
-    }
-    if (beep_cnt != 0)
-    {
-        beep_cnt--;
-        BEEP = ~BEEP;
-    }
-    TL0   = 0x66;   //设置定时初值
-    TH0   = 0xFC;   //设置定时初值
-    TR0   = 1;      //打开定时器1
+        TR0   = 0;      //关闭定时器0
+        if (led_cnt < led_data) {
+                led_cnt++;
+                LED = ON;
+        } else {
+                LED = OFF;
+        }
+        if (beep_cnt != 0) {
+                beep_cnt--;
+                BEEP = ~BEEP;
+        }
+        TL0   = 0x66;   //设置定时器0初值
+        TH0   = 0xFC;   //设置定时器0初值
+        TR0   = 1;      //打开定时器0
 }
 
 //发送一帧数据
@@ -844,7 +834,6 @@ void send_string(uint8_t *pstr)
                 uart_write(*pstr++);
 }
 
-
 //清除数据缓冲区中的所有数据
 //_________________________________________________________
 void clr_rx_buf(uint8_t *pbuf)
@@ -854,124 +843,121 @@ void clr_rx_buf(uint8_t *pbuf)
         rx_buf[i] = 0;
 }
 
-
-
-
 //_________________________________________________________
 int main(void)
 {
-    timer0_init();
-    uart_init();
-    EA = 1;         //打开中断总开关
-    printf("Wait for Serial communication Test Start ...\r\n");
-    printf("Please Send a String of Data:\r\n");
-    while (1)
-    {
-        if (rx_flag == 1)
-        {
-            rx_flag = 0;
-            send_sting(rx_buf);
+        timer0_init();
+        uart_init();
+        EA = 1;         //打开中断总开关
+        printf("Wait for Serial communication Test Start ...\r\n");
+        printf("Please Send a String of Data:\r\n");
+        while (1) {
+                //如果接收到一包数据，回传到上位机
+                if (rx_flag == 1) {
+                        rx_flag = 0;
+                        send_sting(rx_buf);
+                }
         }
-    }
 }
 
 
 
-############################################################
-### % 串口超时接收 + CRC16校验
-### % https://blog.csdn.net/weixin_41542513/
-############################################################
-ip33.com        % CRC（循环冗余校验）在线计算
-[01 01 20 20]   % 需要校验的数据 ->Hex
-
-% 参数模型 NAME:
-CRC-16/MODBUS   x16+x15+x2+x1
-
-% 高位在左低位在右，使用时请注意高低位顺序！！！
-0x00   0x48
+/*******************************************************************************
+应用串口中断 + 定时器中断实现超时检测的串口数据接收方法
+______________________________________________
 
 
+CRC校验码由发送设备计算，并添加到发送信息帧的尾部。 接收设备接收到信息后再重新计算CRC校验码。
+然后接收设备再比较计算出的CRC校验码和接收到的CRC校验码。 如果不符，发送错误应答。 接收设备再
+进行处理。
+___________________________________________________________________________
 
-____________________________________________
-[0x01]          1 % 地址信息(第一帧数据)
-[0x01]          2 % 数据类型(第二帧数据->控制LED灯)
-[0x00 0x10]     3 % 数据()
-[0x25 0x45]     4 % CRC(L字节低位 + H字节高位)
-____________________________________________
-% 我们这里发送为： 0x01 0x01 0x20 0x20 0x48 0x00
 
+        => 串口超时接收 + CRC16校验  https://blog.csdn.net/weixin_41542513/
+        
+        
+        => ip33.com CRC（循环冗余校验）在线计算
+        ________________________________________________________________
+        [01 01 20 20]                   //需要校验的数据 ->Hex
+        CRC-16/MODBUS   x16+x15+x2+1    //参数模型 NAME:
+        0x00   0x48                     //计算结果
+        高位在左低位在右，使用时请注意高低位顺序！！！（高位在前， 低位在后）      
+        ________________________________________________________________
+        
+        
+        
+        => 我们这里发送为： 0x01 0x02 0x20 0x20 0x48 0x00 （低位在前，高位在后）
+        ________________________________________________________________
+        [0x01]          ->地址信息(第一帧数据)， 代表从机地址
+        [0x01]          ->数据类型(第二帧数据->控制LED灯)
+        [0x20 0x20]     ->数据(第三帧数据，第四帧数据)
+        [0x48 0x00]     ->CRC(Low字节低位 + High字节高位)
+        ________________________________________________________________
+
+*******************************************************************************/
 #defind LOCAL_ADDRESS 0x01
 
-//定义接收数据缓冲区最在值
-#define RX_BUF_SIZE  10
 
-//定义接收最大时间为3个毫秒
-#define RX_TIMEOUT 3
+#define RX_BUF_SIZE  10         //定义接收数据缓冲区数组个灵敏
+#define RX_TIMEOUT 3            //定义接收数据超时最大时间为3个毫秒
 
-//启动软件定时器
-uint8_t start_soft_timer = 0;
-//每接收到一帧数据后，就开始计时
-uint8_t rx_soft_timer_cnt;
-
-//定义一包数据接收完成标志
-uint8_t rx_flag;
-
-//定义一个接收缓冲区
-uint8_t rx_buf[RX_BUF_SIZE];
-
-//定义接收缓冲区个数
-uint8_t rx_dat_index = 0;
+uint8_t start_soft_timer = 0;   //启动软件定时器
+uint8_t rx_soft_timer_cnt;      //每接收到一帧数据后，就开始计时
+uint8_t rx_flag;                //定义一包数据接收完成标志
+uint8_t rx_buf[RX_BUF_SIZE];    //定义一个接收缓冲区
+uint8_t rx_dat_index = 0;       //定义接收缓冲区个数
 
 
-//9600bps (11.0592MHz)
+// 11.0592MHz@9600bps
 //1位起始位， 1位停止位， 8位数据位， 共10位数据
 //使用定时器1，做为串行口的波特率发生器
+//_________________________________________________________
 void uart_init(void)
 {
-    PCON &= 0x7F;   //波特率不倍速
-    SCON  = 0x50;   //8位数据，可变波特率
-    TMOD &= 0x0F;   //清除定时器“1”模式位
-    TMOD |= 0x20;   //设定定时器1为8位自动重装方式
-    TL1   = 0xFD;   //设定定时初值
-    TH1   = 0xFD;   //设定定时器重装值
-    ET1   = 0;      //禁止定时器1中断
-    ES    = 1;      //串行口中断打开
-    TR1   = 1;      //启动定时器1
+        PCON &= 0x7F;   //波特率不倍速
+        SCON  = 0x50;   //8位数据，可变波特率
+        TMOD &= 0x0F;   //清除定时器“1”模式位
+        TMOD |= 0x20;   //设定定时器1为8位自动重装方式
+        TL1   = 0xFD;   //设定定时初值
+        TH1   = 0xFD;   //设定定时器重装值
+        ET1   = 0;      //禁止定时器1中断
+        ES    = 1;      //串行口中断打开
+        TR1   = 1;      //启动定时器1
 }
+
 //串行口中断服务程序
+//_________________________________________________________
 void UART_ISR(void) interrupt 4
 {
-    if (RI)
-    {
-        RI = 0; 
-        // 1 % 每接收一帧数据时，打开软件计数器，去计数
-        start_soft_timer = 1;
-        //如果rx_dat_index的值小于数据缓冲区的最大值
-        //把接收到的数据放入rx_buf[]数据缓冲区中
-        if (rx_dat_index < RX_BUF_SIZE)
-        {   // 2 % 接收到数据存储到数据缓冲区，注意缓冲区的大小范围
-            rx_buf[rx_dat_index] = SBUF;
-            rx_dat_index++;
-        }
-        //否则，超过了缓冲区中最大的值，就不在接收了
-        else
-        {
-            rx_dat_index = RX_BUF_SIZE;
+        if (RI) {
+                RI = 0; 
+                // 1 @ 每接收一帧数据时，打开软件计数器，去计数
+                start_soft_timer = 1;
+                //如果rx_dat_index的值小于数据缓冲区的最大值
+                //把接收到的数据放入rx_buf[]数据缓冲区中
+                if (rx_dat_index < RX_BUF_SIZE) {
+                // 2 @ 接收到数据存储到数据缓冲区，注意缓冲区的大小范围
+                        rx_buf[rx_dat_index] = SBUF;
+                        rx_dat_index++;
+                } else {
+                //否则，超过了缓冲区中最大的值，就不在接收了
+                        rx_dat_index = RX_BUF_SIZE;
+                }
+
+                // 3 @ 每接收一帧数据，记得把软件定时计数清零，相当于喂狗
+                //   @ 虽然我们在这边把它清零了，但是在定时中断里面会不断的累加
+                rx_soft_timer_cnt = 0;
         }
         
-        // 3 % 每接收一帧数据，记得把软件定时计数清零，相当于喂狗
-        //   % 虽然我们在这边把它清零了，但是在定时中断里面会不断的累加
-        rx_soft_timer_cnt = 0;
-    }
-    if (TI)
-    {
-        TI = 0;
-    }
+        if (TI) {
+                TI = 0;
+        }
 }
 
 
 //定时器0，16位的定时方式
-//1ms @11.05926MHz
+// 11.05926MHz@1ms
+//_________________________________________________________
 void timer0_init(void)
 {
     TMOD &= 0xF0;   //设置定时器模式
@@ -982,132 +968,126 @@ void timer0_init(void)
     ET0   = 1;      //打开定时器0中断
     TR0   = 1;      //定时器0开始计时
 }
+
 //定时器0中断服务程序
+//_________________________________________________________
 void TIMER0_ISR(void) interrupt 1
 {
-    TR0   = 0;      //关闭定时器0
-    //如果打开了软件定时器
-    if (start_soft_timer == 1)
-    {   // 1 % 累加定时时间计数器
-        rx_soft_timer_cnt++;
-        // 2 % 判断定时时间是否超过了设定的的最大阈值，
-        //   % 如果超过了，则说明等待一段时间后没有新的数据到来
-        //   % 我们判断一包数据接收完成
-        if (rx_soft_timer_cnt > RX_TIMEOUT)
-        {
-            //软件定时器清零
-            rx_soft_timer_cnt = 0;
-
-            //接收标志置“1”，表示这一包数据接收完成
-            rx_flag = 1;
+        TR0   = 0;      //关闭定时器0
+        //如果打开了软件定时器
+        if (start_soft_timer == 1) {
+                // 1 @ 累加定时时间计数器
+                rx_soft_timer_cnt++;
+                // 2 @ 判断定时时间是否超过了设定的的最大阈值，
+                //   @ 如果超过了，则说明等待一段时间后没有新的数据到来
+                //   @ 我们判断一包数据接收完成
+                if (rx_soft_timer_cnt > RX_TIMEOUT) {
+                        //软件定时器清零
+                        rx_soft_timer_cnt = 0;
+                        //接收标志置“1”，表示这一包数据接收完成
+                        rx_flag = 1;
+                }
         }
-    }
-    
-    if (led_cnt < led_data)
-    {
-        led_cnt++;
-        LED = ON;
-    }
-    else
-    {
-        LED = OFF;
-    }
-    if (beep_cnt != 0)
-    {
-        beep_cnt--;
-        BEEP = ~BEEP;
-    }
-    TL0   = 0x66;   //设置定时初值
-    TH0   = 0xFC;   //设置定时初值
-    TR0   = 1;      //打开定时器1
+
+        if (led_cnt < led_data) {
+                led_cnt++;
+                LED = ON;
+        } else {
+                LED = OFF;
+        }
+        if (beep_cnt != 0) {
+                beep_cnt--;
+                BEEP = ~BEEP;
+        }
+        TL0   = 0x66;   //设置定时器0初值
+        TH0   = 0xFC;   //设置定时器0初值
+        TR0   = 1;      //打开定时器0
 }
 
 
 //发送一帧数据
+//_________________________________________________________
 void uart_write(uint8_t dat)
 {
-    SBUF = dat;
-    while(!TI)
+        SBUF = dat;
+        while(!TI);
         TI = 0;
 }
 //发送一串数据
+//_________________________________________________________
 void send_string(uint8_t *pstr)
 {
-    while (*pstr != '\0')
-        uart_write(*pstr++);
+        while (*pstr != '\0')
+                uart_write(*pstr++);
 }
 
 //清除数据缓冲区中的所有数据
+//_________________________________________________________
 void clr_rx_buf(uint8_t *pbuf)
 {
-    uint8_t i;
-    for (i = 0; i < RX_BUF_SIZE; i++)
-        rx_buf[i] = 0;
+        uint8_t i;
+        for (i = 0; i < RX_BUF_SIZE; i++)
+                rx_buf[i] = 0;
 }
 
-
+//_________________________________________________________
 int main(void)
 {
-    uint8_t i;
-    uint16_t crc;
-    uint8_t crch, crcl;
-    timer0_init();
-    uart_init();
-    EA = 1;         //打开中断总开关
-
-    while (1)
-    {   //如果接收到一包数了
-        if (rx_flag)
-        {
-            rx_flag = 0;
-            start_soft_timer = 0;   //关闭软件定时器
-            
-            //判断是不是本机地址
-            if (rx_buf[0] == LOCAL_ADDRESS)
-            {
-                return;
-            }
-            //CRC16校验，校验正确，我们才处理，否则直接返回
-            //并给出错误码
-            crc = crc16(rx_buf, rx_dat_index-2);
-            crch = crc >> 8;
-            crcl = crc & 0xFF;
-            if ((rx_buf[rx_dat_index - 2] != crch) || \
-                 rx_buf[rx_dat_index - 1] != crcl))
-            {   //加入错误码，并返回给上位机
-                rx_buf[1] = rx_buf[1] | 0x80;
-                crc = crc16(rx_buf, rx_dat_index-2);
-                rx_buf[4] = crc & 0xFF;
-                rx_buf[5] = crc >> 8;
-                for (i = 0; i < rx_dat_index; i++)
-                {
-                    uart_write(rx_buf[i]);
+        uint16_t crc;
+        uint8_t crch;
+        uint8_t crcl;
+        uint8_t i;
+        timer0_init();
+        uart_init();
+        EA = 1; //打开中断总开关
+        while (1) {   
+                if (rx_flag) {                          //如果接收到一包数了
+                        rx_flag = 0;                    //清除状态标志位
+                        start_soft_timer = 0;           //关闭软件定时器
+                        if (rx_buf[0] == LOCAL_ADDRESS) { //判断是不是本机地址
+                                return;
+                        }
+                        //CRC16校验，校验正确，我们才处理，否则直接返回
+                        //如果校验错误，并给出错误码
+                        //0x01 0x02 0x20 0x20 （0x48 0x00）
+                        //只计算前4个字节数据，后两位CRC校验位
+                        crc = crc16(rx_buf, rx_dat_index-2);
+                        crch = crc >> 8;
+                        crcl = crc & 0xFF;
+                        //判断数据的最后2位（CRC校验位）
+                        if ((rx_buf[rx_dat_index - 2] != crch) ||  \
+                             rx_buf[rx_dat_index - 1] != crcl)) { 
+                                //加入错误码，并返回给上位机
+                                rx_buf[1] = rx_buf[1] | 0x80;
+                                crc = crc16(rx_buf, rx_dat_index-2);
+                                rx_buf[4] = crc & 0xFF;
+                                rx_buf[5] = crc >> 8;
+                                for (i = 0; i < rx_dat_index; i++) {
+                                        uart_write(rx_buf[i]);
+                                }
+                                return;
+                        }
+                        switch (rx_buf[1]) {    //rx_buf[1]存放的是功能码
+                        case 0x01:
+                                    led_data = rx_buf[2];
+                                    led_data = led_data << 8;
+                                    led_data = led_data + rx_buf[3];
+                                    led_cnt  = 0;
+                                    break;
+                        case 0x02:
+                                    beep_data = rx_buf[2];
+                                    beep_data = beep_data << 8;
+                                    beep_data = beep_data + rx_buf[3];
+                                    beep_cnt  = beep_data;
+                                    break;
+                        default: 
+                                    break;
+                        }
+                        for (i = 0; i < rx_dat_index; i++) {
+                                uart_write(rx_buf[i]);
+                        }
+                        clr_rx_buf(rx_buf);             //清除缓冲区           
+                        rx_dat_index = 0;               //数据缓冲区计数个清零
                 }
-                return;
-            }
-            switch (rx_buf[1])
-            {
-                case 0x01:
-                    led_data = rx_buf[2];
-                    led_data = led_data << 8;
-                    led_data = led_data + rx_buf[3];
-                    led_cnt  = 0;
-                    break;
-                case 0x02:
-                    beep_data = rx_buf[2];
-                    beep_data = beep_data << 8;
-                    beep_data = beep_data + rx_buf[3];
-                    beep_cnt  = beep_data;
-                    break;
-                default: 
-                    break;
-            }
-            for (i = 0; i < rx_dat_index; i++)
-            {
-                uart_write(rx_buf[i]);
-            }
-            clr_rx_buf(rx_buf);     //清除缓冲区           
-            rx_dat_index = 0;         //数据缓冲区计数个清零
         }
-    }
 }
