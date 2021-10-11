@@ -100,7 +100,7 @@ int16_t ds18b20_temperature_data(void)
                 ds18b20_write(0xBE);           //read scratchpad
                 low_byte  = ds18b20_read();    //read byte0
                 high_byte = ds18b20_read();    //read byte1
-                temperature = (int16_t(high_byte) << 8) + low_byte;
+                temperature = ((int16_t)high_byte << 8) + low_byte;
         } else {
                 printf("ds18b20_initialize_failed!\r\n");
         }
