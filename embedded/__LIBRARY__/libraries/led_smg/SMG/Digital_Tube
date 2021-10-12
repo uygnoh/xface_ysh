@@ -37,10 +37,8 @@ int main(void)
 	WEI2 = 1;
 	WEI3 = 1;
 	P0 = 0x00;
-	while (1) 
-	{
-		for (i = 0; i <16; i++) 
-		{
+	while (1) {
+		for (i = 0; i <16; i++) {
 			P0 = table[i];
 			delay_ms(200);
 		}	
