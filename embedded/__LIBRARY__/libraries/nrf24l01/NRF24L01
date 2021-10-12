@@ -1,0 +1,343 @@
+/*******************************************************************************
+        => nRF24L01是NORDIC公司生产的无线通信芯片
+*******************************************************************************/
+//采用FSK调制, 可以实现点对点，或是1对6的通信, 无线通信速度可达2Mbps
+//_________________________________________________________
+1   GND     //电源地
+2   VCC     //电源正极
+3   CE      //使能器件的发送模式或接收模式
+4   CSN     //从器件使能信号
+5   SCK     //时钟信号，由主器件产生
+6   MOSI    //主器件输出，从器件输入
+7   MISO    //主器件输入，从器件输出
+8   IRQ     //中断信号
+
+    
+
+/*******************************************************************************
+        => nRF24L01 操作步骤
+*******************************************************************************/  
+//接收模式(RX模式初始化配置步骤)
+//_________________________________________________________
+1 (RX_ADDR_P0)        //写RX节点的地址_RX_ADD_P0
+2 (EN_AA->AUTO_ACK)   //使能自动应答      
+3 (EN_RXADDR->PIPE_0) //使能通道0(PIPE_0)         
+4 (RF_CH)             //选择通信频率       
+5 (RX_PW_P0)          //选择通道0有效数据宽度 
+6 (RF_SETUP)          //配置发射参数(低噪放大增益，发射功率，速率)
+7 (CONFIG)            //基本参数配置及切换工作模式,切换到接收模式
+
+//发射模式(TX模式初始化配置步骤)
+//_________________________________________________________
+1 (TX_ADDR)           //写TX节点的地址
+2 (RX_ADDR)           //写RX节点的地址
+3 (EN_AA->AUTO_ACK)   //使能自动应答  
+4 (EN_RXADDR)         //使能通道0 
+5 (SETUP_RETR)        //配置自动重发次数
+6 (RF_CH)             //选择通信频率
+8 (RF_SETUP)          //配置发射参数(低噪放大增益，发射功率，速率)
+7 (RX_PW_P0)          //选择通道0有效数据宽度 
+9 (CONFIG)            //基本参数配置及切换工作模式
+
+
+
+/*******************************************************************************
+        => nRF24L01 命令和寄存器
+*******************************************************************************/  
+//nRF24L01命令， nRF24L01总共有8个命令
+//_________________________________________________________________________
+#define R_REGISTER      0x00    //[000A AAAA]读配置寄存器,低5位为寄存器地址(AAAAA表示寄存器的地址)
+#define W_REGISTER      0x20    //[001A AAAA]写配置寄存器,低5位为寄存器地址(AAAAA表示寄存器的地址)
+#define R_RX_PAYLOAD    0x61    //[0110 0001]读RX有效数据,1~32字节,用于接收
+#define W_TX_PAYLOAD    0xA0    //[1010 0000]写TX有效数据,1~32字节,用于发送
+#define FLUSH_TX        0xE1    //[1110 0001]清除TX_FIFO寄存器，发射模式下用
+#define FLUSH_RX        0xE2    //[1110 0010]清除RX_FIFO寄存器， 接收模式下用
+#define REUSE_TX_PL     0xE3    //[1110 0011]重新使用上一包数据, CE=1, 重复发射
+#define NOP             0xFF    //[1111 1111]空操作,可以用来读状态寄存器
+//nRF24L01 寄存器
+//_________________________________________________________________________
+#define CONFIG          0x00    //配置寄存器地址
+#define EN_AA           0x01    //使能自动应答功能
+#define EN_RXADDR       0x02    //接收地址允许
+#define SETUP_AW        0x03    //设置地址宽度(所有数据通道)
+#define SETUP_RETR      0x04    //建立自动重发
+#define RF_CH           0x05    //RF通道
+#define RF_SETUP        0x06    //RF寄存器
+#define STATUS          0x07    //状态寄存器
+#define OBSERVE_TX      0x08    //发送检测寄存器
+#define CD              0x09    //载波检测寄存器
+#define RX_ADDR_P0      0x0A    //数据通道0接收地址
+#define RX_ADDR_P1      0x0B    //数据通道1接收地址
+#define RX_ADDR_P2      0x0C    //数据通道2接收地址
+#define RX_ADDR_P3      0x0D    //数据通道3接收地址
+#define RX_ADDR_P4      0x0E    //数据通道4接收地址
+#define RX_ADDR_P5      0x0F    //数据通道5接收地址
+#define TX_ADDR         0x10    //发送地址寄存器
+#define RX_PW_P0        0x11    //接收数据通道0有效数据宽度(1~32字节)
+#define RX_PW_P1        0x12    //接收数据通道1有效数据宽度(1~32字节)
+#define RX_PW_P2        0x13    //接收数据通道2有效数据宽度(1~32字节)
+#define RX_PW_P3        0x14    //接收数据通道3有效数据宽度(1~32字节)
+#define RX_PW_P4        0x15    //接收数据通道4有效数据宽度(1~32字节)
+#define RX_PW_P5        0x16    //接收数据通道5有效数据宽度(1~32字节)
+#define FIFO_STATUS     0x17    //FIFO状态寄存器
+
+
+
+/*******************************************************************************
+        => nRF24L01 底层驱动
+*******************************************************************************/
+___________________________________________________________
+uint8_t spi_rw(uint8_t byte);
+uint8_t spi_rw_reg(uint8_t reg, uint8_t value);
+uint8_t spi_read(uint8_t reg);
+uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t bytes);
+uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t bytes);
+___________________________________________________________
+
+
+/* Description:
+   Writes one byte to nRF24L01, and return the byte read
+   from nRF24L01 during write, according to SPI protocol
+ * @brief   //写1个字节到NRF24L01
+ * @return  //返回从NRF24L01读出的字节
+ */
+uint8_t spi_rw(uint8_t byte)
+{
+    uint8_t i;
+    for (i = 0; i < 8; i++)     //output 8-bit
+    {
+        MOSI = (byte & 0x80);   //output 'byte', MSB to MOSI
+        byte = (byte << 1);     //shift next bit into MSB
+        SCK = 1;                //set SCK high.
+        byte |= MISO;           //capture current MISO bit
+        SCK = 0;                //..then set SCK low again.
+    }
+    return(byte);               //return read byte
+}
+
+
+/*
+ * (uint8_t reg)写入寄存器的地址
+ * (uint8_t value)写入这个数值到这个寄存器中
+ */
+uint8_t spi_rw_reg(uint8_t reg, uint8_t value)
+{
+    uint8_t status;
+    CSN = 0;                //CSN low, init SPI transaction
+    status = spi_rw(reg);   //select register
+    spi_rw(value);          //..and write value to it..
+    CSN = 1;                //CSN high again
+    return(status);        //return nRF24L01 status byte
+}
+
+/*
+ * @brief   Read one byte from nRF24L01 register, 'reg'
+ * @return  返回寄存器中的值
+ */
+uint8_t spi_read(uint8_t reg)
+{
+    uint8_t reg_val;
+    CSN = 0;                //CSN low, initialize SPI communication..
+    spi_rw(reg);            //select register to read from..
+    reg_val = spi_rw(0);    //..then read register value
+    CSN = 1;                //CSN high, terminate SPI communication
+    return(reg_val);        //return register value
+}
+
+
+/*
+ * @brief   Reads 'bytes' #of bytes form register 'reg'
+ *           Typically used to read RX payload, Rx/Tx address
+ * @return  返回在读的寄存器的状态
+ */
+uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t bytes)
+{
+    uint8_t status, byte_ctr;
+    
+    CSN = 0;
+    /* //Select register to write to and read stauts byte */
+    status = spi_rw(reg);
+    for (byte_ctr = 0; byte_ctr < bytes; byte_ctr++)
+    {
+        /* //Perform spi_rw to read byte from nRF24L01 */
+        pbuf[byte_ctr] = spi_rw(0); 
+    }
+    CSN = 1;
+    /* //return nRf24L01 status byte */
+    return(status); 
+}
+
+
+/*
+ * @brief   Writes contents of buffer '*pbuf' to nRF24L01
+ *           Typically used to write TX payload, Rx/Tx address
+ * @return  返回寄存器中的值
+ */
+uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t bytes)
+{
+    uint8_t status, byte_ctr;
+    
+    CSN = 0;
+    /* //Select register to write to and read status byte */
+    status = spi_rw(reg);
+    /* //then write all byte in buffer(*pbuf) */
+    for (byte_ctr = 0; byte_ctr < bytes; byte_ctr++)
+        spi_rw(*pbuf++); 
+    CSN = 1;
+    /* //return nRf24L01 status byte */
+    return(status);  
+}
+
+
+
+/*******************************************************************************
+        => nRF24L01 接收模式
+*******************************************************************************/
+void RX_Mode(void)
+{
+        CE = 0;
+        //0 Write TX_Address to nRF24L01
+        spi_write_buf(W_REGISTER + TX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
+        //1 Use the same address on the RX device as the TX device
+        spi_write_buf(W_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
+
+        //2 使能(EN_AA->ENAA_P0)数据__通道0__自动应答
+        spi_rw_reg(W_REGISTER + EN_AA, 0x01);
+        //3 使能(EN_RXADDR->ERX_P0)接收数据__通道0__
+        spi_rw_reg(W_REGISTER + EN_RXADR, 0x01);
+        //4 选择通信频率 RF_CH
+        spi_rw_reg(W_REGISTER + RF_CH, 40);
+        //5 (RX_PW_P0)设置接收数据通道0有效数据宽度，5字节
+        //Select same RX payload width as TX Payload width
+        spi_rw_reg(W_REGISTER + RX_PW_P0, TX_PLOAD_WIDTH);
+        //6 配置发射参数（低噪放大器增益、发射功率、无线速率)
+        //TX_PWR:0dBm, datarate:2Mbps, LNA:HCURR
+        spi_rw_reg(W_REGISTER + RF_SETUP, 0x07);
+        //7 配置24L01 的基本参数以及切换工作模式 CONFIG
+        spi_rw_reg(W_REGISTER + CONFIG, 0x0f);
+        CE = 1; //Set CE pin high to enable RX device
+}
+
+
+/*******************************************************************************
+        => nRF24L01 发射模式
+*******************************************************************************/
+void TX_Mode(void)
+{
+        CE = 0;
+        //1 Write TX_Address to nRF24L01
+        spi_write_buf(W_REGISTER + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
+        //2 RX_Addr0 same TX_Adr for Auto.Ack 
+        spi_write_buf(W_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
+        //3 Writes data to TX payload
+        spi_write_buf(W_TX_PLOAD, tx_buf, TX_PLOAD_WIDTH);
+
+        //4 Enable Auto.Ack:Pipe0
+        spi_rw_reg(W_REGISTER + EN_AA, 0x01);
+        //5 Enable Pipe0
+        spi_rw_reg(W_REGISTER + EN_RXADR, 0x01);
+        //6 //500us + 86us, 10 retrans... 
+        spi_rw_reg(W_REGISTER + SETUP_RETR, 0x1a);
+        //7 Select RF channel 40 
+        spi_rw_reg(W_REGISTER + RF_CH, 40);
+        //8 TX_PWr:0dBm, Datarate:2Mbps, LNA:HCURR 
+        spi_rw_reg(W_REGISTER + RF_SETUP, 0x07);
+        //9 Set PWR_UP bit, enable CRC(2 bytes) & Prim:TX. MAX_RT & TX_DS enabled..
+        spi_rw_reg(W_REGISTER + CONFIG, 0x0e);
+        CE = 1;
+}
+
+
+
+/*******************************************************************************
+        => 测试nRF24L01模块，接收代码
+        => 如果检测到五个0x23， P2^0引脚的LED翻转
+*******************************************************************************/
+#define TX_ADR_WIDTH    5                       //定义接收和发射地址的宽度
+#define TX_PLOAD_WIDTH  5                       //定义发射数据的字节的宽度
+uint8_t code TX_ADDRESS[TX_ADR_WIDTH] = {       //定义nRF24L01接收地址
+        0x34, 0x43, 0x10, 0x10, 0x01 
+};  
+uint8_t rx_buf[TX_PLOAD_WIDTH];                 //定义nRF24L01接收缓冲区大小
+
+
+////nf24l01__IO__初始化 
+void init_nf24l01_io(void)
+{
+        CE  = 0;    //chip enable
+        CSN = 1;    //spi disable
+        SCK = 1;    //spi clock line init high
+        LED = 0;    //点亮LED
+}
+
+
+int main(void)
+{
+        uint8_t status;
+        init_nrf24l01_io();             //初始化IO引脚
+        delay_ms(1000);                 //延时1000ms
+        RX_Mode();                      //配置为接收模式 
+        while (1) {
+                status = spi_read(STATUS); //读取芯片的状态寄存器
+                //判断是否发生了接收数据完成的中断, 是的话，将收到数据存到数组rx_buf里
+                //R_RX_PAYLOAD(读RX有效数据,1~32字节,用于接收)
+                if ((status & 0x40) != 0 ) {
+                        spi_read_buf(R_RX_PAYLOAD, rx_buf, TX_PLOAD_WIDTH);
+                }
+                //判断收到的数据是不是0x23
+                if ((rx_buf[0] == 0x23) && (rx_buf[1] == 0x23) &&      \
+                    (rx_buf[2] == 0x23) && (rx_buf[3] == 0x23) &&      \
+                    (rx_buf[4] == 0x23)) { 
+                        LED = ~LED;
+                }
+                spi_rw_reg(FLUSH_RX, 0xFF);             //清除接收缓冲器
+                spi_rw_reg(W_REGISTER + STATUS, status);//清除接收中断标志
+                delay_ms(1000);
+        }
+        return 0;
+}
+
+
+
+/*******************************************************************************
+        => 测试nRF24L01模块，发射代码
+        => 发送数据为 0x23
+*******************************************************************************/
+#define TX_ADR_WIDTH    5                       //定义发射地址数据宽度
+#define TX_PLOAD_WIDTH  5                       //定义一次要发多少个字节数据
+uint8_t code TX_ADDRESS[TX_ADR_WIDTH] = {       //定义nRF24L01的发射地址
+        0x34, 0x43, 0x10, 0x10, 0x01
+}; 
+uint8_t tx_buf[TX_PLOAD_WIDTH] = {              //定义发射缓冲区中的数据   
+        0x23, 0x23, 0x23, 0x23, 0x23
+};
+    
+    
+////nf24l01初始化 
+void init_nf24l01_io(void)
+{
+        CE  = 0;
+        CSN = 1;
+        SCK = 1;
+}
+
+
+int main(void)
+{
+        uint8_t status;
+        delay_ms(1000);
+        init_nrf24l01_io();
+        TX_Mode();
+        while (1) {
+                CE = 0;
+                //将数据送入发送缓冲区
+                spi_write_buf(W_TX_PAYLOAD, tx_buf, TX_PLOAD_WIDTH);
+                CE = 1;
+                while (IRQ);                                    //等待发射完成中断
+                status = spi_read(STATUS);                      //读它的状态寄存器
+                spi_rw_reg(FLUSH_TX, 0xff);                     //清除发送缓冲器
+                spi_rw_reg(W_REGISTER + STATUS, status);        //清除中断标志
+                delay_ms(1000);
+        }
+        return 0;
+}
