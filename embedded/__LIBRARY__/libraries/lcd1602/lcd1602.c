@@ -78,11 +78,11 @@ void lcd1602_init(void)
 {
 	lcd1602_write_cmd(0x38);	//显示模式设置
 	delay_ms(5);
-	lcd1602_write_cmd(0x0f);	//光标显示[光标不闪, 光标不显示]
+	lcd1602_write_cmd(0x0f);	//光标显示
 	delay_ms(5);
 	lcd1602_write_cmd(0x0c);	//显示开及光标设置
 	delay_ms(5);
-	lcd1602_write_cmd(0x06);	//显示光标移动设置(地址指针自动加1)
+	lcd1602_write_cmd(0x06);	//显示光标移动设置
 	delay_ms(5);
 	lcd1602_write_cmd(0x01);	//显示清屏
 	delay_ms(5);
