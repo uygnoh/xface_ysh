@@ -1,5 +1,5 @@
 /*******************************************************************************
-        => nrf24L01__发射端__
+        => nrf24L01__发射端主程序__
 *******************************************************************************/
 //空闲状态SCK为0，CPOL=0；数据在时钟第一个跳变沿采集，CPHA=0；
 void main(void)
@@ -48,8 +48,8 @@ void main(void)
                 }
                 //如果接收到了数据，则实现对应的功能----------------------------------
                 if (rx_buf[0] == 1) {
-                        rx_buf[0] = 0;
-                        LED_02 = 0;
+                        rx_buf[0] = 0;  //把接收到的数据清空
+                        LED_02 = 0;     //LED_02闪烁一次
                         delay_ms(300);
                         LED_02 = 1;
                         delay_ms(300);
@@ -58,7 +58,7 @@ void main(void)
 }
 
 /*******************************************************************************
-        => nrf24L01__接收端__
+        => nrf24L01__接收端主程序__
 *******************************************************************************/
 void main(void)
 {
@@ -93,7 +93,7 @@ void main(void)
                         }
                 }
                 //如果接收到了数据，对数据进行分析来控制LED灯--------------------------
-                switch (rx_buf) {
+                switch (rx_buf[0]) {
                 case 0:
                         break;
                 case 1:
@@ -116,7 +116,7 @@ void main(void)
 }
 
 /*******************************************************************************
-        => nrf24L01__主程序__
+        => nrf24L01__底层驱动__
 *******************************************************************************/
 #define CE
 #define CSN
@@ -127,7 +127,9 @@ void main(void)
 uint8_t TX_ADDRESS[TX_ADR_WIDTH] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; //本地地址
 uint8_t RX_ADDRESS[RX_ADR_WIDTH] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; //接收地址
 
-//检测nrf24l01是否存在
+
+//检测nrf24l01是否存在（0表示nRF24L01存在）
+//_________________________________________________________
 uint8_t nrf24l01_check(void)
 {
         uint8_t tmp1[5] = {0xA5, 0xA5, 0xA5, 0xA5, 0xA5};
@@ -135,66 +137,78 @@ uint8_t nrf24l01_check(void)
         uint8_t i;
         spi_write_buf(WRITE_REG + TX_ADDR, tmp1, 5);    //写入5个字节地址
         spi_read_buf(TX_ADDR, tmp2, 5);                 //读出写入的地址
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < 5; i++) {
                 if (tmp2[i] != 0xA5)
                         break;
         }
         if (i != 5) {
-                return 1;
+                return 1;       //nRF24L01不存在
         }
-        return 0;
+        return 0;               //nRF24L01存在
 }
 
-
-//发送一个字节(MOSI和MISO数据传递)
+//nRF24l01 发送一个字节(MOSI和MISO数据传递)先发送高位
+//_________________________________________________________
 uint8_t nrf24l01_spi_send_byte(uint8_t dat)
 {
         uint8_t i;
-        for (i = 0; i < 8; i++) {
-                //写入一位数据___________________________________
-                MOSI = (dat & 0x80); //先发送高位
-                dat <<= 1;
-                SCK = 1;
-                //读取一位数据___________________________________
-                if (MISO) {
+        for (i = 0; i < 8; i++) {       //output 8-bit
+                //___写入一位数据___
+                MOSI = (dat & 0x80);    //output 'uchar', MSB to MOSI
+                dat <<= 1;              //shift next bit into MSB..
+                
+                //___读取一位数据___
+                SCK = 1;                //Set SCK high ...
+                if (MISO) {             
                         dat |= 1;
                 } else {
-                        dat &= 0xFE;
+                        dat &= 0xFE;    //capture current MISO bit
                 }
-                SCK = 0;
+                SCK = 0;                //..then set SCK low again
         }
         return(dat);
 }
 
+//nRF24l01 初始化
+//_________________________________________________________
 void nrf24l01_init(void)
 {
         uint8_t buf[5] = {0};
-        delay_us(10);
+        delay_us(100);
         CE  = 0;        //chip enable
         CSN = 0;        //spi enable
-        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug
+        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug测试原来的本地址
 }
 
+//nRF24l01 读取指定寄存器的内容
+//_________________________________________________________
 uint8_t spi_read_register(uint8_t reg)
 {
         uint8_t reg_val;
-        CSN = 0;
-        nrf24l01_spi_send_byte(reg);
-        reg_val = nrf24l01_spi_send_byte(0);
-        CSN = 1;
-        return(reg_val);
+        CSN = 0;                                //CSN low, initialize SPI commun
+        nrf24l01_spi_send_byte(reg);            //Select register to read from.
+        reg_val = nrf24l01_spi_send_byte(0);    //..then read register value
+        CSN = 1;                                //CSN high, terminate SPI commun
+        return(reg_val);                        //return register value
 }
 
+//nRF24l01 写入指定寄存器的内容
+//_________________________________________________________
 uint8_t spi_write_register(uint8_t reg, uint8_t value)
 {
         uint8_t status = 0;
-        CSN = 0;
-        status = nrf24l01_spi_send_byte(reg);
-        nrf24l01_spi_send_byte(value);
-        CSN = 1;
-        return(status);
+        CSN = 0;                                //CSN low, init SPI transaction
+        status = nrf24l01_spi_send_byte(reg);   //select register
+        nrf24l01_spi_send_byte(value);          //..and write value to it..
+        CSN = 1;                                //CSN high again
+        return(status);                         //return nRF24L01 status uchar
 }
 
+//nRF24l01 用于读出数据
+// reg:  为寄存器地址
+// pbuf: 为待读出数据地址
+// len:  读出数据的个数
+//_________________________________________________________
 uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
 {
         uint16_t status, i;
@@ -206,6 +220,12 @@ uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
         CSN = 1;
         return(status);
 }
+
+//nRF24l01 用于写数据
+// reg:  为寄存器地址
+// pbuf: 为待写入数据地址
+// len:  写入数据的个数
+//_________________________________________________________
 uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
 {
         uint16_t status, i;
@@ -219,21 +239,25 @@ uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
         return(status);
 }
 
-
-
+//nRF24l01 数据读取后放入“rx_buf”接收缓冲区中
+//_________________________________________________________
 uint8_t nrf24l01_rx_packet(uint8_t *rx_buf)
 {
         uint8_t flag = 0;
         uint8_t status;
-        status = spi_read_register(NRFRegSTATUS);//读取状态寄存器来判断是否接收到数据
-        if (status & 0x40) {
-                CE = 0;
+        status = spi_read_register(NRFRegSTATUS);
+        if (status & 0x40) {    //读取状态寄存器来判断是否接收到数据
+                CE = 0;         //SPI使能
                 spi_read_buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);
                 flag = 1;
         }
+        //接收到数据后，清除状态寄存器
         spi_write_register(WRITE_REG + NRFRegSTATUS, status);
         return flag;
 }
+
+//nRF24l01 接收数据包
+//_________________________________________________________
 void nrf24l01_tx_packet(uint8_t *rx_buf)
 {
         CE = 0;
@@ -242,23 +266,29 @@ void nrf24l01_tx_packet(uint8_t *rx_buf)
         CE = 1;
 }
 
-
+//nRF24l01发接收式配置
+//_________________________________________________________
 void rx_mode(void)
 {
         uint8_t buf[5] = {0};
         CE = 0;
-        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug
+        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug 测试原来的本地址
+        
         spi_write_buf(WRITE_REG + RX_ADDR_P0, RX_ADDRESS, RX_ADR_WIDTH);
-        spi_write_register(WRITE_REG + EN_AA, 0);
-        spi_write_register(WRITE_REG + EN_RXADDR, 0x01);
-        spi_write_register(WRITE_REG + SETUP_RETR, 0x1A);
-        spi_write_register(WRITE_REG + RF_CH, 40);
-        spi_write_register(WRITE_REG + RX_PW_P0, RX_PLOAD_WIDTH);
-        spi_write_register(WRITE_REG + RF_SETUP, 0x0F);
-        spi_write_register(WRITE_REG + CONFIG, 0x0F);
+        spi_write_register(WRITE_REG + EN_AA, 0);               //频道0自动应答
+        spi_write_register(WRITE_REG + EN_RXADDR, 0x01);        //允许接收地址
+        spi_write_register(WRITE_REG + SETUP_RETR, 0x1A);       //设置自动重发时间
+        spi_write_register(WRITE_REG + RF_CH, 40);              //设置信道工作为
+        spi_write_register(WRITE_REG + RX_PW_P0, RX_PLOAD_WIDTH);//设置接收数据长度
+        spi_write_register(WRITE_REG + RF_SETUP, 0x0F);         //设置发射频率为
+        spi_write_register(WRITE_REG + CONFIG, 0x0F);           //设置为接收模式
         CE = 1;
         delay_us(200);
+        delay_us(200);
 }
+
+//nRF24l01发射模式配置
+//_________________________________________________________
 void tx_mode(void)
 {
         CE = 0;

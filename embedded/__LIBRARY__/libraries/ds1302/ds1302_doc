@@ -1,0 +1,159 @@
+/*******************************************************************************
+                => DS1302__底层时序__
+*******************************************************************************/
+//输入参数: addr-待读出的寄存器的地址
+//输出参数: 读出的寄存器addr的数值
+//函数功能: 读出寄存器中的内容
+uint8_t ds1302_read_register(uint8_t addr)
+{
+        uint8_t i;
+        uint8_t dat = 0;
+        uint8_t dat1 = 0;
+        
+        CE = 0;                         //CE设置为初始状态
+        delay_us(nus);                  //稍作延时
+        SCLK = 0                        //SCLK设置为初始状态
+        delay_us(nus);                  //稍作延时
+        //______________________________________________________________
+        CE = 1;                         //拉高CE使能对DS1302的寄存器读写权限
+        delay_us(nus);                  //稍作延时
+        for (i = 0; i < 8; i++) {       //循环向DSIO上发送8bit寄存器地址值
+                DSIO = addr & 0x01;     //低位在前，高位在后
+                addr >>= 1;             //addr右移一位
+                SCLK = 1;               //制造上升沿，DS1302在上升沿完成读取动作
+                delay_us(nus);          //稍作延时
+                SCLK = 0;               //拉低时钟线
+                delay_us(nus);          //稍作延时
+        }
+        for (i = 0; i < 8; i++) {       //循环读取8bit寄存器值数据
+                dat1 = DSIO;            //从最低位开始接收DSIO上的数据
+                dat  = (dat >> 1) | (dat1 << 7);
+                SCLK = 1;               //拉高时钟线
+                delay_us(nus);          //稍作延时
+                SCLK = 0;               //DS1302下降沿时，放置数据
+                delay_us(nus);          //稍作延时
+        }
+        CE   = 0;
+        delay_us(nus);
+        //______________________________________________________________
+        //以下为DS1302复位的稳定时间，必须的！！！
+        SCLK = 1;
+        delay_us(nus);
+        DSIO = 0;
+        delay_us(nus);
+        DSIO = 1;
+        delay_us(nus);
+        return(dat);
+}
+
+//输入参数: addr-待读出的寄存器的地址
+//输出参数: addr-待写入数值的寄存器地址
+//        dat-待写入addr寄存器的数值
+//函数功能: 向DS1302中地址为addr的寄存器写入数值dat
+void ds1302_write_reg(uint8_t addr, uint8_t dat)
+{
+        uint8_t i = 0;
+        CE = 0;                         //CE设置为初始状态
+        delay_us(nus);                  //稍作延时
+        SCLK = 0;                       //SCLK设置为初始状态
+        delay_us(nus);                  //稍作延时
+        //______________________________________________________________
+        CE = 1;                         //拉高CE使能对DS1302的寄存器读写权限
+        delay_us(nus);                  //稍作延时
+        for (i = 0; i < 8; i++) {       //循环逐位发送addr的8个bit，
+                DSIO = addr & 0x01;     //注意低位在前
+                addr >>= 1;             //addr右移一位
+                SCLK = 1;               //拉高SCLK制造一个上升沿，通知DS1302读取数据
+                delay_us(nus);          //延时等待DS1302读取DSIO线上的数据
+                SCLK = 0;               //读完后，拉低SCKL为下一个位的传输作准备
+                delay_us(nus);          //稍作延时
+        }
+        for (i = 0; i < 8; i++) {
+                DSIO = dat & 0x01;
+                dat >>= 1;
+                SCLK = 1;
+                delay_us(nus);
+                SCLK = 0;
+                delay_us(nus);
+        }
+        CE = 0;
+        delay_us(nus); 
+}
+
+
+
+/*******************************************************************************
+                => DS1302__上层应用__
+                => C-51中“code”表示定义的数据为常量，不可改变
+*******************************************************************************/
+uint8_t gTime[7];       //用来存放DS1302中7个时间的BCD码
+uint8_t gDigvalue[8];   //动态数码管上显示的8个数值
+uint8_t code DS1302_READ_ADDR[7]  = {0x81, 0x83, 0x85, 0x87, 0x89, 0x8B, 0x8D};
+uint8_t code DS1302_WRITE_ADDR[7] = {0x80, 0x82, 0x84, 0x86, 0x88, 0x8A, 0x8C};
+
+//共阴数码管显示“0~F”，及分隔符“-”
+uint8_t code gDuanMa[] = {
+0x3f, 0x06, 0x5d, 0x4f, 0x66, 0x6d, 0x7d, 0x07,
+0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x40
+};
+
+//向DS1302中写入时间
+//_________________________________________________________
+void ds1302_write_time(void)
+{
+        uint8_t i;
+        ds1302_write_register(0x8E, 0x00);      //禁用WP以获取写时间寄存权限
+        for (i = 0; i < 7; i++) {
+                ds1302_write_register(DS1302_WRITE_ADDR[i], gTim[i]);
+        }
+        ds1302_write_register(0x8E, 0x80);      //使能WP以禁止对时间寄存器的读写
+}
+
+//从DS1302中读出时间
+//_________________________________________________________
+void ds1302_read_time(void)
+{
+        uint8_t i = 0;
+        for (i = 0; i < 7; i++) {
+                gTime[i] = ds1302_read_register(DS1302_READ_ADDR[i]);
+        }
+}
+
+//从DS1302初始化时间设置
+//_________________________________________________________
+void ds1302_init(void)
+{
+        gTime[0] = 0x50;        //初始化时间， 秒， 注意是BCD码
+        gTime[1] = 0x59;        //初始化时间， 分， 注意是BCD码
+        gTime[2] = 0x23;        //初始化时间， 时， 注意是BCD码
+        gTime[3] = 0x23;        //初始化时间， 日， 注意是BCD码
+        gTime[4] = 0x10;        //初始化时间， 月， 注意是BCD码
+        gTime[5] = 0x01;        //初始化时间， 周， 注意是BCD码
+        gTime[6] = 0x17;        //初始化时间， 年， 注意是BCD码
+        ds1302_write_time();    //将给定的时间写入DS1302内部，以完成初始化
+}
+
+//从DS1302更新时间
+//_________________________________________________________
+void UpdateDigValue(void)
+{
+        ds1302_read_time();     //gDigValue[i]为段码
+        gDigValue[0] = ((gTime[2] >> 4) &) & 0x0F);     //时的高4位
+        gDigValue[1] = ((gTime[2] >> 0) &) & 0x0F);     //时的低4位
+        gDigValue[2] = 16;                              //分隔符
+        gDigValue[3] = ((gTime[1] >> 4) &) & 0x0F);     //分的高4位
+        gDigValue[4] = ((gTime[1] >> 0) &) & 0x0F);     //分的低4位
+        gDigValue[5] = 16;                              //分隔符
+        gDigValue[6] = ((gTime[0] >> 4) &) & 0x0F);     //秒的高4位
+        gDigValue[7] = ((gTime[0] >> 0) &) & 0x0F);     //秒的低4位
+}
+
+//_________________________________________________________
+void main(void)
+{
+        ds1302_init();
+        while (1) {
+                UpdateDigValue();//更新时间
+                DigDisplayTime();//动态刷新时间
+        }
+}
