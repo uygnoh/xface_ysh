@@ -203,6 +203,30 @@ typedef struct os_flag_node {
 
 
 
+/*******************************************************************************
+                         uCOS-II 队列数据结构
+*******************************************************************************/
+typedef struct os_q {
+        struct os_q      *OSQPtr;       //Link to next queue control block in list of free blocks
+        void            **OSQStart;     //Pointer to start of queue data
+        void            **OSQEnd;       //Pointer to end of queue data
+        void            **OSQIn;        //Pointer to where next message will be inserted in the Q
+        void            **OSQOut;       //Pointer to where next message will be extracted from the Q
+        INT16U            OSQSize;      //Size of quue(maximum number of entries)
+        INT16U            OSQEntries;   //Current number of entries in the queue
+} OS_Q;
+
+
+typedef struct os_q_data {
+        void            *OSMsg;         //Pointer to next message to be extracted from queue
+        INT16U            OSNMsgs;      //Number of message in message queue
+        INT16U            OSQSize;      //Size of message queue
+        OS_PRIO           OSEventTbl[OS_EVENT_TBL_SIZE];
+        OS_PRIO           OSEventGrp;   //
+}
+
+
+
 
 
 

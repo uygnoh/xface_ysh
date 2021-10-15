@@ -1,0 +1,83 @@
+/*******************************************************************************
+        => 创建队列
+*******************************************************************************/
+OS_EVENT *OSQCreate( void **start,
+                     INT16U  size)
+{
+        OS_EVENT *pevent;
+        OS_Q     *pq;
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0u;
+        #endif
+        #ifdef OS_SAFETY_CRITICAL_IEC61508
+        #if (OSSafetyCriticalStartFlag == OS_TRUE) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        
+        if (OSIntNesting > 0u) {
+                return ((OS_EVENT *)0);
+        }
+        OS_ENTER_CRITICAL();
+        pevent = OSEventFreeList; //Get next free evnet control block
+        if (OSEventFreeList != (OS_EVENT *)0) {
+                OSEventFreeList = (OS_EVENT *)OSEVentFreeList->OSEventPtr;
+        }
+        OS_EXIT_CRITICAL();
+        if (pevent != (OS_EVENT *)0) {
+                OS_ENTER_CRITICAL();
+                pq = OSQFreeList;       //Get a free queue control block
+                if (pq != (OS_Q *)0) {
+                        OSQFreeList         = OSQFreeList->OSQPtr;
+                        OS_EXIT_CRITICAL();
+                        pq->OSQStart        = start;
+                        pq->OSQEnd          = &start[size];
+                        pq->OSQIn           = start;
+                        pq->OSOut           = start;
+                        pq->OSEntries       = 0u;
+                        pevent->OSEventType = OS_EVENT_TYPE_Q;
+                        pevent->OSEventCnt  = 0u;
+                        pevent->OSEventPtr  = pq;
+                #if OS_EVENT_NAME_EN > 0u
+                        pevent->OSEventName = (INT8U *)(void *)"?";
+                #endif
+                        OS_EventWaitListInit(pevent);
+                } else {
+                        pevent->OSEventPtr = (void *)OSEventFreeList;
+                        OSEventFreeList = pevent;
+                        OS_EXIT_CRITICAL();
+                        pevent = (OS_EVENT *)0;
+                }
+        }
+        return (pevent);
+}   
+
+/*******************************************************************************
+        => 创建队列
+*******************************************************************************/
+
+
+
+
+/*******************************************************************************
+        => 创建队列
+*******************************************************************************/
+
+
+
+
+
+/*******************************************************************************
+        => 创建队列
+*******************************************************************************/
+
+
+
+
+/*******************************************************************************
+        => 创建队列
+*******************************************************************************/
+
+
+
+
