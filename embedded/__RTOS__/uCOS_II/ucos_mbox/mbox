@@ -213,6 +213,100 @@ INT8U OSMboxPostOpt(OS_EVENT *pevent
 /*******************************************************************************
         => 消息邮箱删除
 *******************************************************************************/
+OS_EVENT *OSMboxDel(OS_EVENT *pevnet,
+                    INT8U opt,
+                    INT8U *perr)
+{
+        BOOLEAN tasks_waiting;
+        OS_EVENT *pevent_return;
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CUP_SR cpu_sr = 0u;
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        #if OS_ARG_CHK_EN > 0u
+        if (pevent == (OS_EVENT *)0u) {
+                *perr = OS_ERR_PEVENT_NULL;
+                return (pevent);
+        }
+        #endif
+        
+        if (pevent->OSEventType != OS_EVENT_TYPE_MBOX) {
+                *perr = OS_ERR_EVENT_TYPE;
+                return (pevent);
+        }
+        if (OSIntNesting > 0u){
+                *perr = OS_ERR_DEL_ISR;
+                return (pevent);
+        }
+        OS_ENTER_CRITICAL();
+        if (pevent->OSEventGrp != 0u) {
+                tasks_waiting = OS_TRUE;
+        } else {
+                tasks_waiting = OS_FALSE;
+        }
+        
+        switch (opt) {
+        case OS_DEL_NO_PEND:    //没有任务申请的时候我在删除
+                if (tasks_waiting == OS_FALSE) {
+                #if OS_EVENT_NAME_EN > 0u
+                        pevent->OSEventName = (INT8U *)(void *)"?";
+                #endif
+                        pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+                        pevnet->OSEventPtr  = OSEventFreeList;
+                        pevnet->OSEventCnt  = 0u;
+                        OSEventFreeLsit     = pevent;
+                        OS_EXIT_CRITICAL();
+                        *perr               = OS_ERR_NONE;
+                        pevnet_return       = (OS_EVENT *)0;
+                } else {
+                        OS_EXIT_CRITICAL();
+                        *perr               = OS_ERR_TASK_WAITING;
+                        pevent_return       = pevent;
+                }
+                break;
+        case OS_DEL_ALWAYS:     //不管有没有任务在申请我都删除它
+                while (pevent->oSEventGrp != 0u) {
+                        (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_MBOX, OS_STAT_PEND_OK);
+                }
+                #if OS_EVENT_NAME_EN > 0u
+                        pevent->OSEventName = (INT8U *)(void *)"?";
+                #endif
+                pevent->OSEventType         = OS_EVENT_TYPE_UNUSED;
+                pevent->OSEventPtr          = OSEventFreeList;
+                pevnet->OSEventCnt          = 0u;
+                OSEventFreeList             = pevent;
+                OS_EXIT_CRITICAL();
+                if (task_waiting == OS_TRUE) {
+                        OS_Sched();
+                }
+                *perr         = OS_ERR_NONE;
+                pevent_return = (OS_EVENT *)0;
+                break
+        default:        //参数错误
+                OS_EXIT_CRITICAL();
+                *perr         = OS_ERR_INVALID_OPT;
+                pevent_return = pevent;
+                break;
+        }
+        return (pevent_return);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
