@@ -51,9 +51,9 @@ int main(void)
                 => typedef 定义函数指针
 *******************************************************************************/
 
-int (*padd)(int, int);        //传统形式，定义一个函数指针变量
-typedef int (fun_type)(int, int);      //定义一个函数类型
-typedef int (*fun_ptr_type)(int, int); //定义一个函数指针类型
+int (*padd)(int, int);                  //传统形式，定义一个函数指针变量
+typedef int (fun_type)(int, int);       //定义一个函数类型
+typedef int (*fun_ptr_type)(int, int);  //定义一个函数指针类型
 
 
 /*
