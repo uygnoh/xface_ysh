@@ -1,0 +1,105 @@
+/*******************************************************************************
+        => STM32F10x__USART__结构体
+*******************************************************************************/
+//串口初始化结构体
+//_________________________________________________________
+typedef struct {
+        uint32_t USART_BaudRate;        //波特率（BRR）
+        uint16_t USART_WordLength;      //字长（CR1_M）
+        uint16_t USART_StopBits;        //停止位（CR2_STOP）
+        uint16_t USART_Parity;          //校验位（CR1_PCE, CR1_PS）
+        uint16_t USART_Mode;            //模式选择（CR1_TE, CR1_RE）
+        //硬件流控制（CR3_CTSE, CR3_RTSE）
+        uint16_t UsART_HardWareFlowControl;
+} USART_InitTypeDef;
+
+
+//同步时钟初始化结构体
+//_________________________________________________________
+typedef struct {
+        uint16_t USART_Clock;   //同步时钟（CR2_CLKEN）
+        uint16_t USART_CPOL;    //时钟极性（CR2_CPOL）
+        uint16_t USART_CPHA;    //时钟相位（CR2_CPHA）
+        uint16_t USART_LastBit; //最后一个位的时钟脉冲（CR2_LBC）
+} USART_ClockInitTypeDef;
+
+
+
+/*******************************************************************************
+        => stm32__串口
+*******************************************************************************/
+void usart_setup(void)
+{
+	rcc_configure();
+	gpio_configrue();
+	USART_InitTypeDef USART_InitStructure;
+	USART_InitStructure.USART_BaudRate = 9600;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_Non;
+	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+	USART_InitStructure.USART_Clock = USART_Clock_Disable;
+	USART_InitStructure.USART_CPOL = USART_CPOL_High;
+	USART_InitStructure.USART_CPHA = USART_CPHA_1Edge;
+	USART_InitStructure.USART_LastBit = USART_LastBit_Enable;
+	USART_Init(USART1, &USART_InitStructure);
+	USART_Cmd(USART1, ENABLE);
+}
+int main(void)
+{
+        int i, data, Status;
+        data = 'A';
+        USART_SendData(USART1, data);
+        for (i = 0; i < 30; i++) {
+	        data++;
+	        while (USART1_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+        }
+}
+
+
+
+/*******************************************************************************
+        => stm32__串口波特率设置
+*******************************************************************************/
+//9600@72MHz
+|_________________________________________________________|
+|       Tx/Rx_BaudRate = ƒck / (16 * USARTDIV)            | 
+|       9600 = (72 * 1000 * 1000) / (16 * USARTDIV)       |
+|       U = 72000000 / (9600 * 16)                        |
+|_________________________________________________________|
+float Div;
+u16 M,F,BRR;
+u32 Bound;
+Bound = 9600;
+Div = (float)(72*1000*1000)/(Bound*16);
+M = Div;                // 取整数部分
+F = (Div-M)*16;         // 取小数部分
+BRR = M<<4 + F;         //整合整数部分和小数部分
+
+
+
+/*******************************************************************************
+        => stm32__串口数据发送过程
+*******************************************************************************/
+A. //数据发送过程
+	1. 设置 USART_CR1寄存器中UE位置位 来激活USART
+	2. 设置 USART_CR1寄存器中的M位来定义字长
+	3. 设置 USART_CR2寄存器中编写停止位位数
+	*  如果采用多缓冲器通信，配置 USART_CR3寄存器中的 DMA使能位(DMAT)
+	4. 设置 USART_CR1中的 TE位，发送一个空闲帧作为第一次数据的发送
+	5. 设置 USART_BRR寄存器，设定要求的波特率
+	6. 把发送的数据写进 USART_DR寄存器 (此动作自动清除 TXE位)。
+	   -----在只有一个缓冲器的情况下，对每个待发送的数据重复此步骤
+B. //数据接收过程
+	1. 设置 USART_CR1寄存器中UE位置位 来激活USART
+	2. 设置 USART_CR1寄存器中的M位来定义字长
+	3. 设置 USART_CR2寄存器中编写停止位位数
+	*  如果采用多缓冲器通信，配置USART_CR3寄存器中的 DMA使能位(DMAT)
+	4. 设置 USART_BRR寄存器，设定要求的波特率
+	5. 设置 USART_CR1中的 RE位，激活接收器，使他开始寻找起始位
+	//当一个字符被接收时：
+        RXNE位被置位。它表明移位寄存器的内容被转移到 RDR.
+        RXNEIE位被置位。则产生中断信号.
+        在接收期间如果检测到帧错误，噪音或溢出错误，错误标志将被置起.
+

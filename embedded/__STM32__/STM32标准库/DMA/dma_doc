@@ -1,0 +1,24 @@
+/*******************************************************************************
+        => STM32F10x__DMA__结构本
+*******************************************************************************/
+//DMA初始化结构体
+//_________________________________________________________
+typedef struct {
+        uint32_t DMA_PeripheralBaseAddr;        //外设地址
+        uint32_t DMA_MemoryBaseAddr;            //存储器地址
+        uint32_t DMA_DTR;                       //传输方向
+        uint32_t DMA_BufferSize;                //传输数目
+        uint32_t DMA_PeripheralInc;             //外设地址增量模式
+        uint32_t DMA_MemoryInc;                 //存储器地址增量模式
+        uint32_t DMA_PeripheralDataSize;        //外设数据宽度
+        uint32_t DMA_MemoryDataSize;            //存储器数据宽度
+        uint32_t DMA_Mode;                      //模式选择
+        uint32_t DMA_Priority;                  //通道优先级
+        uint32_t DMA_M2M;                       //存储器到存储器模式
+} DMA_InitTypeDef;
+
+
+
+/*******************************************************************************
+        => stm32__DMA__(Data Memory Access)直接存储器访问
+*******************************************************************************/
