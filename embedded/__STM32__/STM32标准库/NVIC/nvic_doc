@@ -1,0 +1,26 @@
+/*******************************************************************************
+        => STM32F10x__NVIC__结构体
+*******************************************************************************/
+typedef struct {
+        vu32 Enable[2];                 //中断设置使能寄存器
+        vu32 Disable[2];                //中断清除使能寄存器
+        vu32 Set[2];                    //中断设置待处理寄存器
+        vu32 Clear[2];                  //中断清除待处理寄存器
+        vu32 Active[2];                 //中断活动位寄存器
+        vu32 Priority[11];              //中断优先级寄存器
+} NVIC_TypeDef;/* NVIC Structure */
+typedef struct {
+        vu32 CPUID;                     //CPU ID 基寄存器
+        vu32 IRQControlState;           //中断控制状态寄存器
+        vu32 ExceptionTableOffset;      //向量表移位寄存器
+        vu32 AIRC;                      //应用控制/重置寄存器
+        vu32 SysCtrl;                   //系统控制寄存器
+        vu32 ConfigCtrl;                //设置控制寄存器
+        vu32 SystemPriority[3];         //系统处理优先级寄存器
+        vu32 SysHandlerCtrl;            //系统处理控制和状态寄存器
+        vu32 ConfigFaultStatus;         //设置错误状态寄存器
+        vu32 HardFaultStatus;           //硬件错误状态寄存器
+        vu32 DebugFaultStatus;          //除错错误寄存器
+        vu32 MemoryManageFaultAddr;     //存储器管理错误地址寄存器
+        vu32 BusFaultAddr;              //总线错误地址寄存器
+} SCB_TypeDef; /* System Control Block Structure */
