@@ -1,7 +1,6 @@
 /*******************************************************************************
                 => raspberry-pi-40pin
 *******************************************************************************/
-
 |______________________________________________|
 |       3.3V            |      5V              |
 |       SDA.1           |      5V              |
@@ -85,8 +84,22 @@ sudo passwd root
 
 
 /*******************************************************************************
-                => 树莓派 3B+ 网络设置
+                => 设置树莓派wifi的几种方式
 *******************************************************************************/
+1. 方法1
+//这种方式适用于第一次刻录完系统，并且没有有线网络连接的情况下设置树莓派WiFi
+//在SD卡的boot分区种新建 wpa_supplicant.conf 文件，并且配置 WiFi 的 SSID 和密码，
+//这样树莓派启动后会自行读取 wpa_supplicant.conf 配置文件连接 WiFi 设备。
+___________________________________________________________
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network = {     
+        ssid = "WiFi的SSID" 
+        psk  = "WiFi密码"
+}
+
+
+2. 方法2
 //如果登录了树莓派，输入
 ___________________________________________________________
 sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
@@ -98,14 +111,9 @@ network={
 }
 
 
-
-//树莓派3B+开启wifi
+//关闭 | 启用 网络接口
 ___________________________________________________________
-1. 打开树莓派配置
-sudo raspi-config
-
-2. 选择 localisation options
-
-3. 选择 change Timezone,在里面选择亚洲ASIAN，里面选择地址，我选的上海
-
-4. 选择change wi-fi country，选择中国
+sudo ifconfig wlan0 up
+sudo ifconfig wlan0 down
+sudo ip link set wlan0 up
+sudo ip link set wlan0 down
