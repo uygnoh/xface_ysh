@@ -30,7 +30,7 @@ void dma_setup(void)
 {
         DMA_InitTypeDef Y;
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);      //打开DMA1时钟
-        Y.DMA_PeripheralBaseAddr = src_const_buf;               //配置外设为源
+        Y.DMA_PeripheralBaseAddr = src_const_buf;               //配置外设为数据来源
         Y.DMA_MemoryBaseAddr     = destination_buf;             //SRAM为目的地
         Y.DMA_DIR                = DMA_DIR_PeriphealSRC;        //FLASH => SRAM
         Y.DMA_BufferSize         = BUFFER_SIZE;                 //传输数据大小

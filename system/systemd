@@ -16,13 +16,15 @@ systemctl status sshd.service
 systemctl isolate graphical.target 
 
 //用 systemctl 检查当前的默认启动目标
-systemctl get-default    
+systemctl get-default
 systemctl list-dependencies | grep target           
 systemctl list-dependencies graphical.target | grep target
 
 //用 systemctl 修改default.target以变更开机默认启动目标[runlevel]运行级别
 systemctl set-default multi-user.target
 
+systemctl set-default graphical.target//由命令行模式更改为图形界面模式
+systemctl set-default multi-user.target//由图形界面模式更改为命令行模式
 
 
 /*******************************************************************************
