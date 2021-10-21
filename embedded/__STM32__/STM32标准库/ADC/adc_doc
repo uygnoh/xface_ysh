@@ -1,0 +1,189 @@
+/*******************************************************************************
+        STM32F10x__ADC__结构体
+*******************************************************************************/
+typedef struct {
+        uint32_t ADC_Mode;                      //ADC工作模式选择
+        FunctionalState ADC_ScanConvMoce;       //ADC扫描（多通道）
+                                                //或单次（单通道）模式选择
+        FunctionalState ADC_ContinuousConvMode; //ADC单次转换或者连续转换选择
+        uint32_t ADC_ExternalTrigConv;          //ADC转换触发信号
+        uint32_t ADC_DataAlign;                 //ADC数据寄存器对齐格式
+        uint8_t  ADC_NbrOfChannel;              //ADC采集通道数
+} ADC_InitTypeDef;
+
+
+
+/*******************************************************************************
+        STM32F10x__ADC__独立模式__单通道__中断读取
+*******************************************************************************/
+__IO uint16_t ADC_ConvertedValue;
+
+static void adc_nvic_setup(void)
+{
+        NVIC_InitTypeDef Y;
+        NVIC_ProrityGroupConfig(NVIC_PriorityGroup1);           //配置优先级分组
+        Y.NVIC_IRQChannel                   = ADC1_2_IRQn;      //配置中断通道号码
+        Y.NVIC_IRQChannelPreemptionPriority = 1;                //先占优先级
+        Y.NVIC_IRQCahnnelSubPriority        = 1;                //子优先级
+        Y.NVIC_IRQChannelCmd                = ENABLE;
+}
+
+static void adc_gpio_setup(void)
+{
+        GPIO_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+        Y.GPIO_Pin  = GPIO_Pin_1;       //PC—1
+        Y.GPIO_Mode = GPIO_Mode_AIN;    //模拟输入
+        GPIO_Init(GPIOC, &Y);
+        
+}
+
+static void adc_mode_setup()
+{
+        ADC_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);    //打开ADC2时钟
+        Y.Mode                   = ADC_Mode_Independent;        //独立模式
+        Y.ADC_ScanConvMode       = DISABLE;                     //禁止扫描
+        Y.ADC_ContinuousConvMode = ENABLE;                      //连续转换模式
+        Y.ADC_ExternalTrigConv   = ADC_ExternalTrigConv_None;   //不使用外部触发
+        Y.ADC_ADC_DataAlign      = ADC_DataAlign_Righ;          //数据右对齐
+        Y.ADC_NbrOfChannel       = 1;                           //共有1个通道采集数据
+        ADC_Init(ADC2, &Y);
+        
+        //ADC时钟设置//72MHz/8=9MHz（ADC时钟）
+        RCC_ADCCLKConfig(RCC_PCLK2_Div8);       
+        //使用第几个ADC， ADC通道号码， 配置ADC转换顺序， ADC采样率
+        ADC_RegularChannelConfig(ADC2, ADC_Channel_11, 1, ADC_SampleTime_55Cycles5);
+        //配置ADC2， 使用规则中断， 使能中断
+        ADC_ITConfig(ADC2, ADC_IT_EOC, ENABLE);
+        //启动ADC2转换
+        ADC_Cmd(ADC2, ENABLE);
+        //开始校准，并等待校准完成
+        ADC_StartCalibration(ADC2);
+        while(ADC_GEtCalibrationStatus(ADC2));
+        //由于没有采用外部触发，所以使用软件触发ADC转换
+        ADC_SoftwareStartConvCmd(ADC2, ENABLE);
+}
+
+void adc_setup(void)
+{
+        adc_nvic_setup();
+        adc_gpio_setup();
+        adc_mode_setup();
+}
+
+
+
+//ADC1和ADC2的中断服务函数入口是一样的
+//_________________________________________________________
+void ADC1_2_IRQhandler(void)
+{
+        if (ADC_GetITStatus(ADC2, ADC_IT_EOC) == SET) {
+                ADC_ConvertedValue = ADC_GetConversionValue(ADC2);
+        }
+        ADC_ClearITPendingBit(ADC2, ADC_IT_EOC);        //清除中断标志位
+}
+
+
+//main.c
+//_________________________________________________________
+extern __IO uint16_t ADC_ConvertedValue;
+float ADC_ConvetedValueLocal;   //局部变量，用于保存转换计算后的电压值
+int main(void)
+{
+        ADC_ConvertedValudeLocal = (float)ADC_ConvertedValue / 4096 * 3.3;
+}
+
+
+
+/*******************************************************************************
+        => STM32F10x__ADC__独立模式__单通道__DMA读取
+        => 使用的是ADC2的PC1（DMA1的通道1）
+*******************************************************************************/
+__IO uint16_t ADC_DATA;
+
+void adc_dma_setup(void)
+{
+        DMA_InitTypeDef Y;
+        RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);      //打开DMA1时钟
+        Y.DMA_PeripheralBaseAddr = (uint32_t)(&(ADC2->DR));     //配置ADC2为数据来源
+        Y.DMA_MemoryBaseAddr     = (uint32_t)&ADC_DATA;         //SRAM为目的地址
+        Y.DMA_DIR                = DMA_DIR_PeriphealSRC;        //把ADC2中的数据送入(ADC_DATA)
+        Y.DMA_BufferSize         = 1;                           //传输数据大小
+        Y.DMA_PeriphealInc       = DMA_PeripheralInc_Disable;   //禁止地址增量模式
+        Y.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord; //数据宽度为（16位)
+        Y.DMA_MemoryInc          = DMA_MemoryInc_Disable;        //禁止地址增量模式
+        Y.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord; //数据宽度为（16位)
+        Y.DMA_Mode               = DMA_Mode_Circular;           //配置DMA循环模式
+        Y.DMA_Priority           = DMA_Priority_High;           //配置DMA优先级
+        Y.DMA_M2M                = DMA_M2M_Enable;              //禁止内存到内存传输
+        DMA_Init(DMA1_Channel1, &Y);                            //配置DMA1的通道1
+        DMA_ClearFlag(DMA1_FLAG_TC1);                           //清除DMA1的通道1
+        DMA_Cmd(DMA1_Channel1, ENABLE);                         //使能DMA1的通道1
+}
+
+static void adc_gpio_setup(void)
+{
+        GPIO_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+        Y.GPIO_Pin  = GPIO_Pin_1;       //PC—1
+        Y.GPIO_Mode = GPIO_Mode_AIN;    //模拟输入
+        GPIO_Init(GPIOC, &Y);
+        
+}
+
+static void adc_mode_setup()
+{
+        ADC_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);    //打开ADC2时钟
+        Y.Mode                   = ADC_Mode_Independent;        //独立模式
+        Y.ADC_ScanConvMode       = DISABLE;                     //禁止扫描
+        Y.ADC_ContinuousConvMode = ENABLE;                      //连续转换模式
+        Y.ADC_ExternalTrigConv   = ADC_ExternalTrigConv_None;   //不使用外部触发
+        Y.ADC_ADC_DataAlign      = ADC_DataAlign_Righ;          //数据右对齐
+        Y.ADC_NbrOfChannel       = 1;                           //共有1个通道采集数据
+        ADC_Init(ADC2, &Y);
+        
+        //ADC时钟设置//72MHz/8=9MHz（ADC时钟）
+        RCC_ADCCLKConfig(RCC_PCLK2_Div8);       
+        //使用第几个ADC， ADC通道号码， 配置ADC转换顺序， ADC采样率
+        ADC_RegularChannelConfig(ADC2, ADC_Channel_11, 1, ADC_SampleTime_55Cycles5);
+        
+        //使能ADC的DMA请求
+        //-----------------------
+        ADC_DMACmd(ADC2, ENABLE);
+        
+        //启动ADC2转换
+        ADC_Cmd(ADC2, ENABLE);
+        //开始校准，并等待校准完成
+        ADC_StartCalibration(ADC2);
+        while(ADC_GEtCalibrationStatus(ADC2));
+        //由于没有采用外部触发，所以使用软件触发ADC转换
+        ADC_SoftwareStartConvCmd(ADC2, ENABLE);
+}
+
+void adc_setup(void)
+{
+        adc_dma_setup();
+        adc_gpio_setup();
+        adc_mode_setup();
+}
+
+
+
+
+//main.c
+//_________________________________________________________
+extern __IO uint16_t ADC_DATA;
+float ADC_ConvetedValueLocal;   //局部变量，用于保存转换计算后的电压值
+int main(void)
+{
+        ADC_ConvertedValudeLocal = (float)ADC_DATA / 4096 * 3.3;
+}
+
+
+
+
+
+
+
