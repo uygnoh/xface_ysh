@@ -2,15 +2,23 @@
         => STM32F10x__IIC__结构体
 *******************************************************************************/
 typedef struct {
-        vu16 CR1;       //I2C 控制寄存器 1
-        vu16 CR2;       //I2C 控制寄存器 2
-        vu16 OAR1;      //I2C 自身地址寄存器 1
-        vu16 OAR2;      //I2C 自身地址寄存器 2
-        vu16 DR;        //I2C 数据寄存器
-        vu16 SR1;       //I2C 状态寄存器 1
-        vu16 SR2;       //I2C 状态寄存器 2
-        vu16 CCR;       //I2C 时钟控制寄存器
-        vu16 TRISE;     //I2C 上升时间寄存器
+        uint32_t I2C_ClockSpeed;                //设置I2C时钟频率
+        uint32_t I2C_Mode;                      //指定工作模式（IIC模式或SMBUS模式）
+        uint32_t I2C_DutyCycle;                 //指定时钟占空比（2:1 16:9）
+        uint32_t I2C_QwnAddress1;               //指定自身I2C地址
+        uint32_t I2C_Ack;                       //使能或关闭ACK（一般使能）
+        uint32_t I2C_AcknowledgedAddress;       //指定地址的长度（7位或10位）
+} I2C_InitTypeDef;
+typedef struct {
+        vu16 CR1;                               //I2C 控制寄存器 1
+        vu16 CR2;                               //I2C 控制寄存器 2
+        vu16 OAR1;                              //I2C 自身地址寄存器 1
+        vu16 OAR2;                              //I2C 自身地址寄存器 2
+        vu16 DR;                                //I2C 数据寄存器
+        vu16 SR1;                               //I2C 状态寄存器 1
+        vu16 SR2;                               //I2C 状态寄存器 2
+        vu16 CCR;                               //I2C 时钟控制寄存器
+        vu16 TRISE;                             //I2C 上升时间寄存器
 } I2C_TypeDef;
 
 
@@ -18,3 +26,182 @@ typedef struct {
 /*******************************************************************************
         => STM32F10x__IIC__主程序
 *******************************************************************************/
+ //IIC标准模式下， IIC挂载在“APB1总线”上， pclk1 = 36MHz
+|_________________________________________________________|
+|       T_high = CCR * Tpclk1                             |
+|       T_low  = CCR * Tpckk1                             |
+|       SCLK = 2 * CCR * Tpclk1 = 2 * CCR * 1/3MHZ        |
+|_________________________________________________________|
+#define EE_SCL          GPIO_Pin_6      //GPIOB_PB6
+#define EE_SDA          GPIO_Pin_7      //GPIOB_PB7
+
+void gpio_setup(void)
+{
+        GPIO_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+        Y.GPIO_Pin   = EE_SCL;          //IIC串行时钟线
+        Y.GPIO_Mode  = GPIO_Mode_AF_OD; //IIC复用开漏输出
+        Y.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_Init(GPIOB, &Y);
+        Y.GPIO_Pin   = EE_SDA;          //IIC串行数据线
+        Y.GPIO_Mode  = GPIO_Mode_AF_OD; //IIC复用开漏输出
+        Y.GPIO_Speed = GPIO_Speed_50MHz;
+        GPIO_Init(GPIOB, &Y);
+}
+
+void i2c_setup(void)
+{
+        I2C_InitTypeDef Y;
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);    //打开I2C1时钟
+        Y.I2C_Ack               = I2C_Ack_ENABLE;               //使能自动应答
+        Y.I2C_AcknowledgedAddress=I2C_AcknowledgedAddress_7bit; //使用7位地址
+        Y.I2C_ClockSpeed        = 400000;                       //400Kz
+        Y.I2C_DutyCycle         = I2C_DutyCycle_2;              //配置时钟电平占空比
+        Y.I2C_Mode              = I2C_Mode_I2C;                 //配置为I2C模式
+        Y.I2C_OwnAddress1       = 0x5F;                         //配置自身地址
+        I2C_Init(I2C1, &Y);                                     //
+        I2C_Cmd(I2C1, ENABLE);                                  //使能I2C
+}
+
+#define EEPROM_ADDR     0xA0
+void ee_write_byte(uint8_t addr, uint8_t data)
+{
+        //产生起始信号
+        I2C_GenerateSTART(I2C1, ENABLE);
+        //检测__EV5事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) == ERROR);
+        //发送从机设备地址
+        I2C_Send7bitAddress(I2C1, EEPROM_ADDR, I2C_Direction_Transmitter);
+        //检测__EV6事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR);
+        //发送EEPROM内部存储器单元地址
+        I2C_SendData(I2C1, addr);
+        //检测__EV8事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) == ERROR);
+        //向EEPROM发送一个字节数据
+        I2C_SendData(I2C1, data);
+        //检测__EV8_2事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTED) == ERROR);
+        //产生I2C停止信号
+        I2C_GenerateSTOP(I2C1, ENABLE);
+}
+
+
+void ee_read_byte(uint8_t addr, uint8_t *rx_buf, uint8_t num_byte)
+{
+        //产生起始信号
+        I2C_GenerateSTART(I2C1, ENABLE);
+        //检测__EV5事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) == ERROR);
+        //发送从机地址
+        I2C_Send7bitAddress(I2C1, EEPROM_ADDR, I2C_Direction_Transmitter);
+        //检测__EV6事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR);
+        //发送EEPROM内部存储器地址
+        I2C_SendData(I2C1, addr);
+        //检测__EV8事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTING) == ERROR);
+        
+        
+        
+         //________________ 产生起始信号 ________________//
+        I2C_GenerateSTART(I2C1, ENABLE);
+        //检测__EV5事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT) == ERROR);
+        //发送从机地址
+        I2C_Send7bitAddress(I2C1, EEPROM_ADDR, I2C_Direction_Receiver);
+        //检测__EV6事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED) == ERROR);
+
+        
+        
+        while (num_byte) {
+                if (num_byte == 1) {
+                        //接收到最后一个字节，产生非应答信号
+                        I2C_AcknowledgeConfig(I2C1, DISABLE);
+                }
+                //检测__EV7事件__
+                while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_RECEIVED) == ERROR);
+                //接收数据
+                *rx_buf++ = I2C_ReceiveData(I2C1);
+                num_byte--;
+        }
+        //产生I2C停止信号
+        I2C_GenerateSTOP(I2C1, ENABLE);
+        //配置自动应答信号， 以便下次自动应答
+        I2C_AcknowledgeConfig(I2C1, ENABLE);
+}
+
+
+//等待EEPROM写入数据完成
+void eeprom_wait_end(void)
+{
+        do {
+                I2C_GenerateSTART(I2C1, ENABLE);
+                while (I2C_GetFlagStatus(I2C1, I2C_FLAG_SB) == RESET);
+                I2C_Send7bitAddress(I2C1, EEPROM_ADDR, I2C_Direction_Transmitter);
+        } while (I2C_GetFlagStatus(I2C1, I2C_FLAG_ADDR) == RESET);
+        //EEPROM内部时序完成传输
+        I2C_GenerateSTOP(I2C1, ENABLE);
+}
+
+
+//每次写入不能超过8字节
+void ee_write_page(uint8_t addr, uint8_t *tx_buf, uint8_t num_byte)
+{
+        I2CTIMEOUT = I2C_LONG_TIMEOUT;
+        while (I2C_GetFlagStatus(I2C1, I2C_FLAG_BUSY)) {
+                if ((I2CTIMEOUT--) == 0) {
+                        return I2C_TIMEOUT_UserCallback(4);
+                }
+        }        
+        
+        I2CTIMEOUT = I2C_LONG_TIMEOUT;
+        //产生起始信号
+        I2C_GenerateSTART(I2C1, ENABLE);
+        //检测__EV5事件__
+        while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_MODE_SELECT)) {
+                if ((I2C_TIMOUT--) == 0) {
+                        return I2C_TIMEOUT_UserCallback(5);
+                }
+        }
+        
+        I2CTIMEOUT = I2C_LONG_TIMEOUT;
+        //发送从机设备地址
+        I2C_Send7bitAddress(I2C1, EEPROM_ADDR, I2C_Direction_Transmitter);
+        //检测__EV6事件__
+        while (I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR) {
+                if ((I2C_TIMOUT--) == 0) {
+                        return I2C_TIMEOUT_UserCallback(6);
+                }
+        }
+        
+        I2CTIMEOUT = I2C_LONG_TIMEOUT;
+        //发送EEPROM内部存储器单元地址
+        I2C_SendData(I2C1, addr);
+        //检测__EV8事件__
+        while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) {
+                if ((I2C_TIMOUT--) == 0) {
+                        return I2C_TIMEOUT_UserCallback(6);
+                }
+        }
+        
+        
+        while (num_byte--) {
+                //向EEPROM发送一个字节数据
+                I2C_SendData(I2C1, *tx_buf);
+                tx_buf++;
+                
+                I2CTIMEOUT = I2C_LONG_TIMEOUT;
+                //检测__EV8_2事件__
+                while (!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_BYTE_TRANSMITTED)){
+                        if ((I2C_TIMOUT--) == 0) {
+                                return I2C_TIMEOUT_UserCallback(7);
+                        }
+                }
+        }
+        //产生I2C停止信号
+        I2C_GenerateSTOP(I2C1, ENABLE);
+}
+//main.c
+uint8_t rx_buf[6];
