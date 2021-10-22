@@ -1,4 +1,89 @@
 /*******************************************************************************
         => STM32F10x__EXTI__结构体
 *******************************************************************************/
+typedef struct {
+        uint32_t EXTI_Line;                     //用于产生中断或事件的线
+        EXTIMode_TypeDef EXTI_Mode;             //EXTI模式（中断或事件）
+        EXTITrigger_TypeDef EXTI_Trigger;       //触发类型（上升沿或下降沿）
+        FunctionalState EXTI_LineCmd;           //EXTI使能
+} EXTI_InitTypeDef;
+
+
+
+/*******************************************************************************
+        => STM32F10x__EXTI__主程序
+*******************************************************************************/
+#define KEY_01          GPIO_Pin_0      //PA_0  （外部中断输入引脚）
+#define KEY_02          GPIO_Pin_13     //PC_13 （外部中断输入引脚）
+
+static void gpio_setup(void)
+{
+        GPIO_InitTypeDef Y;
+        RCC_APB2PeriphClockCmd(GPIOA, ENABLE);
+        RCC_APB2PeriphClockCmd(GPIOC, ENABLE);
+        //初始化GPIOA_PA0
+        Y.GPIO_Pin  = KEY_01;
+        Y.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+        GPIO_Init(GPIOA, &Y);
+        //初始化GPIOC_PC13
+        Y.GPIO_Pin  = KEY_02;
+        Y.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+        GPIO_Init(GPIOC, &Y);
+}
+
+static void nvic_setup(void)
+{
+        NVIC_InitTypeDef Y;
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1); //配置NVIC优先级组（组1）
+        Y.NVIC_IRQChannel       = EXTI0_IRQn;           //配置中断源（KEY_01）
+        Y.NVIC_IRQChannelPreemptionPriority = 1;        //配置抢占优先级
+        Y.NVIC_IRQChannelSubPriority        = 1;        //配置子优先级
+        Y.NVIC_IRQChannelCmd                = ENABLE;   //使能中断通道
+        NVIC_Init(&Y);                                  //
+        Y.NVIC_IRQChannel       = EXTI15_10_IRQn;       //配置中断源（KEY_02）
+        NVIC_Init(&Y);                                  //
+}
+
+
+static void exti_setup(void)
+{
+        EXTI_InitTypeDef Y;     //它要放在函数的起始位置
+        //打开AFIO时钟
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+        //选择外部中断（EXTI）的信号源
+        GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource0);
+        Y.EXTI_Line    = EXTI_Line0;            //选择中断线
+        Y.EXTI_Mode    = EXTI_Mode_Interrupt;   //中断模式
+        Y.EXTI_Trigger = EXTI_Trigger_Rising;   //上升沿触发
+        Y.EXTI_LineCmd = ENABLE;                //使能外部中断
+        EXTI_Init(&Y);                          //
+        //选择外部中断（EXTI）的信号源
+        GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource13);
+        Y.EXTI_Line    = EXTI_Line13;           //选择中断线
+        Y.EXTI_Mode    = EXTI_Mode_Interrupt;   //中断模式
+        Y.EXTI_Trigger = EXTI_Trigger_Rising;   //上升沿触发
+        Y.EXTI_LineCmd = ENABLE;                //使能外部中断
+        EXTI_Init(&Y);
+}
+
+
+void exti_init(void)
+{
+        nvic_setup();
+        gpio_setup();
+        exti_setup();
+}
+
+
+//中断服务程序（PA0引脚上输入的中断）
+void EXTI0_IRQHandler(void)
+{
+        if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
+                GPIOA->ODR ^= KEY_01;
+        }
+        EXTI_ClearITPendingBit(EXTI_Line0);
+}
+
+
+
 
