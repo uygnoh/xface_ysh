@@ -10,7 +10,7 @@
 
 % 磁盘加密分区打开    
 root@debian:/mnt# 
-cryptsetup luksOpen -d /home/ysh/Documents/FREEYSH/command/security/DM_Crypt/enc.key  /dev/sda2 mydisk
+cryptsetup luksOpen -d /home/ysh/Desktop/github/command/security/DM_Crypt/enc.key  /dev/sda2 mydisk
 ls /dev/mapper/
 mount /dev/mapper/mydisk /mnt
 

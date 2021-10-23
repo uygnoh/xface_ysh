@@ -1,0 +1,91 @@
+/*******************************************************************************
+        => STM32F10x__WWDG__窗口看门狗
+*******************************************************************************/
+//窗口看门狗（喂狗的时间不能过早，也不能过晚）， 设定上限时间， 下限时间固定（在Window中喂狗）
+        +_______________________________+
+        | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 |  => 0x3F
+        |___|_^_|___|___|___|___|___|___|
+              |
+              |
+              |__T6这一位如果跳变为“0”， 还没有喂狗，系统就会产生一次复位
+
+________________|_______________________________________|_______________________
+                |                                       |
+                |                                       |
+  Upper Limit   |               Window                  |  Lower Limit （0x3F）
+                |                                       |
+                |                                       |                
+________________|_______________________________________|_______________________                
+
+
+//窗口看门狗超时时间计算公式
+|__________________________________________________________|
+|  Twwdg = (4096 * 2^WDGTB * (T[5:0]+1)) / Fpclk1          |
+|__________________________________________________________|
+Twwdg           //WWDG超时时间（单位ms）
+Fpclk1          //APB1的时钟频率（单位KHz）
+WDGTB           //WWDG的预分频系数
+T[5:0]          //窗口看门狗的计数器低16位
+
+
+//窗口看门狗注意事项
+//_________________________________________________________
+1 上窗口值_W【6:0】必须大于下窗口值（0x40），否则就没有窗口了。
+2 窗口看门狗的时钟来源（PCLK1）经APB1总线分频后。
+
+
+
+/*******************************************************************************
+        => STM32F10x__WWDG__主程序
+*******************************************************************************/
+uint8_t WWDG_CNT = 0x7F;        //保存WWDG计数器的设置值，默认为最大
+//tr    //T[6:0]计数器值
+//wr    //W[6:0]窗口值
+//fpr   //(WDGTB)预分频系数
+void wwdg_setup(uint8_t tr, uint8_t wr, uint32_t fpr)
+{
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);
+        WWDG_CNT = tr & WWDG_CNT;       //初始化WWDG_CNT
+        WWDG_SetPrescaler(fpr);         //设置WWDG预分频值
+        WWDG_SetWindowValue(wr);        //设置窗口值
+        WWDG_Enable(WWDG_CNT);          //使能窗口看门狗，设置Counter
+        WWDG_ClearFlag();               //清除提前唤醒中断标志位
+        wwdg_nvic_setup();              //初始化窗口看门狗NVIC
+        WWDG_EnableIT();                //开启窗口看门狗中断
+}
+
+//重设置WWDG计数器的值
+void wwdg_set_counter(uint8_t cnt)
+{
+        WWDG_Enable(cnt);               //使能窗口看门狗，设置counter
+}
+
+void wwdg_nvic_setup(void)
+{
+        NVIC_InitTypeDef Y;
+        Y.NVIC_IRQChannel = WWDG_IRQn;
+        Y.NVIC_IRQChannelPreemptionPriority = 0;
+        Y.NVIC_IRQChannelSubPriority        = 0;
+        Y.NVIC_IRQChannelCmd                = ENABLE;
+        NVIC_Init(&Y);
+}
+
+
+void WWDG_IRQHandler(void)
+{
+        WWDG_SetCounter(WWDG_CNT);      //窗口看门狗（喂狗）
+        WWDG_ClearFlag();               //清除提前唤醒中断标志
+        LED_01 = !LED_01;               //LED状态翻转
+}
+
+
+int main(void)
+{
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+        //计数器的值为（0x7F），窗口寄存器的值为（0x5F），预分频系数为（8）
+        wwdg_setup(0x7F, 0x5F, WWDG_Prescaler_8);
+        while (1) {
+        }
+}
+
+
