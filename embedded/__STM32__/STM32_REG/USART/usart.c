@@ -5,13 +5,12 @@
   函数功能: USART1初始化设置 72MHz@115200 1N8
 *******************************************************************************/
 void usart1_setup(void)
-{
-        //打开GPIOA时钟， 打开USART1时钟
-        GPIOA_CLOCK_ENABLE();
-        USART1_CLOCK_ENABLE();
-	//RX(PA.10)浮空输入； TX(PA.09)复用推挽输出(50MHz)
-	GPIOA->CRH  &= (uint32_t)(0xFFFFF00F);
-	GPIOA->CRH  |= (uint32_t)(0x000004B0);
+{   
+        GPIOA_CLOCK_ENABLE();                   //打开GPIOA时钟
+        USART1_CLOCK_ENABLE();                  //打开USART1时钟
+	GPIOA->CRH  &= (uint32_t)(0xFFFFF00F);  //
+	GPIOA->CRH  |= (uint32_t)(0x000000B0);  //TX(PA.09)复用推挽输出(50MHz)
+	GPIOA->CRH  |= (uint32_t)(0x00000400);  //RX(PA.10)浮空输入
 	USART1->CR1 |= BIT_13;                  //USART模块使能
 	USART1->CR1 &= ~BIT_12;                 //1个起始位, 8个数据位
 	USART1->CR2 &= ~(BIT_13 + BIT_12);      //1个停止位(bit13=0, bit12=0)

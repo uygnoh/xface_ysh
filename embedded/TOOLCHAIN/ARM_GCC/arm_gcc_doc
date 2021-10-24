@@ -9,6 +9,21 @@ export PATH=$PATH:$ARM_GCC_CROSS_COMPILER/bin
 
 
 /*******************************************************************************
+        => arm-none-eabi-gdb
+*******************************************************************************/
+arm-none-eabi-gdb: error while loading shared libraries: libncurses.so.5: 
+cannot open shared object file: No such file or directory
+//分析原因：ld提示找不到库文件，而库文件就在当前目录中。
+//链接器ld默认的目录是/lib和/usr/lib，如果放在其他路径也可以，需要让ld知道库文件在哪里。
+
+方法0：（完美解决问题）
+//_________________________________________________________
+sudo apt-get install libncurses5
+sudo apt-get install libncurses5-dev
+
+
+
+/*******************************************************************************
                            arm-none-eabi-gdb 指令
 *******************************************************************************/
 l               //list指令的缩写，意为列出当前执行的源代码。
