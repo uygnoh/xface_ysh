@@ -1,0 +1,22 @@
+{
+        // See https://go.microsoft.com/fwlink/?LinkId=733558
+        // for the documentation about the tasks.json format
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Compiler",
+                "type": "shell",
+                "command": "make"
+            },
+            {
+                "label": "make_clean",
+                "type": "shell",
+                "command": "make clean"
+            },
+            {
+                "label": "STM32_Download",
+                "type": "shell",
+                "command": "make; openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c 'program output/main.bin exit 0x08000000'"
+            }
+        ]
+    }
