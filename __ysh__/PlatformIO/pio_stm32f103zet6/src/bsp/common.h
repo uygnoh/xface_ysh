@@ -12,6 +12,6 @@ void __delay_ms(uint32_t nms);
         => USART1
 *******************************************************************************/
 void usart1_setup(void);
-void usart_send_string(void);
+void usart_send_string(uint8_t *tx_buf);
 
 #endif

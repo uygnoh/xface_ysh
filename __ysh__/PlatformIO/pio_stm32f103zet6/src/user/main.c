@@ -19,8 +19,11 @@ int main(void)
         uint8_t i;
         led_blink();
         usart1_setup();
-        for (i = 0; i < 6; i++) {
-                usart_send_string();
+        uint8_t tx_buf[]  = "hello, world!\n";
+        uint8_t tx_buf1[] = "-------------\n";
+        for (i = 0; i < 255; i++) {
+                usart_send_string(tx_buf1);
+                usart_send_string(tx_buf);
         }
         GPIOA->ODR |= BIT_02;
         return 0;

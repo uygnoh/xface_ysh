@@ -16,7 +16,6 @@ void usart1_setup(void)
 	USART1->CR1 |= BIT_13;                  //USART模块使能
 	USART1->CR1 &= ~BIT_12;                 //1个起始位, 8个数据位
 	USART1->CR2 &= ~(BIT_13 + BIT_12);      //1个停止位(bit13=0, bit12=0)
-	USART1->CR1 |= BIT_03 + BIT_02;         //发送使能 | 接收使能 
 	USART1->BRR  = 0x0271;                  //72MHz@115200 			
 }
 /*******************************************************************************
@@ -25,19 +24,22 @@ void usart1_setup(void)
   输出参数: 无
   函数功能: 串口向上位机发送一串字符
 *******************************************************************************/
-void usart_send_string(void)
+void usart_send_string(uint8_t *tx_buf)
 {
-        uint8_t i = 0;
         uint16_t timeout = 50000;
-        const uint8_t tx_buf[] = "hello, world!\n";
-        while (tx_buf[i] != '\0') {                     //如果字符不是（尾0）
-                USART1->SR &= ~BIT_06;                  //清除发送完成标志位
-                USART1->DR  = tx_buf[i++];              //写入要发送的内容
-                while ((USART1->SR & 0x40) == 0) {      //等待一个字符发送完成
+        USART1->CR1 |= BIT_03;                          //发送使能
+        while (*tx_buf != '\0') {                       //如果字符不是（尾0）
+                while ((USART1->SR & 0x80) == 0) {      //等待发送数据寄存器空
                         if (timeout-- == 0) {
                                 return;
                         }
                 }
+                USART1->DR  = *tx_buf++;
                 timeout = 50000;
+        }
+        while ((USART1->SR & 0x40) == 0) {              //等待发送完成
+                if (timeout-- == 0) {
+                        return;
+                }
         }
 }
