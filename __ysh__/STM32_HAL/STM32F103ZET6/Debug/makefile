@@ -61,8 +61,8 @@ all: main-build
 main-build: STM32F103ZET6.elf secondary-outputs
 
 # Tool invocations
-STM32F103ZET6.elf: $(OBJS) $(USER_OBJS) /home/ysh/Desktop/github/embedded/__STM32__/STM32_HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "STM32F103ZET6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/ysh/Desktop/github/embedded/__STM32__/STM32_HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="STM32F103ZET6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+STM32F103ZET6.elf: $(OBJS) $(USER_OBJS) /home/ysh/Desktop/github/__ysh__/STM32_HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "STM32F103ZET6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/ysh/Desktop/github/__ysh__/STM32_HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="STM32F103ZET6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
