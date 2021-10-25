@@ -1,0 +1,25 @@
+/*******************************************************************************
+        => STM32F4x__系统滴答定时器__
+*******************************************************************************/
+|_________________________________________________________|
+|       HAL_RCC_GetHCLKFreq()/1000      //1ms中断一次      |
+|       HAL_RCC_GetHCLKFreq()/100000    //10us中断一次     |
+|       HAL_RCC_GetHCLKFreq()/1000000   //1us中断一次      |
+|_________________________________________________________|
+HAL_SYSTICK_Config((HAL_RCC_GetHCLKFreq()/1000000);     //1us中断一次
+HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);    //系统滴答定时器时钟源选择
+HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);               //系统滴答定时器中断优先级配置
+//______________________________________________________________________________
+__STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
+{
+        if ((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk) {  //24位向下计数器
+                return (1UL);
+        }
+        SysTick->LOAD  = (uint32_t)(ticks - 1UL);       //设置自动重装载寄存器的数值
+        NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);
+        SysTick->VAL   = 0UL;
+        SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |   //使用内核时钟源（1）
+                         SysTick_CTRL_TICKINT_Msk   |   //产生SysTick异常请求（1）
+                         SysTick_CTRL_ENABLE_Msk;       //定时器使能（1）
+        return (0UL);
+}

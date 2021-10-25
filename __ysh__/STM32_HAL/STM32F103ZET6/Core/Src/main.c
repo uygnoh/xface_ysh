@@ -98,6 +98,7 @@ int main(void)
     if (timer_count == 1000) {
             timer_count = 0;
             HAL_GPIO_TogglePin(LED_01_GPIO_Port, LED_01_Pin);
+            HAL_Delay(1);
     }
     /* USER CODE END WHILE */
 

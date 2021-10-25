@@ -44,10 +44,15 @@ typedef struct {
 #define BASIC_TIMx_PRESCALER            83      //定时器预分频值
 #define BASIC_TIMx_PERIOD               999     //定时器的中断频率为（1MHz/1000=1KHz）
 
+
 //全局结构体变量
+//_________________________________________________________
 TIM_HandleTypeDef htimx;
+uint16_t timer_count = 0;
 
 
+//基本定时器__6__初始化配置（CPU_Freq@84MHz）
+//_________________________________________________________
 void basic_timer6_init(void)
 {
         TIM_MasterConfigTypeDef sMasterConfig;
@@ -62,8 +67,9 @@ void basic_timer6_init(void)
         sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
         HAL_TIMEx_MasterConfigSynchronization(&htimx, &sMasterConfig);
 }
- uint16_t timer_count = 0;
+
 //基本定时器硬件初始化
+//_________________________________________________________
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
 {
         if (htim_base->Instance == TIM6) {
@@ -75,14 +81,14 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
         }
 }
 
-//设置系统时钟为（84MHz）
+//设置系统时钟为（CPU_Freq@84MHz）
+//_________________________________________________________
 int main(void)
 {
         HAL_Init();                     //HAL初始化
         SystemClock_Config();           //配置系统时钟
         basic_timer6_init();            //基本定时器初始化（1ms中断一次）
         HAL_TIM_Base_Start_IT(&htimx);  //在中断模式下启动定时器
-        
         while (1) {
                 if (timer_count == 1000) {
                         timer_count = 0;
@@ -93,12 +99,15 @@ int main(void)
 
 
 //定时器6和DAC共用中断向量表
+//_________________________________________________________
 void TIM6_DAC_IRQHandler(void)
 {
         HAL_TIM_IRQHandler(&htimx);
 }
 
+
 //非阻塞模式下定时器的回调函数
+//_________________________________________________________
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
         timer_count++;
