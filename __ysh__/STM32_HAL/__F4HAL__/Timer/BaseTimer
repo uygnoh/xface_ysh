@@ -1,39 +1,4 @@
 /*******************************************************************************
-        => STM32F4x__定时器__结构体
-*******************************************************************************/
-typedef struct {
-        uint32_t Prescaler;             //定时器预分频设置
-        uint32_t ConuterMode;           //定时器计数方式
-        uint32_t Period;                //定时器周期
-        uint32_t ClockDivision;         //时钟分频
-        uint32_t RepetitionCounter;     //重复计数器
-        uint32_t AutoReloadPreload;     //ARPE：自动重装载预装载允许位
-} TIM_Base_InitTypeDef;
-//_________________________________________________________________________
-Prescaler       //它设定（TIMx_PSC寄存器）的值，可设置范围（0~65535）
-                //基本实现1至65536分频（实际分频系数 = TIMx_PSC+1）
-CounterMode     //定时器计数方式，基本定时器只能向上计数
-Period          //它设定（TIMx_ARR寄存器）的值，可设置范围（0~65535）
-                //假设： 定时器预分频器后的时钟频率为（1MHz），我们设置
-                //Period的值 = 999； 1MHz / (999+1) = 1KHz； 即为1ms的定时周期。
-ClockDivision   //时钟分频，设置定时器时钟CK_INT频率与数字滤波器采样时钟频率分频比，
-                //基本定时器没有这个功能。
-RepetitionCounter//重复计数器，利用它可以轻松控制输出PWM的个数。
-//_________________________________________________________________________
-
-
-typedef struct {
-        TIM_TypeDef                     *Instance;      //定时器基地址
-        TIM_Base_InitTypeDef            Init;           //定时器基本结构体
-        HAL_TIM_ActiveChannel           Channel;        //通道选择
-        DMA_HandleTypeDef               *hdma[7];       //DMA句柄结构体指针
-        HAL_LockTypeDef                 Lock;           //对象资源锁
-        __IO HAL_TIM_StateTypedef       State;          //定时器工作状态
-} TIM_HandleTypeDef;
-
-
-
-/*******************************************************************************
         => STM32F4x__定时器__主程序
 *******************************************************************************/
 #define BASIC_TIMx                      TIM6
