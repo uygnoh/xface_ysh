@@ -8,13 +8,96 @@ sudo usermod -a -G dialout $USER
 
 
 /*******************************************************************************
-        => STM32__系统时钟__
+        => STM32F1XX__系统时钟__
 *******************************************************************************/
 #define SYSCLK_FREQ_72MHz  72000000
 1 STM32启动文件会调用（bl  SystemInit），所以系统一上电，默认系统时钟为（72MHz）
 
 
 
+/*******************************************************************************
+        => STM32F4XX__系统时钟__
+*******************************************************************************/
+  //SystemInit()
+|_________________________________________________________|
+| #define HSE_VALUE       ((uint32_t)8000000)            |
+| #define PLL_M           8                               |
+| #define PLL_Q           7                               |
+| #define PLL_N           336                             |
+| #define PLL_P           2                               |
+| PLL = 8MHz * N / (M * P) = 8MHz * 336 / (8 * 2) = 168MHz|
+|_________________________________________________________|
+1 //系统初始化之后的状态
+//_________________________________________________________
+        SYSCLK（系统时钟）            =168
+        AHB总线时钟（HCLK=SYSCLK）    =168
+        APB1总线时钟（PCLK1=SYSCLK/4）=42
+        APB2总线时钟（PCLK1=SYSCLK/2）=84
+        PLL主时钟                    =168
 
+
+
+/*******************************************************************************
+        => STM32F4XX__SysTick__
+        => SysTick是一个（24）位（倒计数）的定时器，它与（NVIC）绑定在一起
+*******************************************************************************/
+CTRL            //SysTick控制和状态寄存器//
+//_________________________________________________________
+COUNTFLAG[16]   //SysTick标志位（只读）
+    0 ______
+    1 ______如果在上次读取本寄存器后，SysTick已经数到 0
+CLKSOURCE[2]    //SysTick时钟源选择
+    0 ______外部时钟源（HCLK_AHB总线时钟的_1/8）
+    1 ______内部时钟源（HCLK时钟）
+TICKINT[1]      //SysTick中断标志
+    0 ______倒计数到 0 时无动作
+    1 ______倒计数到 0 时产生SysTick异常请求
+ENABLE[0]       //SysTick使能
+    0 ______SysTick定时器禁用
+    1 ______SysTick定时器使能
+        
+        
+LOAD            //SysTick自动重装载寄存器
+//_________________________________________________________
+当倒计数至零时，将被重新装载的值
+VAL             //SysTick当前值寄存器
+//_________________________________________________________
+读取时返回当前倒计数的值，写入则使之清零，同时还会清除在SysTick控制
+及状态寄存器中的COUNTFLAG标志。
+CALIB           //SysTick校准值寄存器
+//_________________________________________________________
+
+//misc.c
+#define SysTick_CLKSource_HCLK_Div8     ((uint32_t)0xFFFFFFFB)
+#define SysTick_CLKSource_HCLK          ((uint32_t)0x00000004)
+void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource)
+{
+        if (SysTick_CLKSource == SysTick_CLKSource_HCLK) {
+                SysTick->CTRL |= SysTick_CLKSource_HCLK;
+        } else {
+                SysTick->CTRL &= SysTick_CLKSource_HCLK_Div8;
+        }
+}
+
+//core_cm4.h
+#define SysTick_CTRL_TICKINT_Pos        1
+#define SysTick_CTRL_TICKINT_Msk        (1UL << SysTick_CTRL_TICKINT_Pos)
+#define SysTick_CTRL_ENABLE_Pos         0
+#define SysTick_CTRL_ENABLE_Msk         (1UL << SysTick_CTRL_ENABLE_Pos)
+#define SysTick_LOAD_RELOAD_Pos         0
+#define SysTick_LOAD_RELOAD_Msk         (0xFFFFFFUL << SysTick_LOAD_RELOAD_Pos)
+#define SysTick_VAL_CURRENT_Pos         0
+#define SysTick_VAL_CURRENT_Msk         (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)
+__STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
+{
+        if ((ticks - 1) > SysTick_LOAD_RELOAD_Msk) return (1);
+        SysTick->LOAD = ticks - 1;
+        NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+        SysTick->VAL  = 0;
+        SysTick->CTRL = SysTick_CTRL_CLSOURCE_Msk |
+                        SysTick_CTRL_TICKINT_Msk  |
+                        SysTick_CRL_ENABLE_Msk;
+        return (0);
+}
 
 
