@@ -1,0 +1,283 @@
+/*******************************************************************************
+        => STM32F10x__RTC__实时时钟
+        => RTC是个独立的定时器
+*******************************************************************************/
+RTC_PRL         //RTC重装载寄存器
+RTC_DIV         //RTC预分频器
+TR_CLK          //一般产生（1秒）的脉冲
+RTC_CNT         //向上计数器（32位）
+
+
+//BKP备份寄存器
+//备份寄存器是（42个16位）的寄存器，可以用来存储（84）个字节数据
+//执行以下操作将使能对后备份寄存器和RTC的访问（它可以由电池维持供电）
+//_________________________________________________________
+1 设置寄存器（RCC_APB1ENR）的（PWREN， BKPEN）位，使能电源和后备时钟
+2 设置寄存器（PWR_CR）的（DBP）位，使能对RTC和后备寄存器的访问
+
+
+//RTC寄存器
+//_________________________________________________________
+RTC_CRH,  RTC_CRL               //RTC控制寄存器
+RTC_PRLH, RTC_PRLL              //RTC预分频重装载寄存器
+RTC_DIVH, RTC_DIVL              //RTC预分频寄存器
+RTC_CNTH, RTC_CNTL              //RTC计数器寄存器
+RTC_ALRH, RTC_ALRL              //RTC闹钟寄存器
+1 修改（CRH，CRL）寄存器，必须先判断（RSF位），确定已经同步
+2 修改（CRH，CRL）寄存器，必须先配置（CNF=1）进入配置模式，设置（CNF=0）为退出配置模式
+3 同时在对RTC相关寄存器写操作之前，必须判断上一次写操作已经结束，也就是判断（RTOFF=1）
+
+
+//RTC函数
+//_________________________________________________________
+void RCC_RTCCLKConfig(uint32_t CLKSource);      //时钟源选择
+void RCC_RTCCLKCmd(FunctionalState NewState);   //时钟使能
+void RTC_SetPrescaler(uint32_t PrescalerValue); //设置预分频值
+void RTC_SetCounter(uint32_t CounterValue);     //设置计数器值
+void RTC_SetAlarm(uint32_t AlarmValue);         //设置闹钟的值
+
+void RTC_ITConfig(uint16_t RTC_IT, FunctionalState NewState);
+
+void RTC_EnterConfigMode(void); //允许RTC配置（CRL【CNF】）
+void RTC_ExitConfigMode(void);  //退出RTC配置（CRL【CNF】）
+void RTC_WaitForLastTask(void); //等待上次操作完成（CRL【RTOFF】）
+void RTC_WaitForSynchro(void);  //等待时钟同步（CRL【RSF】）
+
+FlagStatus RTC_GetFalgStatus(uint16_t RTC_FLAG);
+void RTC_ClearFlag(uint16_t RTC_FLAG);
+ITStauts RTC_GetITStatus(uint16_t RTC_IT);
+void RTC_ClearITPendingBit(uint16_t RTC_IT);
+
+PWR_BackupAccessCmd();          //后备区域访问使能
+RCC_APB1PeriphClockCmd();       //使能PWR和BKP时钟
+RCC_LSEConfig();                //打开LSE, RTC选择LSE作为时钟源
+uint16_t BKP_ReadBackupRegister(uint16_t BKP_DR);//读BKP寄存器
+void BKP_WriteBackupRegister(uint16_t BKP_DR, uint16_t Data);
+
+
+//RTC配置流程
+//_________________________________________________________
+1 使能PWR和BKP时钟（RCC_APB1PeriphClockCmd()）
+2 使能后备寄存器访问（PWR_BackupAccessCmd()）
+3 配置RTC时钟源，使能RTC
+  RCC_RTCCLKConfig()
+  RCC_RCCLKCmd()
+  如果使用LSE, RCC_LSEConfig(RCC_LSE_ON)
+4 设置RTC预分频系数（RCT_SetPrescaler()）
+5 设置时间（RTC_SetCounter()）
+6 如果需要开启相关中断（RTC_ITConfig()）
+7 编写中断服务函数（RTC_IRQHandler()）
+8 部分操作要等待写操作完成和同步
+  RTC_WaitForLastTask();
+  RTC_WaitForSynchro();
+
+
+//_________________________________________________________
+uint8_t rtc_setup(void)
+{
+        uint8_t tmp = 0;
+        RCC_APB1PeriphClcokCmd(RCC_ARP1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+        PWR_BackupAccessCmd(ENABLE);            //使能后备区域访问
+                                                //读取后备区域(BKP_DR1)的值，判断是否为（0x5A5A）
+        if (BKP_ReadBackupRegister(BKP_DR1) != 0x5A5A) {
+                BKP_DeInit();                   //复位备份区域
+                RCC_LSEConfig(RCC_LSE_ON);      //设置外部低速晶振（LSE）
+                while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET && (tmp < 250)) {
+                        tmp++;
+                        delay_ms(10);
+                }
+                if (tmp >= 250) return (1);             //初始化晶振失败*********
+                RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE); //设置RTC时钟
+                RCC_RTCCLKCmd(ENABLE);                  //使能RTC时钟
+                RTC_WaitForLastTask();                  //等待最近一次对RTC寄存器的写操作完成
+                RTC_WaitForSynchro();                   //等待RTC寄存器同步完成
+                RTC_ITConfig(RTC_IT_SEC, ENABLE);       //使能RTC秒中断
+                RTC_WaitForLastTask();                  //等待最近一次对RTC寄存器的写操作完成
+                RTC_EnterConfigMode();                  //进入RTC配置
+                RTC_SetPrescaler(32767);                //设置RTC预分频值
+                RTC_WaitForLastTask();                  //等待最近一次对RTC寄存器的写操作完成
+                RTC_Set(2015, 1, 14, 17, 42, 55);       //设置时间 
+                RTC_ExitConfigMode();                   //退出RTC配置 *********
+                BKP_WriteBackupRegister(BKP_DR1, 0x5A5A);
+        } else {
+                RTC_WaitForSynchro();                   //等待RTC寄存器同步完成
+                RTC_ITConfig(RTC_IT_SEC, ENABLE);       //使能RTC秒中断
+                RTC_WaitForLastTask();                  //等待最近一次对RTC寄存器的写操作完成
+        }
+        RTC_NVIC_Config();
+        RTC_Get();              //更新时间
+        return (0);
+}
+
+
+
+/*******************************************************************************
+        => RTC算法
+*******************************************************************************/
+//判断是否是闰年函数
+//月份    1   2   3   4   5   6   7   8   9   10  11  12
+//闰年    31  29  31  30  31  30  31  31  30  31  30  31
+//非闰年   31  28  31  30  31  30  31  31  30  31  30  31
+//输入参数: 年份
+//输出参数: 闰年（1）， 非闰年（0）
+uint8_t is_leap_year(uint16_t year)
+{
+        if (year % 4 == 0) {
+                if (year % 100 == 0) {
+                        if (year % 400 == 0) {
+                                return (1);
+                        } else {
+                                return (0);
+                        }
+                } else {
+                        return (1);
+                }
+        } else {
+                return (0);
+        }
+}
+
+//以（1970.01.01）为时间基准
+//平年月份日期表
+const uint8_t mon_table[2] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+uint8_t RTC_Set( 
+                  uint16_t year,        //年
+                  uint8_t mon,          //月
+                  uint8_t day,          //日
+                  uint8_t hour,         //时
+                  uint8_t min,          //分
+                  uint8_t sec)          //秒
+{
+        uint16_t tmp;
+        uint32_t seccount = 0;
+        if (year < 1970 || year > 2099) {
+                return (1);
+        }
+        for (tmp = 1970; tmp < year; tmp++) {
+                if (is_leap_year(tmp)) {
+                        seccount += 31622400;           //闰年的秒数
+                } else {
+                        seccount += 31536000;           //平年的秒数
+                }
+        }
+        mon -= 1;
+        for (tmp = 0; tmp < mon; tmp++) {
+                secconut += (uint32_t)mon_table[tmp] * 86400;
+                if (is_leap_year(year) && tmp == 1) {
+                        seccount += 86400;
+                }
+        }
+        seccount += (uint32_t)(day - 1) * 86400;
+        seccount += (uint32_t)hour      * 3600;
+        seccount += (uint32_t)min       * 60;
+        seccount += sec;
+        RCC_APB1PeriphClcokCmd(RCC_ARP1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+        PWR_BackupAccessCmd(ENABLE);            //使能后备区域访问
+        RTC_SetCounter(seccount);
+        RTC_WaitForLastTask();
+        return (0);
+}
+
+
+uint8_t RTC_Alarm_Set( 
+                  uint16_t year,        //年
+                  uint8_t mon,          //月
+                  uint8_t day,          //日
+                  uint8_t hour,         //时
+                  uint8_t min,          //分
+                  uint8_t sec)          //秒
+{
+        uint16_t tmp;
+        uint32_t sccount = 0;
+        if (year < 1970 || year > 2099) {
+                return (1);
+        }
+        for (tmp = 1970; tmp < year; tmp++) {
+                if (is_leap_year(tmp)) {
+                        seccount += 31622400;
+                } else {
+                        seccount += 31536000;
+                }
+        }
+        mon -= 1;
+        for (tmp = 0; tmp < mon; tmp++) {
+                seccount += (uint32_t)mon_table[tmp] * 86400;
+                if (is_leap_year(year) && tmp == 1) {
+                        seccount += 86400;
+                }
+        }
+        seccount += (uint32_t)(day - 1) * 86400;
+        seccount += (uint32_t)hour      * 3600;
+        seccount += (uint32_t)min       * 60;
+        seccount += sec;
+        RCC_APB1PeriphClcokCmd(RCC_ARP1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+        PWR_BackupAccessCmd(ENABLE);            //使能后备区域访问
+        RTC_SetAlarm(seccount);
+        RTC_WaitForLastTask();
+        return (0);     
+}
+
+
+
+
+
+uint8_t RTC_Get(void)
+{
+        static uint16_t daycnt = 0;
+        uint32_t timecount = 0;
+        uint32_t tmp = 0;
+        uint32_t tmp1 = 0;
+        timecount = RTC_GetCounter();
+        tmp = timecount / 86400;        //天数
+        if (daycnt != tmp) {            //超过一天了
+                daycnt = tmp;
+                tmp1 = 1970;
+                while (tmp >= 365) {
+                        if (is_leap_year(tmp1)) {
+                                if (tmp >= 365) tmp -= 365;
+                                else {tmp1++; break;}
+                        } else {
+                                tmp -= 365;
+                                tmp1++;
+                        }
+                }
+                calendar.w_year = tmp1; //得到年份
+                tmp1 = 0;
+                while (tmp >= 28) {     //超过一个月了
+                        if (is_leap_year(calendar.w_year) && tmp1 == 1) {
+                                if (tmp >= 29) tmp -= 29;
+                                else break;
+                        } else {
+                                if (tmp >= mon_table[tmp1]) tmp -= mon_table[tmp1];
+                                else break;
+                        }
+                        tmp1++;
+                }
+                calendar.w_month = tmp1 + 1;    //得到月份
+                calendar.w_date  = tmp1 + 1;    //得到日期
+        }
+        tmp = timecount % 86400;                //得到秒钟数        
+        calendar.hour = tmp / 3600;             //时
+        calendar.min  = (tmp % 3600) / 60;      //分
+        calendar.sec  = (tmp % 3600) % 60       //秒
+        calendar.week = RTC_Get_Week(calendar, w_year, calendar.w_month, calendar.w_date);
+}
+
+void RTC_IRQHandler(void)
+{
+        if (RTC_GetITStatus(RTC_IT_SEC != RESET) {
+                RTC_Get();
+        }
+        if (RTC_GetITStatus(RTC_IT_ALR != RESET) {
+                RTC_ClearITPendBit(RTC_IT_ALR);
+                RTC_Get();
+                printf();
+        }
+        RTC_ClearITPendBit(RTC_IT_SEC | RTC_IT_OW);
+        RTC_WaitForLastTask();
+}
+
+
+
+
+

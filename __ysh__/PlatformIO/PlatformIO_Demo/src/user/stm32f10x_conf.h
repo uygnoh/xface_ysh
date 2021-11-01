@@ -51,6 +51,7 @@
 
 /* customize header file */
 #include "common.h"
+#include "m32.h"
 
 
 
