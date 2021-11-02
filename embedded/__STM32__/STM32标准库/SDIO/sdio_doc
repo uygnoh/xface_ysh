@@ -1,0 +1,34 @@
+/*******************************************************************************
+	=> SDIO__结构体__
+*******************************************************************************/
+//SDIO命令格式（固定为48bit），都是通过（CMD线）连续传输的，数据线不参与
+//___________________________________________________________
+起始位    传输标志    （命令+地址信息/参数）    CRC7校验    终止位
+  0         1         CONTENT（6+32）        7          1
+  
+  
+typedef struct {
+        uint32_t SDIO_ClockEdge;                //时钟沿
+        uint32_t SDIO_ClockBypass;              //旁路时钟
+        uint32_t SDIO_ClockPowerSave;           //节能模式
+        uint32_t SDIO_BusWide;                  //数据线宽度
+        uint32_t SDIO_HardwareFlowControl;      //硬件流控
+        uint8_t  SDIO_ClockDiv;                 //时钟分频
+} SDIO_InitTypeDef;
+
+typedef struct {
+        uint32_t SDIO_Argument;                 //命令参数
+        uint32_t SDIO_CmdIndex;                 //命令号
+        uint32_t SDIO_Response;                 //响应类型
+        uint32_t SDIO_Wait;                     //等待使能
+        uint32_t SDIO_CPSM;                     //命令路径状态机
+} SDIO_CmdInitTypeDef;
+
+typedef struct {
+        uint32_t SDIO_DataTimOut;               //数据传输超时
+        uint32_t SDIO_DataLength;               //数据长度
+        uint32_t SDIO_DataBlockSize;            //数据传输大小
+        uint32_t SDIO_TransferDir;              //数据传输方向
+        uint32_t SDIO_TransferMode;             //数据传输模式
+        uint32_t SDIO_DPSM;                     //数据路径状态机
+} SDIO_DataInitTypeDef;

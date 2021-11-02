@@ -1,11 +1,26 @@
 #ifndef __M32_H__
 #define __M32_H__
 #include "stm32f10x.h"
-/******************************************************************************/
-/*                                                                            */
-/*                               M32                                          */
-/*                                                                            */
-/******************************************************************************/
+
+/*******************************************************************************
+        => M16 || BIT32
+*******************************************************************************/
+#define M16_00                  ((uint16_t)0x0001)
+#define M16_01                  ((uint16_t)0x0002)
+#define M16_02                  ((uint16_t)0x0004)
+#define M16_03                  ((uint16_t)0x0008)
+#define M16_04                  ((uint16_t)0x0010)
+#define M16_05                  ((uint16_t)0x0020)
+#define M16_06                  ((uint16_t)0x0040)
+#define M16_07                  ((uint16_t)0x0080)
+#define M16_08                  ((uint16_t)0x0100)
+#define M16_09                  ((uint16_t)0x0200)
+#define M16_10                  ((uint16_t)0x0400)
+#define M16_11                  ((uint16_t)0x0800)
+#define M16_12                  ((uint16_t)0x1000)
+#define M16_13                  ((uint16_t)0x2000)
+#define M16_14                  ((uint16_t)0x4000)
+#define M16_15                  ((uint16_t)0x8000)
 #define BIT_00                  ((uint32_t)0x00000001)
 #define BIT_01                  ((uint32_t)0x00000002)
 #define BIT_02                  ((uint32_t)0x00000004)
@@ -38,11 +53,12 @@
 #define BIT_29                  ((uint32_t)0x20000000)
 #define BIT_30                  ((uint32_t)0x40000000)
 #define BIT_31                  ((uint32_t)0x80000000)
-/******************************************************************************/
-/*                                                                            */
-/*                     STM32F10x___GPIO___位带操作                             */
-/*                                                                            */
-/******************************************************************************/
+
+
+
+/*******************************************************************************
+        => STM32F10X___位带操作___
+*******************************************************************************/
 #define GPIOA_IDR_A             (GPIOA_BASE + 0x08)
 #define GPIOA_ODR_A             (GPIOA_BASE + 0x0C)
 #define GPIOB_IDR_B             (GPIOB_BASE + 0x08)
@@ -57,65 +73,38 @@
 #define GPIOF_ODR_F             (GPIOF_BASE + 0x0C)
 #define GPIOG_IDR_G             (GPIOG_BASE + 0x08)
 #define GPIOG_ODR_G             (GPIOG_BASE + 0x0C)
-#define BIT_BAND(ADDR, X)  *((volatile unsigned long *)\
-    ((ADDR & 0xF0000000) + 0x02000000 + ((ADDR & 0xFFFFF) << 5) + (X << 2)))
-#define PA_IN(Y)                BIT_BAND(GPIOA_IDR_A, Y)
-#define PA_OUT(Y)               BIT_BAND(GPIOA_ODR_A, Y)
-#define PB_IN(Y)                BIT_BAND(GPIOB_IDR_B, Y)
-#define PB_OUT(Y)               BIT_BAND(GPIOB_ODR_B, Y)
-#define PC_IN(Y)                BIT_BAND(GPIOC_IDR_C, Y)
-#define PC_OUT(Y)               BIT_BAND(GPIOC_ODR_C, Y)
-#define PD_IN(Y)                BIT_BAND(GPIOD_IDR_D, Y)
-#define PD_OUT(Y)               BIT_BAND(GPIOD_ODR_D, Y)
-#define PE_IN(Y)                BIT_BAND(GPIOE_IDR_E, Y)
-#define PE_OUT(Y)               BIT_BAND(GPIOE_ODR_E, Y)
-#define PF_IN(Y)                BIT_BAND(GPIOF_IDR_F, Y)
-#define PF_OUT(Y)               BIT_BAND(GPIOF_ODR_F, Y)
-#define PG_IN(Y)                BIT_BAND(GPIOG_IDR_G, Y)
-#define PG_OUT(Y)               BIT_BAND(GPIOG_ODR_G, Y)
-/******************************************************************************/
-/*                                                                            */
-/*                         STM32F10x__GPIO_MODE                               */
-/*                                                                            */
-/******************************************************************************/
-GPIOn_CRL <===> 0~7 
-GPIOn_CRH <===> 8~15
-        0 0 0 0     (0)模拟输入
-        0 1 0 0     (4)浮空输入(复位后的状态) 
-        1 0 0 0     (8)下拉输入(PnODR = 0)
-        1 0 0 0     (8)上拉输入(PnODR = 1)
-        1 1 0 0     (C)保留
 
-        0 0 0 1     (1)推挽输出(10MHz)              //推挽输出
-        0 0 1 0     (2)推挽输出(02MHz)
-        0 0 1 1     (3)推挽输出(50MHz)
-        
-        0 1 0 1     (5)开漏输出(10MHz)              //开漏输出
-        0 1 1 0     (6)开漏输出(02MHz)
-        0 1 1 1     (7)开漏输出(02MHz)
+#define BIT_BAND(addr, bit_num)  *((volatile unsigned long *)   \
+  ((addr & 0xF0000000) + 0x2000000 + ((addr & 0xFFFFF) << 5) + (bit_num << 2)))
 
-        1 0 0 1     (9)复用推挽输出(10MHz)          //复用推挽输出
-        1 0 1 0     (A)复用推挽输出(02MHz)
-        1 0 1 1     (B)复用推挽输出(50MHz)
-        
-        1 1 0 1     (D)复用开漏输出(10MHz)          //复用开漏输出
-        1 1 1 0     (E)复用开漏输出(02MHz)
-        1 1 1 1     (F)复用开漏输出(50MHz)
-/******************************************************************************/
-/*                                                                            */
-/*                     AHB外设时钟使能寄存器___RCC_AHBENR                        */
-/*                                                                            */
-/******************************************************************************/
+#define PA_IN(number)           BIT_BAND(GPIOA_IDR_A, number)
+#define PA_OUT(number)          BIT_BAND(GPIOA_ODR_A, number)
+#define PB_IN(number)           BIT_BAND(GPIOB_IDR_B, number)
+#define PB_OUT(number)          BIT_BAND(GPIOB_ODR_B, number)
+#define PC_IN(number)           BIT_BAND(GPIOC_IDR_C, number)
+#define PC_OUT(number)          BIT_BAND(GPIOC_ODR_C, number)
+#define PD_IN(number)           BIT_BAND(GPIOD_IDR_D, number)
+#define PD_OUT(number)          BIT_BAND(GPIOD_ODR_D, number)
+#define PE_IN(number)           BIT_BAND(GPIOE_IDR_E, number)
+#define PE_OUT(number)          BIT_BAND(GPIOE_ODR_E, number)
+#define PF_IN(number)           BIT_BAND(GPIOF_IDR_F, number)
+#define PF_OUT(number)          BIT_BAND(GPIOF_ODR_F, number)
+#define PG_IN(number)           BIT_BAND(GPIOG_IDR_G, number)
+#define PG_OUT(number)          BIT_BAND(GPIOG_ODR_G, number)
+
+
+
+/*******************************************************************************
+        => STM32F10X___RCC_AHBENR__AHB外设时钟使能
+*******************************************************************************/
 #define DMA1_CLOCK_ENABLE()     do {RCC->AHBENR |= BIT_00;} while (0)
 #define DMA2_CLOCK_ENABLE()     do {RCC->AHBENR |= BIT_01;} while (0)
 
 
 
-/******************************************************************************/
-/*                                                                            */
-/*                     APB2外设时钟使能寄存器___RCC_APB2ENR                      */
-/*                                                                            */
-/******************************************************************************/
+/*******************************************************************************
+        => STM32F10X___RCC_APB2ENR__APB2外设时钟使能
+*******************************************************************************/
 #define AFIO_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_00;} while (0)
 #define GPIOA_CLOCK_ENABLE()    do {RCC->APB2ENR |= BIT_02;} while (0)
 #define GPIOB_CLOCK_ENABLE()    do {RCC->APB2ENR |= BIT_03;} while (0)
@@ -134,11 +123,9 @@ GPIOn_CRH <===> 8~15
 
 
 
-/******************************************************************************/
-/*                                                                            */
-/*                     APB1外设时钟使能寄存器___RCC_APB1ENR                      */
-/*                                                                            */
-/******************************************************************************/
+/*******************************************************************************
+        => STM32F10X___RCC_APB1ENR__APB1外设时钟使能
+*******************************************************************************/
 #define TIM2_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_00;} while (0)
 #define TIM3_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_01;} while (0)
 #define TIM4_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_02;} while (0)
@@ -155,18 +142,10 @@ GPIOn_CRH <===> 8~15
 #define I2C1_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_21;} while (0)
 #define I2C2_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_22;} while (0)
 #define USB_CLOCK_ENABLE()      do {RCC->APB2ENR |= BIT_23;} while (0)
-#define CAn_CLOCK_ENABLE()      do {RCC->APB2ENR |= BIT_25;} while (0)
+#define CAN1_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_25;} while (0)
+#define CAN2_CLOCK_ENABLE()     do {RCC->APB2ENR |= BIT_26;} while (0)
 #define BKP_CLOCK_ENABLE()      do {RCC->APB2ENR |= BIT_27;} while (0)
 #define PWR_CLOCK_ENABLE()      do {RCC->APB2ENR |= BIT_28;} while (0)
 #define DAC_CLOCK_ENABLE()      do {RCC->APB2ENR |= BIT_29;} while (0)
-
-
-/******************************************************************************/
-/*                                                                            */
-/*                               GPIO                                         */
-/*                                                                            */
-/******************************************************************************/
-
-
 
 #endif

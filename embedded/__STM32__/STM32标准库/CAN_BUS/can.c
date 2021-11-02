@@ -149,35 +149,3 @@ static void can_filter_setup(void)
         CAN_FilterInit(&Y);
         CAN_ITConfig(CAN1, CAN_IT_FMP0, ENABLE);        //CAN通信中断使能(接收邮箱0)
 }
-
-
-
-/*******************************************************************************
-        => CAN发送和接收程序
-*******************************************************************************/
-//CAN接收初始化
-void Init_RxMes(CanRxMsg *RxMessage)
-{
-        uint8_t ubCounter = 0;
-
-        RxMessage->StdId = 0x00;
-        RxMessage->ExtId = 0x00;
-        RxMessage->IDE   = CAN_ID_STD;
-        RxMessage->DLC   = 0;
-        RxMessage->FMI   = 0;
-        for (ubCounter = 0; ubCounter < 8; ubCounter++) {
-                RxMessage->Data[ubCounter] = 0x00;
-        }
-}
-//CAN数据发送
-void CAN_SetMsg(CanTxMsg *TxMessage)
-{	  
-        uint8_t ubCounter  = 0;
-        TxMessage->ExtId   = 0x1314;
-        TxMessage->IDE     = CAN_ID_EXT;
-        TxMessage->RTR     = CAN_RTR_DATA;
-        TxMessage->DLC     = 8;
-        for (ubCounter = 0; ubCounter < 8; ubCounter++) {
-                TxMessage->Data[ubCounter] = ubCounter;
-        }
-}
