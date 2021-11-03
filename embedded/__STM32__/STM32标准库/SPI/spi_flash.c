@@ -37,12 +37,12 @@ void gpio_setup(void)
 }
 
 /*******************************************************************************
-  函数名称: spi_setup()
+  函数名称: spi_flash_init()
   输入参数: 无
   输出参数: 无
   函数功能: SPI初始化配置
 *******************************************************************************/
-void spi_setup(void)
+void spi_flash_init(void)
 {
         SPI_InitTypeDef Y;
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);    //SPI时钟打开
@@ -119,7 +119,7 @@ void spi_wait_write_complete(void)
 }
 
 /*******************************************************************************
-  函数名称: spi_read_id()
+  函数名称: spi_flash_read_id()
   输入参数: 无
   输出参数: 无
   函数功能: 读取__W25Q64__ID号码
