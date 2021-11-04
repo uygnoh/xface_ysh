@@ -1,0 +1,915 @@
+2021-11-04 18:00:28,184 [INFO] Activator:170 - 
+
+
+2021-11-04 18:00:28,188 [INFO] Activator:171 - !SESSION log4j initialized
+2021-11-04 18:00:44,459 [INFO] McuFinderGlobals:39 - Set McuFinder mode to 2 (CubeIDE integrated)
+2021-11-04 18:00:45,198 [INFO] ApplicationProperties:181 - Using Application install path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602
+2021-11-04 18:00:45,279 [INFO] DbMcusXml:74 - Set database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//mcu/
+2021-11-04 18:00:45,286 [INFO] DbBoardsPdsc:56 - Set plugin database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/boardmanager/
+2021-11-04 18:00:45,286 [INFO] DbMcus:258 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,287 [INFO] DbBoards:264 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,290 [INFO] DbExamples:333 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,327 [INFO] DbMcusAds:85 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,329 [INFO] DbMcusDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,335 [INFO] DbMcusJson:65 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,336 [INFO] DbBoardsDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,338 [INFO] DbBoardsJson:58 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,417 [INFO] CrossReferenceDbSqlite:196 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/cs/
+2021-11-04 18:00:45,431 [INFO] DbExamplesSqlite:690 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,680 [INFO] RulesReader:52 - Compatibility file has been processed (237 Rules)
+2021-11-04 18:00:45,967 [INFO] MicroXplorer:622 - Detected Java Version = 11.0.9.1
+2021-11-04 18:00:45,969 [INFO] DbMcusXml:74 - Set database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//mcu/
+2021-11-04 18:00:45,969 [INFO] DbBoardsPdsc:56 - Set plugin database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/boardmanager/
+2021-11-04 18:00:45,970 [INFO] DbMcus:258 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,970 [INFO] DbBoards:264 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,970 [INFO] DbExamples:333 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:45,970 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,971 [INFO] DbMcusAds:85 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,971 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,971 [INFO] DbMcusDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,971 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,972 [INFO] DbMcusJson:65 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,972 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,972 [INFO] DbBoardsDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,972 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,973 [INFO] DbBoardsJson:58 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:45,973 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,973 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,973 [INFO] CrossReferenceDbSqlite:196 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/cs/
+2021-11-04 18:00:45,974 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:45,974 [INFO] DbExamplesSqlite:690 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,258 [INFO] MainPanel:204 - HeapMemory: 268435456
+2021-11-04 18:00:46,639 [INFO] DbMcusXml:74 - Set database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//mcu/
+2021-11-04 18:00:46,639 [INFO] DbBoardsPdsc:56 - Set plugin database path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/boardmanager/
+2021-11-04 18:00:46,640 [INFO] DbMcus:258 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:46,640 [INFO] DbBoards:264 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:46,640 [INFO] DbExamples:333 - Set plugin images path to: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/
+2021-11-04 18:00:46,647 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,647 [INFO] DbMcusAds:85 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,648 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,648 [INFO] DbMcusDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,648 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,649 [INFO] DbMcusJson:65 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,649 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,649 [INFO] DbBoardsDocs:110 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,650 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,650 [INFO] DbBoardsJson:58 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,651 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,651 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,651 [INFO] CrossReferenceDbSqlite:196 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/cs/
+2021-11-04 18:00:46,652 [WARN] DbFile:35 - Overriding database path with different value: /home/ysh/.stmcufinder/plugins/mcufinder/ => /home/ysh/.stmcufinder/plugins/mcufinder
+2021-11-04 18:00:46,652 [INFO] DbExamplesSqlite:690 - Set database path to: /home/ysh/.stmcufinder/plugins/mcufinder//mcu/
+2021-11-04 18:00:46,726 [INFO] ApplicationProperties:181 - Using Application install path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602
+2021-11-04 18:00:46,728 [INFO] PluginManage:178 - Search for loadable plugins [exclusion list=, ]
+2021-11-04 18:00:46,756 [INFO] PluginManage:292 - Check plugin analytics
+2021-11-04 18:00:47,082 [INFO] AnalyticsPlugin:233 - Accepted Software Licenses: 
+2021-11-04 18:00:47,084 [INFO] AnalyticsPlugin:235 - Accepted CMSIS Pack Licenses: 
+2021-11-04 18:00:47,085 [INFO] AnalyticsPlugin:237 - Accepted Firmware Licenses: 
+2021-11-04 18:00:47,086 [INFO] PluginManage:342 - Loaded plugin analytics (category:tool,tabindex:-1)
+2021-11-04 18:00:47,087 [INFO] PluginManage:292 - Check plugin clock
+2021-11-04 18:00:47,160 [INFO] PluginManage:342 - Loaded plugin clock (category:base,tabindex:2)
+2021-11-04 18:00:47,160 [INFO] PluginManage:292 - Check plugin ddr
+2021-11-04 18:00:47,199 [INFO] PluginManage:342 - Loaded plugin ddr (category:tool,tabindex:6)
+2021-11-04 18:00:47,200 [INFO] PluginManage:292 - Check plugin filemanager
+2021-11-04 18:00:47,520 [INFO] PluginManage:342 - Loaded plugin filemanager (category:base,tabindex:10)
+2021-11-04 18:00:47,520 [INFO] PluginManage:292 - Check plugin ipmanager
+2021-11-04 18:00:47,570 [INFO] PluginManage:342 - Loaded plugin ipmanager (category:base,tabindex:5)
+2021-11-04 18:00:47,570 [INFO] PluginManage:292 - Check plugin pinoutandconfiguration
+2021-11-04 18:00:47,614 [INFO] PluginManage:342 - Loaded plugin pinoutandconfiguration (category:base,tabindex:1)
+2021-11-04 18:00:47,614 [INFO] PluginManage:292 - Check plugin pinoutconfig
+2021-11-04 18:00:47,694 [INFO] PluginManage:342 - Loaded plugin pinoutconfig (category:base,tabindex:0)
+2021-11-04 18:00:47,694 [INFO] PluginManage:292 - Check plugin power
+2021-11-04 18:00:47,764 [INFO] PluginManage:342 - Loaded plugin power (category:power,tabindex:4)
+2021-11-04 18:00:47,764 [INFO] PluginManage:292 - Check plugin projectmanager
+2021-11-04 18:00:47,815 [INFO] PluginManage:342 - Loaded plugin projectmanager (category:projectmanager,tabindex:3)
+2021-11-04 18:00:47,815 [INFO] PluginManage:292 - Check plugin thirdparty
+2021-11-04 18:00:48,239 [INFO] PluginManage:342 - Loaded plugin thirdparty (category:base,tabindex:-1)
+2021-11-04 18:00:48,240 [INFO] PluginManage:292 - Check plugin tools
+2021-11-04 18:00:48,242 [WARN] IntegrityCheckThread:59 - waiting for thirdparty lock release [integrity check]
+2021-11-04 18:00:48,243 [INFO] IntegrityCheckThread:61 - entering critical section [integrity check]
+2021-11-04 18:00:48,244 [INFO] ThirdPartyUpdaterWithRetryManager:56 - Updater plugin not ready yet. [1/15]
+2021-11-04 18:00:48,255 [INFO] PluginManage:342 - Loaded plugin tools (category:base,tabindex:7)
+2021-11-04 18:00:48,256 [INFO] PluginManage:292 - Check plugin tutovideos
+2021-11-04 18:00:48,672 [INFO] PluginManage:342 - Loaded plugin tutovideos (category:base,tabindex:-1)
+2021-11-04 18:00:48,673 [INFO] PluginManage:292 - Check plugin updater
+2021-11-04 18:00:48,714 [INFO] PluginManage:342 - Loaded plugin updater (category:base,tabindex:12)
+2021-11-04 18:00:48,715 [INFO] PluginManage:265 - PluginManage : Loaded plugins [13]
+2021-11-04 18:00:49,382 [INFO] PinOutPanel:1435 - setPackage(No Configuration,No Configuration)
+2021-11-04 18:00:49,725 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,725 [INFO] PluginManager:203 - loadIPPluginJar : add can
+2021-11-04 18:00:49,743 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,744 [INFO] PluginManager:203 - loadIPPluginJar : add stm32_wpan
+2021-11-04 18:00:49,753 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,754 [INFO] PluginManager:203 - loadIPPluginJar : add gtzc
+2021-11-04 18:00:49,767 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,767 [INFO] PluginManager:203 - loadIPPluginJar : add fmc
+2021-11-04 18:00:49,776 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,777 [INFO] PluginManager:203 - loadIPPluginJar : add adc
+2021-11-04 18:00:49,778 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,779 [INFO] PluginManager:203 - loadIPPluginJar : add fatfs
+2021-11-04 18:00:49,782 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,783 [INFO] PluginManager:203 - loadIPPluginJar : add resmgrutility
+2021-11-04 18:00:49,798 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,799 [INFO] PluginManager:203 - loadIPPluginJar : add cryp
+2021-11-04 18:00:49,816 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,816 [INFO] PluginManager:203 - loadIPPluginJar : add tsc
+2021-11-04 18:00:49,820 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,820 [INFO] PluginManager:203 - loadIPPluginJar : add spi
+2021-11-04 18:00:49,824 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,825 [INFO] PluginManager:203 - loadIPPluginJar : add gfxmmu
+2021-11-04 18:00:49,829 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,830 [INFO] PluginManager:203 - loadIPPluginJar : add pdm2pcm
+2021-11-04 18:00:49,834 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,834 [INFO] PluginManager:203 - loadIPPluginJar : add sai
+2021-11-04 18:00:49,837 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,838 [INFO] PluginManager:203 - loadIPPluginJar : add lorawan
+2021-11-04 18:00:49,840 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,841 [INFO] PluginManager:203 - loadIPPluginJar : add tracer_emb
+2021-11-04 18:00:49,843 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,843 [INFO] PluginManager:203 - loadIPPluginJar : add tim
+2021-11-04 18:00:49,855 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,856 [INFO] PluginManager:203 - loadIPPluginJar : add gpio
+2021-11-04 18:00:49,866 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,867 [INFO] PluginManager:203 - loadIPPluginJar : add genericplugin
+2021-11-04 18:00:49,871 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,872 [INFO] PluginManager:203 - loadIPPluginJar : add opamp
+2021-11-04 18:00:49,898 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,899 [INFO] PluginManager:203 - loadIPPluginJar : add gic
+2021-11-04 18:00:49,903 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,904 [INFO] PluginManager:203 - loadIPPluginJar : add ts
+2021-11-04 18:00:49,907 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,907 [INFO] PluginManager:203 - loadIPPluginJar : add dfsdm
+2021-11-04 18:00:49,922 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,922 [INFO] PluginManager:203 - loadIPPluginJar : add ipddr
+2021-11-04 18:00:49,924 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,924 [INFO] PluginManager:203 - loadIPPluginJar : add comp
+2021-11-04 18:00:49,929 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,930 [INFO] PluginManager:203 - loadIPPluginJar : add nvic
+2021-11-04 18:00:49,932 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,932 [INFO] PluginManager:203 - loadIPPluginJar : add quadspi
+2021-11-04 18:00:49,941 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,945 [INFO] PluginManager:203 - loadIPPluginJar : add plateformsettings
+2021-11-04 18:00:49,947 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,948 [INFO] PluginManager:203 - loadIPPluginJar : add hash
+2021-11-04 18:00:49,951 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,951 [INFO] PluginManager:203 - loadIPPluginJar : add usart
+2021-11-04 18:00:49,955 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,956 [INFO] PluginManager:203 - loadIPPluginJar : add touchsensing
+2021-11-04 18:00:49,958 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,959 [INFO] PluginManager:203 - loadIPPluginJar : add aes
+2021-11-04 18:00:49,966 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,967 [INFO] PluginManager:203 - loadIPPluginJar : add freertos
+2021-11-04 18:00:49,970 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,970 [INFO] PluginManager:203 - loadIPPluginJar : add i2s
+2021-11-04 18:00:49,975 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,975 [INFO] PluginManager:203 - loadIPPluginJar : add mdma
+2021-11-04 18:00:49,977 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,977 [INFO] PluginManager:203 - loadIPPluginJar : add ltdc
+2021-11-04 18:00:49,980 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,980 [INFO] PluginManager:203 - loadIPPluginJar : add openamp
+2021-11-04 18:00:49,983 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,983 [INFO] PluginManager:203 - loadIPPluginJar : add ucpd
+2021-11-04 18:00:49,986 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,986 [INFO] PluginManager:203 - loadIPPluginJar : add i2c
+2021-11-04 18:00:49,993 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:00:49,993 [INFO] PluginManager:203 - loadIPPluginJar : add dma
+2021-11-04 18:00:50,622 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:50,811 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:50,830 [INFO] DbMcusAds:132 - JSON generation date=Thu Sep 30 14:55:10 HKT 2021 (1632984910476)
+2021-11-04 18:00:50,830 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:50,996 [WARN] DetailPanel:315 - Failed to get advertising image, set to default
+2021-11-04 18:00:51,244 [INFO] ThirdPartyUpdaterWithRetryManager:56 - Updater plugin not ready yet. [2/15]
+2021-11-04 18:00:51,264 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:51,266 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:51,266 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:51,266 [WARN] DetailPanel:315 - Failed to get advertising image, set to default
+2021-11-04 18:00:51,268 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:51,339 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:51,339 [WARN] ThirdParty:796 - waiting for thirdparty lock release [close project]
+2021-11-04 18:00:54,245 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:54,246 [ERROR] AbstractThirdPartyUpdaterManager:153 - class java.lang.Integer cannot be cast to class java.util.List (java.lang.Integer and java.util.List are in module java.base of loader 'bootstrap')
+2021-11-04 18:00:54,246 [INFO] ThirdParty:900 - Integrity check success = false
+2021-11-04 18:00:54,247 [INFO] IntegrityCheckThread:75 - exiting critical section [integrity check]
+2021-11-04 18:00:54,247 [INFO] IntegrityCheckThread:78 - End integrity checks thread
+2021-11-04 18:00:54,247 [INFO] ThirdParty:798 - entering critical section [close project]
+2021-11-04 18:00:54,250 [INFO] ThirdParty:809 - exiting critical section [close project]
+2021-11-04 18:00:54,257 [INFO] PinOutPanel:1435 - setPackage(No Configuration,No Configuration)
+2021-11-04 18:00:54,259 [FATAL] Updater:284 - Updater called before beeing initialized
+2021-11-04 18:00:54,297 [INFO] Updater:1002 - Updater Version found : 6.2.0
+2021-11-04 18:00:54,349 [INFO] ApplicationProperties:181 - Using Application install path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602
+2021-11-04 18:00:54,710 [INFO] MainUpdater:2661 - connection check result : 10
+2021-11-04 18:00:54,711 [INFO] MainUpdater:255 - Updater Check For Update Now.
+2021-11-04 18:00:54,711 [INFO] MicroXplorer:472 - Change Database Version : DB.6.0.20
+2021-11-04 18:00:54,874 [INFO] CheckServerUpdateThread:102 - End of CheckServer Thread
+2021-11-04 18:00:54,954 [INFO] MainUpdater:2661 - connection check result : 10
+2021-11-04 18:00:55,970 [INFO] CrossSelectorPresenter:1330 - Cross Selector saved comparison directory: /home/ysh/.stmcufinder/plugins/mcufinder/mcu/cs_comparisons_mx
+2021-11-04 18:00:55,982 [INFO] MultiScanPanel:200 - Auto-refresh data requested => check proxy status ongoing
+2021-11-04 18:00:55,986 [INFO] FinderPluginLoader:87 - Searching for filters in installed packs
+2021-11-04 18:00:56,006 [INFO] DbMcusXml:100 - Load MCU database from /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//mcu/families.xml
+2021-11-04 18:00:58,858 [INFO] DbMcusJson:94 - JSON generation date=Fri Oct 29 15:56:29 HKT 2021 (1635494189)
+2021-11-04 18:01:01,867 [INFO] DbMcus:175 - Found 1906 MCUs (1866 are supported by CubeMX, 1911 are visible in CubeMX)
+2021-11-04 18:01:01,868 [INFO] ApiDb:251 - Load user favorites file /home/ysh/.stm32cubeide/favorites.mcus.txt: 0 item(s)
+2021-11-04 18:01:01,868 [INFO] ApiDb:255 - User favorites MCUs=[]
+2021-11-04 18:01:01,868 [INFO] DbMcus:187 - Set 0 / 0 favorites MCUs
+2021-11-04 18:01:03,624 [WARN] DetailPanel:315 - Failed to get advertising image, set to default
+2021-11-04 18:01:04,991 [INFO] DbBoardsPdsc:90 - Found 1 items
+2021-11-04 18:01:05,032 [INFO] DbBoardsPdsc:90 - Found 41 items
+2021-11-04 18:01:05,058 [INFO] DbBoardsPdsc:90 - Found 46 items
+2021-11-04 18:01:05,072 [INFO] DbBoardsPdsc:90 - Found 9 items
+2021-11-04 18:01:05,076 [INFO] DbBoardsPdsc:90 - Found 5 items
+2021-11-04 18:01:05,133 [INFO] DbBoardsPdsc:90 - Found 24 items
+2021-11-04 18:01:05,153 [INFO] DbBoardsPdsc:90 - Found 33 items
+2021-11-04 18:01:05,157 [INFO] DbBoardsPdsc:90 - Found 2 items
+2021-11-04 18:01:05,169 [WARN] DbBoardsPdsc:254 - Board STM32H7B3I-EVAL: unknown feature type=Audio, name=, username=Multi-Channel Audio Codec (CS42L51-CNZ), n=1
+2021-11-04 18:01:05,169 [WARN] DbBoardsPdsc:254 - Board STM32H7B3I-EVAL: unknown feature type=Meter, name=, username=Power-metering and Temperature-monitoring with sigma-delta modulators, n=1
+2021-11-04 18:01:05,170 [WARN] DbBoardsPdsc:254 - Board STM32H7B3I-EVAL: unknown feature type=Motor, name=, username=Motor Control, n=1
+2021-11-04 18:01:05,183 [WARN] DbBoardsPdsc:254 - Board STM32H7B3I-DK: unknown feature type=Audio, name=, username=Audio stereo codec with Headphone Amp (CS42L51-CNZ), n=1
+2021-11-04 18:01:05,184 [WARN] DbBoardsPdsc:254 - Board STM32H735G-DK: unknown feature type=Audio, name=, username=Audio stereo codec with Headphone Amp (WM8994ECS/R), n=1
+2021-11-04 18:01:05,185 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=Time-of-Flight and gesture-detection sensor, n=1
+2021-11-04 18:01:05,185 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=3 push-buttons (2 users and 1 reset) and 1 touch key button, n=1
+2021-11-04 18:01:05,185 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=Flexible power-supply options: ST-LINK/V2-1 USB connector, 5 V delivered by ARDUINOÂ® or external connector, USB charger, or USB power, n=1
+2021-11-04 18:01:05,186 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=On-board ST-LINK/V2-1 debugger/programmer with USB re-enumeration capability: Virtual COM port and debug port, n=1
+2021-11-04 18:01:05,186 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=Comprehensive free software libraries and examples available with the STM32CubeWB MCU Package, n=1
+2021-11-04 18:01:05,186 [WARN] DbBoardsPdsc:254 - Board STM32WB5MM-DK: unknown feature type=, name=, username=Support of a wide choice of Integrated Development Environments (IDEs) including IAR Embedded WorkbenchÂ®, MDK-ARM, and STM32CubeIDE, n=1
+2021-11-04 18:01:05,193 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Three user LEDs, n=1
+2021-11-04 18:01:05,194 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=One reset and three user push-buttons, n=1
+2021-11-04 18:01:05,194 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Arduino Uno V3 expansion connector, n=1
+2021-11-04 18:01:05,195 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=ST morpho extension pin headers for full access to all STM32WB I/Os, n=1
+2021-11-04 18:01:05,195 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Integrated PCB antenna and SMA connector footprint, n=1
+2021-11-04 18:01:05,195 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Flexible power-supply options: ST-LINK, USB VBUS, or external sources, n=1
+2021-11-04 18:01:05,195 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=On-board footprint to mount a CR2032 battery socket, n=1
+2021-11-04 18:01:05,196 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=On-board ST-LINK/V2-1 debugger/programmer with USB re-enumeration capability: mass storage, Virtual COM port, and debug port, n=1
+2021-11-04 18:01:05,196 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Comprehensive free software libraries and examples available with the STM32CubeWB MCU Package, n=1
+2021-11-04 18:01:05,196 [WARN] DbBoardsPdsc:254 - Board NUCLEO-WB15CC: unknown feature type=, name=, username=Support of a wide choice of Integrated Development Environments (IDEs) including IAR Embedded Workbench, MDK-ARM, STM32CubeIDE, and Mbed Studio, n=1
+2021-11-04 18:01:05,295 [INFO] DbBoardsJson:87 - JSON generation date=Fri Oct 29 15:56:29 HKT 2021 (1635494189)
+2021-11-04 18:01:05,313 [INFO] DbBoards:117 - Found 167 boards (158 are supported by CubeMX)
+2021-11-04 18:01:05,335 [INFO] DbBoardsDocs:143 - JSON generation date=Fri Oct 29 15:56:29 HKT 2021 (1635494189)
+2021-11-04 18:01:05,352 [INFO] DbBoardsDocs:79 - Found 209 boards documents
+2021-11-04 18:01:05,353 [WARN] DbBoards:127 - board B-L475E-IOT01A2 has no document id list !
+2021-11-04 18:01:05,373 [WARN] DbBoards:127 - board NUCLEO-H743ZI has no document id list !
+2021-11-04 18:01:05,375 [WARN] DbBoards:127 - board NUCLEO-WL55JC2 has no document id list !
+2021-11-04 18:01:05,375 [WARN] DbBoards:127 - board P-NUCLEO-WB55-Nucleo has no document id list !
+2021-11-04 18:01:05,376 [WARN] DbBoards:127 - board P-NUCLEO-WB55-USBDongle has no document id list !
+2021-11-04 18:01:05,379 [WARN] DbBoards:127 - board STEVAL-BFA001V1B has no document id list !
+2021-11-04 18:01:05,379 [WARN] DbBoards:127 - board STEVAL-BFA001V2B has no document id list !
+2021-11-04 18:01:05,381 [WARN] DbBoards:127 - board STEVAL-IDP005V1 has no document id list !
+2021-11-04 18:01:05,381 [WARN] DbBoards:127 - board STEVAL-IDP005V2 has no document id list !
+2021-11-04 18:01:05,381 [WARN] DbBoards:127 - board STEVAL-MKSBOX1V1 has no document id list !
+2021-11-04 18:01:05,381 [WARN] DbBoards:127 - board STEVAL-STWINKT1 has no document id list !
+2021-11-04 18:01:05,382 [WARN] DbBoards:127 - board STEVAL-STWINKT1B has no document id list !
+2021-11-04 18:01:05,382 [WARN] DbBoards:127 - board STM32439I-EVAL2 has no document id list !
+2021-11-04 18:01:05,388 [WARN] DbBoards:127 - board STM32F401C-DISCO has no document id list !
+2021-11-04 18:01:05,390 [WARN] DbBoards:127 - board STM32F769I-DISC1 has no document id list !
+2021-11-04 18:01:05,391 [WARN] DbBoards:127 - board STM32G474E-EVAL1 has no document id list !
+2021-11-04 18:01:05,392 [WARN] DbBoards:127 - board STM32H743I-EVAL2 has no document id list !
+2021-11-04 18:01:05,392 [WARN] DbBoards:127 - board STM32H747I-DISC1 has no document id list !
+2021-11-04 18:01:05,393 [WARN] DbBoards:127 - board STM32H753I-EVAL2 has no document id list !
+2021-11-04 18:01:05,394 [WARN] DbBoards:127 - board STM32L-DISCOVERY has no document id list !
+2021-11-04 18:01:06,411 [ERROR] DbBoards:189 - Image file not found for board B-U585I-IOT02A: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/boards/B-U585I-IOT02A_small.jpg
+2021-11-04 18:01:10,147 [ERROR] DbBoards:189 - Image file not found for board STM32U575I-EV: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db//plugins/mcufinder/images/boards/stm32u575i-ev_small.jpg
+2021-11-04 18:01:10,325 [INFO] ApiDb:251 - Load user favorites file /home/ysh/.stm32cubeide/favorites.boards.txt: 0 item(s)
+2021-11-04 18:01:10,325 [INFO] ApiDb:255 - User favorites Boards=[]
+2021-11-04 18:01:10,325 [INFO] DbBoards:206 - Set 0 / 0 favorites Boards
+2021-11-04 18:01:39,403 [INFO] DbMcusDocs:143 - JSON generation date=Fri Oct 29 15:56:29 HKT 2021 (1635494189)
+2021-11-04 18:01:39,882 [INFO] DbMcusDocs:79 - Found 682 MCUs documents
+2021-11-04 18:02:07,722 [INFO] MainUpdater:2661 - connection check result : 10
+2021-11-04 18:02:07,724 [INFO] MainUpdater:2661 - connection check result : 10
+2021-11-04 18:02:07,853 [INFO] MicroXplorer:442 - Change Database Path : 
+2021-11-04 18:02:07,853 [INFO] MicroXplorer:472 - Change Database Version : DB.6.0.20
+2021-11-04 18:02:07,854 [WARN] ThirdParty:796 - waiting for thirdparty lock release [close project]
+2021-11-04 18:02:07,854 [INFO] ThirdParty:798 - entering critical section [close project]
+2021-11-04 18:02:07,854 [INFO] ThirdParty:809 - exiting critical section [close project]
+2021-11-04 18:02:07,863 [INFO] PinOutPanel:1435 - setPackage(No Configuration,No Configuration)
+2021-11-04 18:02:07,866 [INFO] UtilMem:74 - Begin LoadConfig() Used Memory: 369506920 Bytes (502267904)
+2021-11-04 18:02:07,867 [INFO] MicroXplorer:442 - Change Database Path : 
+2021-11-04 18:02:07,868 [INFO] MicroXplorer:472 - Change Database Version : DB.6.0.20
+2021-11-04 18:02:07,868 [INFO] OpenFileManager:303 - Change cursor
+2021-11-04 18:02:07,919 [WARN] IntegrityCheckThread:59 - waiting for thirdparty lock release [integrity check]
+2021-11-04 18:02:07,920 [INFO] IntegrityCheckThread:61 - entering critical section [integrity check]
+2021-11-04 18:02:08,228 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-BLE1.6.2.1
+2021-11-04 18:02:08,268 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-BLE2.3.2.1
+2021-11-04 18:02:08,296 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-BLE2.3.2.2
+2021-11-04 18:02:08,343 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-NFC4.2.0.3
+2021-11-04 18:02:08,375 [WARN] PackLoader:226 - Cannot read IP mode file for wolfSSL.I-CUBE-wolfSSL.4.8.0
+2021-11-04 18:02:08,408 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-SFXS2LP1.3.1.0
+2021-11-04 18:02:08,501 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-AZRTOS-F4.1.0.0
+2021-11-04 18:02:08,535 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-TOF1.2.0.0
+2021-11-04 18:02:08,574 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-SUBG2.4.2.0
+2021-11-04 18:02:08,617 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-ALGOBUILD.1.2.1
+2021-11-04 18:02:08,635 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-DISPLAY.1.0.0
+2021-11-04 18:02:08,672 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-TOUCHGFX.4.18.0
+2021-11-04 18:02:08,701 [WARN] PackLoader:226 - Cannot read IP mode file for RoweBots.I-CUBE-UNISONRTOS.5.5.0-4
+2021-11-04 18:02:08,820 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-MEMS1.9.0.0
+2021-11-04 18:02:09,477 [WARN] PackLoader:226 - Cannot read IP mode file for SEGGER.I-CUBE-embOS.1.2.0
+2021-11-04 18:02:09,654 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-TOUCHGFX.4.17.0
+2021-11-04 18:02:09,740 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-AZRTOS-H7.2.0.0
+2021-11-04 18:02:09,853 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-AZRTOS-L4.1.0.0
+2021-11-04 18:02:09,901 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-ALS.1.0.1
+2021-11-04 18:02:09,967 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-AI.7.0.0
+2021-11-04 18:02:09,991 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-EEPRMA1.3.1.0
+2021-11-04 18:02:10,007 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-GNSS1.5.2.0
+2021-11-04 18:02:10,120 [WARN] PackLoader:226 - Cannot read IP mode file for STMicroelectronics.X-CUBE-DISPLAY.2.0.0
+2021-11-04 18:02:10,123 [INFO] ThirdParty:900 - Integrity check success = true
+2021-11-04 18:02:10,124 [INFO] IntegrityCheckThread:75 - exiting critical section [integrity check]
+2021-11-04 18:02:10,124 [INFO] IntegrityCheckThread:78 - End integrity checks thread
+2021-11-04 18:02:13,950 [INFO] Context:587 - Trying to add GPIOservice into a context  which must be forbidden
+2021-11-04 18:02:14,711 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) Unable to find key (Mcu.ThirdPartyNb) in loaded IOC file
+2021-11-04 18:02:14,711 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) Unable to find key (Mcu.PinsNb) in loaded IOC file
+2021-11-04 18:02:14,711 [INFO] ImportTextPane:162 - (OptionalMessage_ERROR) Unable to find key (Mcu.IPNb) in loaded IOC file
+2021-11-04 18:02:14,825 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2868A1' from pack STMicroelectronics.X-CUBE-SFXS2LP1.3.1.0: no header file found
+2021-11-04 18:02:14,825 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2868A2' from pack STMicroelectronics.X-CUBE-SFXS2LP1.3.1.0: no header file found
+2021-11-04 18:02:14,825 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2915A1' from pack STMicroelectronics.X-CUBE-SFXS2LP1.3.1.0: no header file found
+2021-11-04 18:02:14,860 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,861 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,861 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,861 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,861 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,862 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,863 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,863 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,863 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,863 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,864 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,864 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,864 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,864 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,864 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,865 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,865 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,865 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,866 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,866 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,866 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:14,866 [WARN] ModelIntegratedComponent:51 - No mode defined for component null
+2021-11-04 18:02:15,116 [WARN] ApiManager:294 - Cannot register API 'Board Extension:IKS01A3' from pack STMicroelectronics.X-CUBE-MEMS1.9.0.0: no header file found
+2021-11-04 18:02:15,117 [WARN] ApiManager:294 - Cannot register API 'Board Extension:IKS01A2' from pack STMicroelectronics.X-CUBE-MEMS1.9.0.0: no header file found
+2021-11-04 18:02:15,117 [WARN] ApiManager:294 - Cannot register API 'Board Extension:IKS02A1' from pack STMicroelectronics.X-CUBE-MEMS1.9.0.0: no header file found
+2021-11-04 18:02:15,148 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2868A1' from pack STMicroelectronics.X-CUBE-SUBG2.4.2.0: no header file found
+2021-11-04 18:02:15,148 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2868A2' from pack STMicroelectronics.X-CUBE-SUBG2.4.2.0: no header file found
+2021-11-04 18:02:15,149 [WARN] ApiManager:294 - Cannot register API 'Board Extension:S2915A1' from pack STMicroelectronics.X-CUBE-SUBG2.4.2.0: no header file found
+2021-11-04 18:02:15,159 [INFO] RtosManager:470 - Registered RTOS mode: class=CMSIS, group=RTOS, mode=CMSIS_V1, owner=FREERTOS
+2021-11-04 18:02:15,160 [INFO] RtosManager:470 - Registered RTOS mode: class=CMSIS, group=RTOS2, mode=CMSIS_V2, owner=FREERTOS
+2021-11-04 18:02:15,160 [INFO] RtosManager:470 - Registered RTOS mode: class=RTOS, group=Core, mode=CMSIS_V1, owner=FREERTOS
+2021-11-04 18:02:15,160 [INFO] RtosManager:470 - Registered RTOS mode: class=RTOS, group=Core, mode=CMSIS_V2, owner=FREERTOS
+2021-11-04 18:02:15,161 [WARN] ModelIntegratedComponent:182 - Missing modes for component STMicroelectronics:FreeRTOS:0.0.1:STMicroelectronics:RTOS:FreeRTOS:Core:::10.2.0:
+2021-11-04 18:02:15,171 [WARN] ApiManager:294 - Cannot register API 'Board Extension:EEPRMA1' from pack STMicroelectronics.X-CUBE-EEPRMA1.3.1.0: no header file found
+2021-11-04 18:02:15,171 [WARN] ApiManager:294 - Cannot register API 'Board Extension:EEPRMA2' from pack STMicroelectronics.X-CUBE-EEPRMA1.3.1.0: no header file found
+2021-11-04 18:02:15,173 [WARN] ApiManager:294 - Cannot register API 'Board Extension:GNSS1A1' from pack STMicroelectronics.X-CUBE-GNSS1.5.2.0: no header file found
+2021-11-04 18:02:15,174 [WARN] ApiManager:294 - Cannot register API 'Board Support:Custom' from pack STMicroelectronics.X-CUBE-GNSS1.5.2.0: no header file found
+2021-11-04 18:02:15,174 [WARN] ApiManager:294 - Cannot register API 'Data Exchange:lib_gnss' from pack STMicroelectronics.X-CUBE-GNSS1.5.2.0: no header file found
+2021-11-04 18:02:15,175 [WARN] ApiManager:294 - Cannot register API 'Wireless:BlueNRG-MS' from pack STMicroelectronics.X-CUBE-BLE1.6.2.1: no header file found
+2021-11-04 18:02:15,177 [WARN] ApiManager:294 - Cannot register API 'Wireless:BlueNRG-2' from pack STMicroelectronics.X-CUBE-BLE2.3.2.1: no header file found
+2021-11-04 18:02:15,178 [WARN] ApiManager:294 - Cannot register API 'Wireless:BlueNRG-2' from pack STMicroelectronics.X-CUBE-BLE2.3.2.2: no header file found
+2021-11-04 18:02:15,181 [WARN] ApiManager:294 - Cannot register API 'Board Extension:NFC04A1' from pack STMicroelectronics.X-CUBE-NFC4.2.0.3: no header file found
+2021-11-04 18:02:16,611 [INFO] UtilMem:74 - End LoadConfig() Used Memory: 446185312 Bytes (525336576)
+2021-11-04 18:02:16,617 [WARN] ThirdParty:762 - waiting for thirdparty lock release [change project]
+2021-11-04 18:02:16,617 [INFO] ThirdParty:764 - entering critical section [change project]
+2021-11-04 18:02:16,617 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-SFXS2LP1 3.1.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :RoweBots I-CUBE-UNISONRTOS 5.5.0-4
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-AZRTOS-F4 1.0.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics USB_HOST 2.0.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-AZRTOS-H7 2.0.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-AZRTOS-L4 1.0.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics USB_DEVICE 3.0.0
+2021-11-04 18:02:16,618 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-TOF1 2.0.0
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics HAL Drivers 0.0.0
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics MBEDTLS 2.16.2
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics MBEDTLS 2.14.1
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-MEMS1 9.0.0
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-SUBG2 4.2.0
+2021-11-04 18:02:16,619 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-ALS 1.0.1
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics USB_DEVICE 2.0.0
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-AI 7.0.0
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-ALGOBUILD 1.2.1
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-DISPLAY 1.0.0
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics FreeRTOS 0.0.1
+2021-11-04 18:02:16,620 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics USB_DEVICE 1.0.0
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :SEGGER I-CUBE-embOS 1.2.0
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-EEPRMA1 3.1.0
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-GNSS1 5.2.0
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics lwIP 2.0.3
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics lwIP 2.1.2
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-BLE1 6.2.1
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-BLE2 3.2.1
+2021-11-04 18:02:16,621 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-BLE2 3.2.2
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-DISPLAY 2.0.0
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics USB_HOST 1.0.0
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-NFC4 2.0.3
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :wolfSSL I-CUBE-wolfSSL 4.8.0
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-TOUCHGFX 4.17.0
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics PDM2PCM 3.1.0
+2021-11-04 18:02:16,622 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics PDM2PCM 3.2.0
+2021-11-04 18:02:16,623 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics PDM2PCM 3.3.0
+2021-11-04 18:02:16,623 [INFO] ThirdParty:952 - CMSIS Pack Vendor :STMicroelectronics X-CUBE-TOUCHGFX 4.18.0
+2021-11-04 18:02:16,623 [INFO] ThirdParty:770 - exiting critical section [change project]
+2021-11-04 18:02:17,433 [INFO] PinOutPanel:1435 - setPackage(No Configuration,No Configuration)
+2021-11-04 18:02:17,435 [INFO] PinOutPanel:1435 - setPackage(STM32F103ZETx,LQFP144)
+2021-11-04 18:02:18,527 [INFO] UtilMem:74 - Before build in PCC Used Memory: 399666288 Bytes (566231040)
+2021-11-04 18:02:19,369 [INFO] SharedServices:72 - Folder for power plug-in: /home/ysh/.stm32cubemx/plugins/power
+2021-11-04 18:02:19,462 [INFO] SharedServices:72 - Folder for power plug-in: /home/ysh/.stm32cubemx/plugins/power
+2021-11-04 18:02:19,544 [INFO] SharedServices:72 - Folder for power plug-in: /home/ysh/.stm32cubemx/plugins/power
+2021-11-04 18:02:19,554 [INFO] SharedServices:72 - Folder for power plug-in: /home/ysh/.stm32cubemx/plugins/power
+2021-11-04 18:02:19,861 [INFO] UtilMem:74 - After build in PCC Used Memory: 454192240 Bytes (566231040)
+2021-11-04 18:02:19,920 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,920 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,921 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,921 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,922 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,922 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,923 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,924 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,925 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,925 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,925 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,926 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,926 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,927 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,928 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,928 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,929 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,930 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,931 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,931 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,932 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,932 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,933 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,933 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,934 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,935 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,935 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,935 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,936 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,936 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,937 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,937 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,938 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,938 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,939 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,940 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,941 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,942 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,943 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:19,944 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 18:02:20,033 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] toolchainItems.length=====1
+2021-11-04 18:02:20,202 [INFO] OpenFileManager:323 - Restore cursor
+2021-11-04 18:02:20,805 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 392408584 Bytes (566231040)
+2021-11-04 18:02:20,917 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 399765064 Bytes (566231040)
+2021-11-04 18:02:22,045 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 18:02:22,045 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 18:02:22,046 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 18:02:22,055 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 18:02:23,682 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 18:02:24,620 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 18:02:24,836 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 18:02:25,217 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 18:02:25,219 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 18:02:25,373 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 18:02:25,381 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 18:02:25,657 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 18:02:25,659 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 18:02:25,811 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 18:02:25,816 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 18:02:25,977 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 18:02:26,041 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 18:02:26,210 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 18:02:26,212 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 18:02:26,546 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 18:02:28,301 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 17mS.
+2021-11-04 18:02:28,307 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 18:02:29,260 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 18:02:29,296 [INFO] ApiDbMcu:458 - Load IP Config File for FATFS
+2021-11-04 18:02:29,344 [INFO] ApiDbMcu:458 - Load IP Config File for FREERTOS
+2021-11-04 18:02:29,360 [INFO] ApiDbMcu:458 - Load IP Config File for USB_DEVICE
+2021-11-04 18:02:38,342 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 10035mS.
+2021-11-04 18:02:38,342 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 18:02:38,346 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 18:02:40,530 [INFO] ApiDb:276 - Save user favorites file /home/ysh/.stm32cubeide/favorites.mcus.txt: 0 item(s)
+2021-11-04 18:02:40,531 [INFO] ApiDb:280 - User favorites MCUs=[]
+2021-11-04 18:03:43,822 [INFO] NvicIntPanel:90 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2021-11-04 18:07:14,304 [INFO] NvicIntPanel:90 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2021-11-04 18:09:37,210 [INFO] NvicIntPanel:90 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,937x188,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2021-11-04 18:11:38,052 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 717472608 Bytes (855638016)
+2021-11-04 18:11:41,666 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 516869312 Bytes (855638016)
+2021-11-04 18:11:42,231 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 18:11:42,232 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 18:11:42,232 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 18:11:42,232 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 18:11:42,233 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 18:11:42,237 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 18:11:42,879 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 18:11:42,984 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 18:11:43,044 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 18:11:43,137 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 18:11:43,165 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 18:11:43,250 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 18:11:43,309 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 18:11:43,317 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 18:11:43,629 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 18:11:43,639 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 18:11:43,722 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 18:11:43,726 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 18:11:43,839 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 18:11:43,840 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 18:11:43,941 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 18:11:43,946 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 18:11:44,076 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 18:11:44,078 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 18:11:44,154 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 18:11:44,157 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 18:11:44,249 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 18:11:44,273 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 18:11:44,358 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 18:11:44,360 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 18:11:44,480 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 18:11:45,807 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 49mS.
+2021-11-04 18:11:45,810 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 18:11:46,611 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 18:11:49,818 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 4008mS.
+2021-11-04 18:11:49,819 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 18:11:49,820 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 18:17:13,366 [INFO] NvicIntPanel:90 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,0x0,invalid,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2021-11-04 18:36:06,907 [INFO] NvicIntPanel:90 - NVIC parent = com.st.microxplorer.plugins.ip.nvic.MultiNvicIntPanel[,0,0,854x188,layout=javax.swing.BoxLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=]
+2021-11-04 18:36:13,113 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 302785528 Bytes (855638016)
+2021-11-04 18:36:14,846 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 359779904 Bytes (855638016)
+2021-11-04 18:36:15,175 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 18:36:15,175 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 18:36:15,175 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 18:36:15,176 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 18:36:15,176 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 18:36:15,177 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 18:36:15,684 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 18:36:15,757 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 18:36:15,771 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 18:36:15,847 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 18:36:15,849 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 18:36:15,922 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 18:36:15,958 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 18:36:15,962 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 18:36:16,082 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 18:36:16,083 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 18:36:16,160 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 18:36:16,165 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 18:36:16,260 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 18:36:16,261 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 18:36:16,333 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 18:36:16,336 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 18:36:16,442 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 18:36:16,443 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 18:36:16,511 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 18:36:16,513 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 18:36:16,594 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 18:36:16,611 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 18:36:16,688 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 18:36:16,689 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 18:36:16,808 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 18:36:17,913 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 16mS.
+2021-11-04 18:36:17,916 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 18:36:18,293 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 18:36:21,540 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3624mS.
+2021-11-04 18:36:21,541 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 18:36:21,542 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:50:30,144 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:50:36,192 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:50:36,271 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:50:36,349 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:50:36,425 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:51:32,680 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:51:32,805 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 19:52:32,237 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 710982648 Bytes (855638016)
+2021-11-04 19:52:34,262 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 299242776 Bytes (855638016)
+2021-11-04 19:52:34,300 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Exception in thread "Thread-16648" java.util.NoSuchElementException
+2021-11-04 19:52:34,302 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/java.util.Scanner.throwFor(Unknown Source)
+2021-11-04 19:52:34,303 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/java.util.Scanner.next(Unknown Source)
+2021-11-04 19:52:34,304 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.parser.stategies.PeripheralListParser.numberInstancesAlgorithm(PeripheralListParser.java:81)
+2021-11-04 19:52:34,305 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.parser.stategies.PeripheralListParser.parse(PeripheralListParser.java:32)
+2021-11-04 19:52:34,307 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.parser.IocParser.iocToAnalyticsProperties(IocParser.java:73)
+2021-11-04 19:52:34,308 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.parser.IocParser.parseToolValuesFile(IocParser.java:49)
+2021-11-04 19:52:34,309 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.analyticscore.AnalyticsContext.registerFileWithoutSave(AnalyticsContext.java:459)
+2021-11-04 19:52:34,310 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.analyticscore.AnalyticsContext.registerFile(AnalyticsContext.java:447)
+2021-11-04 19:52:34,311 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+2021-11-04 19:52:34,312 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+2021-11-04 19:52:34,312 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+2021-11-04 19:52:34,313 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+2021-11-04 19:52:34,316 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.dynamicproxy.AnalyticsInvocationHandler.invoke(AnalyticsInvocationHandler.java:92)
+2021-11-04 19:52:34,316 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.sun.proxy.$Proxy28.registerFile(Unknown Source)
+2021-11-04 19:52:34,323 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.library.analyticscore.AnalyticsAPI.registerFile(AnalyticsAPI.java:75)
+2021-11-04 19:52:34,323 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.microxplorer.plugins.analytics.AnalyticsPlugin.addDataFromIocfile(AnalyticsPlugin.java:901)
+2021-11-04 19:52:34,324 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.microxplorer.plugins.analytics.AnalyticsPlugin.access$300(AnalyticsPlugin.java:52)
+2021-11-04 19:52:34,325 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at com.st.microxplorer.plugins.analytics.AnalyticsPlugin$3.run(AnalyticsPlugin.java:703)
+2021-11-04 19:52:34,325 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 	at java.base/java.lang.Thread.run(Unknown Source)
+2021-11-04 19:52:34,787 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 19:52:34,788 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 19:52:34,788 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 19:52:34,789 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 19:52:34,789 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 19:52:34,789 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 19:52:35,574 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 19:52:35,642 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 19:52:35,670 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 19:52:35,779 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 19:52:35,790 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 19:52:35,860 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 19:52:35,958 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 19:52:35,976 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 19:52:36,105 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 19:52:36,121 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 19:52:36,191 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 19:52:36,205 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 19:52:36,315 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 19:52:36,333 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 19:52:36,407 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 19:52:36,430 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 19:52:36,539 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 19:52:36,555 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 19:52:36,623 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 19:52:36,628 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 19:52:36,725 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 19:52:36,753 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 19:52:36,831 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 19:52:36,848 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 19:52:36,962 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 19:52:38,272 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 301mS.
+2021-11-04 19:52:38,275 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 19:52:38,731 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 19:52:42,042 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3767mS.
+2021-11-04 19:52:42,043 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:52:42,044 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:53:35,693 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 619597800 Bytes (855638016)
+2021-11-04 19:53:37,449 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 657868776 Bytes (855638016)
+2021-11-04 19:53:38,011 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 19:53:38,011 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 19:53:38,011 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 19:53:38,016 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 19:53:38,016 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 19:53:38,018 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 19:53:38,796 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 19:53:38,905 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 19:53:38,923 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 19:53:39,019 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 19:53:39,020 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 19:53:39,089 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 19:53:39,121 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 19:53:39,124 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 19:53:39,235 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 19:53:39,237 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 19:53:39,308 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 19:53:39,312 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 19:53:39,402 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 19:53:39,404 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 19:53:39,475 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 19:53:39,478 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 19:53:39,583 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 19:53:39,584 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 19:53:39,651 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 19:53:39,655 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 19:53:39,734 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 19:53:39,879 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 19:53:39,980 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 19:53:39,981 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 19:53:40,199 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 19:53:40,936 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 16mS.
+2021-11-04 19:53:40,937 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 19:53:41,327 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 19:53:44,376 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3439mS.
+2021-11-04 19:53:44,376 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:53:44,377 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:56:29,622 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 270396656 Bytes (935329792)
+2021-11-04 19:56:31,397 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 341701872 Bytes (935329792)
+2021-11-04 19:56:31,811 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 19:56:31,811 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 19:56:31,811 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 19:56:31,812 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 19:56:31,812 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 19:56:31,812 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 19:56:32,272 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 19:56:32,337 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 19:56:32,349 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 19:56:32,424 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 19:56:32,426 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 19:56:32,495 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 19:56:32,535 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 19:56:32,537 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 19:56:32,644 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 19:56:32,645 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 19:56:32,713 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 19:56:32,718 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 19:56:32,804 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 19:56:32,806 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 19:56:32,874 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 19:56:32,879 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 19:56:32,980 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 19:56:32,981 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 19:56:33,046 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 19:56:33,048 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 19:56:33,125 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 19:56:33,143 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 19:56:33,216 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 19:56:33,218 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 19:56:33,582 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 19:56:34,348 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 22mS.
+2021-11-04 19:56:34,350 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 19:56:34,695 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 19:56:37,082 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 2732mS.
+2021-11-04 19:56:37,083 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 19:56:37,084 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 20:41:47,516 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 278204816 Bytes (935329792)
+2021-11-04 20:41:47,936 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 20:41:47,936 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 20:41:47,936 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 20:41:47,937 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 20:41:47,937 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 20:41:47,956 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 20:41:48,520 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 20:41:48,593 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 20:41:48,615 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 20:41:48,690 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 20:41:48,714 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 20:41:48,784 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 20:41:48,882 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 20:41:48,899 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 20:41:49,013 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 20:41:49,033 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 20:41:49,105 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 20:41:49,128 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 20:41:49,233 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 20:41:49,246 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 20:41:49,327 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 20:41:49,354 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 20:41:49,472 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 20:41:49,473 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 20:41:49,555 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 20:41:49,573 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 20:41:49,672 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 20:41:49,699 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 20:41:49,791 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 20:41:49,816 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 20:41:49,960 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 20:41:51,628 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 421mS.
+2021-11-04 20:41:51,630 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 20:41:52,028 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 20:41:54,427 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 2797mS.
+2021-11-04 20:41:54,428 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 1mS.
+2021-11-04 20:41:54,429 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 20:47:29,374 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 497624624 Bytes (938475520)
+2021-11-04 20:47:29,637 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 20:47:29,637 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 20:47:29,638 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 20:47:29,638 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 20:47:29,638 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 20:47:29,639 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 20:47:30,111 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 20:47:30,196 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 20:47:30,210 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 20:47:30,303 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 20:47:30,304 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 20:47:30,375 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 20:47:30,409 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 20:47:30,412 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 20:47:30,523 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 20:47:30,525 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 20:47:30,594 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 20:47:30,598 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 20:47:30,691 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 20:47:30,693 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 20:47:30,766 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 20:47:30,769 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 20:47:31,146 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 20:47:31,147 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 20:47:31,293 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 20:47:31,296 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 20:47:31,379 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 20:47:31,401 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 20:47:31,509 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 20:47:31,511 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 20:47:31,644 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 20:47:32,548 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 26mS.
+2021-11-04 20:47:32,551 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 20:47:33,050 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 20:47:35,802 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3251mS.
+2021-11-04 20:47:35,803 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 20:47:35,804 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 20:49:21,778 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 558579408 Bytes (942669824)
+2021-11-04 20:49:22,086 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 20:49:22,086 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 20:49:22,086 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 20:49:22,087 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 20:49:22,087 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 20:49:22,088 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 20:49:22,715 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 20:49:22,780 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 20:49:22,797 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 20:49:22,887 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 20:49:22,888 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 20:49:22,965 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 20:49:23,014 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 20:49:23,018 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 20:49:23,134 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 20:49:23,136 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 20:49:23,286 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 20:49:23,291 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 20:49:23,379 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 20:49:23,380 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 20:49:23,446 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 20:49:23,450 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 20:49:23,551 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 20:49:23,552 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 20:49:23,647 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 20:49:23,650 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 20:49:23,726 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 20:49:23,742 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 20:49:23,814 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 20:49:23,816 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 20:49:23,913 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 20:49:24,470 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 14mS.
+2021-11-04 20:49:24,472 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 20:49:24,826 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 20:49:27,484 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3012mS.
+2021-11-04 20:49:27,484 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 20:49:27,485 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 21:02:21,420 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 21:02:21,421 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 21:02:21,421 [INFO] IPUIPlugin:64 - create IPUIPlugin
+2021-11-04 21:02:25,851 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 363840360 Bytes (942669824)
+2021-11-04 21:02:26,302 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 21:02:26,303 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 21:02:26,303 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 21:02:26,304 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 21:02:26,304 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 21:02:26,304 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 21:02:26,792 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 21:02:26,863 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 21:02:26,874 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 21:02:26,955 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 21:02:26,956 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 21:02:27,025 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 21:02:27,058 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 21:02:27,061 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 21:02:27,161 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 21:02:27,162 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 21:02:27,227 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 21:02:27,231 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 21:02:27,325 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 21:02:27,326 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 21:02:27,400 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 21:02:27,404 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 21:02:27,503 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 21:02:27,504 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 21:02:27,569 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 21:02:27,571 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 21:02:27,647 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 21:02:27,663 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 21:02:27,730 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 21:02:27,731 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 21:02:27,833 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 21:02:28,984 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 18mS.
+2021-11-04 21:02:28,987 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 21:02:29,448 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 21:02:31,713 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 2726mS.
+2021-11-04 21:02:31,713 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 21:02:31,714 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 21:02:55,374 [INFO] Gpio:248 - dependency for GPIO [RCC, SYS, USART1]
+2021-11-04 21:40:20,623 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 600824720 Bytes (942669824)
+2021-11-04 21:40:22,039 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 612359024 Bytes (942669824)
+2021-11-04 21:40:22,401 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 624357648 Bytes (942669824)
+2021-11-04 21:40:22,920 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: NVIC
+2021-11-04 21:40:22,921 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: USART
+2021-11-04 21:40:22,921 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: SYS
+2021-11-04 21:40:22,921 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: GPIO
+2021-11-04 21:40:22,921 [INFO] BlockDiagram:2735 - set Specific Code input for plugin: RCC
+2021-11-04 21:40:23,023 [INFO] CodeGenerator:641 - code generatio: config db path: /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.common.mx_6.2.0.202102191602//db/
+2021-11-04 21:40:23,962 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp_save
+2021-11-04 21:40:24,022 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/license.tmp
+2021-11-04 21:40:24,213 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c_save
+2021-11-04 21:40:24,300 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/gpio.c
+2021-11-04 21:40:24,333 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h_save
+2021-11-04 21:40:24,397 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/gpio.h
+2021-11-04 21:40:24,479 [INFO] LogOutputStream:76 - [STDOUT_REDIRECT] Command line
+2021-11-04 21:40:24,496 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c_save
+2021-11-04 21:40:24,606 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/usart.c
+2021-11-04 21:40:24,619 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h_save
+2021-11-04 21:40:24,699 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/usart.h
+2021-11-04 21:40:24,726 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c_save
+2021-11-04 21:40:24,811 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_it.c
+2021-11-04 21:40:24,821 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h_save
+2021-11-04 21:40:24,906 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_it.h
+2021-11-04 21:40:24,929 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c_save
+2021-11-04 21:40:25,031 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/stm32f1xx_hal_msp.c
+2021-11-04 21:40:25,033 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp_save
+2021-11-04 21:40:25,099 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/MXTmpFiles/system.tmp
+2021-11-04 21:40:25,115 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h_save
+2021-11-04 21:40:25,198 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/stm32f1xx_hal_conf.h
+2021-11-04 21:40:25,229 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h_save
+2021-11-04 21:40:25,302 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Inc/main.h
+2021-11-04 21:40:25,325 [INFO] CodeEngine:229 - oldGeneratedFile, /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c_save
+2021-11-04 21:40:25,425 [INFO] CodeEngine:247 - Generated code: /home/ysh/Desktop/github/__ysh__/STM32_HAL/project/stm32f103zet6_hal/Core/Src/main.c
+2021-11-04 21:40:26,338 [INFO] ProjectBuilder:2460 - Time for Copy HAL[1] : 302mS.
+2021-11-04 21:40:26,342 [INFO] ProjectBuilder:3418 - Project Generator version: 3.13.0-B3
+2021-11-04 21:40:27,323 [INFO] ConfigFileManager:1242 - The Die is : DIE414
+2021-11-04 21:40:30,046 [INFO] ProjectBuilder:3584 - Time for Generating toolchain IDE Files: 3704mS.
+2021-11-04 21:40:30,047 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
+2021-11-04 21:40:30,048 [INFO] ProjectBuilder:2339 - Time for Copy CMSIS : 0mS.
