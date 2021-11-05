@@ -7,6 +7,43 @@ sudo usermod -a -G dialout $USER
 
 
 
+//STM32CubeIDE使用（ITM）调试
+//Debug[Trace Asynchronous SW]
+//_________________________________________________________
+1) Debugger
+        Serial Wire Viewer(SWV)
+                [*]Enable
+                Clock Settings
+                Core Clock: [72] MHz
+        Listen Port Number
+                (61234)
+2) 新建一个文件，复制常用的代码（common.h）
+        #ifndef __COMMON_H__
+        #define __COMMON_H__
+        //Standard C Library Header
+        #include "stdarg.h"
+        #include "stdbool.h"
+        #include "stdint.h"
+        #include "stdio.h"
+        #include "stdlib.h"
+        #include "string.h"
+        #include "time.h"
+        #include "math.h"
+        //ST Library Header
+        #include "stm32f103xx_hal.h"
+        uint32_t _write(int file, char *ptr, int len)
+        {
+                int DataIdx;
+                for (DataIdx = 0; DataIdx < len; DataIdx++) {
+                        ITM_SendChar(*ptr++);
+                }
+                return len;
+        }
+        #endif
+3) 搜索（live） | (swv) 然后点（设置）
+
+
+
 /*******************************************************************************
         => STM32F1XX__系统时钟__
 *******************************************************************************/
