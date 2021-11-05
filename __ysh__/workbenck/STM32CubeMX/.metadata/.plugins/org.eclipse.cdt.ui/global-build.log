@@ -1,14 +1,17 @@
-11:05:28 **** Incremental Build of configuration Debug for project STM32F103ZET6 ****
+19:19:28 **** Incremental Build of configuration Debug for project STM32F103ZET6 ****
 make -j4 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xE -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "STM32F103ZET6.elf" @"objects.list"   -mcpu=cortex-m3 -T"/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F103ZETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="STM32F103ZET6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: STM32F103ZET6.elf
+ 
+arm-none-eabi-objdump -h -S  STM32F103ZET6.elf  > "STM32F103ZET6.list"
+arm-none-eabi-objcopy  -O binary  STM32F103ZET6.elf  "STM32F103ZET6.bin"
 arm-none-eabi-size   STM32F103ZET6.elf 
    text	   data	    bss	    dec	    hex	filename
-  11900	    152	   1704	  13756	   35bc	STM32F103ZET6.elf
+  12184	    156	   1748	  14088	   3708	STM32F103ZET6.elf
 Finished building: default.size.stdout
  
-11:05:52 **** Incremental Build of configuration Debug for project STM32F103ZET6 ****
-make -j4 all 
-arm-none-eabi-size   STM32F103ZET6.elf 
-   text	   data	    bss	    dec	    hex	filename
-  11900	    152	   1704	  13756	   35bc	STM32F103ZET6.elf
-Finished building: default.size.stdout
+Finished building: STM32F103ZET6.bin
+ 
+Finished building: STM32F103ZET6.list
  

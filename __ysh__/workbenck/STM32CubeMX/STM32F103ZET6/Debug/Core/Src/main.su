@@ -1,7 +1,9 @@
-common.h:24:9:__io_putchar	16	static
-main.c:90:5:main	8	static
-main.c:166:6:SystemClock_Config	72	static
-main.c:203:6:HAL_UART_TxCpltCallback	16	static
-main.c:208:6:HAL_UART_RxCpltCallback	16	static
-main.c:214:6:HAL_UART_ErrorCallback	16	static
-main.c:228:6:Error_Handler	4	static,ignoring_inline_asm
+common.h:35:9:__io_putchar	16	static
+main.c:88:6:running	8	static
+main.c:101:5:main	8	static
+main.c:176:6:SystemClock_Config	72	static
+main.c:213:6:HAL_UART_TxCpltCallback	16	static
+main.c:218:6:HAL_UART_RxCpltCallback	16	static
+main.c:224:6:HAL_UART_ErrorCallback	16	static
+main.c:231:6:RxCpltCallback	4	static
+main.c:241:6:Error_Handler	4	static,ignoring_inline_asm

@@ -80,7 +80,18 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+system_struct_t SYSTEM = {
+        running
+};
+void running(void);
 
+void running(void)
+{
+        HAL_Delay(100);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+        HAL_Delay(100);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+}
 /* USER CODE END 0 */
 
 /**
@@ -139,8 +150,7 @@ while (uart_ready != SET) {
 uart_ready = RESET;
 
 while (1) {
-        LED_01();
-        HAL_Delay(1000);
+        SYSTEM.running();
         printf("hello, world\n");
 }
 /*****************************************************************************/
@@ -218,7 +228,10 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart1)
 /*****************************************************************************/
 //////////////////////////////// 用户自定义函数 ////////////////////////////////
 
+void RxCpltCallback(void)
+{
 
+}
 /* USER CODE END 4 */
 
 /**
