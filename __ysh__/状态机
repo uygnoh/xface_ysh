@@ -1,35 +1,4 @@
 /*******************************************************************************
-        => STM32__程序框架__
-*******************************************************************************/
-//_________________________________________________________
-//      系统初始化头文件
-//_________________________________________________________
-typedef struct {
-        void (*running)(void);
-} system_struct_t;
-extern system_struct_t SYSTEM;
-extern void running(void);
-
-
-//_________________________________________________________
-//      源文件
-//_________________________________________________________
-static void runing(void);
-system_struct_t SYSTEM = {
-        running
-};
-
-static void runnig(void)
-{
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-}
-
-
-
-/*******************************************************************************
         => STM32__状态机__
 *******************************************************************************/
 //________________________________________________________|
@@ -42,8 +11,6 @@ typedef enum {
         STATE_01 = (uint8_t)0x01,
         STATE_02 = (uint8_t)0x02,
         STATE_03 = (uint8_t)0x03,
-        STATE_04 = (uint8_t)0x04,
-        STATE_05 = (uint8_t)0x05,
 } state_machine_enum_t;
 
 //定义（状态机）结构体类型
@@ -52,8 +19,6 @@ typedef struct {
         void (*fun_state01)(void);
         void (*fun_state02)(void);
         void (*fun_state03)(void);
-        void (*fun_state04)(void);
-        void (*fun_state05)(void);
 } state_machine_struct_t;
 
 //结构体声明
@@ -61,8 +26,6 @@ extern state_machine_struct_t state_machine;
 extern void (*fun_state01)(void);
 extern void (*fun_state02)(void);
 extern void (*fun_state03)(void);
-extern void (*fun_state04)(void);
-extern void (*fun_state05)(void);
 #endif
 
 
@@ -73,15 +36,13 @@ extern void (*fun_state05)(void);
 void (*fun_state01)(void);
 void (*fun_state02)(void);
 void (*fun_state03)(void);
-void (*fun_state04)(void);
-void (*fun_state05)(void);
+
+
 state_machine_struct_t state_machine = {
         STATE_01,       //默认为状态“1”
         fun_state01,
         fun_state02,
         fun_state03,
-        fun_state04,
-        fun_state05,
 };
 
 void fun_state01(void)
@@ -109,26 +70,9 @@ void fun_state03(void)
         LED.LED_OFF(LED_02);
         LED.LED_OFF(LED_03);
         //状态机切换到（状态1）
-        state_machine.status = STATE_04;
-}
-void fun_state04(void)
-{
-        HAL_Delay(500);
-        LED.LED_OFF(LED_01);
-        LED.LED_OFF(LED_02);
-        LED.LED_OFF(LED_03);
-        //状态机切换到（状态1）
-        state_machine.status = STATE_05;
-}
-void fun_state05(void)
-{
-        HAL_Delay(500);
-        LED.LED_OFF(LED_01);
-        LED.LED_OFF(LED_02);
-        LED.LED_OFF(LED_03);
-        //状态机切换到（状态1）
         state_machine.status = STATE_01;
 }
+
 
 void state_machine_runing(void)
 {
@@ -136,8 +80,6 @@ void state_machine_runing(void)
         case STATE_01: state_machine.fun_state01(); break;
         case STATE_02: state_machine.fun_state02(); break;
         case STATE_03: state_machine.fun_state03(); break;
-        case STATE_04: state_machine.fun_state04(); break;
-        case STATE_05: state_machine.fun_state05(); break;
         default: state_machine.status = STATE_01;
         }
 }

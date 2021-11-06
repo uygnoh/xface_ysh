@@ -26,5 +26,6 @@ int main(void)
                 usart_send_string(tx_buf);
         }
         GPIOA->ODR |= BIT_02;
+
         return 0;
 }

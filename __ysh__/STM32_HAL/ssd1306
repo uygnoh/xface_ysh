@@ -23,38 +23,3 @@ ___________________________________________________________
                 1  0  0  0  X3  X2  X1  X0
 ___________________________________________________________
 
-
-
-
-/*******************************************************************************
-        => RTC
-*******************************************************************************/
-HAL_RTC_Init(RtC_HandleTypeDef *hrtc);
-HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc);
-
-HAL_RTC_SetTime();              //时间设置
-HAL_RTC_GetTime();              //时间获取
-HAL_RTC_SetDate();              //日期设置
-HAL_RTC_GetDate();              //日期获取
-
-HAL_RTC_SetAlarm();             //设置闹钟参数
-HAL_RTC_SetAlarm_IT();          //设置闹钟参数并开启中断
-HAL_RTC_DeactivateAlarm();      //禁止闹钟
-HAL_RTC_GetAlarm();             //获取闹钟参数信息
-HAL_RTC_AlarmIRQHandler();      //闹钟中断通用处理函数
-HAL_RTC_PollForAlarmAEvent();   //等待闹钟 B 时间到
-HAL_RTC_AlarmAEventCallback();  //闹钟 B 中断事件处理回调函数
-HAL_RTC_PollForBlarmAEvent();   //等待闹钟 A 时间到
-HAL_RTC_AlarmBEventCallback();  //闹钟 A 中断事件处理回调函数
-
-
-
-
-
-
-
-
-
-
-
-

@@ -20,7 +20,7 @@ void fun_ptr_00(void)
         printf("函数指针的地址为: %p\n", *fun_ptr);
         printf("函数的地址为: %p\n", add);
         printf("函数的地址为: %p\n", *add);
-        printf("函数的地址为: %d\n", (*add)(3, 3));
+        printf("函数指针: %d\n", (*add)(3, 3));
 }
 #endif
 
