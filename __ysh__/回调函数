@@ -25,9 +25,9 @@
 //________________________________________________________|
 //定义枚举类型
 typedef enum {
-        LED_01 = (uint8_t)0x01;
-        LED_02 = (uint8_t)0x02;
-        LED_03 = (uint8_t)0x03;
+        LED_01 = (uint8_t)0x01,
+        LED_02 = (uint8_t)0x02,
+        LED_03 = (uint8_t)0x03,
 } led_enum_t;
 
 
@@ -55,13 +55,13 @@ led_struct_t LED = {
 };
 
 //实现中间函数功能（它只起到一个调用的作用）
-void (*led_fun_ptr)(led_enum_t led_number, void (*callback_fun)(led_enum_t))
+void led_fun_ptr(led_enum_t led_number, void (*callback_fun)(led_enum_t))
 {
         (*callback_fun)(led_number);
 }
 
 //底层驱动函数
-void led_on(led_enum_t, led_number)
+void led_on(led_enum_t led_number)
 {
         switch (led_number) {
         case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET); break;
@@ -71,7 +71,7 @@ void led_on(led_enum_t, led_number)
         }
 }
 //底层驱动函数
-void led_off(led_enum_t, led_number)
+void led_off(led_enum_t led_number)
 {
         switch (led_number) {
         case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); break;

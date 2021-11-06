@@ -24,30 +24,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "bsp_debug.h"
+#include "bsp_led.h"
+#include "bsp_uart.h"
 
-#include "common.h"
-
-
-/*****************************************************************************/
-/*      => 宏定义                                                             */
-/*****************************************************************************/
-#define LED_01()                HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_2)
-#define TX_BUFFER_SIZE          (COUNTOF(tx_buffer) - 1)
-#define RX_BUFFER_SIZE          TX_BUFFER_SIZE
-#define COUNTOF(__BUFFER__)     (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-
-
-/*****************************************************************************/
-/*      => 类型定义                                                           */
-/*****************************************************************************/
-__IO ITStatus    uart_ready = RESET;
-
-
-/*****************************************************************************/
-/*      => 全局变量定义                                                        */
-/*****************************************************************************/
-uint8_t         tx_buffer[] = " ****UART_TwoBoards_ComIT**** ";
-uint8_t         rx_buffer[RX_BUFFER_SIZE];
 
 
 /* USER CODE END Includes */
@@ -80,18 +60,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-system_struct_t SYSTEM = {
-        running
-};
-void running(void);
 
-void running(void)
-{
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-}
 /* USER CODE END 0 */
 
 /**
@@ -125,35 +94,13 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
-/*****************************************************************************/
-if (HAL_UART_Transmit_IT(&huart1, (uint8_t *)tx_buffer, TX_BUFFER_SIZE) != HAL_OK) {
-        Error_Handler();
-}
-while (uart_ready != SET) {
-        LED_01();
-        HAL_Delay(100);
-}
-//Reset transmission flag
-uart_ready = RESET;
-
-
-if (HAL_UART_Receive_IT(&huart1, (uint8_t *)rx_buffer, RX_BUFFER_SIZE) != HAL_OK) {
-        Error_Handler();
-}
-while (uart_ready != SET) {
-        LED_01();
-        HAL_Delay(100);
-        break;
-}
-//Reset transmission flag
-uart_ready = RESET;
-
+test();
 while (1) {
-        SYSTEM.running();
-        printf("hello, world\n");
+        LED.bsp_led(LED_02, led_on);
+        HAL_Delay(500);
+        LED.bsp_led(LED_02, led_off);
+        HAL_Delay(500);
 }
-/*****************************************************************************/
 
 
   /* USER CODE END 2 */
@@ -207,31 +154,9 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 
-//////////////////////////////// 用户自定义函数 ////////////////////////////////
-/*****************************************************************************/
-//UART__发送完成（中断）回调函数
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart1)
-{
-        uart_ready = SET;      //设置传输完成标志位（SET传输完成）
-}
-//UART__接收完成（中断）回调函数
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart1)
-{
-        uart_ready = SET;      //设置传输完成标志位（SET传输完成）
-}
 
-//UART__出错（中断）回调函数
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart1)
-{
-        Error_Handler();
-}
-/*****************************************************************************/
-//////////////////////////////// 用户自定义函数 ////////////////////////////////
 
-void RxCpltCallback(void)
-{
 
-}
 /* USER CODE END 4 */
 
 /**
