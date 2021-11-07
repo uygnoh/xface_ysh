@@ -27,6 +27,7 @@
 #include "bsp_debug.h"
 #include "bsp_led.h"
 #include "bsp_uart.h"
+#include "common.h"
 
 
 
@@ -100,6 +101,8 @@ while (1) {
         HAL_Delay(500);
         LED.bsp_led(LED_02, led_off);
         HAL_Delay(500);
+        printf("hello, world!\n");
+        __delay_us(100);
 }
 
 

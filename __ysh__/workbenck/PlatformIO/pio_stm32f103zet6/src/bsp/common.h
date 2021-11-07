@@ -13,5 +13,6 @@ void __delay_ms(uint32_t nms);
 *******************************************************************************/
 void usart1_setup(void);
 void usart_send_string(uint8_t *tx_buf);
+void led_blink(void);
 
 #endif

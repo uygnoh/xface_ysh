@@ -43,3 +43,22 @@ void usart_send_string(uint8_t *tx_buf)
                 }
         }
 }
+/*******************************************************************************
+  函数名称: void led_blink(void)
+  输入参数: 无
+  输出参数: 无
+  函数功能: 测试程序
+*******************************************************************************/
+void led_blink(void)
+{
+        uint8_t i;
+        GPIOA_CLOCK_ENABLE();                   //打开GPIOA时钟
+        GPIOA->CRL  &= (uint32_t)(0xFFFFF0FF);  //清除相关的位
+	GPIOA->CRL  |= (uint32_t)(0xFFFFF3FF);  //PA2__推挽输出
+        for (i = 0; i < 6; i++) {               //循环 6 次
+                GPIOA->ODR |= BIT_02;
+                __delay_ms(500);
+                GPIOA->ODR &= ~BIT_02;
+                __delay_ms(500);
+        }
+}
