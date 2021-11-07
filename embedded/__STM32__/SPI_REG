@@ -1,0 +1,68 @@
+/*******************************************************************************
+                => STM32F407__SPI__PIN__
+*******************************************************************************/
+void nrf24l01_init(int is_receiver)
+{
+        int i;
+        spi2_init();
+        nrf24_io_init();
+        
+        //第一次上电，等待100ms
+        dalay_us(1000 * 120);
+        
+        //standby => power down
+        //设置（PWR_UP = 0）， 在（0）号寄存器中设置
+        nrf24_write_byte(0x00, 0x08);
+        dalay_us(1000 * 10);
+        //现在是（power down）模式
+        
+        
+        
+}
+
+
+void spi2_init(void)
+{
+        uint32_t tmp = 0;
+        spi2_io_init();
+        spi_clock_on(2);
+        
+        
+        //set SPI_CR2
+        *(volatile uint32_t *)(spi2_base + 0x40) = 0x04;
+        
+        //set SPI_CR1
+        tmp  = 0;
+        tmp |= (1 << 2);        //master configuration
+        tmp |= (3 << 3);        //baud rate 42Mhz / 0
+        //tmp |= 1 << 8;
+        //tmp |= 1 << 9;
+        tmp |= (1 << 6);        //enable spi
+        *(volatile uint32_t *)(spi2_base + 0x00) = tmp;
+}
+
+void spi2_io_init(void)
+{
+        gpio_clock_on('b');
+        gpio_set_aternate('b', 13, 5);
+        gpio_set_aternate('b', 14, 5);
+        gpio_set_aternate('b', 15, 5);
+}
+
+nrf24l01_io_init(void)
+{
+}
+
+void nrf24_write_byte(uint8_t reg_addr, uint8_t data)
+{
+        uint8_t status;
+        
+        set_csn(0);
+        delay_us(100);
+        
+        status = spi2_tran_byte(0x20 | reg_addr);
+        spi2_tran_byte(data);
+        
+        set_csn(1);
+        delay_us(100);
+}
