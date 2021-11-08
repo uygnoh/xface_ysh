@@ -23,5 +23,5 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/STM32F1xx_HAL_Driver/Src \
-STM32F1_REG/source \
+Regf103/source \
 

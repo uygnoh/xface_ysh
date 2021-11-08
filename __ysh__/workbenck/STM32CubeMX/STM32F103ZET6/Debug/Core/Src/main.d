@@ -24,9 +24,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
  ../Core/Inc/bsp_debug.h ../Core/Inc/bsp_led.h ../Core/Inc/bsp_uart.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/common.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/m32.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/common.h
+ /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h \
+ /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/M32.h \
+ /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h
 
 ../Core/Inc/main.h:
 
@@ -88,8 +88,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/bsp_uart.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/common.h:
+/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/m32.h:
+/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/M32.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F1_REG/include/common.h:
+/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h:
