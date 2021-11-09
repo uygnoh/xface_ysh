@@ -6,12 +6,12 @@
 #define DS18B20_DQ_IN  PGin(11)  //数据端口 PG11
 #define DS18B20_DQ_OUT PGout(11) //数据端口 PG11
 /*******************************************************************************
-  函数名称: void ds18b20_rst(void)
+  函数名称: void ds18b20_init(void)
   输入参数: 无
   输出参数: 无
-  函数功能: 复位DS18B20
+  函数功能: 初始化DS18B20
 *******************************************************************************/
-void ds18b20_rst(void)
+void ds18b20_init(void)
 {
         DS18B20_IO_OUT();       //SET PG11 OUTPUT
         DS18B20_DQ_OUT=0;       //拉低DQ
@@ -88,27 +88,23 @@ uint8_t ds18b20_read_byte(void)
         }
         return dat;
 }
-/*******************************************************************************
-  函数名称: void ds18b20_write_byte(uint8_t dat)
-  输入参数: dat：要写入的字节
-  输出参数: 无
-  函数功能: 写一个字节到DS18B20
-*******************************************************************************/
+//写一个字节到DS18B20
+//dat：要写入的字节
 void ds18b20_write_byte(uint8_t dat)
 {
         uint8_t i;
         uint8_t tmp;
-        DS18B20_IO_OUT();                       //SET PG11 OUTPUT;
+        DS18B20_IO_OUT();       //SET PG11 OUTPUT;
         for (i = 1; i <= 8; i++) {
                 tmp = dat & 0x01;
                 dat=dat>>1;
                 if (tmp) {
-                        DS18B20_DQ_OUT=0;       // Write 1
+                        DS18B20_DQ_OUT=0;   // Write 1
                         delay_us(2);
                         DS18B20_DQ_OUT=1;
                         delay_us(60);
                 } else {
-                        DS18B20_DQ_OUT=0;       // Write 0
+                        DS18B20_DQ_OUT=0;   // Write 0
                         delay_us(60);
                         DS18B20_DQ_OUT=1;
                         delay_us(2);
@@ -116,58 +112,53 @@ void ds18b20_write_byte(uint8_t dat)
         }
 }
 //开始温度转换
-void ds18b20_start(void)
+void DS18B20_Start(void)
 {
-        ds18b20_rst();
-        ds18b20_check();
-        DS18B20_Write_Byte(0xcc);   // skip rom
-        DS18B20_Write_Byte(0x44);   // convert
+    DS18B20_Rst();
+        DS18B20_Check();
+    DS18B20_Write_Byte(0xcc);   // skip rom
+    DS18B20_Write_Byte(0x44);   // convert
 }
 //初始化DS18B20的IO口 DQ 同时检测DS的存在
 //返回1:不存在
 //返回0:存在
-uint8_t ds18b20_init(void)
+u8 DS18B20_Init(void)
 {
-        RCC->APB2ENR |= 1<<8;           //使能PORTG口时钟
-        GPIOG->CRH   &= 0XFFFF0FFF;     //PORTG.11 推挽输出
-        GPIOG->CRH   |= 0X00003000;
-        GPIOG->ODR   |= 1<<11;          //输出1
-        ds18b20_rst();
-        return ds18b20_check();
+        RCC->APB2ENR|=1<<8;             //使能PORTG口时钟
+        GPIOG->CRH&=0XFFFF0FFF;         //PORTG.11 推挽输出
+        GPIOG->CRH|=0X00003000;
+        GPIOG->ODR|=1<<11;              //输出1
+        DS18B20_Rst();
+        return DS18B20_Check();
 }
 //从ds18b20得到温度值
 //精度：0.1C
 //返回值：温度值 （-550~1250）
-short ds18b20_get_temperatur(void)
+short DS18B20_Get_Temp(void)
 {
-        uint8_t flag;
-        uint8_t tl, th;
-        short temperature;
-        ds18b20_start ();               // ds1820 start convert
-        ds18b20_rst();
-        ds18b20_check();
-        ds18b20_write_byte(0xcc);       // skip rom
-        ds18b20_write_byte(0xbe);       // convert
-        tl = ds18b20_Read_Byte();       // LSB
-        th = ds18b20_Read_Byte();       // MSB
+    u8 temp;
+    u8 TL,TH;
+        short tem;
+    DS18B20_Start ();                   // ds1820 start convert
+    DS18B20_Rst();
+    DS18B20_Check();
+    DS18B20_Write_Byte(0xcc);   // skip rom
+    DS18B20_Write_Byte(0xbe);   // convert
+    TL=DS18B20_Read_Byte();     // LSB
+    TH=DS18B20_Read_Byte();     // MSB
 
-        if (th > 7) {
-                th   =~ th;
-                th   =~ tl;
-                flag = 0;       //温度为负
-        } else {
-                flag = 1;       //温度为正
-        }
-
-        temperature   = th;
-        temperature <<= 8;
-        temperature  += tl;
-        temperature   = (float)temperature * 0.0625;
-        if (flag) {
-                return temperature;
-        } else {
-                return -temperature;
-        }
+    if(TH>7)
+    {
+        TH=~TH;
+        TL=~TL;
+        temp=0;                                 //温度为负
+    }else temp=1;                               //温度为正
+    tem=TH;                                     //获得高八位
+    tem<<=8;
+    tem+=TL;                                    //获得底八位
+    tem=(float)tem*0.625;               //转换
+        if(temp)return tem;             //返回温度值
+        else return -tem;
 }
 
 
