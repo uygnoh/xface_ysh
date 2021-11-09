@@ -8,7 +8,7 @@
   |    SystemClock / PCLK_DIV_6 = 12MHz                            |
   |________________________________________________________________|
 *******************************************************************************/
-void ext_adc_conf(void)
+void adc_conf(void)
 {
         GPIOA_CLOCK_ENABLE();                   //使能PORTA口时钟
         ADC1_CLOCK_ENABLE();                    //ADC1时钟使能
@@ -46,9 +46,9 @@ void ext_adc_conf(void)
   输出参数: 返回值:转换结果
   函数功能: 获得ADC1某个通道的值
 *******************************************************************************/
-uint16_t ext_get_adc_value(uint8_t channel)
+uint16_t get_adc_value(uint8_t channel)
 {
-        ext_adc_conf();
+        adc_conf();
         ADC1->SQR3 &= 0XFFFFFFE0;       //ADC1_SQR3__SQ1[4:0]
         ADC1->SQR3 |= channel;          //ADC1_通道__16__选择第（1_序列）
         ADC1->CR2  |= BIT_22;           //启动规则转换通道

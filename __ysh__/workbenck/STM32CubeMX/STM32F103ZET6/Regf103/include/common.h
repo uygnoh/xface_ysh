@@ -2,6 +2,8 @@
 #define __COMMON_H__
 #include "M32.h"
 #include "stm32f1xx_hal.h"
+#include "stdio.h"
+
 
 /*******************************************************************************
         => STM32F103__SysTic__
@@ -16,14 +18,14 @@ void uart_send_string(void);
 /*******************************************************************************
         => STM32F103__内部温度传感器__
 *******************************************************************************/
-void     adc_conf(void);
-uint16_t get_adc_value(uint8_t channel);
-uint16_t get_adc_average(uint8_t channel, uint8_t number);
-uint16_t get_temperature(void);
+void adc1_16_conf(void);
+uint16_t get_adc1_16_value(uint8_t channel);
+uint32_t get_adc1_16_average(uint8_t channel, uint8_t number);
+void get_temperature(void);
 /*******************************************************************************
         => STM32F103__ADC1__
 *******************************************************************************/
-void ext_adc_conf(void);
-uint16_t ext_get_adc_value(uint8_t channel);
+void adc_conf(void);
+uint16_t get_adc_value(uint8_t channel);
 
 #endif

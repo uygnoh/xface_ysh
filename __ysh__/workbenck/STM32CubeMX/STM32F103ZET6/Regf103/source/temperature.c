@@ -1,6 +1,6 @@
 #include "common.h"
 /*******************************************************************************
-  函数名称: void adc_conf(void)
+  函数名称: static void adc1_16_conf(void)
   输入参数: 无
   输出参数: 无
   函数功能: ADC配置（设置系统时钟为72MHz）， ADC1的时钟为
@@ -8,7 +8,7 @@
   |    SystemClock / PCLK_DIV_6 = 12MHz                            |
   |________________________________________________________________|
 *******************************************************************************/
-void adc_conf(void)
+void adc1_16_conf(void)
 {
         //GPIOA_CLOCK_ENABLE();                 //使能PORTA口时钟
         //GPIOA->CRL    &= 0XFFFFFF0F;          //PA1__模拟输入
@@ -23,9 +23,9 @@ void adc_conf(void)
         ADC1->CR2     &= ~(BIT_01);             //ADC1_CR2__单次转换模式
         ADC1->CR2     &= (uint32_t)0xFFF1FFFF;  //ADC1_CR2__EXTSEL[19:17]
         ADC1->CR2     |= (uint32_t)0xFFFEFFFF;  //ADC1_CR2__EXTSEL[19:17]软件控制转换
-        ADC1->CR2     |= BIT_20;                //使用用外部触发(SWSTART) !!!必须使用一个事件来触发
-        ADC1->CR2     &= ~(BIT_11);             //右对齐
-        ADC1->CR2     |= BIT_23;                //temperature sensor and V_REFINT channel enabled
+        ADC1->CR2     |= BIT_20;                //使用外部事件启动转换(SWSTART) !!!必须使用一个事件来触发
+        ADC1->CR2     &= ~(BIT_11);             //ALIGN:数据对齐（0，右对齐）
+        ADC1->CR2     |= BIT_23;                //启用温度传感器和V_REFINT
 
         ADC1->SQR1    &= (uint32_t)0xFF0FFFFF;  //ADC_SQR1__L[23:20]__规则组转换的总数
         ADC1->SQR1    |= (uint32_t)0x00000000;  //Regular channel sequence length
@@ -44,50 +44,47 @@ void adc_conf(void)
         while (ADC1->CR2 & BIT_02);            //等待校准结束
 }
 /*******************************************************************************
-  函数名称: uint16_t get_adc_value(uint8_t channel)
+  函数名称: uint16_t get_adc1_16_value(uint8_t channel)
   输入参数: channel:通道值（0~16）
   输出参数: 返回值:转换结果
-  函数功能: 获得ADC1某个通道的值
+  函数功能: 获得ADC1__通道16__的值
 *******************************************************************************/
-uint16_t get_adc_value(uint8_t channel)
+uint16_t get_adc1_16_value(uint8_t channel)
 {
         ADC1->SQR3 &= 0XFFFFFFE0;       //ADC1_SQR3__SQ1[4:0]
         ADC1->SQR3 |= channel;          //ADC1_通道__16__选择第（1_序列）
         ADC1->CR2  |= BIT_22;           //启动规则转换通道
         while (!(ADC1->SR & BIT_01));   //等待转换结束
-        return (ADC1->DR);              //返回adc值
-        HAL_Delay(5);
+        return (ADC1->DR);              //返回adc1的值
 }
 /*******************************************************************************
-  函数名称: uint16_t get_adc_value(uint8_t channel)
-  输入参数: channel:通道编号（0~16）
-  输入参数: times:获取次数
-  输出参数: 返回值:通道channel的number次转换结果平均值
-  函数功能: 获取通道channel的转换值，取number次,然后平均
+  函数名称: static uint16_t get_adc1_16_average(uint8_t channel, uint8_t number)
+  输入参数: channel: 通道编号（0~16）
+  输入参数: number:  读取温度的次数
+  输出参数: 返回（number）次温度的平均值
+  函数功能: 获取通道__16__的温度转换值， 取number次, 然后平均
 *******************************************************************************/
-uint16_t get_adc_average(uint8_t channel, uint8_t number)
+uint32_t get_adc1_16_average(uint8_t channel, uint8_t number)
 {
-        uint8_t i;
-        int16_t tmp = 0;
+        uint8_t  i;
+        uint32_t tmp = 0;
         for (i = 0; i < number; i++) {
-                tmp += get_adc_value(channel);
+                tmp += get_adc1_16_value(channel);
                 HAL_Delay(5);
         }
         return (tmp / number);
 }
 /*******************************************************************************
-  函数名称: short get_temprate(void)
-  输入参数: channel:通道编号（0~16）
-  输入参数: times:获取次数
-  输出参数: 返回值:温度值(扩大了100倍,单位:℃.)
-  函数功能: 得到温度值
+  函数名称: void get_temperature(void)
+  输入参数: 无
+  输入参数: 无
+  输出参数: 返回值:温度值(单位:℃.)
+  函数功能: 得到STM32F103内部温度数据
+  读取ADC1通道__16__, 取10次平均温度值（ADC通道16是内部温度传感器专用通道）
 *******************************************************************************/
-uint16_t get_temperature(void)
+void get_temperature(void)
 {
-        adc_conf();
         uint16_t  adcx;
-        uint16_t  temperature;
-        adcx        = get_adc_value(16);             //读取通道16,20次取平均
-        temperature = (1.43- adcx*3.3/4096) / 0.0043 + 25 ;
-        return (temperature);
+        adcx = get_adc1_16_value(16);
+        printf("Temperature: %f\n", (1.43 - adcx * 3.3 / 4096) / 0.0043 + 25);
 }

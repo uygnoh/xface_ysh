@@ -50,7 +50,7 @@
 //#include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 
 /* customize header file */
-#include "m32.h"
+#include "M32.h"
 #include "common.h"
 
 
