@@ -2082,3 +2082,21 @@ Reason: (1) Failed to connect to device. Please check power and cabling to targe
 
 !ENTRY org.eclipse.cdt.dsf 4 10001 2021-11-08 21:47:11.073
 !MESSAGE Target not available.
+!SESSION 2021-11-09 07:54:51.381 -----------------------------------------------
+eclipse.buildId=Version 1.6.0
+java.version=11.0.9.1
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_HK
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2021-11-09 07:55:14.690
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2021-11-09 07:55:14.894
+!MESSAGE Log4j initialized with config file /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/.metadata/.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 4 4 2021-11-09 07:55:32.738
+!MESSAGE com.st.stm32cube.ide.mcu.ide/META-INF/version/build_ref file not found, build reference will not be reported into properties
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2021-11-09 07:55:32.900
+!MESSAGE Started RMI Server, listening on port 41337
