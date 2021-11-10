@@ -1,5 +1,5 @@
 #include "bsp_uart.h"
-#include "usart.h"
+#include "usart.h"              //需要包含“usart.h”头文件
 
 __IO ITStatus                   uart_ready;
 uint8_t                         tx_buffer[] = " ****UART_TwoBoards_ComIT**** ";
