@@ -98,8 +98,8 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
-
 GPIOG_CLOCK_ENABLE();
+
 while (1) {
         get_temperature();
         printf("DS18B20: %.3f\n", ds18b20_read_temperature());

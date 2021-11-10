@@ -23,7 +23,7 @@ void uart_conf(uint32_t brr)
         USART1_CLOCK_ENABLE();                  //打开USART1时钟
 	GPIOA->CRH  &= ((uint32_t)0xFFFFF00F);  //清除相关的位
 	GPIOA->CRH  |= ((uint32_t)0x000000B0);  //TX(PA.09)复用推挽输出__50MHz__
-	GPIOA->CRH  |= ((uint32_t)0x00000400);  //RX(PA.10)浮空输入
+	GPIOA->CRH  |= ((uint32_t)0x00000400);  //RX(PA.10)浮空输入（也可以上拉输入）
 	USART1->CR1 |= BIT_13;                  //USART模块使能
 	USART1->CR1 &= ~BIT_12;                 //1个起始位, 8个数据位
 	USART1->CR2 &= ~(BIT_13 + BIT_12);      //1个停止位
