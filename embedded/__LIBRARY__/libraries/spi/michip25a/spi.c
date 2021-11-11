@@ -13,9 +13,9 @@ void spi_write(uint8_t dat)
         for (i = 0; i < 8; i++) {               //高位在前，低位在后
                 SCLK = 0;                       //时钟线拉低, 先把数据准备好
                 if ((dat & 0x80) == 0x80) {     //判断当前传输位是“1”还是“0”
-                        SI = 1;                 //从机接收数据，主机发送数据
+                        MOSI = 1;               //从机接收数据，主机发送数据
                 } else {
-                        SI = 0;
+                        MOSI = 0;
                 }
                 dat <<= 1;                      //准备下一个数据位
                 SCLK = 1;                       //上升沿，“从机”数据采样
@@ -36,7 +36,7 @@ uint8_t spi_read(void)
                 SCLK  = 0;              //时钟下降沿期间，从机准备好数据
                 SCLK  = 1;              //来一个上升沿，主机采样总线上的数据
                 dat <<= 1;              //dat右移1位
-                if (SO == 1) {         //从机发送数据，主机接收数据
+                if (MISO == 1) {        //从机发送数据，主机接收数据
                         dat |= 0x01;
                 } else {
                         dat &= 0xFE;
@@ -68,9 +68,9 @@ uint8_t eeprom_read_byte(uint8_t addr)
 {
         uint8_t dat;
         CS = 0;                 //片选信号
-        spi_write(READ);   //写入“读”命令
-        spi_write(addr);   //写入要读的地址
-        dat = spi_read();  //返回读出的字节
+        spi_write(READ);        //写入“读”命令
+        spi_write(addr);        //写入要读的地址
+        dat = spi_read();       //返回读出的字节
         CS = 1;                 //片选信号
 }
 
