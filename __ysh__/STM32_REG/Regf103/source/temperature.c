@@ -11,8 +11,6 @@
 *******************************************************************************/
 void adc1_16_conf(void)
 {
-        //GPIOA_CLOCK_ENABLE();                 //使能PORTA口时钟
-        //GPIOA->CRL    &= 0XFFFFFF0F;          //PA1__模拟输入
         ADC1_CLOCK_ENABLE();                    //ADC1时钟使能
         RCC->APB2RSTR |= BIT_09;                //ADC1复位
         RCC->APB2RSTR &= ~(BIT_09);             //ADC1复位结束
@@ -22,7 +20,7 @@ void adc1_16_conf(void)
         ADC1->CR1     |= 0XF0FFFF;              //ADC1_CR1__独立工作模式__
         ADC1->CR1     &= ~(BIT_08);             //ADC1_CR1__非扫描模式
         ADC1->CR2     &= ~(BIT_01);             //ADC1_CR2__单次转换模式
-        ADC1->CR2     &= (uint32_t)0xFFF1FFFF;  //ADC1_CR2__EXTSEL[19:17]
+        ADC1->CR2     &= (uint32_t)0xFFF1FFFF;  //ADC1_CR2__EXTSEL[19:17]（111）
         ADC1->CR2     |= (uint32_t)0xFFFEFFFF;  //ADC1_CR2__EXTSEL[19:17]软件控制转换
         ADC1->CR2     |= BIT_20;                //使用外部事件启动转换(SWSTART) !!!必须使用一个事件来触发
         ADC1->CR2     &= ~(BIT_11);             //ALIGN:数据对齐（0，右对齐）
@@ -31,8 +29,6 @@ void adc1_16_conf(void)
         ADC1->SQR1    &= (uint32_t)0xFF0FFFFF;  //ADC_SQR1__L[23:20]__规则组转换的总数
         ADC1->SQR1    |= (uint32_t)0x00000000;  //Regular channel sequence length
 
-        //ADC1->SMPR2   &= (uint32_t)0xFFFFFFF0;//设置通道__1__的采样时间
-        //ADC1->SMPR2   |= (uint32_t)0xFFFFFFF7;//通道1（SMP0[2:0]__239.5 cycles）
         ADC1->SMPR1   &= (uint32_t)0xFFE3FFFF;  //设置通道__16__的采样时间
         ADC1->SMPR1   |= (uint32_t)0x001C0000;  //通道1（SMP16[20:18]__239.5 cycles）
 
@@ -53,7 +49,7 @@ void adc1_16_conf(void)
 uint16_t get_adc1_16_value(uint8_t channel)
 {
         ADC1->CR2  |= BIT_00;           //再次开启AD转换器
-        ADC1->SQR3 &= 0XFFFFFFE0;       //ADC1_SQR3__SQ1[4:0]
+        ADC1->SQR3 &= 0XFFFFFFE0;       //ADC1_SQR3__SQ1[4:0]转换顺序
         ADC1->SQR3 |= channel;          //ADC1_通道__16__选择第（1_序列）
         ADC1->CR2  |= BIT_22;           //启动规则转换通道
         while (!(ADC1->SR & BIT_01));   //等待转换结束
