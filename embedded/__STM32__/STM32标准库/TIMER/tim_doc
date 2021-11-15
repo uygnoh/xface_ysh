@@ -19,6 +19,8 @@ void nvic_setup(void)
         Y.NVIC_IRQChannelCmd                = ENABLE;           //使能中断
         NVIC_Init(&Y);
 }
+
+
 void basic_timer6_setup(void)
 {
         TIM_TimeBaseInitTypeDef Y;                      //设置定时器（内部时钟）
@@ -58,22 +60,22 @@ static void timer1_gpio_setup(void)
 
         // 输出比较通道 GPIO 初始化
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Pin   =  GPIO_Pin_8;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_Init(GPIOA, &GPIO_InitStructure);
 
         // 输出比较通 （道互补通道） GPIO初始化
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_13;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Pin   =  GPIO_Pin_13;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_Init(GPIOB, &GPIO_InitStructure);
 
         // 输出比较通道 （刹车通道） GPIO 初始化
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB);
-        GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Pin   =  GPIO_Pin_12;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_Init(GPIOB, &GPIO_InitStructure);
         // BKIN引脚默认先输出低电平

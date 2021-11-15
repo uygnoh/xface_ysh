@@ -1,0 +1,42 @@
+typedef struct {
+        uint16_t TIM_Prescaler;         // 预分频器
+        uint16_t TIM_CounterMode;       // 计数模式
+        uint32_t TIM_Period;            // 定时器周期
+        uint16_t TIM_ClockDivision;     // 时钟分频
+        uint8_t TIM_RepetitionCounter;  // 重复计算器
+} TIM_TimeBaseInitTypeDef;
+
+
+typedef struct {
+        uint16_t TIM_OCMode;            // 比较输出模式
+        uint16_t TIM_OutputState;       // 比较输出使能
+        uint16_t TIM_OutputNState;      // 比较互补输出使能
+        uint32_t TIM_Pulse;             // 脉冲宽度
+        uint16_t TIM_OCPolarity;        // 输出极性
+        uint16_t TIM_OCNPolarity;       // 互补输出极性
+        uint16_t TIM_OCIdleState;       // 空闲状态下比较输出状态
+        uint16_t TIM_OCNIdleState;      // 空闲状态下比较互补输出状态
+} TIM_OCInitTypeDef;
+
+
+typedef struct {
+        uint16_t TIM_Channel;           // 输入通道选择
+        uint16_t TIM_ICPolarity;        // 输入捕获触发选择
+        uint16_t TIM_ICSelection;       // 输入捕获选择
+        uint16_t TIM_ICPrescaler;       // 输入捕获预分频器
+        uint16_t TIM_ICFilter;          // 输入捕获滤波器
+} TIM_ICInitTypeDef;
+
+
+typedef struct {
+        uint16_t TIM_OSSRState;         // 运行模式下的关闭状态选择
+        uint16_t TIM_OSSIState;         // 空闲模式下的关闭状态选择
+        uint16_t TIM_LOCKLevel;         // 锁定配置
+        uint16_t TIM_DeadTime;          // 死区时间
+        uint16_t TIM_Break;             // 断路输入使能控制
+        uint16_t TIM_BreakPolarity;     // 断路输入极性
+        uint16_t TIM_AutomaticOutput;   // 自动输出使能
+} TIM_BDTRInitTypeDef;
+
+
+
