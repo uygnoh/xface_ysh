@@ -1,4 +1,11 @@
 /*******************************************************************************
+        => 时间管理数据结构
+*******************************************************************************/
+volatile INT32U         OSTime;         //任务控制块TCB中的OSTCBDly
+
+
+
+/*******************************************************************************
         => 空闲任务
 *******************************************************************************/
 void OS_TaskIdle(void *p_arg)
@@ -60,56 +67,6 @@ void OS_TaskStat(void *p_arg)
         
 }
 
-
-/*******************************************************************************
-        => 中断进入 中断退出
-*******************************************************************************/
-void OSIntEnter(void)
-{
-        if (OSRunning == OS_TRUE) {
-                if (OSIntNesting < 255u) {
-                        OSIntNesting++;
-                }
-        }
-}
-
-
-void OSIntExit(void)
-{
-        #if OS_CRITICAL_METHOD == 3u
-        OS_CPU_SR cpu_sr = 0u;
-        #endif
-        
-        if (OSRunning == OS_TRUE) {
-                OS_ENTER_CRITICAL();
-                if (OSIntNesting > 0u) {
-                        OSIntNesting--;
-                }
-                // 表示此中断已经是最外面一层了，系统中的中断服务程序全部执行完成
-                if (OSIntNesting == 0u) {
-                        // 如果这个调度器没有上锁，可以调度了
-                        if (OSLockNesting == 0u) {
-                           //找到当前就绪表中最高优先级的号码，并把它写在OSPrioHighRdy
-                                OS_SchedNew();
-                            //然后以OSPrioHighRdy为索引，找到就绪表中最高优先级的TCB指针
-                                OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-                             //如果最就绪表中最高优先级号码和当前任务的优先级号码不相等
-                                if (OSPrioHighRdy != OSPrioCur) {
-                             #if OS_TASK_PROFILE_EN > 0u
-                                        OSTCBHighRdy->OSTCBCtxSwCtr++;
-                             #endif
-                                        //上下文计数器加1
-                                        OSCtxSwCtr++;
-                                        //触发PendSV异常
-                                        OSIntCtxSw();
-                                }
-                        }
-                }
-                OS_EXIT_CRITICAL();
-        }
-}
-
-
 /*******************************************************************************
         => OSTimeDly()
 *******************************************************************************/
@@ -138,7 +95,6 @@ void OSTimeDly(INT32U ticks)
                 OS_Sched();                     //Find next task to run
         }
 }
-
 
 /*******************************************************************************
         => OSTimeDlyHMSM() 小时，分钟，秒，毫秒
@@ -188,60 +144,6 @@ INT8U OSTimeDlyHMSM (
         
         return (OS_ERR_NONE);              
 }
-
-
-/*******************************************************************************
-        => OSTimeDlyResume()
-*******************************************************************************/
-// 可以强制让任务从阻塞态变成就绪态
-INT8U OSTimeDlyResume(INT8U prio)
-{
-        OS_TCB  *ptcb;
-        #if OS_CRITICAL_METHOD == 3u
-        OS_CPU_SR cpu_sr = 0u;
-        #endif
-        
-        //判断优先级是否合法，任务不能自己恢复自己
-        //prio=255 忽略
-        if (prio >= OS_LOWEST_PRIO) {
-                return (OS_ERR_PRIO_INVALID);
-        }
-        OS_ENTER_CRITICAL();
-        ptcb = OSTCBPrioTbl[prio];
-        //参数检查
-        if (ptcb == (OS_TCB *)0) {
-                OS_EXIT_CRITICAL();
-                return (OS_ERR_TASK_NOT_EXIST);
-        }
-        // #define OS_TCB_RESERVED ((OS_TCB *)1)
-        if (ptcb == OS_TCB_RESERVED) {
-                OS_EXIT_CRITICAL();
-                return (OS_ERR_TASK_NOT_EXIST);
-        }
-        if (ptcb->OSTCBDly == 0u) {
-                OS_EXIT_CRITICAL();
-                return (OS_ERR_TIME_NOT_DLY);
-        }
-        
-        ptcb->OSTCBDly = 0;             //Clear the time delay
-        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
-                ptcb->OSTCBStat         &= ~OS_STAT_PEND_ANY; //Yes, Clear status flag
-                ptcb->OSTCBStatPend      = OS_STAT_PEND_TO;   //Indicate PEND timeout
-        } else {
-                ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
-        }
-        //判断任务是否被挂起，下面是处理任务没有挂起的代码
-        if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) == OS_STAT_RDY) { //Is task suspended?
-                OSRdyGrp               |= ptcb->OSTCBBitY;        //NO, Make ready
-                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
-                OS_EXIT_CRITICAL();
-                OS_Sched();             //See if thid if new highest priority                       
-        } else {
-                OS_EXIT_CRITICAL();     //Task may be suspended
-        }
-        return (OS_ERR_NONE);
-}
-
 
 /*******************************************************************************
         => OSTimeTick()
@@ -315,4 +217,56 @@ void OSTimeTick(void)
                         OS_EXIT_CRITICAL();
                 }
         }           
+}
+
+/*******************************************************************************
+        => OSTimeDlyResume()
+*******************************************************************************/
+// 可以强制让任务从阻塞态变成就绪态
+INT8U OSTimeDlyResume(INT8U prio)
+{
+        OS_TCB  *ptcb;
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0u;
+        #endif
+        
+        //判断优先级是否合法，任务不能自己恢复自己
+        //prio=255 忽略
+        if (prio >= OS_LOWEST_PRIO) {
+                return (OS_ERR_PRIO_INVALID);
+        }
+        OS_ENTER_CRITICAL();
+        ptcb = OSTCBPrioTbl[prio];
+        //参数检查
+        if (ptcb == (OS_TCB *)0) {
+                OS_EXIT_CRITICAL();
+                return (OS_ERR_TASK_NOT_EXIST);
+        }
+        // #define OS_TCB_RESERVED ((OS_TCB *)1)
+        if (ptcb == OS_TCB_RESERVED) {
+                OS_EXIT_CRITICAL();
+                return (OS_ERR_TASK_NOT_EXIST);
+        }
+        if (ptcb->OSTCBDly == 0u) {
+                OS_EXIT_CRITICAL();
+                return (OS_ERR_TIME_NOT_DLY);
+        }
+        
+        ptcb->OSTCBDly = 0;             //Clear the time delay
+        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
+                ptcb->OSTCBStat         &= ~OS_STAT_PEND_ANY; //Yes, Clear status flag
+                ptcb->OSTCBStatPend      = OS_STAT_PEND_TO;   //Indicate PEND timeout
+        } else {
+                ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
+        }
+        //判断任务是否被挂起，下面是处理任务没有挂起的代码
+        if ((ptcb->OSTCBStat & OS_STAT_SUSPEND) == OS_STAT_RDY) { //Is task suspended?
+                OSRdyGrp               |= ptcb->OSTCBBitY;        //NO, Make ready
+                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                OS_EXIT_CRITICAL();
+                OS_Sched();             //See if thid if new highest priority                       
+        } else {
+                OS_EXIT_CRITICAL();     //Task may be suspended
+        }
+        return (OS_ERR_NONE);
 }
