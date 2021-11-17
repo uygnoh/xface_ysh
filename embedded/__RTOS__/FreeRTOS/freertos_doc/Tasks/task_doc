@@ -1,21 +1,21 @@
 /*******************************************************************************
-                FreeRTOS-任务状态
+        => FreeRTOS-任务状态
 *******************************************************************************/
-1. 运行态
+1. 运行态（running）
 ___________________________________________________________
 //当一个任务正在运行时，那么这个任务处于运行态。 处于运行态的任务是当前正
 //在使用CPU的任务。 如果使用的是单核处理器的话那么不管在任何时刻永远都只
 //有一个任务处于运行态。
 
 
-2. 就绪态
+2. 就绪态（ready）
 ___________________________________________________________
 //处于就绪态的任务是那些已经准备就绪（这些任务没有阻塞或挂起），可以运行
 //的任务，但是处于就绪态的任务还没有运行，因为有一个同优先级或者更高优先
 //级的任务在在运行！
 
 
-3. 阻塞态
+3. 阻塞态（blocked）
 ___________________________________________________________
 //如果一个任务当前正在等某个外部事件的话就说它处于阻塞态，比如说某个任务
 //调用了“vTaslDelay()”的话就会进入阻塞态，直到延时周期完成。 任务在等待
@@ -24,40 +24,49 @@ ___________________________________________________________
 //的事件还没有来临！
 
 
-4. 
+4. 挂起态（suspend）
 ___________________________________________________________
 //像阻塞态一样，任务进入挂起态以后也不能被调度器调用进入运行态， 
 //但是进入挂起态的任务没有超时时间。 任务进入和退出挂起态通过调用函数
 //vTaskSupend 和 xTaskResume()
 
 
+5. 管理任务
+//1 找到最高优先级的（运行态，就绪态）的任务，运行它
+//2 如果大家平级，轮流执行， 排队， 链表前面的先运行， 运行（1）个tick后，乖乖地去链表尾部排队
 
+
+
+___________________________________________________________
 /*******************************************************************************
-                FreeRTOS-动态内存创建
+        => FreeRTOS-动态内存创建
 *******************************************************************************/
-xTaskCreate()
+//xTaskCreate()
         1 申请任务堆栈内存
         2 申请任务控制块内存
         3 把“任务堆栈内存的首地址”存储到“任务控制块中”
         4 调用prvInitialiseNewTask(),初始化新的任务
         5 调用prvAddNewTaskToReadyList(),添加新的任务到就绪列表中
 
-prvInitialiseNewTask()
+//prvInitialiseNewTask()
         1 初始化堆栈为“0xA5”，作堆栈溢出检查（可选功能）
         2 获取栈顶地址，保存到栈顶指针中
         3 保存任务名称到“pxNewTCB->pcTaskName[x]”
         4 保存任务优先级到“pxNewTCB->uxPriority”
         5 初始化状态列表项和事件列表项
         6 初始化各种任务控制块成员变量
-        7 调用pxPortInitialiseStack()， 初始化堆栈， 返回值保存到“pxNewTCB->pxTopOfStack”
+        7 调用pxPortInitialiseStack()， 初始化堆栈， 
+          返回值保存到“pxNewTCB->pxTopOfStack”
         8 保存/记录任务句柄，其实就是任务控制块
 
-prvAddNewTaskReadyList(TCB_t *pxNewTCB)
+//prvAddNewTaskReadyList(TCB_t *pxNewTCB)
         1 uxCurrentNumberOfTasks++; 记录系统中有多少个任务
         2 如果创建的是“第1个任务”，初始化相关列表prvInitialiseTaskLists();
         3 调用prvAddTaskToReadyList(); 将任务添加到就绪列表中
-        4 如果新创建的任务优先级比当前任务优先级高，那么调用taskYIELK_IF_USING_PREMPTION();进行任务切换
-prvAddTaskToReadyList();
+        4 如果新创建的任务优先级比当前任务优先级高，那么调用
+          taskYIELK_IF_USING_PREMPTION();进行任务切换
+        
+//prvAddTaskToReadyList();
         1 将uxTopReadyPriority()相应的bit位置“1”，表示相应优先级有就绪任务
         2 将新创建的任务添加到对应的就绪列表中，末尾插入。       
         3 例如：“优先级5”，pxReadyTasksLists[5]
@@ -65,7 +74,7 @@ prvAddTaskToReadyList();
 
 
 /*******************************************************************************
-                FreeRTOS-任务删除， 挂起， 恢复
+        => FreeRTOS-任务删除， 挂起， 恢复
 *******************************************************************************/
 //任务删除 vTaskDelete()
 ———————————————————————————————————————————————————————————
@@ -98,7 +107,7 @@ prvAddTaskToReadyList();
 
 
 /*******************************************************************************
-                FreeRTOS 任务切换
+        => FreeRTOS 任务切换
 *******************************************************************************/
 // PendSV异常触发
 ___________________________________________________________
@@ -140,21 +149,21 @@ __asm void xPortPendSVHandler( void )
 
         mrs r0, psp
         isb
-        /* Get the location of the current TCB. */
+        //Get the location of the current TCB.
         ldr	r3, =pxCurrentTCB
         ldr	r2, [r3]
 
- //TST比较指令， 测试按位与， 计算 (Rn & #iMM), APSR寄存器的N位和Z位会被更新
- //it equ, 如果Z位置“1”， 则执行下一条语句
-        /* Is the task using the FPU context?  If so, push high vfp registers. */
+//TST比较指令， 测试按位与， 计算 (Rn & #iMM), APSR寄存器的N位和Z位会被更新
+//it equ, 如果Z位置“1”， 则执行下一条语句
+        //Is the task using the FPU context?  If so, push high vfp registers.
         tst r14, #0x10
         it eq
         vstmdbeq r0!, {s16-s31}
 
-        /* Save the core registers. */
+        //Save the core registers.
         stmdb r0!, {r4-r11, r14}
 
-        /* Save the new top of stack into the first member of the TCB. */
+        //Save the new top of stack into the first member of the TCB.
         str r0, [r2]
 
         stmdb sp!, {r3}
@@ -169,14 +178,14 @@ __asm void xPortPendSVHandler( void )
         msr basepri, r0
         ldmia sp!, {r3}
 
-        /* The first item in pxCurrentTCB is the task top of stack. */
+        //The first item in pxCurrentTCB is the task top of stack.
         ldr r1, [r3]
         ldr r0, [r1]
 
-        /* Pop the core registers. */
+        //Pop the core registers.
         ldmia r0!, {r4-r11, r14}
 
-        /* Is the task using the FPU context?  If so, pop the high vfp registers
+        //Is the task using the FPU context?  If so, pop the high vfp registers
         too. */
         tst r14, #0x10
         it eq

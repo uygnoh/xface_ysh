@@ -1,13 +1,13 @@
 #include "task.h"
 
-/* 创建任务 */
+//创建任务
 task_handle_t task_create(
-	task_function_t 	task_entry,	//任务入口
-	const char * const 	task_name,	//任务名称
-	const uint32_t 		task_stack_size,//任务栈大小
-	void * const 		task_parameter,	//任务形参
-	uint32_t * const 	task_stack_addr,//任务栈起始地址
-	tcb_t * const 		tcb_ptr)	//任务控制块指针
+        task_function_t         task_entry,              //任务入口
+        const char * const      task_name,              //任务名称
+        const uint32_t          task_stack_size,        //任务栈大小
+        void * const            task_parameter, 	 //任务形参
+        uint32_t * const        task_stack_addr,        //任务栈起始地址
+        tcb_t * const           tcb_ptr)                //任务控制块指针
 {
 	tcb_t *new_tcb;
 	//定义一个任务句柄task_handle，任务句柄用于指向任务的TCB

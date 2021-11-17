@@ -32,7 +32,4 @@ void opt_config(void)
         *((uint8_t *)0x480E)    = ~opt_bytes[7];//等待状态配置的互补字节
         *((uint8_t *)0x487E)    = opt_bytes[8]; //启动引导
         *((uint8_t *)0x487F)    = ~opt_bytes[8];//启动引导的互补字节
-
 }
-
-

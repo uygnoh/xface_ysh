@@ -16,14 +16,13 @@ QueueHandle_t xQueueGenericCreate(
         
         //判断一下队列项是不是 == 0
         //它对应的是信号量
-        if (uxItemSize == (UBaseType_t)0) 
+        if (uxItemSize == (UBaseType_t)0) {
                 xQueueSizeInBytes = (size_t)0;
         //统计队列总字节数， 它对应的是队列
-        else
+        } else {
                 xQueueSizeInBytes = (size_t)(uxQueueLength * uxItemSize);
-                
+        }  
         pxNewQueue = (Queue_t *)pvPortMalloc(sizeof(Queue_t) + xQueueSizeInBytes);
-        
         if (pxNewQueue != NULL) {
                 //计算队列存储区的首地址
                 pucQueueStorage = ((uint8_t *)pxNewQueue) + sizeof(Queue_t);

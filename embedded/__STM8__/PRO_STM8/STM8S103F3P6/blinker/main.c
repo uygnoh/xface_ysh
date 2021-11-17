@@ -5,7 +5,8 @@
 
 #define __nop() __asm nop __endasm
 
-void main() {
+void main() 
+{
     port_init();
     clk_init();
 

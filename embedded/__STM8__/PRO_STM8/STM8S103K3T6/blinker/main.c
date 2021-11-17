@@ -4,7 +4,8 @@
 #include "init.h"
 
 
-void main() {
+void main() 
+{
     port_init();
     clk_init();
 
