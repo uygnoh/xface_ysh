@@ -1,0 +1,64 @@
+sbit wei = P1^3;
+uint8_t tmp;
+void delay_ms(uint16_t z)
+{
+        uint16_t x, y;
+        for (x = z; x > 0; x--)
+                for (y = 110; y > 0; y--);
+}
+//列码
+P2_5 连接 （K5, K6, K2, K4）
+P2_4 连接 （K7, K8, K3, K1）
+//行码
+P2_3 连接 （K1, K2）
+P2_2 连接 （K3, K4）
+P2_1 连接 （K8, K6）
+P2_0 连接 （K7, K5）
+
+
+
+
+while (1) {
+//检测P2_5（端口）
+//_________________________________________________________
+        P2  = 0xDF;
+        tmp = P2;
+        if (tmp != 0xDF) {
+                delay_ms(10);
+                switch (tmp) {
+                case 0xD7:
+                        P0 = table[2];
+                        break;
+                case 0xDB:
+                        P0 = table[4];
+                        break;
+                case 0xDD:
+                        P0 = table[6];
+                        break;
+                case 0xDE:
+                        P0 = table[5];
+                        break;
+                }
+        }
+//检测P2_4（端口）
+//_________________________________________________________
+        P2  = 0xEF;
+        tmp = P2;
+        if (tmp != 0xEF) {
+                delay_ms(10);
+                switch (tmp) {
+                case 0xE7:
+                        P0 = table[1];
+                        break;
+                case 0xEB:
+                        P0 = table[3];
+                        break;
+                case 0xED:
+                        P0 = table[8];
+                        break;
+                case 0xEE:
+                        P0 = table[7];
+                        break;
+                }
+        }
+}

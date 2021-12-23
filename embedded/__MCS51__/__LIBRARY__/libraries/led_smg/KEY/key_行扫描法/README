@@ -1,0 +1,157 @@
+#include<reg52.h>
+#define uint unsigned int
+#define uchar unsigned char
+#define key_port P2
+#define smg_port P0
+void key_display();
+void key_scan44();
+uchar key_tmp, key_value;
+//共阴数码管编码表
+uchar code table[] = { 
+        0x3f, 0x06, 0x5b, 0x4f,
+        0x66, 0x6d, 0x7d, 0x07,
+        0x7f, 0x6f, 0x77, 0x7c, 
+        0x39, 0x5e, 0x79, 0x71
+};
+int main(void)
+{
+        while (1) {
+                key_scan44();//键盘扫描子程序
+                key_display();//键盘显示子程序
+        }
+        return 0;
+}
+void key_display()
+{
+    smg_port = table[key_value];
+}
+
+
+//_________________________________________________________
+// 矩阵键盘行扫描方式
+//_________________________________________________________
+       /*_______________________.
+        |   第1行     __IO__0    |
+        |   第2行     __IO__1    |
+        |   第3行     __IO__2    |
+        |   第4行     __IO__3    |
+        |   第1列     __IO__4    |
+        |   第2列     __IO__5    |
+        |   第3列     __IO__6    |
+        |   第4列     __IO__7    |
+        |_______________________*/
+void key_scan4x4(void)
+{
+//key_port端口检测, 检测第一行
+//_________________________________________________
+        key_port = 0xfe;                
+        key_tmp  = key_port & 0xf0;     //有键按下，则key_port端口高四位会发生变化
+        while (key_tmp != 0xf0) {       //有键按下，则执行下面语句
+                key_tmp = key_port;     //读回P2端口数据，在没有键按下，可以退出while
+                switch (key_tmp) {
+                case 0xee:              //检测第一行，第1列 
+                        key_value = 0;
+                        break;
+                case 0xde:              //检测第一行，第2列
+                        key_value = 1;
+                        break;
+                case 0xbe:              //检测第一行，第3列
+                        key_value = 2;
+                        break;
+                case 0x7e:              //检测第一行，第4列
+                        key_value = 3;
+                        break;    
+                }
+                
+                //松手检测，有键按下，则执行下面语句
+                while (key_tmp != 0xf0) {
+                        key_tmp = key_port;
+                        key_tmp = key_tmp & 0xf0;
+                }
+        }
+    
+//key_port端口检测, 检测第二行         
+//_________________________________________________
+        key_port = 0xfd;        
+        key_tmp = key_port & 0xf0;
+        while (key_tmp != 0xf0) {   
+                key_tmp = key_port;
+                switch (key_tmp) {
+                case 0xed:              //检测第二行，第1列 
+                        key_value = 4;
+                        break;      
+                case 0xdd:              //检测第二行，第2列               
+                        key_value = 5;
+                        break;
+                case 0xbd:              //检测第二行，第3列 
+                        key_value = 6;
+                        break;
+                case 0x7d:              //检测第二行，第4列 
+                        key_value = 7;
+                        break;    
+                }
+             
+                //松手检测，有键按下，则执行下面语句
+                while (key_tmp != 0xf0) {
+                        key_tmp = key_port;
+                        key_tmp = key_tmp & 0xf0;
+                }
+        }
+    
+//key_port端口检测, 检测第三行
+//_________________________________________________
+        key_port = 0xfb;
+        key_tmp  = key_port & 0xf0;
+        while (key_tmp != 0xf0) {   
+                key_tmp = key_port;
+                switch (key_tmp) {
+                case 0xeb:              //检测第三行，第1列 
+                        key_value = 8;
+                        break;
+                case 0xdb:              //检测第三行，第2列
+                        key_value = 9;
+                        break;
+                case 0xbb:              //检测第三行，第3列
+                        key_value = 10;
+                        break;
+                case 0x7b:              //检测第三行，第4列
+                        key_value = 11;
+                        break;      
+                }
+
+                //松手检测，有键按下，则执行下面语句
+                while(key_tmp != 0xf0) {
+                        key_tmp = key_port;
+                        key_tmp = key_tmp & 0xf0;     
+                }
+        }
+    
+//key_port端口检测, 检测第四行
+//_________________________________________________
+        key_port = 0xf7;
+        key_tmp  = key_port & 0xf0;
+        while (key_tmp != 0xf0) {   
+                key_tmp = key_port;
+                switch (key_tmp) {
+                case 0xe7:              //检测第四行，第1列
+                        key_value = 12;
+                        break;
+                case 0xd7:              //检测第四行，第2列
+                        key_value = 13;
+                        break;
+                case 0xb7:              //检测第四行，第3列
+                        key_value = 14;
+                        break;
+                case 0x77:              //检测第四行，第4列
+                        key_value = 15;
+                        break;     
+                }
+
+                //松手检测，有键按下，则执行下面语句
+                while (key_tmp != 0xf0) {
+                        key_tmp = key_port;
+                        key_tmp = key_tmp & 0xf0; 
+                }
+        }
+}
+
