@@ -1,354 +1,284 @@
-############################################################
-### % SMG <===> 数码管
-############################################################
-/* % 8位数码管与IO接口 */
-/*___________________________________*/
-D7   D6   D5   D4   D3   D2   D1   D0   % 数据端口__IO__
+/*******************************************************************************
+        => SMG <===> 数码管
+*******************************************************************************/
+//8位数码管段码与IO接口
+//_____________________________________________________________
+D7   D6   D5   D4   D3   D2   D1   D0  //数据端口__IO__
 |    |    |    |    |    |    |    |     
-dp   G    F    E    D    C    B    A    % 数码管的段码__SMG_SEG__
-|    |    |    |    |    |    |    |
-1    2    3    4    5    6    7    8    % 数码管的位选__SMG_BIT__
+dp   G    F    E    D    C    B    A   //数码管的段码__SMG_SEG__
+//_____________________________________________________________
 
-/* % “-”共阴极数码管编码表, 阴极接公共端  */
-/*___________________________________*/
+
+
+//“-”共阴极数码管编码表, 阴极接公共端
+//_____________________________________________________________
 uint8_t code table[] = { 
-    0x3f,0x06,0x5b,0x4f,
-    0x66,0x6d,0x7d,0x07,
-    0x7f,0x6f,0x77,0x7c,
-    0x39,0x5e,0x79,0x71
+        0x3f, 0x06, 0x5b, 0x4f,
+        0x66, 0x6d, 0x7d, 0x07,
+        0x7f, 0x6f, 0x77, 0x7c,
+        0x39, 0x5e, 0x79, 0x71
+};
+//共阴极数码管, 段码信号定义, 阴极接公共端
+uint8_t code smg_seg_code[] = { 
+        0x3F,   //0
+        0x06,   //1
+        0x5B,   //2
+        0x4F,   //3
+        0x66,   //4
+        0x6D,   //5
+        0x7D,   //6
+        0x07,   //7
+        0x7F,   //8
+        0x6F,   //9
+        0x77,   //A
+        0x7C,   //B
+        0x39,   //C
+        0x5E,   //D
+        0x79,   //E
+        0x71,   //F
+        0x76,   //H
+        0x38,   //L
+        0x37,   //n
+        0x3E,   //u
+        0x73,   //p
+        0x5C,   //o
+        0x40,   //-
+        0x00    //关闭数码管
 };
 
 
-/* % “+”共阳极数码管编码表, 阳极接公共端  */
-/*___________________________________*/
+
+//“+”共阳极数码管编码表, 阳极接公共端
+//_____________________________________________________________
 uint8_t code table[] = { 
-    0xc0,0xf9,0xa4,0xb0,
-    0x99,0x92,0x82,0xf8,
-    0x80,0x90,0x88,0x83,
-    0xc6,0xa1,0x86,0x8e
+    0xc0, 0xf9, 0xa4, 0xb0,
+    0x99, 0x92, 0x82, 0xf8,
+    0x80, 0x90, 0x88, 0x83,
+    0xc6, 0xa1, 0x86, 0x8e
 };
-
-
-/* % 共阴极数码管, 段码信号定义 */
-/*___________________________________*/
+//共阳极数码管, 段码信号定义, 阳极接公共端
 uint8_t code smg_seg_code[] = { 
-    0x3F,   /* % “0” */
-    0x06,   /* % “1” */
-    0x5B,   /* % “2” */
-    0x4F,   /* % “3” */
-    0x66,   /* % “4” */
-    0x6D,   /* % “5” */
-    0x7D,   /* % “6” */
-    0x07,   /* % “7” */
-    0x7F,   /* % “8” */
-    0x6F,   /* % “9” */
-    0x77,   /* % “A” */
-    0x7C,   /* % “B” */
-    0x39,   /* % “C” */
-    0x5E,   /* % “D” */
-    0x79,   /* % “E” */
-    0x71,   /* % “F” */
-    0x76,   /* % “H” */
-    0x38,   /* % “L” */
-    0x37,   /* % “n” */
-    0x3E,   /* % “u” */
-    0x73,   /* % “p” */
-    0x5C,   /* % “o” */
-    0x40,   /* % “-” */
-    0x00    /* % “关闭数码管” */
+        0xC0,   //0
+        0xF9,   //1
+        0xA4,   //2
+        0xB0,   //3
+        0x99,   //4
+        0x92,   //5
+        0x82,   //6
+        0xF8,   //7
+        0x80,   //8
+        0x90,   //9
+        0x88,   //A
+        0x83,   //B
+        0xC6,   //C
+        0xA1,   //D
+        0x86,   //E
+        0x8E    //F
 };
 
 
-/* % 共阳极数码管, 段码信号定义  */
-/*___________________________________*/
-uint8_t code smg_seg_code[] = { 
-    0xC0,   /* % “0” */
-    0xF9,   /* % “1” */
-    0xA4,   /* % “2” */
-    0xB0,   /* % “3” */
-    0x99,   /* % “4” */
-    0x92,   /* % “5” */
-    0x82,   /* % “6” */
-    0xF8,   /* % “7” */
-    0x80,   /* % “8” */
-    0x90,   /* % “9” */
-    0x88,   /* % “A” */
-    0x83,   /* % “B” */
-    0xC6,   /* % “C” */
-    0xA1,   /* % “D” */
-    0x86,   /* % “E” */
-    0x8E    /* % “F” */
-};
 
-
-/* % 共阴数码管, 位选信号定义 */ 
-/*___________________________________*/
+//数码管, 位选信号定义
+//_____________________________________________________________
 uint8_t code smg_bit_code[] = {
-    0xfe,   /* % 第“0”位数码管 */ 
-    0xfd,   /* % 第“1”位数码管 */  
-    0xfb,   /* % 第“2”位数码管 */  
-    0xf7,   /* % 第“3”位数码管 */  
-    0xef,   /* % 第“4”位数码管 */  
-    0xdf,   /* % 第“5”位数码管 */  
-    0xbf,   /* % 第“6”位数码管 */  
-    0x7f    /* % 第“7”位数码管 */ 
+        0xfe,   //第“0”位数码管
+        0xfd,   //第“1”位数码管 
+        0xfb,   //第“2”位数码管 
+        0xf7,   //第“3”位数码管 
+        0xef,   //第“4”位数码管 
+        0xdf,   //第“5”位数码管 
+        0xbf,   //第“6”位数码管 
+        0x7f    //第“7”位数码管
 };
 
 
-/* % 共阳数码管, 位选信号定义 */ 
-/*___________________________________*/
-uint8_t code smg_bit_code[] = {
-    0x,   /* % 第“0”位数码管 */ 
-    0x,   /* % 第“1”位数码管 */  
-    0x,   /* % 第“2”位数码管 */  
-    0x,   /* % 第“3”位数码管 */  
-    0x,   /* % 第“4”位数码管 */  
-    0x,   /* % 第“5”位数码管 */  
-    0x,   /* % 第“6”位数码管 */  
-    0x    /* % 第“7”位数码管 */ 
-};
 
+//__IO__共阴极数码管__IO__
+//_____________________________________________________________
+#define SMG_SEG P0      //P0_数码管段码
+#define SMG_BIT P2      //P2_数码管位选
+#define SMG_N   4       //数码管个数
 
-/* % __IO__共阴极数码管__IO__ */ 
-/*___________________________________*/
-#define SMG_SEG P0  /* % P0_数码管段码 */
-#define SMG_BIT P2  /* % P2_数码管位选 */
-#define SMG_N   4   /* % 数码管个数 */
-
-/* % 数码管动态扫描延时宏定义 */
+//数码管动态扫描延时宏定义
 #define SMG_HC595_DELAY()     delay_ms(1)
 
-/* % 数码管动态扫描, 窗口定义 */
-uint8_t window;         /* % 定义一个窗口变量 */
-uint8_t parm1 = 44;     /* % 定义第一个窗口参数变量 */
-uint8_t parm2 = 55;     /* % 定义第二个窗口参数变量 */
-uint8_t parm3 = 66;     /* % 定义第三个窗口参数变量 */
-uint8_t parm4 = 77;     /* % 定义第四个窗口参数变量 */
 
-/* % 8位共阴极数码管, 小数点位显示 */   
-uint8_t digdot0 = 0;    /* % 第“1”个数码管小数点 */
-uint8_t digdot1 = 0;    /* % 第“2”个数码管小数点 */
-uint8_t digdot2 = 0;    /* % 第“3”个数码管小数点 */
-uint8_t digdot3 = 0;    /* % 第“4”个数码管小数点 */
-uint8_t digdot4 = 0;    /* % 第“5”个数码管小数点 */
-uint8_t digdot5 = 0;    /* % 第“6”个数码管小数点 */
-uint8_t digdot6 = 0;    /* % 第“7”个数码管小数点 */
-uint8_t digdot7 = 0;    /* % 第“8”个数码管小数点 */
+//数码管动态扫描, 窗口定义
+uint8_t window;                 //定义一个窗口变量
+uint8_t par_00    = 44;         //定义第一个窗口参数变量
+uint8_t par_01    = 55;         //定义第二个窗口参数变量
+uint8_t par_02    = 66;         //定义第三个窗口参数变量
+uint8_t par_03    = 77;         //定义第四个窗口参数变量
 
 
+//8位共阴极数码管, 小数点位显示  
+uint8_t digdot_00 = 0;          //第“1”个数码管小数点
+uint8_t digdot_01 = 0;          //第“2”个数码管小数点
+uint8_t digdot_02 = 0;          //第“3”个数码管小数点
+uint8_t digdot_03 = 0;          //第“4”个数码管小数点
+uint8_t digdot_04 = 0;          //第“5”个数码管小数点
+uint8_t digdot_05 = 0;          //第“6”个数码管小数点
+uint8_t digdot_06 = 0;          //第“7”个数码管小数点
+uint8_t digdot_07 = 0;          //第“8”个数码管小数点
 
-############################################################
-### % 数码管动态刷新显示 (switch-case) ->共阴极数码管
-### % (使用__IO__端口模拟)
-############################################################
-/* 数码管动态显示编程步骤
-1 % 送段码
-2 % 送位选 
-3 % 延时(1ms < 10ms)
-4 % 消隐
+
+
+/*******************************************************************************
+        => 数码管动态刷新显示 (switch-case) ->共阴极数码管
+        => (使用__IO__端口模拟)
+*******************************************************************************/
+/*      数码管动态显示编程步骤
+        1 送段码
+        2 送位选 
+        3 延时(1ms < 10ms)
+        4 消隐
 */
 
-/* % 数码管段码表声明 */
+//数码管段码表声明
 uint8_t code smg_seg_code[]; 
-/* % 位选信号定义, 低4位 */ 
+//位选信号定义, 低4位
 uint8_t code smg_bit_code[] = {0xfe, 0xfd, 0xfb, 0xf7};
-/* % 数据显示缓冲区 */   
-uint8_t led_buf[22, 22, 22, 22];
+//数据显示缓冲区  
+uint8_t smg_buf[22, 22, 22, 22];
 
 
-/* % 4位数码管动态刷新显示 */
+//4位数码管动态刷新显示
 void smg_display(void)
 {
-    /* % static用它来定义i为静态局部变量 */
-    /* % 它只初始化一次，下次再进入这个函数，就不在初始化了 */
-    /* % 而是保存的是i上一次调用时的值 */
-    static uint8_t i = 0;
-    switch (i)
-    {
-        case 0:             /* % 第 1 位数码管 */
-            /* % 段码 */
-            SMG_SEG = smg_seg_code[led_buf[0]];
-            /* % 位选 */
-            SMG_BIT = smg_bit_code[0];
-            /* % 延时 */
-            delay_ms(1);
-            /* % 消隐 */
-            SMG_SEG = 0x00;
-            i++;
-            break;
-        case 1:             /* % 第 2 位数码管 */
-            SMG_SEG = smg_seg_code[led_buf[1]];
-            SMG_BIT = smg_bit_code[1];
-            delay_ms(1);
-            SMG_SEG = 0x00;
-            i++;
-            break;
-        case 2:             /* % 第 3 位数码管 */
-            SMG_SEG = smg_seg_code[led_buf[2]];
-            SMG_BIT = smg_bit_code[2];
-            delay_ms(1);
-            SMG_SEG = 0x00;
-            i++;
-            break;
-        case 3:             /* % 第 4 位数码管 */
-            SMG_SEG = smg_seg_code[led_buf[3]];
-            SMG_BIT = smg_bit_code[3];
-            delay_ms(1);
-            SMG_SEG = 0x00;
-            i = 0;
-            break;
+        //static用它来定义i为静态局部变量
+        //它只初始化一次，下次再进入这个函数，就不在初始化了
+        //而是保存的是i上一次调用时的值
+        static uint8_t i = 0;
+        
+        switch (i) {
+        case 0:             //第 1 位数码管
+                SMG_SEG = smg_seg_code[smg_buf[0]];     //段码
+                SMG_BIT = smg_bit_code[0];              //位选
+                delay_ms(1);                            //延时
+                SMG_SEG = 0x00;                         //消隐
+                i++;
+                break;
+        case 1:             //第 2 位数码管
+                SMG_SEG = smg_seg_code[smg_buf[1]];
+                SMG_BIT = smg_bit_code[1];
+                delay_ms(1);
+                SMG_SEG = 0x00;
+                i++;
+                break;
+        case 2:             //第 3 位数码管
+                SMG_SEG = smg_seg_code[smg_buf[2]];
+                SMG_BIT = smg_bit_code[2];
+                delay_ms(1);
+                SMG_SEG = 0x00;
+                i++;
+                break;
+        case 3:             //第 4 位数码管
+                SMG_SEG = smg_seg_code[smg_buf[3]];
+                SMG_BIT = smg_bit_code[3];
+                delay_ms(1);
+                SMG_SEG = 0x00;
+                i = 0;
+                break;
         default: 
-            break;
-    }
+                break;
+        }
 }
 
 
 
-############################################################
-### % 多个窗口的数码管动态显示 ->共阴极数码管
-### % (使用__IO__端口模拟)
-############################################################
-/* % 分时显示多个窗口，数码管动态刷新 */
-/* % 定义4个窗口， 分时刷新显示 */
-void smg_more_window_display(void)
-{
-    uint16_t i;
-    switch (window)
-    {
-    case 0:                     /* % 窗口 1 */
-        led_buf[0] = 0;         /* % 第一个数码管显示“0”, 表示第1个窗口 */
-        led_buf[1] = 22;        /* % 第二个数码管显示“-” */
-        led_buf[2] = parm1/10;  /* % 第三个数码管显示“” */
-        led_buf[3] = parm1%10;  /* % 第四个数码管显示“” */
-        for (i = 0; i < 5000; i++)
-            smg_display();      /* % 动态刷新四个数码管显示“” */
-        window++;               /* % 跳转到下一个窗口 */
-        break;
-    case 1:                     /* % 窗口 2 */
-        led_buf[0] = 1;         /* % 第一个数码管显示“1”, 表示第2个窗口 */
-        led_buf[1] = 22;        /* % 第二个数码管显示“-” */
-        led_buf[2] = parm2/10;  /* % 第三个数码管显示“” */
-        led_buf[3] = parm2%10;  /* % 第四个数码管显示“” */
-        for (i = 0; i < 5000; i++)
-            smg_display();      /* % 动态刷新四个数码管显示“” */
-        window++;               /* % 跳转到下一个窗口 */
-        break;
-    case 2:                     /* % 窗口 3 */
-        led_buf[0] = 2;         /* % 第一个数码管显示“2”, 表示第3个窗口 */
-        led_buf[1] = 22;        /* % 第二个数码管显示“-” */
-        led_buf[2] = parm3/10;  /* % 第三个数码管显示“” */
-        led_buf[3] = parm3%10;  /* % 第四个数码管显示“” */
-        for (i = 0; i < 5000; i++)
-            smg_display();      /* % 动态刷新四个数码管显示“” */
-        window++;               /* % 跳转到下一个窗口 */
-        break;
-    case 3:                     /* % 窗口 4 */
-        led_buf[0] = 3;         /* % 第一个数码管显示“3”, 表示第4个窗口 */
-        led_buf[1] = 22;        /* % 第二个数码管显示“-” */
-        led_buf[2] = parm4/10;  /* % 第三个数码管显示“” */
-        led_buf[3] = parm4%10;  /* % 第四个数码管显示“” */
-        for (i = 0; i < 5000; i++)
-            smg_display();      /* % 动态刷新四个数码管显示“” */
-        window = 0;             /* % 跳转到第一个窗口 */
-        break;
-    default: 
-        break;
-    }
-}
-
 
 
 ############################################################
-### % 两片74HC595级联实现8个数码管的动态显示 ->共阴极数码管
-### % 不带小数点显示
+###两片74HC595级联实现8个数码管的动态显示 ->共阴极数码管
+###不带小数点显示
 ############################################################
 /* 数码管动态显示编程步骤
-1 % 送段码
-2 % 送位选 
-3 % 延时(1ms < 10ms)
-4 % 消隐
+1送段码
+2送位选 
+3延时(1ms < 10ms)
+4消隐
 % 第一个74HC595接数码的段码
 % 第二个74HC595接数码的位选
 % 先发送位码， 再发送段码
 */
 
-/* % 共阴数码管, 段码信号定义 */
+/*共阴数码管, 段码信号定义 */
 uint8_t code smg_seg_code[];
  
-/* % 共阴数码管, 位选信号定义 */ 
+/*共阴数码管, 位选信号定义
 uint8_t code smg_bit_code[];
 
-/* % 数据显示缓冲区 */   
-uint8_t led_buf[0, 0, 0, 0, 0, 0, 0, 0];
+/*数据显示缓冲区  
+uint8_t smg_buf[0, 0, 0, 0, 0, 0, 0, 0];
 
 
-/* % 8位数码管动态刷新显示(两片74HC595级联) */
+/*8位数码管动态刷新显示(两片74HC595级联) */
 void smg_hc595_display(void)
 {
     uint8_t tmp;
-    /* % "static"用它来定义i为静态局部变量 */
-    /* % 它只初始化一次，下次再进入这个函数，就不在初始化了 */
-    /* % 而是保存的是i上一次调用时的值 */
+    //"static"用它来定义i为静态局部变量 */
+    //它只初始化一次，下次再进入这个函数，就不在初始化了 */
+    //而是保存的是i上一次调用时的值 */
     static uint8_t i = 0;
     
     switch (i)
     {
-        case 0: /* % 数码管 1 */  
-            /* % 段码关闭， 位选关闭, 消隐 */
+        case 0: /*数码管 1 
+            //段码关闭， 位选关闭, 消隐 */
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[0]];        
-            /* % 低“8位_tmp”是段码, 高“8位_smg_bit_code”是位选 */
-            /* % 送段码， 送位选 */
+            tmp = smg_seg_code[smg_buf[0]];        
+            //低“8位_tmp”是段码, 高“8位_smg_bit_code”是位选 */
+            //送段码， 送位选 */
             led_hc595_driver(tmp, smg_bit_code[0]);
-            /* % 延时 */
+            //延时 */
             SMG_HC595_DELAY();
             i++;
             break;
-        case 1: /* % 数码管 2 */  
+        case 1: /*数码管 2 
             led_hc595_driver(0x00, 0xff);   
-            tmp = smg_seg_code[led_buf[1]];        
+            tmp = smg_seg_code[smg_buf[1]];        
             led_hc595_driver(tmp, smg_bit_code[1]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 2: /* % 数码管 3 */
+        case 2: /*数码管 3 */
             led_hc595_driver(0x00, 0xff);     
-            tmp = smg_seg_code[led_buf[2]];        
+            tmp = smg_seg_code[smg_buf[2]];        
             led_hc595_driver(tmp, smg_bit_code[2]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 3: /* % 数码管 4 */   
+        case 3: /*数码管 4  
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[3]];        
+            tmp = smg_seg_code[smg_buf[3]];        
             led_hc595_driver(tmp, smg_bit_code[3]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 4: /* % 数码管 5 */  
+        case 4: /*数码管 5 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[4]];        
+            tmp = smg_seg_code[smg_buf[4]];        
             led_hc595_driver(tmp, smg_bit_code[4]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 5: /* % 数码管 6 */ 
+        case 5: /*数码管 6
             led_hc595_driver(0x00, 0xff);   
-            tmp = smg_seg_code[led_buf[5]];        
+            tmp = smg_seg_code[smg_buf[5]];        
             led_hc595_driver(tmp, smg_bit_code[5]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 6: /* % 数码管 7 */  
+        case 6: /*数码管 7 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[6]];        
+            tmp = smg_seg_code[smg_buf[6]];        
             led_hc595_driver(tmp, smg_bit_code[6]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 7: /* % 数码管 8 */  
+        case 7: /*数码管 8 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[7]];        
+            tmp = smg_seg_code[smg_buf[7]];        
             led_hc595_driver(tmp, smg_bit_code[7]);
             SMG_HC595_DELAY();
             i = 0;
@@ -361,119 +291,119 @@ void smg_hc595_display(void)
 
 
 ############################################################
-### % 两片74HC595级联实现8个数码管的动态显示 ->共阴极数码管
-### % 带小数点控制程序编写
+###两片74HC595级联实现8个数码管的动态显示 ->共阴极数码管
+###带小数点控制程序编写
 ############################################################
 #include "74hc595.c"
 /* 数码管动态显示编程步骤
-1 % 送段码
-2 % 送位选 
-3 % 延时(1ms < 10ms)
-4 % 消隐
+1送段码
+2送位选 
+3延时(1ms < 10ms)
+4消隐
 % 第一个74HC595接数码的段码
 % 第二个74HC595接数码的位选
 % 先发送位码， 再发送段码
 */
 
-/* % 数码管动态扫描延时宏定义 */
+/*数码管动态扫描延时宏定义 */
 #define SMG_HC595_DELAY()     delay_ms(1)
 
-/* % 共阴数码管, 段码信号定义 */
+/*共阴数码管, 段码信号定义 */
 uint8_t code smg_seg_code[];
  
-/* % 共阴数码管, 位选信号定义 */ 
+/*共阴数码管, 位选信号定义
 uint8_t code smg_bit_code[];
 
-/* % 数据显示缓冲区 */   
-uint8_t led_buf[0, 0, 0, 0, 0, 0, 0, 0];
+/*数据显示缓冲区  
+uint8_t smg_buf[0, 0, 0, 0, 0, 0, 0, 0];
 
 
 
-/* % 8位数码管动态刷新显示(两片74HC595级联) */
-/* % 8位数码管动态刷新显示(带有小数点动态显示) */
+/*8位数码管动态刷新显示(两片74HC595级联) */
+/*8位数码管动态刷新显示(带有小数点动态显示) */
 void smg_hc595_display(void)
 {
     uint8_t tmp;
-    /* % "static"用它来定义i为静态局部变量 */
-    /* % 它只初始化一次，下次再进入这个函数，就不在初始化了 */
-    /* % 而是保存的是i上一次调用时的值 */
+    //"static"用它来定义i为静态局部变量 */
+    //它只初始化一次，下次再进入这个函数，就不在初始化了 */
+    //而是保存的是i上一次调用时的值 */
     static uint8_t i = 0;
     
     switch (i)
     {
-        case 0: /* % 数码管 1 */  
-            /* % 段码关闭， 位选关闭, 消隐 */
+        case 0: /*数码管 1 
+            //段码关闭， 位选关闭, 消隐 */
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[0]]; 
-            /* % 判断是否显示小数点， 为“1”显示小数点 */
+            tmp = smg_seg_code[smg_buf[0]]; 
+            //判断是否显示小数点， 为“1”显示小数点 */
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[0]] | 0x80;      
-            /* % 低“8位_tmp”是段码, 高“8位_smg_bit_code”是位选 */
-            /* % 送段码， 送位选 */
+                temp = smg_seg_code[smg_buf[0]] | 0x80;      
+            //低“8位_tmp”是段码, 高“8位_smg_bit_code”是位选 */
+            //送段码， 送位选 */
             led_hc595_driver(tmp, smg_bit_code[0]);
-            /* % 延时 */
+            //延时 */
             SMG_HC595_DELAY();
             i++;
             break;
-        case 1: /* % 数码管 2 */  
+        case 1: /*数码管 2 
             led_hc595_driver(0x00, 0xff);   
-            tmp = smg_seg_code[led_buf[1]]; 
+            tmp = smg_seg_code[smg_buf[1]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[1]] | 0x80;        
+                temp = smg_seg_code[smg_buf[1]] | 0x80;        
             led_hc595_driver(tmp, smg_bit_code[1]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 2: /* % 数码管 3 */
+        case 2: /*数码管 3 */
             led_hc595_driver(0x00, 0xff);     
-            tmp = smg_seg_code[led_buf[2]]; 
+            tmp = smg_seg_code[smg_buf[2]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[2]] | 0x80;        
+                temp = smg_seg_code[smg_buf[2]] | 0x80;        
             led_hc595_driver(tmp, smg_bit_code[2]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 3: /* % 数码管 4 */   
+        case 3: /*数码管 4  
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[3]]; 
+            tmp = smg_seg_code[smg_buf[3]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[3]] | 0x80;        
+                temp = smg_seg_code[smg_buf[3]] | 0x80;        
             led_hc595_driver(tmp, smg_bit_code[3]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 4: /* % 数码管 5 */  
+        case 4: /*数码管 5 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[4]]; 
+            tmp = smg_seg_code[smg_buf[4]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[4]] | 0x80;       
+                temp = smg_seg_code[smg_buf[4]] | 0x80;       
             led_hc595_driver(tmp, smg_bit_code[4]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 5: /* % 数码管 6 */ 
+        case 5: /*数码管 6
             led_hc595_driver(0x00, 0xff);   
-            tmp = smg_seg_code[led_buf[5]]; 
+            tmp = smg_seg_code[smg_buf[5]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[5]] | 0x80;        
+                temp = smg_seg_code[smg_buf[5]] | 0x80;        
             led_hc595_driver(tmp, smg_bit_code[5]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 6: /* % 数码管 7 */  
+        case 6: /*数码管 7 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[6]];
+            tmp = smg_seg_code[smg_buf[6]];
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[6]] | 0x80;         
+                temp = smg_seg_code[smg_buf[6]] | 0x80;         
             led_hc595_driver(tmp, smg_bit_code[6]);
             SMG_HC595_DELAY();
             i++;
             break;
-        case 7: /* % 数码管 8 */  
+        case 7: /*数码管 8 
             led_hc595_driver(0x00, 0xff);  
-            tmp = smg_seg_code[led_buf[7]]; 
+            tmp = smg_seg_code[smg_buf[7]]; 
             if (digdot0 = 1)
-                temp = smg_seg_code[led_buf[7]] | 0x80;        
+                temp = smg_seg_code[smg_buf[7]] | 0x80;        
             led_hc595_driver(tmp, smg_bit_code[7]);
             SMG_HC595_DELAY();
             i = 0;
