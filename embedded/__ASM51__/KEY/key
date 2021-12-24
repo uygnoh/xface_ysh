@@ -65,7 +65,8 @@ LOOP_90:
         DJNZ    R6, LOOP_90
         DJNZ    R7, LOOP_80
         RET
-        
+
+
         
 /*******************************************************************************
         => 距阵按键
@@ -185,7 +186,7 @@ K07:
 
 
 ;//____________________________________________________________
-;//共阳极数码管编码表（0~F）
+;//键值编码显示子程序
 ;//____________________________________________________________
 KEY_DISPLAY:   
         MOV     A, R1
@@ -207,3 +208,192 @@ TABLE:
 /*******************************************************************************
         => 距阵按键（线反转法）
 *******************************************************************************/
+/*
+        线反转法是通过给单片机的IO端口赋值二次，最后得出所按下的按键编码值的一种算法。
+        （取P3端口的低__四位__为行线， 高__四位__为列线）
+        1. 我们给P3端口赋值为（0x0F），即（00001111），假设“0键”被按下了
+           则这时P3端口的实际值为（00001110）
+        2. 我们给P3端口再赋值为（0xF0），即（11110000），如果“0键”被按下了
+           则这时P3端口的实际值为（11100000）
+        3. 我们把两次P3端口的实际值相加得到（11101110），即（0xEE）
+           由次我们便得到按下“0键”所对应的键值为（0xEE）
+        4. XRL（异或）
+           | A   |   1  1  0  1  0  1  1  0          
+           | R0  |   1  1  1  0  0  0  1  0
+           | XRL |———————————————————————--
+           | ==  |   0  0  1  1  0  1  0  0
+*/
+        ORG     0000H
+        LJMP    MAIN
+MAIN:
+        MOV     R0, #00H
+        MOV     R1, #00H
+        MOV     R2, #00H
+        MOV     R3, #00H
+        MOV     A, #00H
+        MOV     DPTR, #TABLE
+KEY_SCAN:
+        MOV     P3, #0F0H       ;//给P3端口赋值为（0xF0），高四位为1，低四位为0
+        MOV     A, P3           ;//把P3端口的（0xF0）给A，开始扫描
+        XRL     A, #0F0H        ;//让A中的值和（0xF0）相异或再存回A中
+        
+        MOV     A, P3           ;//把P3端口的（0xF0）给A，开始扫描
+        MOV     R0, A           ;//把A中的值存放到R0中
+        XRL     A, #0F0H        ;//让A中的值和（0xF0）相异或再存回A中      
+        JNZ     KEY_SCAN_00     ;//判断A是否为0， 不为0， 则跳转到KEY_SCAN_00
+        LJMP    KEY_SCAN        ;//为0， 则顺序执行， 跳回到KEY_SCAN
+KEY_SCAN_00:
+        MOV     A,  #00H        ;//清空A
+        MOV     P3, #0FH        ;//给P3端口赋值为（0x0F）高四位为0， 低四位为1
+        MOV     A, P3           ;//把P3端口的值送入A中
+        MOV     R1, A           ;//把A的值保存到R1中
+        XRL     A, #0FH         ;////让A中的值和（0x0F）相异或再存回A中
+        JNZ     KEY_VAL         ;//判断A是否为0， 不为0，则跳转到KEY_VAL 
+        LJMP    KEY_SCAN        ;//跳回到KEY_SCAN
+KEY_VAL:
+        MOV     A, R0           ;//把R0的值存入A中
+        MOV     B, R1           ;//把R1的值存入B中
+        ORL     A, B            ;//A和B相或，再存回A
+        SJMP    DISPLAY_00      ;//跳转到DISPLAY_00
+        
+
+
+;//____________________________________________________________
+;// 键值编码（0 ~ F）
+;//____________________________________________________________ 
+DISPLAY_00:
+        CJNE    A, #0EEH, DISPLAY_01
+        MOV     A, #00H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_01:
+        CJNE    A, #0EDH, DISPLAY_02
+        MOV     A, #01H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN   
+DISPLAY_02:
+        CJNE    A, #0EBH, DISPLAY_03
+        MOV     A, #02H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_03:
+        CJNE    A, #0E7H, DISPLAY_04
+        MOV     A, #03H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_04:
+        CJNE    A, #0DEH, DISPLAY_05
+        MOV     A, #04H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_05:
+        CJNE    A, #0DDH, DISPLAY_06
+        MOV     A, #05H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_06:
+        CJNE    A, #0DBH, DISPLAY_07
+        MOV     A, #06H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_07:
+        CJNE    A, #0D7H, DISPLAY_08
+        MOV     A, #07H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_08:
+        CJNE    A, #0BEH, DISPLAY_09
+        MOV     A, #08H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_09:
+        CJNE    A, #0BDH, DISPLAY_0A
+        MOV     A, #09H
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0A:
+        CJNE    A, #0BBH, DISPLAY_0B
+        MOV     A, #0AH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0B:
+        CJNE    A, #0B7H, DISPLAY_0C
+        MOV     A, #0BH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0C:
+        CJNE    A, #07EH, DISPLAY_0D
+        MOV     A, #0CH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0D:
+        CJNE    A, #07DH, DISPLAY_0E
+        MOV     A, #0DH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0E:
+        CJNE    A, #07BH, DISPLAY_0F
+        MOV     A, #0EH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+DISPLAY_0F:
+        CJNE    A, #077H, KEY
+        MOV     A, #0FH
+        MOVC    A, @A+DPTR
+        MOV     P0, A
+        LCALL   DELAY_1
+        LJMP    KEY_SCAN
+KEY:
+        LJMP    MAIN
+
+
+;//____________________________________________________________
+;//延时子程序
+;//____________________________________________________________     
+DELAY_1:
+        MOV     R2, #0FH
+LOOP_80:
+        MOV     R3, #OFAH
+LOOP_90:
+        DJNZ    R3, LOOP_90
+        DJNZ    R2, LOOP_80
+        RET
+
+
+;//____________________________________________________________
+;//共阳极数码管编码表（0~F）
+;//____________________________________________________________
+TABLE:
+        DB   0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8
+        DB   0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8e
+        END
