@@ -1,0 +1,28 @@
+/*******************************************************************************
+        => Symbol Editor(原理图符号编辑器)
+*******************************************************************************/
+// https://en.wikipedia.org/wiki/Reference_designator
+
+
+1 Tools ->Edit Schematic Symbols	//编辑原理图符号
+2 Create a new library			//创建新的原理图库文件
+  Name:                                 //555_badge
+3 Create new symbol			//创建新的原理图符号
+  选择库文件为:                           //[555_badge]
+4 Add pins to componet			//添加引脚,添加边框
+  ~TRIGGER
+  http://www.555-timer-circuits.com/flashing-led.htm
+5 Move part anchor			//锚工具
+  如果原点不是在十字光标处，可以点击锚工具
+  然后点击中间的部分来移动原点
+6 File ->Save library			//保存库文件 
+
+
+7 原理图库文件的添加 
+// https://github.com/digikey/digikey-kicad-library  下载digikey库文件
+把库文件复制到： ~/Documents/kicad/libraries/digikey-kicad-library-master
+回到程序主界面，运行原理图库编辑器，在原理图库编辑器中可以添加已有的库文件
+Tool ->Edit Schematic Symbol {File ->Add Library} 添加已有的原理图库文件
+
+8 运行原理图库编辑器(Symbol library edit)  //原理图库文件的删除
+Preferences ->Manage Symbol Libraries 此处可以移出不要的库文件

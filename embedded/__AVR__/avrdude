@@ -13,7 +13,6 @@ USBASP是一种基于ATMEL公司的AVR系列RISC单片机的高性价比和一�
 sudo apt-get install avrdude
 
 
-
 //AT89S51, AT89S52 系列单片机与USBASP-ISP下载器连接
 //_________________________________________________________
 |//USBasp          at89s52    |
@@ -25,6 +24,7 @@ sudo apt-get install avrdude
 |  GND     <===>    GND       |
 |  5V      <===>    VCC       |
 |_____________________________|
+
 
 
 /*******************************************************************************
@@ -62,13 +62,4 @@ Arduino-IDE ->File ->examples ->11. ArduinoISP ->ArduinoISP
 sudo avrdude -P usb -p m16 -c usbasp -t
 
 avrdude> part
-
-
-
-
-
-
-
-
-
 

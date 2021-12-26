@@ -59,7 +59,7 @@ START:
 *******************************************************************************/
 MAIN:
         CALL    KEY_SCAN        ;//呼叫子程序
-        JNB     TR0, MAIN       ;//JNB就是后边的位操作码为0则跳转到指定的行地址
+        JNB     TR0, MAIN       ;//if (TR0 == 0); 则跳转到（MAIN）
         CALL    DISPLAY_SEC
         CALL    DISPLAY_MIN
         CALL    DISPLAY_HOUR
@@ -115,7 +115,7 @@ KEY_SCAN_F3:
 ;// 加按键
 ;//____________________________________________________________
 KEY_SCAN_A0:    ;//秒钟加一
-        JB      TR0, KEY_SCAN           ;//如果（TR0 = 1），则跳转到KEY_SCAN
+        JB      TR0, KEY_SCAN           ;//if（TR0 == 1），则跳转到KEY_SCAN
         MOV     A, FUNCNT
         CJNE    A, #1, KEY_ADD_K1
         CALL    DELAY_10MS              ;//延时消抖
