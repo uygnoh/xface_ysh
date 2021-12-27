@@ -1,0 +1,286 @@
+/*******************************************************************************
+        => LCD12864（无子库）__PG12864LRS-JNN-H__
+*******************************************************************************/
+//LCD12864是由两片（64*64）组成，使用（CS1，CS2）使能。
+//每半屏由8页，每页中字节数据由低到高。
+1       VDD     5V              //模块电源
+2       VSS     0V              //模块电源
+3       VO      0V~-10V         //外部液晶偏置电压（负压）输入端
+4       CS1     H/L             //左半屏使能（低电平有效）
+5       CS2     H/L             //右半屏使能（低电平有效）
+6       RST     H/L             //LCM复位（低电平有效）
+7       R/W     H/L             //H:读数据 L:写数据
+8       D/I     H/L             //H:数据 L:指令
+9       E       H/L             //LCM使能
+10      LED-A   5V              //LED背光电源
+11      LED-K   0V              //LED背光电源
+//背光电路中串接 5欧姆 电阻
+//请在 DB0~DB7 数据线上加入10K电阻
+//VO需要一个外部（0~-10V）负压输入，使液晶显示。 可串接电位器调整液晶灰度。
+//指令集表
+|_______________________________________________________________________________
+| D/I | R/W | DB7 | DB6 | DB5 | DB4 | DB3 | DB2 | DB1 | DB0 | Function
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  0  |  0  |  0  |  0  |  1  |  1  |  1  |  1  |  1  |  P  | P=1（开显示）
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  0  |  0  |  0  |  1  | A5  | A4  | A3  | A2  | A1  | A0  | 列地直设置（0~63）
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  0  |  0  |  1  |  0  |  1  |  1  |  1  | A2  | A1  | A0  | 页码设置（0~7）
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  0  |  0  |  1  |  1  | A5  | A4  | A3  | A2  | A1  | A0  | 显示起始地址设置（0~63）
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  0  |  1  |  B  |  0  |  P  |  R  |  0  |  0  |  0  |  0  | B=1（LCM忙）；R=1（复位）
+|     |     |     |     |     |     |     |     |     |     | P=1（开显示）
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  1  |  0  | A7  | A6  | A5  | A4  | A3  | A2  | A1  | A0  | 写8位显示数据
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+|  1  |  1  | A7  | A6  | A5  | A4  | A3  | A2  | A1  | A0  | 读8位显示数据
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|___________________
+
+
+
+
+/*******************************************************************************
+        => LCD12864（无子库）__程序__
+        本程序使用Pctolcd取模（设置为：阴码，逆向，列行式）
+*******************************************************************************/
+#define DISP_ON         0x38    //开显示
+#define DISP_OFF        0x3E    //关显示
+#define COL_ADDR        0x40    //列地址
+#define PAGE_ADDR       0xB8    //页地址
+#define START_LINE      0xC0    //起始页
+
+
+sbit    CS1 = P1^3;             //左半屏
+sbit    CS2 = P1^4;             //右半屏
+sbit    DI  = P1^0;             //数据，指令
+sbit    RW  = P1^1;             //读，写
+sbit    EN  = P1^2;             //使能
+sbit    RST = p1^5;
+
+
+uint8_t code chinese[][32] = {};
+uint8_t code english[][16] = {};
+
+
+
+void delay_ms(uint16_t z)
+{
+        uint16_t x, y;
+        for (x = z; x > 0; x--)
+                for (y = 110; y > 0; y--);
+}
+
+//_____________________________________________________________
+// LCD12864（无子库）写命令
+//_____________________________________________________________
+//写左半屏
+void write_cmd_left(uint8_t cmd)
+{
+        CS1 = 1;
+        CS2 = 0;
+        DI  = 0;
+        RW  = 0;
+        PO  = cmd;
+        delay_ms(1);
+        EN  = 1;
+        delay_ms(5);
+        EN  = 0;
+        delay_ms(5);
+}
+//写右半屏
+void write_cmd_right(uint8_t cmd)
+{
+        CS1 = 0;
+        CS2 = 1;
+        DI  = 0;
+        RW  = 0;
+        PO  = cmd;
+        delay_ms(1);
+        EN  = 1;
+        delay_ms(5);
+        EN  = 0;
+        delay_ms(5);
+}
+
+
+//_____________________________________________________________
+// LCD12864（无子库）写数据
+//_____________________________________________________________
+//写左半屏
+void write_dat_left(uint8_t dat)
+{
+        CS1 = 1;
+        CS2 = 0;
+        DI  = 1;
+        RW  = 0;
+        PO  = dat;
+        delay_ms(1);
+        EN  = 1;
+        delay_ms(5);
+        EN  = 0;
+        delay_ms(5);
+}
+//写右半屏
+void write_dat_right(uint8_t dat)
+{
+        CS1 = 0;
+        CS2 = 1;
+        DI  = 1;
+        RW  = 0;
+        PO  = dat;
+        delay_ms(1);
+        EN  = 1;
+        delay_ms(5);
+        EN  = 0;
+        delay_ms(5);
+}
+
+
+//_____________________________________________________________
+// LCD12864（无子库）清屏
+//_____________________________________________________________
+void clear_left(void)
+{
+        uint8_t j, k;
+        CS1 = 1;
+        CS2 = 0;
+        write_cmd_left(PAGE_ADDR + 0);
+        write_cmd_left(COL_ADDR  + 0);
+        for (k = 0; k < 8; k++) {
+                write_cmd_left(PAGE_ADDR + k);
+                for (j = 0; j < 64; j++) {
+                        write_dat_left(0x00);
+                }
+        }
+}
+void clear_right(void)
+{
+        uint8_t j, k;
+        CS1 = 0;
+        CS2 = 1;
+        write_cmd_right(PAGE_ADDR + 0);
+        write_cmd_right(COL_ADDR  + 0);
+        for (k = 0; k < 8; k++) {
+                write_cmd_right(PAGE_ADDR + k);
+                for (j = 0; j < 64; j++) {
+                        write_dat_right(0x00);
+                }
+        }
+}
+
+
+//_____________________________________________________________
+// LCD12864（无子库）初始化
+//_____________________________________________________________
+void lcd12864_init(void)
+{
+        RST = 0;
+        delay_ms(50);
+        RST = 1;
+        delsy_ms(50);
+        write_cmd_left(DISP_OFF);
+        write_cmd_right(DISP_OFF);
+        write_cmd_left(COL_ADDR    + 0);        //列地址（左）清零
+        write_cmd_right(COL_ADDR   + 0);        //列地址（右）清零
+        write_cmd_left(PAGE_ADDR  + 0);         //页地址（左）清零
+        write_cmd_right(PAGE_ADDR + 0);         //页地址（右）清零
+        write_cmd_left(START_LINE   + 0);       //起始地址（左）清零
+        write_cmd_right(START_LINE  + 0);       //起始列地址（右）清零
+        write_cmd_left(DISP_ON);
+        write_cmd_right(DISP_ON);
+}
+
+
+
+//_____________________________________________________________
+// LCD12864（无子库）显示中文
+//page, 页
+//col,  列
+//num,  字的顺序编号
+//_____________________________________________________________
+void display_ch_left(uint8_t page, uint8_t col, uint8_t num)
+{
+        uint8_t i = 0;
+        uint8_t j = 0;
+        CS1 = 1;
+        CS2 = 0;
+        for (i = 0; i < 2; i++) {                               //一个汉字，占2页
+                write_cmd_left(PAGE_ADDR + page + i);           //页地址
+                write_cmd_left(COL_ADDR + col);                 //列地址
+                for (j = 0; j < 16; j++) {
+                        write_dat_left(chinese[num][16*i = j]);
+                }
+        }
+}
+void display_ch_right(uint8_t page, uint8_t col, uint8_t num)
+{
+        uint8_t i = 0;
+        uint8_t j = 0;
+        CS1 = 0;
+        CS2 = 1;
+        for (i = 0; i < 2; i++) {                               //一个汉字，占2页
+                write_cmd_right(PAGE_ADDR + page + i);          //页地址
+                write_cmd_right(COL_ADDR + col);                //列地址
+                for (j = 0; j < 16; j++) {
+                        write_dat_right(chinese[num][16*i + j]);
+                }
+        }
+}
+
+
+
+
+//_____________________________________________________________
+// LCD12864（无子库）显示英文
+//page, 页
+//col,  列
+//num,  字的顺序编号
+//_____________________________________________________________
+void display_en_left(uint8_t page, uint8_t col, uint8_t num)
+{
+        uint8_t i = 0;
+        uint8_t j = 0;
+        CS1 = 1;
+        CS2 = 0;
+        for (i = 0; i < 2; i++) {                               // 
+                write_cmd_left(PAGE_ADDR + page + i);           //页地址
+                write_cmd_left(COL_ADDR + col);                 //列地址
+                for (j = 0; j < 8; j++) {
+                        write_dat_left(english[num][8*i = j]);
+                }
+        }
+}
+void display_en_right(uint8_t page, uint8_t col, uint8_t num)
+{
+        uint8_t i = 0;
+        uint8_t j = 0;
+        CS1 = 0;
+        CS2 = 1;
+        for (i = 0; i < 2; i++) {                               // 
+                write_cmd_right(PAGE_ADDR + page + i);          //页地址
+                write_cmd_right(COL_ADDR + col);                //列地址
+                for (j = 0; j < 8; j++) {
+                        write_dat_right(english[num][8*i + j]);
+                }
+        }
+}
+
+
+int main(void)
+{
+        lcd12864_init();
+        clear_left();
+        clear_right();
+        while (1) {
+                display_ch_left(0, 0, 0);
+                display_ch_left(0, 16, 1);
+                display_ch_left(0, 32, 2);
+                display_ch_left(0, 48, 3);
+                
+                display_ch_right(0, 0, 4);
+                display_ch_right(0, 16, 5);
+                display_ch_right(0, 32, 6);
+                display_ch_right(0, 48, 7);
+        }
+}

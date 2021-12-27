@@ -1,0 +1,162 @@
+/*******************************************************************************
+        => LCD12864__ST7920__控制器__
+*******************************************************************************/
+0 //内部包括有国标一级，二级简体中文字库
+1 //该模块具有4位/8位并行
+2 //2线或3线串行接口
+3 //显示分辨率为(128*64)
+4 //内置8192个16*16点汉字，和128个16*8点ASCII字符集
+5 //CGROM(Character Generator ROM)  字符产生单元
+6 //CGRAM(Character Generator RAM)  用户自定义字符产生单元
+7 //DDRAM(Display Data RAM)         显示数据存放单元
+8 //GDRAM(Graphic RAM)              绘图单元
+
+
+//LCD12864（汉字显示坐标）
+___________________________________________________________
+                    X坐标
+第一行     80  81  82  83  84  85  86  87
+第二行     90  91  92  93  94  95  96  97
+第三行     88  89  8A  8B  8C  8D  8E  8F
+第四行     98  99  9A  9B  9C  9D  9E  9F
+___________________________________________________________
+
+
+//LCD12864字符编码(ascii) 0x00~0x7F
+___________________________________________________________
+0x00    0x01    0x02    0x03    ...     0x0F
+0x10                            ...     0x1F
+0x20                            ...     0x2F
+0x30                            ...     0x3F
+0x40                            ...     0x4F
+0x50                            ...     0x5F
+0x60                            ...     0x6F    
+0x70                            ...     0x7F
+___________________________________________________________
+
+
+
+//ST7920__中文字符编码表
+___________________________________________________________
+B0E0 ->班
+lcd12864_write_dat(0xB0);
+lcd12864_write_dat(0xE0);
+
+
+
+/*******************************************************************************
+        => LCD12864__ST7920__简单汉字显示程序__（并口）
+*******************************************************************************/
+#include <reg51.h>
+#define uint8_t  unsigned char
+#define uint16_t unsigned int
+sbit    RS = P1^0;
+sbit    RW = P1^1;
+sbit    EN = P1^2;
+uint8_t code table_00[] = "好好学习单片机！";
+uint8_t code table_01[] = "周老师祝你们成功！";
+
+void delay_ms(uint16_t z)
+{
+        uint16_t x, y;
+        for (x = z; x > 0; x--)
+                for (y = 110; y > 0; y--)
+}
+
+void write_cmd(uint8_t cmd)
+{
+        RS = 0;
+        RW = 0;
+        EN = 0;
+        delay_ms(1);
+        P0 = cmd;
+        delay_ms(1);
+        EN = 1;
+        delay_ms(5);
+        EN = 0;
+        delay_ms(5);
+}
+
+void write_dat(uint8_t dat)
+{
+        RS = 1;
+        RW = 0;
+        EN = 0;
+        delay_ms(1);
+        P0 = dat;
+        delay_ms(1);
+        EN = 1;
+        delay_ms(5);
+        EN = 0;
+        delay_ms(5);
+}
+
+void lcd12864_init(void)
+{
+        delay_ms(100);
+        write_cmd(0x30);        //启用基本指令集
+        delay_ms(1);
+        write_cmd(0x30);
+        delay_ms(1);
+        write_cmd(0x0E);        //打开所有显示
+        delay_ms(1);
+        write_cmd(0x0C);        //不显示光标
+        delay_ms(1);
+        write_cmd(0x06);        //地址指针自动加一
+        delay_ms(1);
+        write_cmd(0x01);        //清屏
+        delay_ms(1);
+}
+
+void hanzi(uint8_t *ch)
+{
+        while (*ch != 0) {
+                write_dat(*ch++);
+        }
+        delay_ms(50);
+}
+
+void lcd12864_display_00(void)
+{
+        uint8_t i;
+        write_cmd(0x80);        //在第一行显示汉字
+        for (i = 0; i < 16; i++) {
+                write_dat(table_00[i]);
+                delay_ms(5);
+        }
+}
+
+void lcd12864_display_01(void)
+{
+        uint8_t i;
+        write_cmd(0x90);        //在第二行显示汉字
+        for (i = 0; i < 16; i++) {
+                write_dat(table_01[i]);
+                delay_ms(5);
+        }
+}
+
+void lcd12864_display_02(void)
+{
+        write_cmd(0x80);
+        hanzi("白日依山尽， 唐");
+        write_cmd(0x90);
+        hanzi("黄河入海流。 王");
+        write_cmd(0x88);
+        hanzi("欲穷千里目，之");
+        write_cmd(0x98);
+        hanzi("更上一层楼。 涣");
+}
+
+void main(void)
+{
+        lcd12864_init();        //LCD12864初始化
+        lcd12864_display_00();  //第一行显示
+        lcd12864_display_01();  //第二行显示
+        write_cmd(0x88);        //第三行显示生僻字
+        write_dat(0xf7);        //给出生僻字编码（1）
+        write_dat(0xd0);        //给出生僻字编码（2）
+        write_cmd(0x88);        //第四行显示字符串
+        hanzi("QQ: 961832097"); //字符串函数显示
+        while (1);
+}
