@@ -1,0 +1,95 @@
+/*******************************************************************************
+        => STM32_SRAM-DEBUG
+*******************************************************************************/
+//_____________________________________________________________
+//为什么第一条指令的地址是0x0800_0188？
+//我们的代码不是应该从0x0800_0000开始吗？
+//可能看到这样的代码会有这样的疑惑。  那就要来看看ARMCM4的架构了。
+//_____________________________________________________________
+ARM_CM 架构定义： 规定“0”地址的第一个数据为sp（栈指针）
+        //当STM32使用FLASH启动的时候，0x0800_0000 会被映射为__0__地址
+        //当STM32使用eSRAM启动的时候，0x2000_0000 会被映射为__0__地址
+以后连续的地址用来存放中断向量表。  向量表之后的地址用来存放实际的代码。
+137     g_pfnVectors:
+138             .word	_estack
+139             .word	Reset_Handler
+                .word	NMI_Handler
+                .word	HardFault_Handler
+                ......
+235             .word   FPU_Handler
+
+//_____________________________________________________________
+从139行开始到235行，共97个中断向量。 外加0地址的sp的值，共98个数据，
+每一个数据占用4个字节，合计98×4=392=0x188。 从0地址开始存放的话，
+存放到0x187位置结束。 所以0x188作为第一条指令的起点。
+//_____________________________________________________________
+
+
+
+/*******************************************************************************
+        => STM32_链接文件
+*******************************************************************************/
+/* Entry Point */
+ENTRY(Reset_Handler)
+
+/* Highest address of the user mode stack */
+_estack = 0x20010000;     /* end of 64K RAM */
+
+/* Generate a link error if heap and stack don't fit into RAM */
+_Min_Heap_Size  = 0;      /* required amount of heap  */
+_Min_Stack_Size = 0x100;  /* required amount of stack */
+
+/* Specify the memory areas */
+MEMORY
+{
+        FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 512K
+        RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 64K
+        MEMORY_B1 (rx)  : ORIGIN = 0x60000000, LENGTH = 0K
+}
+在flash.ld链接文件中定义了_estack。这个值在汇编文件中使用，作为0地址下的sp的值。
+一般来说，栈的初始值是可以随便设定的。只要在RAM中就可以。但是为了避免内存碎片化，会
+将sp的初始值放置RAM中的最后一个地址。照这样来算，64K的RAM最后一个地址为0x2001_0000。
+这也就是将_estack设置为这个值的原因。
+
+
+//_____________________________________________________________
+在我看来，这里的_Min_Heap_Size和_Min_Stack_Size并没有什么用。只是用来保证你程序
+中bss段不至于过大而已。比如你在程序中申请了一个比较大的数组，char buf[64*1024]。这
+样你的bss段至少占用了64K的内存。在加上_Min_Heap_Size和_Min_Stack_Size的大小，已
+经超出了RAM的实际大小了。这样在链接的时候便会给你报错。
+
+
+不同于MDK，MDK的汇编文件中有一个数值，可以设置heap的大小，用于malloc等内存分配。
+但是在gcc中，即使你将链接文件中的_Min_Heap_Size更改为0，arm gcc的malloc函数
+一样能够分配到内存。因为他使用不一样的机制。他的内存分配是malloc和sbrk共同作用的。
+sbrk这个系统调用需要你自己来实现。
+//_____________________________________________________________
+
+
+
+
+/*******************************************************************************
+        => STM32_更改FLASH的地址
+*******************************************************************************/
+要想让程序在RAM中能够运行，只需要更改FLASH的地址为RAM中的地址就可以了。
+因为Nucleo303有64K的内存，所以分配20K内存给RAM，分配40K内存当作FLASH使用。 更改如下：
+/* Entry Point */
+ENTRY(Reset_Handler)
+
+/* Highest address of the user mode stack */
+_estack = 0x20005000;     /* end of 20K RAM */
+
+/* Generate a link error if heap and stack don't fit into RAM */
+_Min_Heap_Size  = 0;      /* required amount of heap  */
+_Min_Stack_Size = 0x100;  /* required amount of stack */
+
+/* Specify the memory areas */
+MEMORY
+{
+        FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 40K
+        RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 20K
+        MEMORY_B1 (rx)  : ORIGIN = 0x60000000, LENGTH = 0K
+}
+
+
+
