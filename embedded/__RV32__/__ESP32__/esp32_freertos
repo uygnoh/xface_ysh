@@ -344,3 +344,91 @@ void app_main(void)
         printf("Name   State   Priority   Stack     Num       \n");
         printf("%s\n", pcWriteBuffer);
 }
+
+
+
+/*******************************************************************************
+        => esp32-c3（TASK_STACK）任务堆栈调式
+*******************************************************************************/
+uxTaskGetStackHighWaterMark()           //取得任务堆栈的剩余空间
+
+
+void my_task_00(void *pvParam)
+{       
+        while (1) {
+                printf("MY_TASK_00\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void main_app(void)
+{
+        TaskHandle_t my_task_00_handle;
+        xTaskCreate(my_task_00, "TASK_00", 1024, NULL, 1, &my_task_00_handle);
+        UBaseType_t is_stack;
+        while (1) {
+                is_stack = uxTaskGetStackHighWaterMark(my_task_00_handle);
+                printf("MY_TASK_00 STACK_SIZE: %d\n");
+                vTaskDelay(3000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3__看门狗__
+*******************************************************************************/
+//_____________________________________________________
+// Interrupt Watchdog（中断Watchdog）
+//_____________________________________________________
+
+
+
+
+//_____________________________________________________
+// 如何把我们的任务加入（任务看门狗列表，并在相应的时间内喂狗）
+// Task Watchdog Timer（任务定时器Watchdog）
+// 下面程序， 会触发（任务Watchdog）， 因为它会使空闲任务无法运行
+// 因为空闲任务的优先级是（0）
+//_____________________________________________________
+void my_task_00(void *pvParam)
+{       
+        while (1) {
+                ;
+        }
+}
+void main_app(void)
+{
+        TaskHandle_t my_task_00_handle;
+        xTaskCreate(my_task_00, "TASK_00", 1024, NULL, 1, &my_task_00_handle);
+}
+
+
+
+//_____________________________________________________
+// Task Watchdog Timer（任务定时器Watchdog）
+// 添加任务Watchdog的监控列表
+//_____________________________________________________
+#include "esp_task_wdt.h"
+void my_task_00(void *pvParam)
+{       
+        while (1) {
+                printf("MY_TASK_00\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void my_task_01(void *pvParam)
+{       
+        esp_task_wdt_add(NULL);         //把当前的任务（添加到任务监控列表中）
+        while (1) {                     //如果在相应的时间没有喂狗的话
+                printf("TASK_01\n");    //它就会触发（任务看门狗）
+                esp_task_wdt_reset();   //喂狗
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void main_app(void)
+{
+        TaskHandle_t my_task_00_handle;
+        TaskHandle_t my_task_01_handle;
+        xTaskCreate(my_task_00, "TASK_00", 1024, NULL, 0, &my_task_00_handle);
+        xTaskCreate(my_task_01, "TASK_01", 1024, NULL, 0, &my_task_01_handle);
+}
