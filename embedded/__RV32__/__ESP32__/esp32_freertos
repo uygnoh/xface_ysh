@@ -1,0 +1,346 @@
+/*******************************************************************************
+        => esp32-c3启动流程
+*******************************************************************************/
+//FreeRTOS
+app_main() ->
+main_task() ->
+esp_startup_start_app_common() ->
+esp_startup_start_app() ->
+
+//Esp_system
+start_cpu0_default() -> 
+start_cpu0 ->
+g_startup_fn ->
+SYS_STARTUP_FN ->
+call_start_cpu0 ->
+
+
+
+/*******************************************************************************
+        => esp32-c3（任务创建和删除）
+*******************************************************************************/
+//_____________________________________________________
+//创建任务并删除自己（my_task_00）
+//_____________________________________________________
+void my_task_00(void *pvParam)
+{
+        printf("Hello World! Frist!\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        printf("Hello World! Second!\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        printf("Hello World! Third!\n");
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        
+        vTaskDelete(NULL);
+}
+
+//_____________________________________________________
+//创建任务（my_task）
+//_____________________________________________________
+void my_task(void *pvParam)
+{
+        while (1) {
+                printf("Hello World! In the myTask!\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void app_main(void)
+{
+        //_____________________________________________________
+        //创建任务（my_task_00）
+        //_____________________________________________________
+        //xTaskCreate(my_task_00, "myTask2", 1024, NULL, 1, NULL);
+        
+        //_____________________________________________________
+        //创建任务（my_task）
+        //_____________________________________________________
+        TaskHandle_t my_handle = NULL;
+        xTaskCreate(myTask, "myTask1", 1024, NULL, 1, &my_handle);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        
+        //_____________________________________________________
+        //删除任务（my_task）
+        //_____________________________________________________
+        if (my_handle != NULL) {
+                xTaskDelete(my_handle);
+        }
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3（传入参数的四种方式）
+*******************************************************************************/
+//_____________________________________________________
+//传入整数
+//_____________________________________________________
+void my_task(void *pvParam)
+{
+        int *ptr_int;
+        ptr_int = (int *)pvParam;
+        printf("I got testNum = %d\n", *ptr_int);
+        vTaskDelay(1000 / portTICK_PERTOD_MS);
+        
+        vTaskDelete(NULL);
+}
+
+int int_num = 1;
+
+void app_main(void)
+{
+        xTaskCreate(my_task, "myTask1", 1024, (void *)&int_num, 1, NULL);
+}
+
+
+
+//_____________________________________________________
+//传入数组
+//_____________________________________________________
+void my_task(void *pvParam)
+{
+        int *ptr_array_addr;
+        ptr_array_addr = (int *)pvParam;
+        printf("I got Num1 = %d\n", *ptr_array_addr);
+        printf("I got Num2 = %d\n", *(ptr_array_addr+1));
+        printf("I got Num3 = %d\n", *(ptr_array_addr+2));
+        vTaskDelay(1000 / portTICK_PERTOD_MS);
+        
+        vTaskDelete(NULL);
+}
+
+int array_num[] = {6, 7, 8};
+
+void app_main(void)
+{
+        xTaskCreate(my_task, "myTask1", 1024, (void *)array_num, 1, NULL);
+}
+
+
+
+//_____________________________________________________
+//传入结构体
+//_____________________________________________________
+typedef struct X_STRUCT {
+        int mem_00;
+        int mem_01;
+} xstruct;
+xstruct struct_text = {6, 9};
+
+void my_task(void *pvParam)
+{
+        xstruct *ptr_struct;
+        ptr_struct = (xstruct *)pvParam;
+        printf("I got struct mem_00 = %d\n", ptr_struct->mem_00);
+        printf("I got struct mem_01 = %d\n", ptr_struct->mem_01);
+        vTaskDelay(1000 / portTICK_PERTOD_MS);
+        
+        vTaskDelete(NULL);
+}
+
+
+void app_main(void)
+{
+        xTaskCreate(my_task, "myTask1", 1024, (void *)&struct_text, 1, NULL);
+}
+
+
+
+//_____________________________________________________
+//传入字符串
+//_____________________________________________________
+static const char *ptr_str = "i am ysh";
+
+void my_task(void *pvParam)
+{
+        char *ptr_test;
+        ptr_test = (char *)pvParam;
+        printf("I got message = %s\n", ptr_test);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelete(NULL);
+}
+
+void app_main(void)
+{
+        xTaskCreate(my_task, "myTask1", 1024, (void *)ptr_str, 1, NULL);
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3（任务优先级别）
+*******************************************************************************/
+1. 优先级别定义
+        //每一个任务都有一个优先级别，它从（ 0 ~ configMAX_PRIORITIES-1 ）
+        //数值越大，优先级别越高
+2. 相同的优先级别
+        //顺序执行， 切换相同的时间片
+3. 不同的优先级别
+        //
+4. 修改优先级别
+        //
+
+
+
+//_____________________________________________________
+//获取任务的优先级
+//_____________________________________________________
+void my_task(void *pvParam)
+{
+        int *ptr_int;
+        ptr_int = (int *)pvParam;
+        printf("I got testNum = %d\n", *ptr_int);
+        vTaskDelay(1000 / portTICK_PERTOD_MS);
+        
+        vTaskDelete(NULL);
+}
+int int_num = 1;
+void app_main(void)
+{
+        UBaseType priority_num;
+        TaskHandle_t my_task_handle;
+        xTaskCreate(my_task, "myTASK", 1024, (void *)&int_num, 3, &my_task_handle);
+        
+        priority_num = uxTaskPriorityGet(my_task_handle);
+        printf("my_task priority: %d\n", priority_num);
+}
+
+
+
+//_____________________________________________________
+// 相同优先级别任务（执行情况）
+//_____________________________________________________
+void my_task_00(void *pvParam)
+{
+        while (1) {
+                printf("my_task_00\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void my_task_01(void *pvParam)
+{
+        while (1) {
+                printf("my_task_01\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        xTaskCreate(my_task_00, "MY_TASK_00", 1024, NULL, 1, NULL);
+        xTaskCreate(my_task_01, "MY_TASK_01", 1024, NULL, 1, NULL);
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3（任务挂起）
+*******************************************************************************/
+void my_task_00(void *pvParam)
+{
+        while (1) {
+                printf("my_task_00\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+                vTaskSuspend(NULL);
+        }
+}
+void my_task_01(void *pvParam)
+{
+        while (1) {
+                printf("my_task_01\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        TaskHandle_t my_task_00_handle;
+        xTaskCreate(my_task_00, "MY_TASK_00", 1024, NULL, 1, &my_task_00_handle);
+        xTaskCreate(my_task_01, "MY_TASK_01", 1024, NULL, 1, NULL);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        //vTaskSuspend(my_task_00_handle);
+        vTaskResume(my_task_00_handle);
+}
+
+
+
+//_____________________________________________________
+// 挂起所有任务（它不能使用FreeRTOS其它API函数）
+//_____________________________________________________
+void my_task_00(void *pvParam)
+{
+        printf("Test begin\n");
+        
+        vTaskSuspendAll();
+        
+        for (int i = 0; i < 9999; i++) {
+                for (int j = 0; j < 9999; j++) {
+                        ;
+                }
+        }
+        printf("Test end\n");
+        
+        xTaskResumeAll();
+        
+        vTaskDelete(NULL);
+}
+void my_task_01(void *pvParam)
+{
+        while (1) {
+                printf("MY_TASK_01\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        TaskHandle_t my_task_00_handle;
+        TaskHandle_t my_task_01_handle;
+        xTaskCreate(my_task_00, "TASK_00", 1024, NULL, 1, &my_task_00_handle);
+        xTaskCreate(my_task_01, "TASK_01", 1024, NULL, 1, &my_task_01_handle);
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3（TASK_LIST）统计显示信息
+*******************************************************************************/
+1. Enable FreeRTOS trace facility
+2. Enable FreeRTOS stats formatting functions
+
+
+void my_task_00(void *pvParam)
+{
+        printf("Test begin\n");
+        
+        vTaskSuspendAll();
+        
+        for (int i = 0; i < 9999; i++) {
+                for (int j = 0; j < 9999; j++) {
+                        ;
+                }
+        }
+        printf("Test end\n");
+        
+        xTaskResumeAll();
+        
+        vTaskDelete(NULL);
+}
+void my_task_01(void *pvParam)
+{
+        while (1) {
+                printf("MY_TASK_01\n");
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        TaskHandle_t my_task_00_handle;
+        TaskHandle_t my_task_01_handle;
+        xTaskCreate(my_task_00, "TASK_00", 1024, NULL, 1, &my_task_00_handle);
+        xTaskCreate(my_task_01, "TASK_01", 1024, NULL, 1, &my_task_01_handle);
+        
+        static char pcWriteBuffer[512] = {0};
+        vTaskList(pcWriteBuffer);
+        printf("______________________________________________\n");
+        printf("Name   State   Priority   Stack     Num       \n");
+        printf("%s\n", pcWriteBuffer);
+}
