@@ -1,6 +1,5 @@
 #define F_CPU                   (8000000UL)     //8MHz
 #include <avr/io.h>
-#include <avr/iom328p.h>
 #include <avr/delay.h>
 int main(void)
 {
