@@ -1,3 +1,64 @@
 /*******************************************************************************
         => esp32-c3 队列
 *******************************************************************************/
+//_____________________________________________________________
+// 向队列中发送数据
+//_____________________________________________________________
+void tx_task(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType status;
+        int i = 0;
+        while (1) {
+                status = xQueueSend(q_handle, &i, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                i++;
+                if (i == 8) {
+                        i = 0;
+                }
+                vTaskDelay(1000 / protTICK_PERIOD_MS);
+        }
+}
+//_____________________________________________________________
+// 从队列中接收数据
+//_____________________________________________________________
+void rx_task(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int j = 0;
+        while (1) {
+                //如果接收数据缓冲器中的内容不为空，那么开始接收数据
+                if (uxQueueMessagesWaiting(q_handle) != 0) {
+                        status = xQueueReceive(q_handle, &j, 0);
+                        if (status != pdPASS) {
+                                printf("Receive fail!\n");
+                        } else {
+                                printf("Receive j = %d!\n");
+                        }
+                } else {
+                        printf("NO data!\n");
+                }
+
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        QueueHandle_t q_handle;
+        q_handle = xQueueCreate(5, sizeof(int));
+        if (q_handle != NULL) {
+                printf("Create queue successfully!\n");
+                xTaskCreate(tx_task, "TX_TASK", 1024*5, (void *)q_handle, 1, NULL);
+                xTaskCreate(rx_task, "RX_TASK", 1024*5, (void *)q_handle, 1, NULL);
+        } else {
+                printf("Can't create queue!\n");
+        }
+}
+

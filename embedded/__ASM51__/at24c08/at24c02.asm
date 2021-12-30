@@ -20,15 +20,15 @@ START:
         SETB    SCL             ;//初始化（I2C）
         SETB    SDA
         MOV     DATA, #0
-        MOV     ADDRESS, #1
-        MOV     A, ADDRESS
+        MOV     MEM_ADDR, #1
+        MOV     A, MEM_ADDR
         CALL    READ_ADDRESS
         CALL    COMPARE
 MAIN:
         INC     A
         MOV     DATA, A
         CALL    DISPLAY
-        MOV     A, ADDRESS
+        MOV     A, MEM_ADDR
         CALL    WRITE_ADDRESS
 COMPARE:
         PUSH    ACC
@@ -43,7 +43,7 @@ COMPARE_00:
         RET
         
 ;//____________________________________________________________
-;//显示函数
+;//1位数码管__显示函数
 ;//____________________________________________________________
 SMG_DISPLAY:
         MOVC    A, @A+DPTR
@@ -154,7 +154,7 @@ WRITE_ADDRESS:
         MOV     A, #0A0H        ;//写入器件地址（呼叫器件）
         CALL    SEND_BYTE       ;//发送器地址
         CALL    IIC_ACK         ;//读取从机应答信号
-        MOV     A, ADDRESS      ;//写入器件内部地址
+        MOV     A, MEM_ADDR    ;//写入器件内部地址
         CALL    SEND_BYTE       ;//发送器内部存储器地址
         CALL    IIC_ACK         ;//读取从机应答信号
         MOV     A, DATA         ;//向指定内存写入数据
@@ -171,7 +171,7 @@ READ_ADDRESS:
         MOV     A, #0A0H        ;//写入器件地址（呼叫器件）
         CALL    SEND_BYTE       ;//发送器地址
         CALL    IIC_ACK         ;//读取从机应答信号
-        MOV     A, ADDRESS      ;//写入器件内部地址
+        MOV     A, MEM_ADDR     ;//写入器件内部地址
         CALL    SEND_BYTE       ;//发送器内部存储器地址
         CALL    IIC_ACK         ;//读取从机应答信号
         
