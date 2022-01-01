@@ -50,17 +50,17 @@ clean:
 #______________________________________________________________
 CC      = avr-gcc
 OBJCOPY = avr-bojcopy
-CFLAGS  = -os -mmcu=atmega328p
+CFLAGS  = -Os -mmcu=atmega328p
 
 #______________________________________________________________
 # wildcard（函数）当前目录下匹配模式的文件
 # gnu make工具的Makefile中$(SRC:%.c=%.o)的含义：
 # 将SRC变量中所有以.c结尾的文件名替换成对应的以.o结尾的文件名，然后赋回给SRC
 #______________________________________________________________
-BIN     = main
+TARGET  = main
+SUBDIR  = $(shell ls -d */)
 ROOTSRC = $(wildcard *.c)
 ROOTOBJ = $(ROOTSRC:%.c=%.o)
-SUBDIR  = $(shell ls -d */)
 SUBSRC  = $(shell find $(SUBDIR) -name '*.c')
 SUBOBJ  = $(SUBSRC:%.c=%.o)
 
@@ -74,11 +74,11 @@ SUBOBJ  = $(SUBSRC:%.c=%.o)
 # 
 # 注意！ （$< 对应了 xxx.c）， （$@ 对应了 xxx.o）
 #______________________________________________________________
-$(BIN): $(ROOTOBJ) $(SUBOBJ)
-	$(CC) $(CFLAGS) -o $(BIN) $(ROOTOBJ) $(SUBOBJ)
+$(TARGET): $(ROOTOBJ) $(SUBOBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(ROOTOBJ) $(SUBOBJ)
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
 clean:
-	rm -r $(BIN) $(ROOTOBJ) $(SUBOBJ)
+	rm -r $(TARGET) $(ROOTOBJ) $(SUBOBJ)

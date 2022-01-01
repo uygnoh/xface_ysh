@@ -1,47 +1,21 @@
-#______________________________________________________________
-# 内嵌函数（Makefile）
-#______________________________________________________________
-# $(wildcard PATTERN)                   //当前目录下匹配模式的文件
-# $(patsubst PATTERN, REPLACEMENT, TEXT)//模式替换函数
-# $(patsubst %.c, %.o, $src) 等价于 $(src:.c=.o)
-
-
-
-#______________________________________________________________
-# 二级目录__Makefile__
-# main.c    Makefile    led/    pwm/    adc/
-#______________________________________________________________
 CC      = avr-gcc
-OBJCOPY = avr-bojcopy
-CFLAGS  = -os -mmcu=atmega328p
+OBJCOPY = avr-objcopy
+CFLAGS  = -Os -mmcu=atmega328p
 
-#______________________________________________________________
-# wildcard（函数）当前目录下匹配模式的文件
-# gnu make工具的Makefile中$(SRC:%.c=%.o)的含义：
-# 将SRC变量中所有以.c结尾的文件名替换成对应的以.o结尾的文件名，然后赋回给SRC
-#______________________________________________________________
-BIN     = main
+
+TARGET  = main
+SUBDIR  = $(shell ls -d */)
 ROOTSRC = $(wildcard *.c)
 ROOTOBJ = $(ROOTSRC:%.c=%.o)
-SUBDIR  = $(shell ls -d */)
 SUBSRC  = $(shell find $(SUBDIR) -name '*.c')
 SUBOBJ  = $(SUBSRC:%.c=%.o)
 
-#______________________________________________________________
-# Makefile自动化变量
-#       $@   规则的目标文件名
-#       $<   规则的第一个依赖文件名
-#       $^   规则的所有的依赖文件列表
-#______________________________________________________________
-# （.c.o:） 等价于 （%.o:%.c）， 注意其中的（.c.o），是一个旧格式（不要弄反了）
-# 
-# 注意！ （$< 对应了 xxx.c）， （$@ 对应了 xxx.o）
-#______________________________________________________________
-$(BIN): $(ROOTOBJ) $(SUBOBJ)
-	$(CC) $(CFLAGS) -o $(BIN) $(ROOTOBJ) $(SUBOBJ)
+
+$(TARGET): $(ROOTOBJ) $(SUBOBJ)
+	$(CC) $(CFLAGS) -o $(TARGET).elf $(ROOTOBJ) $(SUBOBJ)
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
 clean:
-	rm -r $(BIN) $(ROOTOBJ) $(SUBOBJ)
+	rm -rf $(TARGET).elf $(ROOTOBJ) $(SUBOBJ)
