@@ -157,7 +157,7 @@ void send_romcode(uint8_t *romcode)
 {
         uint8_t i;
         for (i = 0; i < 8; i++) {
-                uart_write(romcode[i];
+                uart_write(romcode[i]);
         }
 }
 
