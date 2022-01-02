@@ -1,5 +1,5 @@
 /*******************************************************************************
-        => esp32-c3 队列
+        => esp32-c3（向队列中发送数据）
 *******************************************************************************/
 //_____________________________________________________________
 // 向队列中发送数据
@@ -61,4 +61,166 @@ void app_main(void)
                 printf("Can't create queue!\n");
         }
 }
+
+
+
+/*******************************************************************************
+        => esp32-c3（向队列中发送数据）__结构体传递__
+*******************************************************************************/
+typedef struct A_STRUCT {
+        char id;
+        char data;
+} q_struct;
+
+
+void tx_task(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        q_struct usb = {1, 55};
+        
+        while (1) {
+                status = xQueueSend(q_handle, &usb, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                usb.id++;
+                if (usb.id == 8) {
+                        usb.id = 0;
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void rx(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParm;
+        
+        BaseType_t status;
+        q_struct usb = {0, 0};
+        
+        while (1) {
+                if (uxQueueMessageWaiting(q_handle) != 0) {
+                        status = xQueueReceive(q_handle, &usb, 0);
+                        if (status != pdPASS) {
+                                printf("rec fail!\n");
+                        } else {
+                                printf("rec id = %d, data = %d\n", usb.id, usb.data);
+                        }
+                } else {
+                        printf("no data!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void app_main(void)
+{
+        QueueHandle_t q_handle;
+        q_handle = xQueueCreate(5, sizeof(q_struct));
+        
+        if (q_handle != NULL) {
+                printf("Create queue successfully!\n");
+                xTaskCreate(tx_task, "TX_TASK", 1024*5, (void *)q_hanle, 1, NULL);
+                xTaskCreate(rx_task, "RX_TASK", 1024*5, (void *)q_hanle, 1, NULL);
+        } else {
+                printf("Can't create queue!\n");
+        }
+        
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3（向队列中发送数据）__指针传递__
+*******************************************************************************/
+typedef struct A_STRUCT {
+        char id;
+        char data;
+} q_struct;
+
+
+void tx_task(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        
+        char *ptr_tx;
+        int i = 0;
+        
+        while (1) {
+                ptr_tx = (char *)malloc(50);            //分配内存
+                snprintf(ptr_tx, 50, "Today is a Good day %d\r\n!", i);
+                i++;
+                status = xQueueSend(q_handle, &ptr_tx, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void rx(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParm;
+        BaseType_t status;
+        char *ptr_rx;
+        
+        while (1) {
+                if (uxQueueMessageWaiting(q_handle) != 0) {
+                        status = xQueueReceive(q_handle, &ptr_rx, 0);
+                        if (status != pdPASS) {
+                                printf("rec fail!\n");
+                        } else {
+                                printf("rec id = %s", ptr_rx);
+                        }
+                        free(ptr_rx);           //释放这个变量所指向的内存空间
+                } else {
+                        printf("no data!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void app_main(void)
+{
+        QueueHandle_t q_handle;
+        q_handle = xQueueCreate(5, sizeof(char *));
+        
+        if (q_handle != NULL) {
+                printf("Create queue successfully!\n");
+                xTaskCreate(tx_task, "TX_TASK", 1024*5, (void *)q_hanle, 1, NULL);
+                xTaskCreate(rx_task, "RX_TASK", 1024*5, (void *)q_hanle, 1, NULL);
+        } else {
+                printf("Can't create queue!\n");
+        }
+        
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

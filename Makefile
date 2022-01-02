@@ -27,12 +27,12 @@ CFLAGS          += -I $(shell pwd)/include
 ###____________________________________________________________
 ### Makefile
 ###____________________________________________________________
-TARGET  = main
-SUBDIR  = $(shell ls -d */)
-ROOTSRC = $(wildcard *.c)
-ROOTOBJ = $(patsubst %.c, %.o, $(ROOTOBJ))
-SUBSRC  = $(shell find $(SUBDIR) -name '*.c')
-SUBOBJ  = $(patsubst %.c, %.o, $(SUBOBJ))
+TARGET          = main
+SUBDIR          = $(shell ls -d */)
+ROOTSRC         = $(wildcard *.c)
+ROOTOBJ         = $(patsubst %.c, %.o, $(ROOTOBJ))
+SUBSRC          = $(shell find $(SUBDIR) -name '*.c')
+SUBOBJ          = $(patsubst %.c, %.o, $(SUBOBJ))
 
 
 $(TARGET): $(ROOTOBJ) $(SUBOBJ)
