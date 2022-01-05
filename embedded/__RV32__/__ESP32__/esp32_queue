@@ -213,7 +213,227 @@ void app_main(void)
 
 
 
+/*******************************************************************************
+        => esp32-c3（向队列中发送数据）__多个Task的输入，只有一个输出__
+*******************************************************************************/
+void send_task_00(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i = 0x00;
+        while (1) {
+                status = xQueueSend(q_handle, &i, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void send_task_11(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i = 0x11;
+        while (1) {
+                status = xQueueSend(q_handle, &i, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
 
+void rx_task(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i;
+        while (1) {
+                if (uxQueueMessageWaiting(q_handle) != 0) {
+                        //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
+                        status = xQueueReceive(q_handle, &i, portMAX_DELAY);
+                        if (status != pdPASS) {
+                                printf("rec fail!\n");
+                        } else {
+                                printf("rec: %d!\n", i);
+                        }
+                } else {
+                        printf("no data!\n");
+                }
+                //vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+void app_main(void)
+{
+        QueueHandle_t q_handle;
+        q_handle = xQueueCreate(5, sizeof(int));
+        if (q_handle != NULL) {
+                printf("Create queue successfully!\n");
+                xTaskCreate(send_task_00, "SEND_TASK_00", 1024*5, (void *)q_handle, 1, NULL);
+                xTaskCreate(send_task_11, "SEND_TASK_00", 1024*5, (void *)q_handle, 1, NULL);
+                xTaskCreate(rx_task_11, "RX_TASK_00", 1024*5, (void *)q_handle, 2, NULL);
+        } else {
+                printf("Can't create queue!\n");
+        }
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3 队列集合
+*******************************************************************************/
+void send_task_00(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i = 0x00;
+        while (1) {
+                status = xQueueSend(q_handle, &i, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+void send_task_11(void *pvParam)
+{
+        QueueHandle_t q_handle;
+        q_handle = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i = 0x11;
+        while (1) {
+                status = xQueueSend(q_handle, &i, 0);
+                if (status != pdPASS) {
+                        printf("send fail!\n");
+                } else {
+                        printf("send done!\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+void rx_task(void *pvParam)
+{
+        QueueSetHandle_t q_set_handle;
+        q_set_handle = (QueueSetHandle_t)pvParam;
+        QueueMemberHandle_t q_data;
+        BaseType_t status;
+        int i;
+        while (1) {
+                //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
+                q_data = xQueueSelectFromSet(q_set_handle, portMAX_DELAY);
+                //从有数据的队列取出数据
+                status = xQueueReceive(q_data, &i, portMAX_DELAY);
+                if (status != pdPASS) {
+                        printf("rec fail!\n");
+                } else {
+                        printf("rec: %d!\n", i);
+                }
+        }
+}
+
+void app_main(void)
+{
+        QueueHandle_t q_handle_00;
+        QueueHandle_t q_handle_01;
+        q_handle_00 = xQueueCreate(5, sizeof(int));     //长度为5
+        q_handle_01 = xQueueCreate(5, sizeof(int));     //长度为5
+        QueueSetHandle_t q_set_handle;                  //队列集合
+        q_set_handle = xQueueCreateSet(10);             //长度为5+5
+        xQueueAddToSet(q_handle_00, q_set_handle);      //添加队列集合
+        xQueueAddToSet(q_handle_01, q_set_handle);      //添加队列集合
+        if ((q_handle_00 != NULL) && (q_handle_01 != NULL) && (q_set_handle != NULL)) {
+                printf("Create queue successfully!\n");
+                xTaskCreate(send_task_00, "SEND_TASK_00", 1024*5, (void *)q_handle_00, 1, NULL);
+                xTaskCreate(send_task_11, "SEND_TASK_00", 1024*5, (void *)q_handle_01, 1, NULL);
+                xTaskCreate(rx_task_11, "RX_TASK_00", 1024*5, (void *)q_set_handle, 2, NULL);
+        } else {
+                printf("Can't create queue!\n");
+        }
+}
+
+
+
+/*******************************************************************************
+        => esp32-c3 队列邮箱
+*******************************************************************************/
+void write_task(void *pvParam)
+{
+        QueueHandle_t mailbox;
+        mailbox = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i = 0;
+        while (1) {
+                status = xQueueOverWrite(mailbox, &i);
+                if (status != pdPASS) {
+                        printf("fail!\n");
+                } else {
+                        printf("done!\n");
+                }
+                i++;
+                vTaskDelay(6000 / portTICK_PERIOD_MS);
+        }
+}
+
+
+void read_task_00(void *pvParam)
+{
+        QueueHandle_t mailbox;
+        mailbox = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i;
+        while (1) {
+                status = xQueuePeek(mailbox, &i, 0);
+                if (status != pdPASS) {
+                        printf("read fail\n");
+                } else {
+                        printf("read i = %d\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+
+void read_task_01(void *pvParam)
+{
+        QueueHandle_t mailbox;
+        mailbox = (QueueHandle_t)pvParam;
+        BaseType_t status;
+        int i;
+        while (1) {
+                status = xQueuePeek(mailbox, &i, 0);
+                if (status != pdPASS) {
+                        printf("read fail\n");
+                } else {
+                        printf("read i = %d\n");
+                }
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+}
+void app_main(void)
+{
+        QueueHandle_t m_handle;
+        m_handle = xQueueCreate(1, sizeof(int));
+        if (m_handle != NULL) {
+                printf("create Mailbox successfully!\n");
+                xTaskCreate(write_task, "WRITE_TASK", 1024, (void *)m_handle, 1, NULL);
+                xTaskCreate(read_task_00, "READ_TASK_00", 1024, (void *)m_handle, 2, NULL);
+                xTaskCreate(read_task_01, "READ_TASK_01", 1024, (void *)m_handle, 2, NULL);
+        } else {
+                printf("Error\n");
+        }
+}
 
 
 
