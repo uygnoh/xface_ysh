@@ -21,6 +21,8 @@ void OSInit(void)
         OSInitHookEnd();
 }
 
+
+
 /*******************************************************************************
         => 初始化杂项函数
 *******************************************************************************/
@@ -35,6 +37,8 @@ void OS_InitMisc(void)
         OSCtxSwCtr      = 0u;   // 上下文切换计数器
         OSIdleCtr       = 0u;   // 空闲任务计数器
 }
+
+
 
 /*******************************************************************************
         => 初始化(就绪表, 就绪组， 任务优先级， 任务优先级指针)
@@ -60,8 +64,10 @@ void OS_InitRdyList(void)
         OSTCBCur      = (OS_TCB *)0;
 }
 
+
+
 /*******************************************************************************
-        => 初始化TCB的空闲链表
+        => 初始化操作系统__空闲链表__
 *******************************************************************************/
 void OS_InitTCBList(void)
 {
@@ -70,9 +76,10 @@ void OS_InitTCBList(void)
         OS_TCB  *ptcb1;
         OS_TCB  *ptcb2;
         
-        // 清除系统所有TCB块
-        OS_MemClr((INT8U *)&OSTCBTbl[0],    sizeof(OSTCBTbl));
-        // 清除系统所有TCB优先级表
+        // 清除系统所有OS_TCB块（OSTCBTbl【】它是TCB的一个表格）
+        // 它使用数组方式实现（TCB的空闲链表）
+        OS_MemClr((INT8U *)&OSTCBTbl[0], sizeof(OSTCBTbl));
+        // 清除系统所有OS_TCB优先级表
         OS_MemClr((INT8U *)&OSTCBPrioTbl[0], sizeof(OSTCBPrioTbl));
         
         // 初始化任务空闲链表
@@ -96,6 +103,7 @@ void OS_MemClr(INT8U *pdest, INT16U size)
                 size--;
         }
 }
+
 
 
 /*******************************************************************************
@@ -123,12 +131,12 @@ INT8U OS_TCBInit(
         
         // 如果空闲链表中有TCB块，则执行下面的语句
         if (ptcb != (OS_TCB *)0) {
-                // Update poointer to free TCB list
+                // Update pointer to free TCB list
                 OSTCBFreeList       = ptcb->OSTCBNext;
                 OS_EXIT_CRITICAL();
                 
                 ptcb->OSTCBStkPtr   = ptops;      //Load Stack pointer in TCB
-                ptcb->oSTCBPrio     = prio;       //Load task priority into TCB
+                ptcb->OSTCBPrio     = prio;       //Load task priority into TCB
                 ptcb->OSTCBStat     = OS_STAT_RDY;     // Task is ready to run
                 ptcb->OSTCBStatPend = OS_STAT_PEND_OK; // clear pend status
                 ptcb->OSTCBDly      = 0u;              // task is not delayed
@@ -139,13 +147,15 @@ INT8U OS_TCBInit(
                 pbos                = pbos;
                 otp                 = opt;
                 id                  = id;
-                
-      /* 任务就绪掩码计算( 64位优先级只用到“6”位二进制数 )  */  
+        //_____________________________________________________________
+        //任务就绪掩码计算( 64位优先级只用到“6”位二进制数 ) （高3位 + 低3位）
+        // 00 111111
+        //_____________________________________________________________
                 #if OS_LOWEST_PRIO <= 63u
                 // 高“3”位对应就绪表中的行 | 也对应(INT8U OSRdyGrp)就绪组中的“位号”
                 // 低“3”位对应就绪表中的列 
-                ptcb->OSTCBY       = (INT8U)(prio >> 3u);  //取出优先级高3位(行)
-                ptcb->OSTCBX       = (INT8U)(prio & 0x07u);//取出优先级低3位(列)
+                ptcb->OSTCBY       = (INT8U)(prio >> 3u);  //取出优先级高3位(行)索引
+                ptcb->OSTCBX       = (INT8U)(prio & 0x07u);//取出优先级低3位(列)索引
                 #endif
                 // OSTCBBitY: 就绪组中位的掩码
                 // OSTCBBitX: 就绪表中，以就绪就绪组中位的掩码为索引，对应位的掩码
@@ -170,9 +180,9 @@ INT8U OS_TCBInit(
                 OSTCBList               = ptcb;
                 
                 
-                // 让任务处于运行态
+                // 让任务处于就绪状态_________________________
                 OSRdyGrp               |= ptcb->OSTCBBitY;
-                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitx;
+                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
                 OSTaskCtr++;
                 OS_EXIT_CRITICAL();
                 return (OS_ERR_NONE);
@@ -181,6 +191,7 @@ INT8U OS_TCBInit(
         
         return (OS_ERR_TASK_NO_MORE_TCB);
 }
+
 
 
 /*******************************************************************************
@@ -248,7 +259,7 @@ INT8U OSTaskCreate(void   (*task)(void *p_arg),
         }
         
         // 如果正在创建的那个任务的优先级的TCB指针为空指针
-        // 那就表示这个任务不存在
+        // 那就表示这个任务不存在，那么就可以创建这个任务
         if (OSTCBPrioTbl[prio] == (OS_TCB *)0) {
                 // OS_TCB_RESERVED = (OS_TCB *)1; 先占个位置
                 OSTCBPrioTbl[prio] = OS_TCB_RESERVED;
@@ -273,7 +284,6 @@ INT8U OSTaskCreate(void   (*task)(void *p_arg),
                 return (err);
         }
         OS_EXIT_CRITICAL();
-        
         return (OS_ERR_PRIO_EXIST);
 }
 
