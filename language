@@ -262,15 +262,3 @@ a[0],a[1],a[2]。 每个元素的大小为 sizeof ( a[0]) , 即 sizof(char)*4。
 即 a[i][j] 的首地址为 &a[i] + j*sizof(char)。 再把&a[i]的值用 a 表示,得到 a[i][j]元素的
 首地址为: a + i*sizof(char)*4+ j*sizof(char)。 同样,可以换算成以指针的形式表示:*(*(a+i)+j)。
 
-
-
-
-
-
-
-
-
-
-
-
-
