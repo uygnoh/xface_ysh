@@ -28,7 +28,7 @@ OS_CPU_SR_Restore
 
 
 /*******************************************************************************
-                              OSCtxSw || OSIntCtxSw
+        => OSCtxSw || OSIntCtxSw
 *******************************************************************************/
 // 在任务中进行上下文切换
 OSCtxSw
@@ -47,20 +47,14 @@ OSIntCtSw
 
 
 /*******************************************************************************
-                       ARM-CM ( OS_CPU_PendSVHandler )
+        => ARM-CM ( OS_CPU_PendSVHandler )
 *******************************************************************************/
 /*
 ;       ARM-CM3 使用小端模式(低字节放在低地址，高字节放在高地址)
 ; Note:
-;      1) pendSV is user to cause a context switch. This is a recommended method
-;         for performing context switches with Cortex-M3. This is because the
-;         Cortex-M3 auto-saves half of the processor context on any exception
-;         , and restores same on return from exception.
-;          So only saving of R4-R11 is required and fixing up the stack
-;         pointers. using the PendSV exception this way means that contex saving 
-;         and restoring is identical wheher it is initiate from a thread or 
-;         occurs due to an interrupt or exception.
-;      2) Pseudo-code is:
+;      1) Cortex-M3处理器， 进入异常前， 会自动保存自动保存（xPSR, PC, LR, L12, R3-R0）
+          用户需要自己保存（R4-R11）， 这8个寄存器， 还需要修改栈顶指针
+;      2) 程序伪代码:
 ;         a) Get the process SP, if 0 then skip (goto d) the saving part (first context switch);
 ;         b) Save remaining regs r4-r11 on process stack;
 ;         c) Save the process SP in its TCB, OSTCBCur->OSTCBStkPtr = SP
@@ -77,10 +71,7 @@ OSIntCtSw
 ;         c) Stack is Main stack (switched form Process stack)
 ;         d) OSTCBCur     points to the OS_TCB of the task to suspend
 ;            OSTCBHighRdy ponits to the OS_TCB of the task to resume
-;      4) Since PendSv is set to lowest priority in the system (by OSSTartHighRdy()
-;         aboue), we know that it will only be run when no other exception
-;         or interrupt is active, and therefore safe to assume that context
-;         being switched out was using the process stack (PSP).
+;      4) 在没有任何（异常和中断）的情况下，进行上下文切换（因为PENDSV异常的优先级为最低）
 */
 
 OS_CPU_PendSVHandler
@@ -92,7 +83,7 @@ OS_CPU_PendSVHandler
         MRS     R0, PSP            ; //PSP is process stack pointer
         
         ; //如果PSP寄存器为“0”，则跳转 (表示这是任务的第一次切换)
-        ; //CBZ,先比较，结果为“0”，则跳转
+        ; //CBZ（先比较）， 如果结果为“0”， 则跳转
         CBZ     R0, OS_CPU_PendSVHandler_nosave
         
         SUBS    R0, R0, #0x20      ; //R0 = (R0 - 32)
@@ -145,7 +136,7 @@ OS_CPU_PendSVHandler_nosave
 
 
 /*******************************************************************************
-                       ARM-CM ( OSStartHighRdy )
+        => ARM-CM ( OSStartHighRdy )
 *******************************************************************************/
 ;Note:   
 ;        1) This function triggers pendSV exception (essentially, causes a 

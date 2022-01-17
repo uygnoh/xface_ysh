@@ -1,0 +1,105 @@
+EESchema Schematic File Version 4
+LIBS:power-cache
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:C C?
+U 1 1 61DFD3B0
+P 1450 1100
+F 0 "C?" H 1565 1146 50  0000 L CNN
+F 1 "C" H 1565 1055 50  0000 L CNN
+F 2 "" H 1488 950 50  0001 C CNN
+F 3 "~" H 1450 1100 50  0001 C CNN
+	1    1450 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 61DFD43C
+P 2550 1100
+F 0 "C?" H 2665 1146 50  0000 L CNN
+F 1 "C" H 2665 1055 50  0000 L CNN
+F 2 "" H 2588 950 50  0001 C CNN
+F 3 "~" H 2550 1100 50  0001 C CNN
+	1    2550 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:L_Coupled L?
+U 1 1 61DFD5C9
+P 2000 1100
+F 0 "L?" H 2000 1378 50  0000 C CNN
+F 1 "L_Coupled" H 2000 1287 50  0000 C CNN
+F 2 "" H 2000 1100 50  0001 C CNN
+F 3 "~" H 2000 1100 50  0001 C CNN
+	1    2000 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 61DFD6E4
+P 3050 800
+F 0 "C?" H 3165 846 50  0000 L CNN
+F 1 "C" H 3165 755 50  0000 L CNN
+F 2 "" H 3088 650 50  0001 C CNN
+F 3 "~" H 3050 800 50  0001 C CNN
+	1    3050 800 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 61DFD718
+P 3050 1350
+F 0 "C?" H 3165 1396 50  0000 L CNN
+F 1 "C" H 3165 1305 50  0000 L CNN
+F 2 "" H 3088 1200 50  0001 C CNN
+F 3 "~" H 3050 1350 50  0001 C CNN
+	1    3050 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Thermistor_NTC TH?
+U 1 1 61DFD7DD
+P 1500 600
+F 0 "TH?" H 1598 646 50  0000 L CNN
+F 1 "NTC(负温度系数热敏电阻)" H 1598 555 50  0000 L CNN
+F 2 "" H 1500 650 50  0001 C CNN
+F 3 "~" H 1500 650 50  0001 C CNN
+	1    1500 600 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Fuse F?
+U 1 1 61DFD8BA
+P 850 900
+F 0 "F?" H 910 946 50  0000 L CNN
+F 1 "Fuse" H 910 855 50  0000 L CNN
+F 2 "" V 780 900 50  0001 C CNN
+F 3 "~" H 850 900 50  0001 C CNN
+	1    850  900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 61DFDE88
+P 1050 1450
+F 0 "R?" H 1120 1496 50  0000 L CNN
+F 1 "R" H 1120 1405 50  0000 L CNN
+F 2 "" V 980 1450 50  0001 C CNN
+F 3 "~" H 1050 1450 50  0001 C CNN
+	1    1050 1450
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

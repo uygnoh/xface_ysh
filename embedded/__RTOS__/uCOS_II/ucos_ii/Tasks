@@ -365,10 +365,11 @@ INT8U OSTaskDel(INT8U prio)
         }
         
         // 把TCB字段设置为相应的状态
-        // 为了防止任务调度
         ptcb->OSTCBDly          = 0u;             // Prevent OSTimeTick() from updating
         ptcb->OSTCBStat         = OS_STAT_RDY;    // Prevent task from beging resumed
         ptcb->OSTCBStatPend     = OS_STAT_PEND_OK;
+        
+        // 为了防止任务调度
         if (OSLockNesting < 255u) {     // Make sure we don't context switch
                 OSLockNesting++;
         }
@@ -399,6 +400,7 @@ INT8U OSTaskDel(INT8U prio)
         }
         return (OS_ERR_NONE);
 }
+
 
 
 /*******************************************************************************
@@ -479,6 +481,7 @@ INT8U OSTaskSuspend(INT8U prio)
 }
 
 
+
 /*******************************************************************************
         => uCOS-II 任务恢复
 *******************************************************************************/
@@ -538,6 +541,7 @@ INT8U OSTaskResume(INT8U prio)
         OS_EXIT_CRITICAL();
         return (OS_ERR_TASK_NOT_SUSPENDED);
 }
+
 
 
 /*******************************************************************************
