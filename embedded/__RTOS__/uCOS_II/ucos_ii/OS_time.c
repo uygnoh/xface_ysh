@@ -1,7 +1,8 @@
 /*******************************************************************************
-        => 时间管理数据结构
+        => 时间管理数据结构( os_time.c)
 *******************************************************************************/
-volatile INT32U         OSTime;         //任务控制块TCB中的OSTCBDly
+volatile INT32U         OSTime;
+volatile INT32U         OSTCBDly;
 
 
 
@@ -14,14 +15,15 @@ void OS_TaskIdle(void *p_arg)
         OS_CPU_SR cpu_sr = 0u;
         #endif
         
-        p_arg = p_arg;          // 解除编译器警告
+        p_arg = p_arg;                  // 解除编译器警告
         for (;;) {
                 OS_ENTER_CRITICAL();
                 OSIdleCtr++;
                 OS_EXIT_CRITICAL();
-                OSTaskIdleHook();
+                OSTaskIdleHook();       //在这个函数中，可以停止CPU，以节省电能
         }
 }
+
 
 
 /*******************************************************************************
@@ -40,16 +42,18 @@ void OS_TaskStat(void *p_arg)
         //Prevent compiler warning for not using 'p_arg'
         p_arg = p_arg;
         while (OSStatRdy == OS_FALSE) {
-                // 等待统计任务准备就绪
+                // 等待统计任务准备就绪（延时0.2秒）
                 OSTimeDly(2u * OS_TICKS_PER_SEC / 10u); 
         }
         
-        //最在空闲任务数缩小100
+        //空闲任务数缩小100
         OSIdleCtrMax /= 100uL;
         
+        //如果(OSIdleCtrlMax == 0uL)，则CPU使用率为（0%）
         if (OSIdleCtrlMax == 0uL) {
                 OSCPUUsage = 0u;
                 for (;;) {
+                        //延时（1秒）
                         OSTimeDly(OS_TICKS_PER_SEC);
                 }
         }
@@ -58,6 +62,7 @@ void OS_TaskStat(void *p_arg)
                 OSIdleCtrRun = OSIdleCtr; //获取上一秒空闲计数器的值
                 OSIdleCtr    = 0u;        //重置下一秒的空闲计数器
                 OS_EXIT_CRITICAL();
+                //因为分子分母同时 x100， 所以得到下面计算公式
                 OSCPUUsage   = (INT8U)(100uL - OSIdleCtrRun / OSIdleCtrMax);
                 OSTaskStatHook();         //调用用户可定义的钩子      
 
@@ -66,6 +71,8 @@ void OS_TaskStat(void *p_arg)
         }
         
 }
+
+
 
 /*******************************************************************************
         => OSTimeDly()
@@ -83,7 +90,9 @@ void OSTimeDly(INT32U ticks)
         if (OSLockNesting > 0u) {       //See if called with scheduler locked
                 return;
         }
-        if (ticks > 0u) {               //0 means no delay
+        
+        //如果（ticks == 0）， 不需要延时
+        if (ticks > 0u) {
                 OS_ENTER_CRITICAL();
                 y            = OSTCBCur->OSTCBY; //Delay current task
                 OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
@@ -96,18 +105,20 @@ void OSTimeDly(INT32U ticks)
         }
 }
 
+
+
 /*******************************************************************************
         => OSTimeDlyHMSM() 小时，分钟，秒，毫秒
 *******************************************************************************/
 INT8U OSTimeDlyHMSM (
-                INT8U hours,
-                INT8U minutes,
-                INT8U seconds,
-                INT8U ms)
+                INT8U  hours,    //小时
+                INT8U  minutes,  //分钟
+                INT8U  seconds,  //秒
+                INT16U ms)       //毫秒(1s == 1000ms)
 {
         INT32U  ticks;
         
-        if (OSIntNesting > 0u) {                //See fi trying to call from ISR
+        if (OSIntNesting > 0u) {                //See if trying to call from ISR
                 return (OS_ERR_TIME_DLY_ISR);
         }
         if (OSLockNesting > 0u) {               //See if called with scheduler locked
@@ -134,16 +145,23 @@ INT8U OSTimeDlyHMSM (
                 return (OS_ERR_TIME_INVALID_MS);
         }
 #endif
+
+        //OS_TICKS_PER_SER( 一秒钟指定的时钟滴答数值 )
         //compute the total number of clock ticks required ...
         //...(rounded to the nearest tick)返回一比较近似的时钟滴答数值
-        //使用“500uL”这个数值，利用四舍五入法
-        ticks = ((INT32U)houurs   * 3600uL              + \
-                 (INT32U)minutes  * 60uL                + \
-                 (INT32U)seconds) * OS_TICKS_PER_SEC    + \
-        OS_TICKS_PER_SEC * ((INT32U)ms + 500uL / OS_TICKS_PER_SEC) / 1000uL;
-        
+        //（使用整形数据模拟FPU运算）使用“500uL”这个数值，利用四舍五入法
+        ticks = (  (INT32U)houurs  * 3600uL                        + \
+                   (INT32U)minutes * 60uL                          + \
+                   (INT32U)seconds)        ) * OS_TICKS_PER_SEC    + \
+                 //（使用整形数据模拟FPU运算）使用“500uL”这个数值，利用四舍五入法
+                 // Y * (X + 500/Y) / 1000
+                 OS_TICKS_PER_SEC * ((INT32U)ms + 500uL / OS_TICKS_PER_SEC) / 1000uL;
+        //最终转换成（时钟滴答数值），使用（OSTimeDly(ticks);）
+        OSTimeDly(ticks);
         return (OS_ERR_NONE);              
 }
+
+
 
 /*******************************************************************************
         => OSTimeTick()
@@ -205,10 +223,9 @@ void OSTimeTick(void)
                                         } else {
                                                 ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
                                         }
-                                        if ((ptcb->OSTCBStat &OS_SATA_SUSPEND) == OS_STAT_RDY) {
+                                        if ((ptcb->OSTCBStat & OS_SATA_SUSPEND) == OS_STAT_RDY) {
                                                 OSRdyGrp               |= ptcb->OSTCBBitY;
                                                 OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
-                                                
                                         }
                                         
                                 }
@@ -218,6 +235,8 @@ void OSTimeTick(void)
                 }
         }           
 }
+
+
 
 /*******************************************************************************
         => OSTimeDlyResume()
@@ -231,7 +250,7 @@ INT8U OSTimeDlyResume(INT8U prio)
         #endif
         
         //判断优先级是否合法，任务不能自己恢复自己
-        //prio=255 忽略
+        //prio == 255 忽略
         if (prio >= OS_LOWEST_PRIO) {
                 return (OS_ERR_PRIO_INVALID);
         }
