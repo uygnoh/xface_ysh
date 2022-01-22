@@ -14,7 +14,7 @@
 //_____________________________________________________________
 su -
 export CRYPT=/home/ysh/Desktop/github/command/security/DM_Crypt/DM_CRYPT
-cryptsetup luksOpen -d $CRYPT/enc.key  /dev/sda2/ mydisk
+cryptsetup luksOpen -d $CRYPT/enc.key  /dev/sda2 mydisk
 ls /dev/mapper/
 mount /dev/mapper/mydisk /mnt
 

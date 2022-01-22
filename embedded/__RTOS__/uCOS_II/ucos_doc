@@ -1,14 +1,15 @@
 /*******************************************************************************
         => https://www.silabs.com/       (freeysh)(weihong)
 *******************************************************************************/
-assingned                       // 分配
-resume                          // 恢复
+Assingned                       // 分配
+Resume                          // 恢复
 Pending                         // 请求
 OSTCBFreeList                   // 它指向TCB的_空闲链表(单链表结构)
 OSTCBList                       // 它指向TCB的_就绪链表(双链表结构)
 OSLockNesting                   // 调度器锁
 OSIntNesting                    // 中断嵌套层数
 Mutex PIP                       // 互斥信号量的进程提升优先级
+
 
 // uCOS-II 全局变量 //
 OS_EXT  INT32U  OSCtxSwCtr;     // Counter of number of context switches
@@ -37,8 +38,10 @@ OS_EXT  OS_TCB  *OSTCBPrioTbl[OS_LOWEST_PRIO + 1u];
 OS_EXT  OS_TCB   OSTCBTbl[OS_MAX_TASKS + OS_N_SYS_TASKS];
 
 
-// uCOS-II 中奇怪的对称代码 //
-_________________________________________________
+
+/*******************************************************************************
+        => uCOS-II 中奇怪的对称代码
+*******************************************************************************/
 // 是为了防止长时间的关中断，影响操作系统的实时性
 // 任务上锁是为了让别的任务不能获得执行权
 //调度器上锁
@@ -52,7 +55,6 @@ OS_ENTRY_CRITICAL();
 if (OSLockNesting > 0) {
         OSLockNesting--;
 }
-_________________________________________________
 
 
 

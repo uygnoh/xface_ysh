@@ -47,7 +47,7 @@ void OS_InitRdyList(void)
 {
         INT8U i;
         
-        // 清除就绪组， 清除就绪表
+        // 清除就绪组， 清除就绪表（OS_RDY_TBl_SIZE = 8）
         OSRdyGrp      = 0u;
         for (i = 0u; i < OS_RDY_TBl_SIZE; i++) {
                 OSRdyTbl[i] = 0u;
@@ -177,7 +177,7 @@ INT8U OS_TCBInit(
                 if (OSTCBList != (OS_TCB *)0) {
                         OSTCBList->OSTCBPrev = ptcb;
                 }
-                OSTCBList               = ptcb;
+                OSTCBList             = ptcb;
                 
                 
                 // 让任务处于就绪状态_________________________

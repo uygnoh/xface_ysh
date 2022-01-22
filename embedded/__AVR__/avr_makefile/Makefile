@@ -4,16 +4,16 @@ CFLAGS  = -Os -mmcu=atmega328p
 
 
 TARGET  = main
-SUBDIR  = $(shell ls -d */)
 ROOTSRC = $(wildcard *.c)
-ROOTOBJ = $(ROOTSRC:%.c=%.o)
+ROOTOBJ = $(patsubst %.c, %.o, $(ROOTSRC))
+SUBDIR  = $(shell ls -d */)
 SUBSRC  = $(shell find $(SUBDIR) -name '*.c')
-SUBOBJ  = $(SUBSRC:%.c=%.o)
+SUBOBJ  = $(patsubst %.c, %.o, $(SUBSRC))
 
 
 $(TARGET): $(ROOTOBJ) $(SUBOBJ)
 	$(CC) $(CFLAGS) -o $(TARGET).elf $(ROOTOBJ) $(SUBOBJ)
-.c.o:
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
