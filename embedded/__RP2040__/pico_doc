@@ -1,0 +1,40 @@
+/*******************************************************************************
+        => Raspberry-Pico
+*******************************************************************************/
+mkdir pico
+cd pico
+git clone -b master https://github.com/raspberrypi/pico-sdk.git
+cd pico-sdk
+git submodule update --init
+cd ..
+git clone -b master https://github.com/raspberrypi/pico-examples.git
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico 工具安装
+*******************************************************************************/
+sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libssl-dev tk python3-tk
+
+wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
+tar -zxvf cmake-3.19.4.tar.gz
+cd cmake-3.19.4
+./bootstrap
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico
+*******************************************************************************/
+cd pico$
+git clone https://github.com/raspberrypi/pico-project-generator.git
+cd pico-project-generator
+export PICO_SDK_PATH="$HOME/Desktop/pico/pico-sdk"
+export DISPLAY=:0
+//生成源码文件
+./pico_project.py --gui
+
+
+
+
+
