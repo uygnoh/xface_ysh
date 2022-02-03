@@ -1,5 +1,5 @@
 /*******************************************************************************
-        => Raspberry-Pico
+        => Raspberry-Pico 相关文件下载
 *******************************************************************************/
 mkdir pico
 cd pico
@@ -14,8 +14,12 @@ git clone -b master https://github.com/raspberrypi/pico-examples.git
 /*******************************************************************************
         => Raspberry-Pico 工具安装
 *******************************************************************************/
+//编译器安装
 sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libssl-dev tk python3-tk
 
+
+//安装CMake
+cd pico$
 wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
 tar -zxvf cmake-3.19.4.tar.gz
 cd cmake-3.19.4
@@ -26,6 +30,7 @@ cd cmake-3.19.4
 /*******************************************************************************
         => Raspberry-Pico
 *******************************************************************************/
+//自动生成Demo
 cd pico$
 git clone https://github.com/raspberrypi/pico-project-generator.git
 cd pico-project-generator
@@ -33,8 +38,4 @@ export PICO_SDK_PATH="$HOME/Desktop/pico/pico-sdk"
 export DISPLAY=:0
 //生成源码文件
 ./pico_project.py --gui
-
-
-
-
 
