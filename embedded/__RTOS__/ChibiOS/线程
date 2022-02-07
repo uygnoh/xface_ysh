@@ -1,0 +1,36 @@
+/*******************************************************************************
+        => ChibiOS__线程__
+*******************************************************************************/
+在chSysInit（）之后，main（）成为一个线程本身，另一个名为idle的线程被创建：
+idle是一个虚拟线程，当所有其他线程都没有准备好运行时，它运行。
+重要的是这些halInit（）和chSysInit（）在main（）的开头执行。在使用之前使用
+任何ChibiOS API都会产生不必要的行为，可能会导致系统崩溃。
+
+
+//声明一个名为waThread1的工作区， 其大小为 128字节
+static THD_WORKING_AREA(<name>, <size>);
+static THD_WORKING_AREA(waThread1, 128);
+
+//声明一个函数，其中<function_Thread1>是函数名，<args>是传递给函数的参数，<code>是它的实现
+static THD_FUNCTION(<function_Thread1>, <args>) {
+        <code>
+}
+
+chThdCreateStatic(
+        waThread1,              //指向工作区域的指针（waThread1，我们之前声明的那个）
+        sizeof(waThread1),     //工作区的大小
+        NORMALPRIO + 1,        //线程的优先级
+        function_Thread1,      //作为线程执行的函数（function_Thread1，之前已声明过）
+        NULL);                 //一个将传递给Thread1函数的参数（在这种情况下，我们没有传递任何东西）
+        
+        
+        
+        
+
+
+
+
+
+
+
+
