@@ -1,0 +1,29 @@
+//中断使能寄存器 (0xE000_E100 – 0xE000_E11C)
+___________________________________________________________
+__IO uint32_t ISER[8];  //Interrupt Set Enable Register
+
+//中断除能寄存器 (0xE000E180 - 0xE000_E19C)
+___________________________________________________________
+__IO uint32_t ICER[8];  //Interrupt Clear Enable Register
+
+//悬起寄存器族 (0xE000_E200 – 0xE000_E21C)
+___________________________________________________________
+__IO uint32_t ISPR[8];  //Interrupt Set Pending Register
+
+//解悬寄存器族 (0xE000E280 - 0xE000_E29C)
+___________________________________________________________
+__IO uint32_t ICPR[8];  //Interrupt Clear Pending Register
+
+//中断活动状态寄存器族 (0xE000_E300_0xE000_E31C) 
+___________________________________________________________
+__IO uint32_t IABR[8];  //Interrupt Active bit Register
+
+//中断优先级寄存器阵列 (0xE000_E400 – 0xE000_E4EF)
+___________________________________________________________
+__IO uint8_t  IP[240];  //Interrupt Priority Register (8Bit wide)
+
+//软件触发中断寄存器STIR (0xE000_EF00) 
+___________________________________________________________
+__O  uint32_t STIR;     //Software Trigger Interrupt Register
+INTID[8:0]              //影响编号为INTID的外部中断， 其悬起位被置位。
+                        例如: 写入8， 则悬起 IRQ#8
