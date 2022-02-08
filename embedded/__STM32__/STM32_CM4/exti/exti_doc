@@ -1,0 +1,69 @@
+/*******************************************************************************
+        => EXTI
+*******************************************************************************/
+EXTI 线 16 连接到 PVD 输出
+EXTI 线 17 连接到 RTC 闹钟事件
+EXTI 线 18 连接到 USB OTG FS 唤醒事件
+EXTI 线 19 连接到 以太网唤醒事件
+EXTI 线 20 连接到 USB OTG HS(在 FS 中配置)唤醒事件
+EXTI 线 21 连接到 RTC 入侵和时间戳事件
+EXTI 线 22 连接到 RTC 唤醒事件
+
+
+
+/*******************************************************************************
+        => 系统配置控制器 (SYSCFG)__System configuration controller
+*******************************************************************************/
+(SYSCFG_MEMRMP)__SYSCFG memory remap register   //SYSCFG 存储器重映射寄存器
+                                                //SYSCFG 外部中断配置寄存器组
+(SYSCFG_EXTICR1)__SYSCFG external interrupt configuration register 1
+(SYSCFG_EXTICR2)__SYSCFG external interrupt configuration register 2
+(SYSCFG_EXTICR3)__SYSCFG external interrupt configuration register 3
+(SYSCFG_EXTICR4)__SYSCFG external interrupt configuration register 4
+
+
+
+/*******************************************************************************
+        => EXTI（寄存器组）
+*******************************************************************************/
+(EXTI_IMR)__Interrupt mask register__   //中断屏蔽寄存器(line = (0..22))
+EXTI->IMR &= ~(1 << line);              //屏蔽来自line线的中断请求
+EXTI->IMR |=  (1 << line);              //开放来自line线的中断请求
+
+
+(EXTI_EMR)__Event mask register__       //事件屏蔽寄存器(line = (0..22))
+EXTI->EMR &= ~(1 << line);              //屏蔽来自line线的事件请求
+EXTI->EMR |=  (1 << line);              //开放来自line线的事件请求
+
+
+(EXTI_RTSR)__Rising trigger selection register__
+                                        //上升沿触发选择寄存器(line = (0..22))
+EXTI->RTSR &= ~(1 << line);             //0:禁止输入线上升沿触发(事件和中断)
+EXTI->RTSR |=  (1 << line);             //1:允许输入线上升沿触发(事件和中断)
+
+
+(EXTI_FTSR)__Falling trigger selection register__
+                                        //下降沿触发选择寄存器
+EXTI->FTSR &= ~(1 << line);             //0:禁止输入线下降沿触发(事件和中断)
+EXTI->FTSR |=  (1 << line);             //1:允许输入线下降沿触发(事件和中断)
+
+
+(EXTI_SWIER)__Software interrupt event register__
+                                        //软件中断事件寄存器
+1 当该位为“0”时, 写“1”将设置（EXTI_PR）寄存器中相应的挂起位
+2 如果在EXTI_IMR和EXTI_EMR中允许产生该中断, 则产生中断请求
+3 通过清除（EXTI_PR）寄存器的对应位(写入“1”), 可以清除该位为“0”
+EXTI->SWIER |= (1 << line);             //向该位写入（1）
+
+
+(EXTI_PR)__Pending register__           //挂起寄存器
+0:没有发生触发请求
+1:发生了选择的触发请求
+当在外部中断线上发生了选择的边沿事件,该位被置“1”。
+在此位中写入“1”可以清除它, 也可以通过改变边沿检测的极性清除。
+EXTI->PR &= ~(1 << line);               //清除挂起位
+
+
+
+
+
