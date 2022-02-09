@@ -36,7 +36,7 @@ void OSIntExit(void)
                 if (OSIntNesting == 0u) {
                         // 如果这个调度器没有上锁，可以调度了
                         if (OSLockNesting == 0u) {
-                        //找到当前就绪表中最高优先级的号码，并把它写在OSPrioHighRdy
+                                //找到当前就绪表中最高优先级的号码，并把它写在OSPrioHighRdy
                                 OS_SchedNew();
                                 //然后以OSPrioHighRdy为索引，找到就绪表中最高优先级的TCB指针
                                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];

@@ -94,14 +94,14 @@ void OSTimeDly(INT32U ticks)
         //如果（ticks == 0）， 不需要延时
         if (ticks > 0u) {
                 OS_ENTER_CRITICAL();
-                y            = OSTCBCur->OSTCBY; //Delay current task
+                y            = OSTCBCur->OSTCBY;        //延时当前正在运行的任务
                 OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
                 if (OSRdyTbl[y] == 0u) {
                         OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
                 }
-                OSTCBCur->OSTCBDly = ticks;     //Load ticks in TCB
+                OSTCBCur->OSTCBDly = ticks;             //Load ticks in TCB
                 OS_EXIT_CRITICAL();
-                OS_Sched();                     //Find next task to run
+                OS_Sched();                             //Find next task to run
         }
 }
 
@@ -159,81 +159,6 @@ INT8U OSTimeDlyHMSM (
         //最终转换成（时钟滴答数值），使用（OSTimeDly(ticks);）
         OSTimeDly(ticks);
         return (OS_ERR_NONE);              
-}
-
-
-
-/*******************************************************************************
-        => OSTimeTick()
-*******************************************************************************/
-void OSTimeTick(void)
-{
-        OS_TCB          *ptcb;
-        #if OS_TICK_STEP_EN > 0u
-        BOOLEAN         step;
-        #endif
-        
-        #if OS_CRITICAL_METHOD == 3u
-        OS_CPU_SR cpu_sr = 0;
-        #endif
-        
-        #if OS_TIME_TICK_HOOK_EN > 0u
-        OSTimeTickHook();
-        #endif
-        
-        #if OS_TIME_GET_SET_EN > 0u
-        OS_ENTER_CRITICAL();
-        OSTime++;
-        OS_EXIT_CRITICAL();
-        #endif
-        
-        if (OSRunning == OS_TRUE) {
-        #if OS_TICK_STEP_EN > 0
-                switch (OSTickStepState) {
-                case OS_TICK_STEP_DIS:
-                        step            = OS_TRUE;
-                        break;
-                case OS_TICK_STEP_WAIT:
-                        step            = OS_FALSE;
-                        break;
-                case OS_TICK_STEP_ONCE:
-                        step            = OS_TRUE;
-                        OSTickStepState = OS_TICK_STEP_WAIT;
-                        break;
-                default:
-                        step            = OS_TRUE
-                        OSTickStepState = OS_TICK_STEP_DIS;
-                        break;
-                }
-                if (step == OS_FALSE) {
-                        return;
-                }
-        #endif
-        
-                ptcb = OSTCBList;
-                while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
-                        OS_ENTER_CRITICAL();
-                        if (ptcb->OSTCBDly != 0) {
-                                ptcb->OSTCBDly--;
-                                if (ptcb->OSTCBDly == 0u) {
-                                
-                                        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
-                                                ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_PEND_ANY;
-                                                ptcb->OSTCBStatPend = OS_STAT_PEND_TO;
-                                        } else {
-                                                ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
-                                        }
-                                        if ((ptcb->OSTCBStat & OS_SATA_SUSPEND) == OS_STAT_RDY) {
-                                                OSRdyGrp               |= ptcb->OSTCBBitY;
-                                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
-                                        }
-                                        
-                                }
-                        }
-                        ptcb = ptcb->OSTCBNext;
-                        OS_EXIT_CRITICAL();
-                }
-        }           
 }
 
 

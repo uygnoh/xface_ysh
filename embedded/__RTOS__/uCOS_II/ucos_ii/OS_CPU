@@ -135,6 +135,11 @@ OS_CPU_PendSVHandler_nosave
 
 
 
+
+
+
+
+
 /*******************************************************************************
         => ARM-CM ( OSStartHighRdy )
 *******************************************************************************/
@@ -177,3 +182,105 @@ OSStartHighRdy
 
 OSSTartHang                             ; //should never get here
         B       OSSTartHang
+        
+        
+        
+/*******************************************************************************
+        => OS_CPU_SysTickHandle（）
+*******************************************************************************/
+void OS_CPU_SysTickHandle(void)
+{
+        OS_CPU_SR cpu_sr;
+        
+        //进入中断
+        OS_ENTER_CRITICAL();
+        OSIntNesting++;
+        OS_EXIT_CRITICAL();
+        
+        OSTimeTick();
+        
+        //退出中断
+        OSIntExit();
+}
+
+
+/*******************************************************************************
+        => OSTimeTick()
+*******************************************************************************/
+这个节拍服务函数是在OSTickISR函数中调用的，目的是在时钟节拍到来时，
+检查每个任务的任务控制块中的.OSTCBDly-1后是否为0，如果是，那么表明
+这个任务刚才是挂起的状态，此时应改变为就绪态
+void OSTimeTick(void)
+{
+        OS_TCB          *ptcb;
+        #if OS_TICK_STEP_EN > 0u
+        BOOLEAN         step;
+        #endif
+        
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_sr = 0;
+        #endif
+        
+        #if OS_TIME_TICK_HOOK_EN > 0u
+        OSTimeTickHook();
+        #endif
+        
+        #if OS_TIME_GET_SET_EN > 0u
+        OS_ENTER_CRITICAL();
+        OSTime++;
+        OS_EXIT_CRITICAL();
+        #endif
+        
+        if (OSRunning == OS_TRUE) {
+        #if OS_TICK_STEP_EN > 0
+                switch (OSTickStepState) {
+                case OS_TICK_STEP_DIS:
+                        step            = OS_TRUE;
+                        break;
+                case OS_TICK_STEP_WAIT:
+                        step            = OS_FALSE;
+                        break;
+                case OS_TICK_STEP_ONCE:
+                        step            = OS_TRUE;
+                        OSTickStepState = OS_TICK_STEP_WAIT;
+                        break;
+                default:
+                        step            = OS_TRUE
+                        OSTickStepState = OS_TICK_STEP_DIS;
+                        break;
+                }
+                if (step == OS_FALSE) {
+                        return;
+                }
+        #endif
+                ///时钟节拍到来时，将控制块双向链表的第一个控制块取出（并不是节拍之前运行的任务）
+                ptcb = OSTCBList;
+                //空闲任务处于控制块双向链表的最后一个，如果取出的控制块为空闲任务的控制块，
+                //那么已经取到最后一个了，就结束
+                while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
+                        OS_ENTER_CRITICAL();
+                        if (ptcb->OSTCBDly != 0) {
+                                ptcb->OSTCBDly--;
+                                if (ptcb->OSTCBDly == 0u) {
+                                        //是不是在等待某种信号，OS_STAT_PEND_ANY，
+                                        //如果是，因为等待超时，所以不再等待某种信号， 清除标志位
+                                        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
+                                                ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_PEND_ANY;
+                                                ptcb->OSTCBStatPend = OS_STAT_PEND_TO;
+                                        } else {
+                                                ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
+                                        }
+                                       
+                                        if ((ptcb->OSTCBStat & OS_SATA_SUSPEND) == OS_STAT_RDY) {
+                                                OSRdyGrp               |= ptcb->OSTCBBitY;
+                                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
+                                        }
+                                        
+                                }
+                        }
+                         //下一个任务控制块
+                        ptcb = ptcb->OSTCBNext;
+                        OS_EXIT_CRITICAL();
+                }
+        }           
+}

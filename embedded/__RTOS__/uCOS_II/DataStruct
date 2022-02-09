@@ -30,11 +30,9 @@ typedef struct os_tcb {
 
 } OS_TCB;
 
-
-
-/*******************************************************************************
+//_____________________________________________________________
         => uCOS-II 任务状态
-*******************************************************************************/
+//_____________________________________________________________
 #define OS_STAT_RDY             0x00u   //Ready to run 就绪
 #define OS_STAT_SEM             0x01u   //Pending on semaphore
 #define OS_STAT_MBOX            0x02u   //Pending on mailbox
@@ -43,7 +41,6 @@ typedef struct os_tcb {
 #define OS_STAT_MUTEX           0x10u   //pending on mutual exclusion semaphore
 #define OS_STAT_FLAG            0x20u   //Pending on event flag group
 #define OS_STAT_MULTI           0x80u   //Pending on multiple events 多事件
-
 #define OS_STAT_PEND_ANY        (OS_STAT_SEM | OS_STAT_MBOX | OS_STAT_Q |\
                                               OS_STAT_MUTEX | OS_STAT_FLAG)
 
@@ -81,9 +78,9 @@ OS_EXT OS_TCB   *OSTCBList      // Pointer to doubly linked list of TCBs
 
 #if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
 typedef struct OS_EVENT {
-        INT8U    OSEventType; //事件类型
-        void    *OSEventPtr;  //它是用来指向消息或队列的结构体
-        INT16U   OSEventCnt;  //这个事件计数器是针对信号量的计数(对其它的事件不起作用)
+        INT8U    OSEventType; //表示事件控制块类型
+        void    *OSEventPtr;  //它是用来指向消息或队列的结构
+        INT16U   OSEventCnt;  //这个事件计数器只针对信号量的计数(对其它的事件类型不起作用)
         
         //事件就绪组，事件就绪表( 用于任务和事件之间登记 )
         //使用就绪组和就绪表这种数据结构，表示所有的任务都可以关注这个事件
@@ -99,11 +96,9 @@ typedef struct OS_EVENT {
 } OS_EVENT;
 #endif
 
-
-
-/*******************************************************************************
+//_____________________________________________________________
         => 事件类型
-*******************************************************************************/
+//_____________________________________________________________
 #define OS_EVENT_TYPE_UNUSED    0u      //没有使用
 #define OS_EVENT_TYPE_MBOX      1u      //消息邮箱
 #define OS_EVENT_TYPE_Q         2u      //消息队列
