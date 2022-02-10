@@ -121,30 +121,27 @@ typedef struct os_sem_data {
 
 
 /*******************************************************************************
-        => 事件标志组控制块
+        => 事件标志控制块
 *******************************************************************************/
 #if OS_FLAGS_NBITS == 8u
-        typedef INT8U OS_FLAGS;
+typedef INT8U OS_FLAGS;
 #endif
-
 #if OS_FLAGS_NBITS == 16u
-        typedef INT16U OS_FLAGS;
+typedef INT16U OS_FLAGS;
 #endif
-
 #if OS_FLAGS_NBITS == 32u
-        typedef INT32U OS_FLAGS;
+typedef INT32U OS_FLAGS;
 #endif
 
 //_____________________________________________________________
 //      事件标志组->1
 //_____________________________________________________________
 typedef struct os_flag_grp {
-        //事件标志组类型, 它只有一个类型选项
-        //在此处它只有一个选项[ OS_EVENT_TYPE_FLAG ]    
-        INT8U           OSFlagType,
-        void          *OSFlagWaitList, //它指向事件标志节点--->2
-        OS_FLAGS        OSFlagFalgs,   //事件标志组类型
-        #if OS_FLAG_NAME_EN > 0u       //事件标志组名称
+        INT8U           OSFlagType,     //事件标志类型, 它只有一个类型选项
+                                        //此处它只能是[ OS_EVENT_TYPE_FLAG ] 类型
+        void          *OSFlagWaitList,  //它指向事件标志节点--->2
+        OS_FLAGS        OSFlagFalgs,    //8，16，32 bit flag
+        #if OS_FLAG_NAME_EN > 0u        //事件标志名称
         INT8U         *OSFlagName,
         #endif
 } OS_FLAG_GRP;
