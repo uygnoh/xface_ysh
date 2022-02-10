@@ -414,14 +414,213 @@ OS_FLAGS OSFlagPend(
 
 
 
+/*******************************************************************************
+        => OS_FlagPost()
+*******************************************************************************/
+OS_FLAG OSFlagPost(
+        OS_FLAG_GRP     *pgrp,
+        OS_FLAGS        flags,
+        INT8U           opt,
+        INT8U           *perr)
+{
+        OS_FLAG_NODE    *pnode;
+        BOOLEAN         sched;
+        OS_FLAGS        flags_cur;
+        OS_FLAGS        flags_rdy;
+        BOOLEAN         rdy;
+        
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR       cpu_sr = 0u
+        #endif
+        
+        #ifdef OS_SAFETY_CRITICAL
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        #if OS_ARG_CHK_EN > 0u
+        if (pgrp == (OS_FLAG_GRP *)0) {
+                *perr = OS_ERR_FLAG_INVALID_PGRP;
+                return ((OS_FLAG)0);
+        }
+        #endif
+        if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {
+                *perr = OS_ERR_EVENT_TYPE;
+                return ((OS_FLAG)0);
+        }
+        
+        OS_ENTER_CRITICAL();
+        switch (opt) {
+        case OS_FLAG_CLR:
+                //Clear the flag specified in the group
+                pgrp->OSFlagFlags &= (OS_FLAGS)~flags;
+                break;
+        case OS_FLAG_SET:
+                //Set the flags specified in the group
+                pgrp->OSFlagFlags |= flags;
+                break;
+        default:
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_FLAG_INVALID_OPT;
+                return ((OS_FLAGS)0);
+        }
+        sched = OS_FALSE;
+        pnode = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
+        
+        //如果pnode不为空
+        while (pnode != (OS_FLAG_NODE *)0) {
+                switch (pnode->OSFlagNodeWaitType) {
+                case OS_FLAG_WAIT_SET_ALL:
+                        flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlag);
+                        if (flags_rdy == pnode->OSFlagNodeFlags) {
+                                rdy = OS_FlagTaskRdy(pnode, flags_rdy);
+                                if (rdy == TRUE) {
+                                        sched = OS_TRUE;
+                                }
+                        }
+                        break;
+                case OS_FLAG_WAIT_SET_ANY:
+                        flag_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlags);
+                        if (flags_rdy != (OS_FLAGS)0) {
+                                rdy = OS_FlagTaskRdy(pnode, flags_rdy);
+                                if (rdy == OS_TRUE) {
+                                        sched = OS_TRUE;
+                                }
+                        }
+                        break;
+                case OS_FLAG_WAIT_CLR_ALL:
+                        flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
+                        if (flags_rdy == pnode->OSFlagNodeFlags) {
+                                rdy = OS_FlagTaskRdy(pnode, flags_rdy);
+                                if (rdy == OS_TRUE) {
+                                        sched = OS_TRUE;
+                                }
+                        }
+                        break;
+                case OS_FLAG_WAIT_CLR_ANY:
+                        flag_rdy = (OS_FLAG)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
+                        if (flags_rdy != (OS_FLAGS)0) {
+                                rdy = OS_FlagTaskRdy(pnode, flags_rdy);
+                                if (rdy == OS_TRUE) {
+                                        sched = OS_TRUE;
+                                }
+                        }
+                        break;
+                default:
+                        OS_EXIT_CRITICAL();
+                        *perr = OS_ERR_FLAG_WAIT_TYPE;
+                        return ((OS_FLAGS)0);
+                }
+                //Ponit to next task waiting for event flag(s)
+                pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
+        }
+        
+        OS_EXIT_CRITICAL();
+        if (sched == OS_TRUE) {
+                OS_Sched();
+        }
+        OS_ENTER_CRITICAL();
+        flag_cur = pgrp->OSFlagFalgs;
+        OS_EXIT_CRITICAL();
+        *perr = OS_ERR_NONE;
+        return (flag_cur);
+}
 
 
 
 
-
-
-
-
+/*******************************************************************************
+        => OS_FlagDel()
+*******************************************************************************/
+OS_FLAG_GRP *OSFlagDel(
+        OS_FLAG_GRP     *pgrp,
+        INT8U           opt,
+        INT8U           *perr)
+{
+        BOOLEAN         tasks_waiting;
+        OS_FLAG_NODE    *pnode;
+        OS_FLAG_GRP     *pgrp_return;
+        
+        #if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR cpu_se        = 0u
+        #endif
+        #ifdef OS_SAFETY_CRITICAL
+        if (perr == (INT8U *)0) {
+                OS_SAFETY_CRITICAL_EXCEPTION();
+        }
+        #endif
+        #if OS_ARG_CHK_EN > 0u
+        if (pgrp == (OS_FLAGS_GRP *)0) {
+                *perr = OS_ERR_FLAG_INVALID_PGRP;
+                return (pgrp);
+        }
+        #endif
+        if (OSIntNesting > 0u) {
+                *perr = OS_ERR_DEL_ISR;
+                return (pgrp);
+        }
+        if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {
+                *perr = OS_ERR_EVENT_TYPE;
+                return (pgrp);
+        }
+        
+        OS_ENTER_CRITICAL();
+        if (pgrp->OSFlagWaitList != (void *)0) {        //See if any tasks waiting on event flags
+                tasks_waiting = OS_TRUE;                //Yes
+        } else {
+                tasks_waiting = OS_FALSE;               //No
+        }
+        
+        switch (opt) {
+        //如果没有任务在等待
+        //_____________________________________________________
+        case OS_DEL_NO_PEND:
+                if (tasks_waiting == OS_FALSE) {
+                #if OS_FLAG_NAME_EN > 0u
+                        pgrp->OSFlagName = (INT8U *)(void *)"?";
+                #endif
+                        pgrp->OSFlagType     = OS_EVENT_TYPE_UNUSED;
+                        pgrp->OSFlagWaitList = (void *)OSFlagFreeList;
+                        pgrp->OSFlagFlags    = (OS_FLAG)0;
+                        OSFlagFreeList       = pgrp;
+                        OS_EXIT_CRITICAL();
+                        *perr                = OS_ERR_NONE;
+                        pgrp_return          = (OS_FLAG_GRP *)0;
+                } else {
+                        OS_EXIT_CRITICAL();
+                        *perr                = OS_ERR_TASK_WAITING;
+                        pgrp_return          = pgrp;
+                }
+        //不管有没有任务在等待，都删除它
+        //_____________________________________________________
+        case OS_DEL_ALWAYS:
+                pnode = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
+                while (pnode != (OS_FLAG_NODE *)0) {
+                        (void)OS_FlagTaskRdy(pnode, (OS_FLAG)0);
+                        pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
+                }
+                #if OS_FLAG_NAME_EN > 0u
+                pgrp->OSFlagName = (INT8U *)(void *)"?";
+                #endif
+                pgrp->OSFlagType = OS_EVENT_TYPE_UNUSED;
+                pgrp->OSFlagWaitList = (void *)OSFlagFreeList;
+                pgrp->OSFlagFlags = (OS_FLAGS)0;
+                OSFlagFreeList = pgrp;
+                OS_EXIT_CRITICAL();
+                if (tasks_waiting == OS_TRUE) {
+                        OS_Sched();
+                }
+                *perr       = OS_ERR_NONE;
+                pgrp_return = (OS_FLAG_GRP *)0;
+                break;
+        default:
+                OS_EXIT_CRITICAL();
+                *perr       = OS_ERR_INVALID_OPT;
+                pgrp_return = pgrp;
+                break;
+        }
+        return (pgrp_return);
+}
 
 
 
