@@ -171,21 +171,32 @@ typedef struct os_flag_node {
 *******************************************************************************/
 typedef struct os_q {
         struct os_q      *OSQPtr;       //Link to next queue control block in list of free blocks
+                                        //指向结构体本身（用于构造队列空闲链表的指针）
         void            **OSQStart;     //Pointer to start of queue data
+                                        //指向消息队列的起始位置
         void            **OSQEnd;       //Pointer to end of queue data
+                                        //指向消息队列的结束位置（特殊用法：它指向最后一个消息的下一个消息）
         void            **OSQIn;        //Pointer to where next message will be inserted in the Q
+                                        //它是指向要插入消息的下一条消息
         void            **OSQOut;       //Pointer to where next message will be extracted from the Q
+                                        //它是指向要被提取消息的下一条消息
         INT16U            OSQSize;      //Size of quue(maximum number of entries)
+                                        //表示这个队列的大小（可以进入队列的最大消息数）
         INT16U            OSQEntries;   //Current number of entries in the queue
+                                        //当前实际进入队列的消息数
 } OS_Q;
-
+//队列为满（OSQSize    == OSQEntries）__FULL
+//队列为空（         0 == OSQEntries）__EMPTY
 
 typedef struct os_q_data {
         void            *OSMsg;         //Pointer to next message to be extracted from queue
+                                        //指向下一条要出队的消息
         INT16U            OSNMsgs;      //Number of message in message queue
+                                        //队列中消息的数目
         INT16U            OSQSize;      //Size of message queue
+                                        //消息队列最大能容纳的消息数目
         OS_PRIO           OSEventTbl[OS_EVENT_TBL_SIZE];
-        OS_PRIO           OSEventGrp;   //
+        OS_PRIO           OSEventGrp;   //事件就绪组
 }
 
 

@@ -19,15 +19,15 @@ OS_EVENT *OSMboxCreate(void *pmsg)
         }
         
         OS_ENTER_CRITICAL();
-        pevent = OSEventFreeList;               //Get next free event control block
+        pevent = OSEventFreeList;               //从事件控制块中摘出一个空闲链表
         if (OSEventFreeList != (OS_Event *)0) { //See if pool of free ECB pool was empty
                 OSEventFreeList = (OS_Event *)OSEventFreeList->OSEventPtr;
         }
         OS_EXIT_CRITICAL();
         if (pevnet != (OS_EVENT *)0) {
                 pevent->OSEeventType    = OS_EVENT_TYPE_MBOX;
-                pevent->OSEventCnt      = 0u;
-                pevent->OSEventPtr      = pmsg; //Deposit message in event control block
+                pevent->OSEventCnt      = 0u;   //消息邮箱也不用这个资源
+                pevent->OSEventPtr      = pmsg; //把这个消息赋值给事件指针
         #if OS_EVENT_NAME_EN > 0u
                 pevent->OSEventName     = (INT8U *)(void *)"?";
         #endif
@@ -35,7 +35,6 @@ OS_EVENT *OSMboxCreate(void *pmsg)
         }
         return (pevent); //Return pointer to event control block
 }
-
 #if (OS_EVENT_EN)
 void OS_EventWaitListInit(OS_EVENT *pevent)
 {
@@ -45,6 +44,7 @@ void OS_EventWaitListInit(OS_EVENT *pevent)
                 pevent->OSEvnetTbl[i] = 0u;
         }
 }
+#endif
 
 /*******************************************************************************
         => 消息邮箱申请
@@ -76,6 +76,10 @@ void *OSMboxPend( OS_EVENT *pevent,
         if (OSIntNesting > 0u) {
                 *perr = OS_ERR_PEND_ISR;
                 return ((void *)0);
+        }
+        if (OSLockNesting > 0u) {
+                *perr = OS_ERR_PEND_LOCKED;
+                return ((void *)0);    
         }
         
         OS_ENTER_CRITICAL();
@@ -123,7 +127,7 @@ void *OSMboxPend( OS_EVENT *pevent,
 }
 
 /*******************************************************************************
-        => 消息邮箱释放
+        => 消息邮箱释放（写入消息）
 *******************************************************************************/
 INT8U OSMboxPost(OS_EVNET *pevnet, void *pmsg)
 {
@@ -164,6 +168,10 @@ INT8U OSMboxPost(OS_EVNET *pevnet, void *pmsg)
 /*******************************************************************************
         => 消息邮箱释放Opt
 *******************************************************************************/
+#define OS_POST_NONE                    0x00    //NO option selectd
+#define OS_POST_OPT_BROADCAST           0x01    //广播方式
+#define OS_POST_OPT_FRONT               0x02    //Post to highest priority task waiting
+#define OS_POST_OPT_NO_SCHED            0x03    //Do noe call the scheduler if this option is selected
 INT8U OSMboxPostOpt(OS_EVENT *pevent
                     void *pmsg,
                     INT8U opt)
@@ -179,10 +187,10 @@ INT8U OSMboxPostOpt(OS_EVENT *pevent
                 return (OS_ERR_POST_NULL_PTR);
         }
         #endif
-        
         if (pevent->OSEventType != OS_EVENT_TYPE_MBOX) {
                 return (OS_ERR_EVENT_TYPE);
         }
+        
         OS_ENTER_CRITICAL();
         //表明有任务在申请我所释放的这条消息
         if (pevent ->OSEventGrp != 0) {
@@ -195,6 +203,7 @@ INT8U OSMboxPostOpt(OS_EVENT *pevent
                         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_MBOX, OS_STAT_PEND_OK);
                 }
                 OS_EXIT_CRITICAL();
+                //指定选项要不要调度
                 if ((opt & OS_POST_OPT_NO_SCHED) == 0u) {
                         OS_Sched();
                 }
@@ -242,7 +251,9 @@ OS_EVENT *OSMboxDel(OS_EVENT *pevnet,
                 *perr = OS_ERR_DEL_ISR;
                 return (pevent);
         }
+        
         OS_ENTER_CRITICAL();
+        //判断有没有任务在申请将要删除的这个消息邮箱
         if (pevent->OSEventGrp != 0u) {
                 tasks_waiting = OS_TRUE;
         } else {
@@ -286,7 +297,7 @@ OS_EVENT *OSMboxDel(OS_EVENT *pevnet,
                 *perr         = OS_ERR_NONE;
                 pevent_return = (OS_EVENT *)0;
                 break
-        default:        //参数错误
+        default:                //参数错误
                 OS_EXIT_CRITICAL();
                 *perr         = OS_ERR_INVALID_OPT;
                 pevent_return = pevent;
