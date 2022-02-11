@@ -1,7 +1,8 @@
-
+// 初始化链表
+//______________________________________________________________________________
 void vListInitialise( List_t * const pxList )
 {
-        ////将链表索引指针指向最后一个节点
+        //将链表索引指针指向最后一个节点
         pxList->pxIndex             = (ListItem_t *)&(pxList->xListEnd);
 
         //将链表最后一个节点的辅助排序值设置为最大，确保该节点就是链表的最后节点
@@ -15,15 +16,16 @@ void vListInitialise( List_t * const pxList )
         pxList->uxNumberOfItems     = (UBaseType_t) 0U;
 }
 
-
+// 初始化链表节点
+//______________________________________________________________________________
 void vListInitialiseItem(ListItem_t * const pxItem)
 {
         //初始化该节点所在的链表为空，表示节点还没有插入任何链表
 	pxItem->pvContainer = NULL;
 }
 
-
-/* 将节点插入链表的尾部 */
+// 将节点插入链表的尾部
+//______________________________________________________________________________
 void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
 {
         ListItem_t * const pxIndex = pxList->pxIndex;
@@ -39,7 +41,8 @@ void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
         (pxList->uxNumberOfItems)++;
 }
 
-
+//将新节点插入指定的（链表中）
+//______________________________________________________________________________
 void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
 {
         ListItem_t *pxIterator;
@@ -68,7 +71,8 @@ void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
         (pxList->uxNumberOfItems)++;
 }
 
-
+//从节点中移出链表
+//______________________________________________________________________________
 UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 {
         List_t * const pxList = (List_t *)pxItemToRemove->pvContainer;
