@@ -1,4 +1,22 @@
 //______________________________________________________________________________
+//      => 添加任务到就绪列表中
+//______________________________________________________________________________
+#define prvAddTaskToReadyList( pxTCB )                                         \
+        traceMOVED_TASK_TO_READY_STATE( pxTCB );                               \
+        taskRECORD_READY_PRIORITY( (pxTCB)->uxPriority );                      \
+        vListInsertEnd( &(pxReadyTasksLists[ (pxTCB)->uxPriority ]),           \
+                                         &( (pxTCB )->xStateListItem) );       \
+        tracePOST_MOVED_TASK_TO_READY_STATE( pxTCB )
+
+
+
+
+
+
+
+
+
+//______________________________________________________________________________
 //      => 使用静态方法创建任务
 //______________________________________________________________________________
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
@@ -225,7 +243,7 @@ static void prvInitialiseNewTask(
         #endif
 
         #if( configNUM_THREAD_LOCAL_STORAGE_POINTERS != 0 )
-        for (x = 0; x < (UBaseType_ )configNUM_THREAD_LOCAL_STORAGE_POINTERS; x++) {
+        for (x = 0; x < (UBaseType_t )configNUM_THREAD_LOCAL_STORAGE_POINTERS; x++) {
                 pxNewTCB->pvThreadLocalStoragePointers[ x ] = NULL;
         }
         #endif

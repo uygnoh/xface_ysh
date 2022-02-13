@@ -319,12 +319,13 @@ void HAL_SYSTICK_Callback(void)
                         tmp = bldc_dev.step_counter * 50;
                         pid_result = IncPIDCalc(tmp);      //增量式PID计算
                         pid_result = pid_result * 10 / 25; //*10/25转速和占空比转换
-                        if ((pid_result + speed_duty) < 70)
+                        if ((pid_result + speed_duty) < 70) {
                                 speed_duty = 70;
-                        else if ((pid_result + speed_duty) > 1000)
+                        } else if ((pid_result + speed_duty) > 1000) {
                                 speed_duty = 1000;
-                        else
+                        } else{
                                 speed_duty += pid_result;
+                        }
                         time_count = 0;
                         bldc_dev.step_counter = 0;
                 } 
