@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+/*
+//回调函数是一种在定义的模块不运行，交给另一个模块运行的函数
+//回调函数的适用条件：
+        1 模块之间互相独立， 存在着相互调用关系
+        2 两个模块处在不同的层次，为了确保单向依赖（单向调用）
+          通常在下层设置函数指针，然后在上层设置回调函数。
+
+
+void fun_00(void) {
+        printf("我是函数__00\n");
+}
+void fun_01(void) {
+        printf("我是函数__01\n");
+}
+int main(void) {
+        void (*ptr)(void);      //函数指针（它指向无参数无返回值的函数）
+        void * (*ptr)(int *);   //函数指针（只能指向这样的函数
+                                          void *fun(int *a) ）
+                                //函数指针赋值（必须格式要相同）
+        ptr = fun_00;           //让ptr这个指针（指向fun_00的整个函数）
+        //函数实际上就是一个代码块，这个代码块执行到最后就会返回
+        
+        (*ptr)();       //原始的运行方法（表示通过 * 拿到所指的对象），然后让它运行
+                        //（*表示解引用）
+        ptr();          //函数指针的运行（简写的方法），实际就是它指向的函数对象的运行
+        
+        ptr = fun_01;   //修改ptr的指向
+        ptr();          //运行ptr指向的对象
+}      
+        
+        
+        
+        
+//______________________________________________________________________________
+// run.c
+//______________________________________________________________________________
+#include <unistd.h>
+
+//定义一个函数指针，在循环中运行
+void (*step)(void) = NULL;
+
+void run(void) {
+        int cnt = 0;
+        while (1) {
+                //有赋值才运行，（避免乱运行）
+                if (step() != NULL) {
+                        step();
+                }
+                cnt++;
+                sleep(1);
+        }
+}
+
+//______________________________________________________________________________
+// main.c
+//______________________________________________________________________________
+//先声明，再使用
+extern void void (*step)(void);
+
+void mystep_cb(void) {
+        printf("记秒到时！\n");
+}
+
+int main(void)
+{
+        step = mystep_cb;
+        run();
+}
+*/
+
+
+
+/*
+//______________________________________________________________________________
+// run.c
+//______________________________________________________________________________
+#include <unistd.h>
+
+//定义一个函数指针，在循环中运行
+//void (*step)(void) = NULL;
+//void (*step)(int) = NULL;
+int (*step)(int) = NULL;
+void run(void) {
+        int cnt = 0;
+        int result;
+        while (1) {
+                //有赋值才运行，（避免乱运行）
+                if (step() != NULL) {
+                        result = step(cnt);
+                        printf("result = %d\n", result);
+                }
+                cnt++;
+                sleep(1);
+        }
+}
+//安装函数
+void cb_install(int (*p)(int)) {
+        step = p;
+}
+//______________________________________________________________________________
+// main.c
+//______________________________________________________________________________
+//先声明，再使用
+//extern void void (*step)(int);
+//void cb_install(void (*p)(int));
+void cb_install(int (*p)(int);
+
+int mystep_cb(int i) {
+        printf("记秒到时, i=%d\n", i);
+        return (1024);
+}
+
+int main(void)
+{
+        cb_install(mystep_cb);
+        run();
+}
+
+*/
+
+//gcc -Wall -pthread -g -o call call.c
+void *callback(void *arg)
+{
+        //pthread_self()获取本线程的（ID）
+	printf("call back running, %lu\n", pthread_self());
+	return (NULL);
+}
+
+
+
+int main(void)
+{
+        //创建第一个线程
+	pthread_t tid_01;
+	//将callback进去，此时callback就是回调函数
+	pthread_create(&tid_01, NULL, callback, NULL);
+
+        //创建第二个线程
+	pthread_t tid_02;
+	pthread_create(&tid_02, NULL, callback, NULL);
+
+	pthread_join(tid_01, NULL);
+	pthread_join(tid_02, NULL);
+	
+	return 0;
+}

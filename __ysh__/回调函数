@@ -16,6 +16,11 @@
 //函数fun_00()=>调用函数fun_01()， 同时函数fun_02()作为参数传递给函数fun_01()
 
 
+1 函数我名字可以作为参数使用
+2 如果一个函数的名字被当作参数来使用，那么这个函数就可以称之为（回调函数）
+3 回调函数（不是说这个函数有特别之处，只是被当做参数使用而已）
+
+
 
 /*******************************************************************************
         => STM32__回调函数主程序__
@@ -41,8 +46,8 @@ typedef struct {
 
 
 extern led_struct_t     LED;
-extern void             LED_ON(led_enum_t);
-extern void             LED_OFF(led_enum_t);
+extern void             led_on(led_enum_t);
+extern void             led_off(led_enum_t);
 
 
 //________________________________________________________|
@@ -51,11 +56,11 @@ extern void             LED_OFF(led_enum_t);
 void (*led_fun_ptr)(led_enum_t, void (*callback_fun)(led_enum_t));
 //初始化（定义了个中间函数）
 led_struct_t LED = {
-        led_fun_ptr
+        led_fun_ptrx
 };
 
 //实现中间函数功能（它只起到一个调用的作用）
-void led_fun_ptr(led_enum_t led_number, void (*callback_fun)(led_enum_t))
+void led_fun_ptrx(led_enum_t led_number, void (*callback_fun)(led_enum_t))
 {
         (*callback_fun)(led_number);
 }

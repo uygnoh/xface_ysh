@@ -6,22 +6,26 @@
 //________________________________________________________|
 #ifndef __STATE_MACHINE_H__
 #define __STATE_MACHINE_H__
-//定义（状态机）枚举类型
+// 定义（状态机）枚举类型
+//_____________________________________________________________
 typedef enum {
         STATE_01 = (uint8_t)0x01,
         STATE_02 = (uint8_t)0x02,
         STATE_03 = (uint8_t)0x03,
 } state_machine_enum_t;
 
+
 //定义（状态机）结构体类型
+//_____________________________________________________________
 typedef struct {
         state_machine_enum_t status;    //状态机的状态
-        void (*fun_state01)(void);
-        void (*fun_state02)(void);
-        void (*fun_state03)(void);
+        void (*fun_state01)(void);      //函数指针
+        void (*fun_state02)(void);      //函数指针
+        void (*fun_state03)(void);      //函数指针
 } state_machine_struct_t;
 
-//结构体声明
+
+//_____________________________________________________________
 extern state_machine_struct_t state_machine;
 extern void (*fun_state01)(void);
 extern void (*fun_state02)(void);
@@ -33,11 +37,8 @@ extern void (*fun_state03)(void);
 //________________________________________________________|
 //      LED.C                                             |
 //________________________________________________________|
-void (*fun_state01)(void);
-void (*fun_state02)(void);
-void (*fun_state03)(void);
-
-
+// 状态机结构体（赋初值）
+//_____________________________________________________________
 state_machine_struct_t state_machine = {
         STATE_01,       //默认为状态“1”
         fun_state01,
@@ -45,6 +46,8 @@ state_machine_struct_t state_machine = {
         fun_state03,
 };
 
+// 功能函数
+//_____________________________________________________________
 void fun_state01(void)
 {
         HAL_Delay(500);
@@ -73,7 +76,8 @@ void fun_state03(void)
         state_machine.status = STATE_01;
 }
 
-
+// 运行状态机程序
+//_____________________________________________________________
 void state_machine_runing(void)
 {
         switch (state_machine.status) {

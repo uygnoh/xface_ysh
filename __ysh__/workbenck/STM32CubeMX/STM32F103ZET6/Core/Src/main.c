@@ -94,19 +94,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART1_UART_Init();
-  MX_ADC1_Init();
+  //MX_USART1_UART_Init();
+  //MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
-
-GPIOG_CLOCK_ENABLE();
 while (1) {
-        get_temperature();
-        printf("DS18B20: %.3f\n", ds18b20_read_temperature());
-        LED.bsp_led(LED_02, led_on);
-        delay_ms(100);
-        LED.bsp_led(LED_02, led_off);
-        delay_ms(100);
+        //get_temperature();
+        //printf("DS18B20: %.3f\n", ds18b20_read_temperature());
+        LED->bsp_led(LED_02, led_on);
+        delay_ms(1000);
+        LED->bsp_led(LED_02, led_off);
+        delay_ms(1000);
 }
 
 
