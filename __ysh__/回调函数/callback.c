@@ -55,9 +55,7 @@ extern void             led_off(led_enum_t);
 //________________________________________________________|
 void (*led_fun_ptr)(led_enum_t, void (*callback_fun)(led_enum_t));
 //初始化（定义了个中间函数）
-led_struct_t LED = {
-        led_fun_ptrx
-};
+led_struct_t LED = { led_fun_ptrx };
 
 //实现中间函数功能（它只起到一个调用的作用）
 void led_fun_ptrx(led_enum_t led_number, void (*callback_fun)(led_enum_t))

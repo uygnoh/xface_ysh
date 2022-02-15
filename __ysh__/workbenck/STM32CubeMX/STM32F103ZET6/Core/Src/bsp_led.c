@@ -1,8 +1,7 @@
 #include "bsp_led.h"
 
 //定义结构体类型数据（此时已经分配了存储空间）
-led_struct_t *LED = {bsp_ledx};
-
+led_struct_t LED = {bsp_ledx};
 
 void bsp_ledx(led_enum_t led_number, void (*callback_fun)(led_enum_t))
 {

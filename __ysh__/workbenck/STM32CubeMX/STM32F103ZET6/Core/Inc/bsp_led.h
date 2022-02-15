@@ -2,6 +2,7 @@
 #define __BSP_LED_H__
 #include "stm32f1xx_hal.h"
 
+//声明一个枚举类型
 typedef enum {
         LED_01 = (uint8_t)0x01,
         LED_02 = (uint8_t)0x02,
@@ -14,7 +15,7 @@ typedef struct {
 } led_struct_t;
 
 
-led_struct_t *LED;
+extern led_struct_t LED;
 void bsp_ledx(led_enum_t led_number, void (*callback_fun)(led_enum_t));
 void led_on(led_enum_t led_number);
 void led_off(led_enum_t led_number);

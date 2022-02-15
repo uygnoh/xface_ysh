@@ -88,7 +88,7 @@ void run(void) {
         int result;
         while (1) {
                 //有赋值才运行，（避免乱运行）
-                if (step() != NULL) {
+                if (step(cnt) != NULL) {
                         result = step(cnt);
                         printf("result = %d\n", result);
                 }
@@ -121,6 +121,12 @@ int main(void)
 
 */
 
+
+
+
+//______________________________________________________________________________
+// CallbackFunction
+//______________________________________________________________________________
 //gcc -Wall -pthread -g -o call call.c
 void *callback(void *arg)
 {
@@ -128,9 +134,6 @@ void *callback(void *arg)
 	printf("call back running, %lu\n", pthread_self());
 	return (NULL);
 }
-
-
-
 int main(void)
 {
         //创建第一个线程

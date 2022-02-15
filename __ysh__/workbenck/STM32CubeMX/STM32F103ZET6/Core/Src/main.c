@@ -100,9 +100,9 @@ int main(void)
 while (1) {
         //get_temperature();
         //printf("DS18B20: %.3f\n", ds18b20_read_temperature());
-        LED->bsp_led(LED_02, led_on);
+        LED.bsp_led(LED_02, led_on);
         delay_ms(1000);
-        LED->bsp_led(LED_02, led_off);
+        LED.bsp_led(LED_02, led_off);
         delay_ms(1000);
 }
 
