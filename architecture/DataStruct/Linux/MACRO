@@ -9,7 +9,7 @@
 
 //计算member在type中的位置
 // include/linux/stddef.h
-#define offsetof(TYPE, MEMBER)  (size_t)(&((TYPE*)0)->MEMBER)
+#define offsetof(TYPE, MEMBER)  ((size_t)&((TYPE*)0)->MEMBER)
 
 
 //根据member的地址取type的起始地址
