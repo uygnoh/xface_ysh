@@ -1,14 +1,28 @@
 #include "bsp_led.h"
 
-//定义结构体类型数据（此时已经分配了存储空间）
-led_struct_t LED = {bsp_ledx};
+/*******************************************************************************
+        => 回调函数（中间层函数）
+*******************************************************************************/
+//私有函数声明
+static void bsp_ledx(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T));
 
-void bsp_ledx(led_enum_t led_number, void (*callback_fun)(led_enum_t))
+//公有变量定义
+LED_STRUCT_T LED = {
+        bsp_ledx,
+};
+
+//私有函数
+static void bsp_ledx(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
 {
         (*callback_fun)(led_number);
 }
 
-void led_on(led_enum_t led_number)
+
+
+/*******************************************************************************
+        => 回调函数（底层函数）
+*******************************************************************************/
+void led_on(LED_ENUM_T led_number)
 {
         switch (led_number) {
         case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET); break;
@@ -18,7 +32,7 @@ void led_on(led_enum_t led_number)
         }
 }
 
-void led_off(led_enum_t led_number)
+void led_off(LED_ENUM_T led_number)
 {
         switch (led_number) {
         case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); break;

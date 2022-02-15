@@ -29,7 +29,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .debug_info   0000a198  00000000  00000000  00020209  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000020ef  00000000  00000000  0002a3a1  2**0
+ 13 .debug_abbrev 000020ed  00000000  00000000  0002a3a1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_aranges 00000820  00000000  00000000  0002c490  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00003ea4  00000000  00000000  0002d3e8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000aafb  00000000  00000000  0003128c  2**0
+ 17 .debug_line   0000aafd  00000000  00000000  0003128c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000995ba  00000000  00000000  0003bd87  2**0
+ 18 .debug_str    000995ba  00000000  00000000  0003bd89  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  000d5341  2**0
+ 19 .comment      00000053  00000000  00000000  000d5343  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00002e4c  00000000  00000000  000d5394  2**2
+ 20 .debug_frame  00002e4c  00000000  00000000  000d5398  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -873,11 +873,11 @@ Disassembly of section .text:
  8000b5e:	bf00      	nop
 
 08000b60 <bsp_ledx>:
+        bsp_ledx,
+};
 
-//定义结构体类型数据（此时已经分配了存储空间）
-led_struct_t LED = {bsp_ledx};
-
-void bsp_ledx(led_enum_t led_number, void (*callback_fun)(led_enum_t))
+//私有函数
+static void bsp_ledx(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
 {
  8000b60:	b580      	push	{r7, lr}
  8000b62:	b082      	sub	sp, #8
@@ -898,7 +898,10 @@ void bsp_ledx(led_enum_t led_number, void (*callback_fun)(led_enum_t))
 
 08000b7c <led_on>:
 
-void led_on(led_enum_t led_number)
+/*******************************************************************************
+        => 回调函数（底层函数）
+*******************************************************************************/
+void led_on(LED_ENUM_T led_number)
 {
  8000b7c:	b580      	push	{r7, lr}
  8000b7e:	b082      	sub	sp, #8
@@ -950,7 +953,7 @@ void led_on(led_enum_t led_number)
 
 08000bcc <led_off>:
 
-void led_off(led_enum_t led_number)
+void led_off(LED_ENUM_T led_number)
 {
  8000bcc:	b580      	push	{r7, lr}
  8000bce:	b082      	sub	sp, #8

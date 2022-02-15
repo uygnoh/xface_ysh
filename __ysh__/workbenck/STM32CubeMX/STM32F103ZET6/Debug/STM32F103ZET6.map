@@ -4084,7 +4084,6 @@ LOAD /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.ide.mcu.externaltools.g
  *(.text*)
  .text.bsp_ledx
                 0x0000000008000b60       0x1c Core/Src/bsp_led.o
-                0x0000000008000b60                bsp_ledx
  .text.led_on   0x0000000008000b7c       0x50 Core/Src/bsp_led.o
                 0x0000000008000b7c                led_on
  .text.led_off  0x0000000008000bcc       0x50 Core/Src/bsp_led.o
@@ -4882,25 +4881,25 @@ LOAD /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.ide.mcu.externaltools.g
  .debug_info    0x0000000000007dfa     0x18c1 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
  .debug_info    0x00000000000096bb      0xadd Regf103/source/reg_systick.o
 
-.debug_abbrev   0x0000000000000000     0x20ef
- .debug_abbrev  0x0000000000000000      0x180 Core/Src/bsp_led.o
- .debug_abbrev  0x0000000000000180      0x14e Core/Src/gpio.o
- .debug_abbrev  0x00000000000002ce      0x293 Core/Src/main.o
- .debug_abbrev  0x0000000000000561      0x11d Core/Src/stm32f1xx_hal_msp.o
- .debug_abbrev  0x000000000000067e      0x163 Core/Src/stm32f1xx_it.o
- .debug_abbrev  0x00000000000007e1      0x286 Core/Src/syscalls.o
- .debug_abbrev  0x0000000000000a67      0x1bf Core/Src/sysmem.o
- .debug_abbrev  0x0000000000000c26      0x14e Core/Src/system_stm32f1xx.o
- .debug_abbrev  0x0000000000000d74      0x1c4 Core/Src/usart.o
- .debug_abbrev  0x0000000000000f38       0x12 Core/Startup/startup_stm32f103zetx.o
- .debug_abbrev  0x0000000000000f4a      0x1ed Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
- .debug_abbrev  0x0000000000001137      0x313 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
- .debug_abbrev  0x000000000000144a      0x228 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.o
- .debug_abbrev  0x0000000000001672      0x1e8 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
- .debug_abbrev  0x000000000000185a      0x273 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
- .debug_abbrev  0x0000000000001acd      0x193 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
- .debug_abbrev  0x0000000000001c60      0x28b Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
- .debug_abbrev  0x0000000000001eeb      0x204 Regf103/source/reg_systick.o
+.debug_abbrev   0x0000000000000000     0x20ed
+ .debug_abbrev  0x0000000000000000      0x17e Core/Src/bsp_led.o
+ .debug_abbrev  0x000000000000017e      0x14e Core/Src/gpio.o
+ .debug_abbrev  0x00000000000002cc      0x293 Core/Src/main.o
+ .debug_abbrev  0x000000000000055f      0x11d Core/Src/stm32f1xx_hal_msp.o
+ .debug_abbrev  0x000000000000067c      0x163 Core/Src/stm32f1xx_it.o
+ .debug_abbrev  0x00000000000007df      0x286 Core/Src/syscalls.o
+ .debug_abbrev  0x0000000000000a65      0x1bf Core/Src/sysmem.o
+ .debug_abbrev  0x0000000000000c24      0x14e Core/Src/system_stm32f1xx.o
+ .debug_abbrev  0x0000000000000d72      0x1c4 Core/Src/usart.o
+ .debug_abbrev  0x0000000000000f36       0x12 Core/Startup/startup_stm32f103zetx.o
+ .debug_abbrev  0x0000000000000f48      0x1ed Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
+ .debug_abbrev  0x0000000000001135      0x313 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
+ .debug_abbrev  0x0000000000001448      0x228 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.o
+ .debug_abbrev  0x0000000000001670      0x1e8 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
+ .debug_abbrev  0x0000000000001858      0x273 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
+ .debug_abbrev  0x0000000000001acb      0x193 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
+ .debug_abbrev  0x0000000000001c5e      0x28b Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
+ .debug_abbrev  0x0000000000001ee9      0x204 Regf103/source/reg_systick.o
 
 .debug_aranges  0x0000000000000000      0x820
  .debug_aranges
@@ -5036,25 +5035,25 @@ LOAD /opt/st/stm32cubeide_1.6.0/plugins/com.st.stm32cube.ide.mcu.externaltools.g
  .debug_macro   0x00000000000039c8      0x1a3 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
  .debug_macro   0x0000000000003b6b      0x339 Regf103/source/reg_systick.o
 
-.debug_line     0x0000000000000000     0xaafb
- .debug_line    0x0000000000000000      0x6a4 Core/Src/bsp_led.o
- .debug_line    0x00000000000006a4      0x670 Core/Src/gpio.o
- .debug_line    0x0000000000000d14      0xa56 Core/Src/main.o
- .debug_line    0x000000000000176a      0x65a Core/Src/stm32f1xx_hal_msp.o
- .debug_line    0x0000000000001dc4      0x733 Core/Src/stm32f1xx_it.o
- .debug_line    0x00000000000024f7      0x7d5 Core/Src/syscalls.o
- .debug_line    0x0000000000002ccc      0x4cb Core/Src/sysmem.o
- .debug_line    0x0000000000003197      0x6d7 Core/Src/system_stm32f1xx.o
- .debug_line    0x000000000000386e      0x6cb Core/Src/usart.o
- .debug_line    0x0000000000003f39       0x87 Core/Startup/startup_stm32f103zetx.o
- .debug_line    0x0000000000003fc0      0x904 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
- .debug_line    0x00000000000048c4      0xaec Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
- .debug_line    0x00000000000053b0     0x122e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.o
- .debug_line    0x00000000000065de      0x9c3 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
- .debug_line    0x0000000000006fa1      0xd12 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
- .debug_line    0x0000000000007cb3      0x862 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
- .debug_line    0x0000000000008515     0x1c80 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
- .debug_line    0x000000000000a195      0x966 Regf103/source/reg_systick.o
+.debug_line     0x0000000000000000     0xaafd
+ .debug_line    0x0000000000000000      0x6a6 Core/Src/bsp_led.o
+ .debug_line    0x00000000000006a6      0x670 Core/Src/gpio.o
+ .debug_line    0x0000000000000d16      0xa56 Core/Src/main.o
+ .debug_line    0x000000000000176c      0x65a Core/Src/stm32f1xx_hal_msp.o
+ .debug_line    0x0000000000001dc6      0x733 Core/Src/stm32f1xx_it.o
+ .debug_line    0x00000000000024f9      0x7d5 Core/Src/syscalls.o
+ .debug_line    0x0000000000002cce      0x4cb Core/Src/sysmem.o
+ .debug_line    0x0000000000003199      0x6d7 Core/Src/system_stm32f1xx.o
+ .debug_line    0x0000000000003870      0x6cb Core/Src/usart.o
+ .debug_line    0x0000000000003f3b       0x87 Core/Startup/startup_stm32f103zetx.o
+ .debug_line    0x0000000000003fc2      0x904 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
+ .debug_line    0x00000000000048c6      0xaec Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
+ .debug_line    0x00000000000053b2     0x122e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.o
+ .debug_line    0x00000000000065e0      0x9c3 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
+ .debug_line    0x0000000000006fa3      0xd12 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
+ .debug_line    0x0000000000007cb5      0x862 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
+ .debug_line    0x0000000000008517     0x1c80 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
+ .debug_line    0x000000000000a197      0x966 Regf103/source/reg_systick.o
 
 .debug_str      0x0000000000000000    0x995ba
  .debug_str     0x0000000000000000    0x8fb43 Core/Src/bsp_led.o
