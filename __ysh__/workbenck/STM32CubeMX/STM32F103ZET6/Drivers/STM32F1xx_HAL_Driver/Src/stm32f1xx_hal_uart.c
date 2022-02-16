@@ -380,7 +380,7 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
     UART_InitCallbacksToDefault(huart);
-
+    HAL_UART_TxHalfCpltCallback(huart);
     if (huart->MspInitCallback == NULL)
     {
       huart->MspInitCallback = HAL_UART_MspInit;

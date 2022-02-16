@@ -3,19 +3,19 @@
 /*******************************************************************************
         => 回调函数（中间层函数）
 *******************************************************************************/
-//私有函数声明
-static void bsp_ledx(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T));
-
-//公有变量定义
-LED_STRUCT_T LED = {
-        bsp_ledx,
-};
-
-//私有函数
-static void bsp_ledx(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
+//函数声明
+void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T));
+//函数功能
+void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
 {
         (*callback_fun)(led_number);
 }
+
+//定义（LED_STRUCT_T LED）结构体，申请空间并初始化它
+LED_STRUCT_T LED = { HOS };
+
+//定义（LED_STRUCT_T *）结构体指针，并没有初始化指针
+LED_STRUCT_T *BSP;
 
 
 

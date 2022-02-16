@@ -5,3 +5,102 @@
 //      }
 //函数（fun_01）调用（fun_02），同时将（fun_03）作为参数传递给（fun_02），
 //此时，fun_01为应用层函数，fun_02为中间层函数，fun_03为回调函数，回调函数只是一种说法。
+/*******************************************************************************
+        => bsp_led.h
+*******************************************************************************/
+#ifndef __BSP_LED_H__
+#define __BSP_LED_H__
+#include "stm32f1xx_hal.h"
+
+
+//声明一个枚举类型
+typedef enum {
+        LED_01 = (uint8_t)0x01,
+        LED_02 = (uint8_t)0x02,
+        LED_03 = (uint8_t)0x03,
+} LED_ENUM_T;
+
+
+//声明一个结构体类型（它并没有分配存储空间）
+//HOS（它是一个函数指针） =>它指向
+//HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
+typedef struct {
+        void (*HOS)(LED_ENUM_T, void (*callback_fun)(LED_ENUM_T));
+} LED_STRUCT_T;
+
+
+//外部变量
+extern LED_STRUCT_T LED;
+extern LED_STRUCT_T *BSP;
+
+//外部函数
+extern void led_on(LED_ENUM_T led_number);
+extern void led_off(LED_ENUM_T led_number);
+
+#endif
+
+
+
+/*******************************************************************************
+        => bsp_led.c
+*******************************************************************************/
+#include "bsp_led.h"
+
+/*******************************************************************************
+        => 回调函数（中间层函数）
+*******************************************************************************/
+//私有函数声明
+void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T));
+//私有函数
+void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
+{
+        (*callback_fun)(led_number);
+}
+
+//定义（LED_STRUCT_T LED）结构体，申请空间并初始化它
+LED_STRUCT_T LED = { HOS };
+
+//定义（LED_STRUCT_T *）结构体指针，并没有初始化指针
+LED_STRUCT_T *BSP;
+
+
+/*******************************************************************************
+        => 回调函数（底层函数）
+*******************************************************************************/
+void led_on(LED_ENUM_T led_number)
+{
+        switch (led_number) {
+        case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET); break;
+        case LED_02: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET); break;
+        case LED_03: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET); break;
+        default: break;
+        }
+}
+
+void led_off(LED_ENUM_T led_number)
+{
+        switch (led_number) {
+        case LED_01: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); break;
+        case LED_02: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET); break;
+        case LED_03: HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); break;
+        default: break;
+        }
+}
+
+
+
+/*******************************************************************************
+        => 主程序
+*******************************************************************************/
+int main(void)
+{
+        //初始化指针（注意： 指针一定要初始化它！）
+        BSP = &LED;
+
+        while (1) {
+                BSP->HOS(LED_02, led_on);
+                delay_ms(1000);
+                BSP->HOS(LED_02, led_off);
+                delay_ms(1000);
+        }
+}

@@ -74,6 +74,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -97,13 +99,22 @@ int main(void)
   //MX_USART1_UART_Init();
   //MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+
+
+//初始化结构体指针，（！！！！）
+        BSP = &LED;
+
+
 while (1) {
         //get_temperature();
         //printf("DS18B20: %.3f\n", ds18b20_read_temperature());
-        LED.bsp_led(LED_02, led_on);
+
+        BSP->HOS(LED_02, led_on);
         delay_ms(1000);
-        LED.bsp_led(LED_02, led_off);
+        BSP->HOS(LED_02, led_off);
         delay_ms(1000);
+        (*GPIOA).CRL = 0xFF;
+
 }
 
 
