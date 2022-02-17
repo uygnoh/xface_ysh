@@ -35,7 +35,7 @@ void TIM3_IRQHandler(void)
 void pid_init(void)
 {
         pid.sv          = 120;  //用户设定值
-        pid.kp          = 30;   //
+        pid.kp          = 30;   //比例系数
         pid.t           = 500;  //PID计算周期（500ms）
         pid.ti          = 5000000;//积分时间
         pid.td          = 1000; //微分时间（1S中的变化率）
@@ -46,7 +46,7 @@ void pid_init(void)
 
 void pid_calc(void)
 {
-        float del_ek;
+        float del_ek;   //最近两次偏差之差
         float ti;
         float ki;
         float td;
