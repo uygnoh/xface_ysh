@@ -105,6 +105,7 @@ static void can_mode_setup(void)
         Y.CAN_TXFP      = DISABLE;              //发送 FIFO 优先级 取决于报文标示符
         Y.CAN_Mode      = CAN_Mode_LoopBack;    //调式使用（回环模式）*************
         Y.CAN_SJW       = CAN_SJW_2tq;          //重新同步跳跃宽度 2 个时间单元
+                                                //(它不影响波特率配置)
         Y.CAN_BS1       = CAN_BS1_5tq;          //时间段 1 占用了 5 个时间单
         Y.CAN_BS2       = CAN_BS2_3tq;          //时间段 2 占用了 3 个时间单
         Y.CAN_Prescaler = 4;//波特率分频器, 定义了时间单元的时间长度 36/(1+5+3)/4=1Mbps

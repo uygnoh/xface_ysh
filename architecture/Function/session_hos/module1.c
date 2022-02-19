@@ -23,8 +23,8 @@ HOS_STATE_ENUM_T HOSAPI(hos_run)(struct __hos *hos)
                 return (HOS_STATE_NULL);
         }
 
-        if (hos->state != HOS_STATE_RUNNING) &&
-           (hos->state != HOS_STATE_RUNNING_IDLE) {
+        if ((hos->state != HOS_STATE_RUNNING) &&
+            (hos->state != HOS_STATE_RUNNING_IDLE)) {
                 return (hos->state);
         }
 
@@ -33,7 +33,7 @@ HOS_STATE_ENUM_T HOSAPI(hos_run)(struct __hos *hos)
         hos_buffer_push(punit->hos_submodule, buf);
 
         if (punit->hos_submodule != NULL) {
-                state = puint->hos_submodule->hos_run(punit->hos_submodule);
+                state = punit->hos_submodule->hos_run(punit->hos_submodule);
                 if (state == HOS_STATE_STOP) {
                         bstop |= 1;
                 }
@@ -90,7 +90,7 @@ int HOSAPI(HOS_CMD_STREAM_START)(struct __hos *hos, HOS_FILE_STRUCT_T *file)
         }
         
         if (file->filename) {
-                prinf("==== module1 start, filename: %s ====\n", file->filename);
+                printf("==== module1 start, filename: %s ====\n", file->filename);
         }
         
         HOS_FILE_STRUCT_T fl;
@@ -112,7 +112,7 @@ int HOSAPI(HOS_CMD_STREAM_START)(struct __hos *hos, HOS_FILE_STRUCT_T *file)
 }
 
 static
-int SESSIONAPI(HOS_CMD_STREAM_STOP)(struct __hos *hos)
+int HOSAPI(HOS_CMD_STREAM_STOP)(struct __hos *hos)
 {
         HOS_UNIT_STRUCT_T *punit = NULL;
 
@@ -196,10 +196,10 @@ void HOSAPI(hos_deinit)(struct __hos *hos)
         HOS_UNIT_STRUCT_T *punit = NULL;
 
         if (hos != NULL) {
-                punit (HOS_UNIT_STRUCT_T *)hos->handle;
+                punit = (HOS_UNIT_STRUCT_T *)hos->handle;
         }
         if (punit != NULL) {
-                free(puint);
+                free(punit);
         }
 
         printf("hos_init : %s ..\n", hos->name);

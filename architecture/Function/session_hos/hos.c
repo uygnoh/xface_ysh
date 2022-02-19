@@ -26,6 +26,7 @@ static const struct __hos  *ghos_null[] = {NULL, NULL, };
 static const struct __hos **ghos_all = (const struct __hos **)ghos_null;
 
 
+//系统全部初始化
 void hos_init_all(const struct __hos *ghos[])
 {
         int index;
@@ -47,6 +48,7 @@ void hos_init_all(const struct __hos *ghos[])
         }
 }
 
+//系统全部重新初始化
 void hos_deinit_all(void)
 {
         int index;
@@ -112,7 +114,7 @@ HOS_STATE_ENUM_T hos_run(struct __hos *hos)
                 }
                 index++;
         }
-        if (ghos_all[index == NULL) {
+        if (ghos_all[index] == NULL) {
                 return (-1);
         }
         return (hos->hos_run(hos));

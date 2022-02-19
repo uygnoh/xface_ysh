@@ -1,0 +1,135 @@
+//______________________________________________________________________________
+// hos.h
+//______________________________________________________________________________
+#define HOSAPI(function)        hos_private##function
+
+typedef void *HOSHANDLE;
+typedef void *FIL;
+
+// 用枚举定义系统中（所有模块）
+typedef enum {
+        HOS_NONE,
+        //System
+        HOS_SYS,
+        //Modules
+        HOS_MODULE01,
+        HOS_MODULE02,
+        HOS_MODULE03,
+        //End
+        HOS_TYPE,
+} HOS_TYPE_ENUM_T;
+
+//用结构体定义文件类型
+typedef struct __hos_file {
+        char *filename;
+        int type;
+        int sub_type;
+} HOS_FILE_STRUCT_T;
+
+//用枚举定义系统状态
+typedef enum {
+        HOS_STATE_NULL = 0,
+        HOS_STATE_INITED,
+        HOS_STATE_RUNNING,
+        HOS_STATE_RUNNING_IDLE,
+        HOS_STATE_RUNNING_PAUSE,
+        HOS_STATE_STOP,
+} HOS_STATE_ENUM_T;
+
+//用结构体定义（系统函数指针）
+struct __hos {
+        const char name[128];
+        const long types;
+        
+        HOSHANDLE(*hos_init)(struct __hos *hos);
+        HOS_STATE_ENUM_T state;
+        HOSHANDLE handle;
+        HOS_STATE_ENUM_T (*hos_run)(struct __hos *hos);
+        int(*hos_command)(struct __hos *hos, int cmd, void *params);
+        void(*hos_deinit)(struct __hos *hos);
+};
+
+//用枚举定义系统（命令类型）
+typedef enum {
+        HOS_CMD_NONE = 0,
+        HOS_CMD_STREAM_START,
+        HOS_CMD_STREAM_PAUSE,
+        HOS_CMD_STREAM_RESUME,
+        HOS_CMD_STREAM_STOP,
+        HOS_CMD_STREAM_BUFCHANGED,
+        //hos special command
+        HOS_CMD_STREAM_USER = 0x10,
+} HOS_CMD_ID_ENUM_T;
+
+#define HOS_CMD_USER(x)         ((x) + HOS_CMD_STREAM_USER)
+
+enum {
+       HOS_CMD_STREAM_USER0 =  HOS_CMD_USER(0),
+       HOS_CMD_STREAM_USER1
+};
+//______________________________________________________________________________
+// hos.c
+//______________________________________________________________________________
+char *hos_buffer_push(struct __hos *hos, char *buf)
+char *hos_buffer_pop(struct __hos *hos)
+static const struct __hos  *ghos_null[] = {NULL, NULL, };
+static const struct __hos **ghos_all = (const struct __hos **)ghos_null;
+
+void hos_init_all(const struct __hos *ghos[])
+void hos_deinit_all(void)
+
+struct __hos *hos_get(HOS_TYPE_ENUM_T type)
+struct __hos *hos_next(struct __hos *hos)
+
+HOS_STATE_ENUM_T hos_run(struct __hos *hos)
+int hos_command(struct __hos *hos, int cmd, void *params)
+
+//______________________________________________________________________________
+// hos_sys.c
+//______________________________________________________________________________
+#include "hos.h"
+typedef struct {
+        struct __hos *hos;
+} HOS_UNIT_STRUCT_T;
+
+static HOS_STATE_ENUM_T HOSAPI(hos_run)(struct __hos *hos)
+static int HOSAPI(hos_command)(struct __hos *hos, int cmd, void *params)
+
+static void HOSAPI(hos_deinit)(struct __hos *hos)
+static HOSHANDLE HOSAPI(hos_init)(struct __hos *hos)
+
+struct __hos ghos_sys =
+{
+	"sys", (1 << HOS_SYS), &HOSAPI(hos_init),
+};
+
+//______________________________________________________________________________
+// module1.c
+//______________________________________________________________________________
+#include "hos.h"
+
+// put all global variables to this struct
+typedef struct {
+        struct __hos *hos;
+        struct __hos *hos_submodule;
+        HOS_TYPE_ENUM_T mytype;
+        char *load_buf;
+        FIL file;
+} HOS_UNIT_STRUCT_T;
+
+
+static int HOSAPI(HOS_CMD_STREAM_BUFCHANGED)(struct __hos *hos, char *buf)
+static int HOSAPI(HOS_CMD_STREAM_START)(struct __hos *hos, HOS_FILE_STRUCT_T *file)
+static int HOSAPI(HOS_CMD_STREAM_STOP)(struct __hos *hos)
+
+
+static HOS_STATE_ENUM_T HOSAPI(hos_run)(struct __hos *hos)
+static int HOSAPI(hos_command)(struct __hos *hos, int cmd, void *params)
+static void HOSAPI(hos_deinit)(struct __hos *hos)
+static HOSHANDLE HOSAPI(hos_init)(struct __hos *hos)
+struct __hos ghos_module1 = {
+        "module1", (1 << HOS_MODULE01), &HOSAPI(hos_init),
+};
+
+
+

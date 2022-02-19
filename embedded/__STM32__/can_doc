@@ -1,0 +1,81 @@
+.GPIO_Mode  = GPIO_Mode_IPU;            //接收（RX），上拉输入模式
+.GPIO_Speed = GPIO_Speed_50MHz;         //输出速度
+.GPIO_Mode  = GPIO_Mode_AF_PP;          //发送（TX），复用推挽输出
+
+void nvic_configuration(void)
+{
+        NVIC_InitTypeDef NVIC_InitStructure;
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+        
+        NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriortiy = 0;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);
+}
+
+
+void can_configuration(void)
+{
+        CAN_InitTypeDef CAN_InitStructure;
+        CAN_FilterInit
+        
+        CAN_DeInit(CAN1);
+        CAN_StructInit(&CAN_InitStructure);
+        
+        //关闭时间触发模式
+        CAN_InitStructure.CAN_TTCM = DISABLE;
+        //关闭自动离管理
+        CAN_InitStructure.CAN_ABOM = DISABLE;
+        //关闭自动唤醒模式
+        CAN_InitStructure.CAN_AWUM = DISABLE;
+        //禁止报文自动重传
+        CAN_InitStructure.CAN_NART = DISABLE;
+        //FIFO 溢出时报文覆盖原文件
+        CAN_InitStructure.CAN_RFLM = DISABLE;
+        //报文发送优先级取决于ID号
+        CAN_InitStructure.TXFP = DISABLE;
+        //正常的工作模式
+        CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
+        
+        //设置CAN波特率（125K）
+        CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
+        CAN_InitStructure.CAN_BS1 = CAN_BS1_3tq;
+        CAN_InitStructure.CAN_BS2 = CAN_BS2_2tq;
+        CAN_InitStructure.CAN_Prescaler = 48;
+        CAN_Init(CAN1, &CAN_InitSTructure);
+        
+        //屏蔽
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

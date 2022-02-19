@@ -12,6 +12,7 @@
 typedef void *HOSHANDLE;
 typedef void *FIL;
 
+// 用枚举定义系统中（各个模块名称）
 typedef enum {
         HOS_NONE,
         //System
@@ -24,12 +25,14 @@ typedef enum {
         HOS_TYPE,
 } HOS_TYPE_ENUM_T;
 
-typedef struct __hos_file {
+//用结构体定义（各个模块参数）
+typedef struct {
         char *filename;
         int type;
         int sub_type;
 } HOS_FILE_STRUCT_T;
 
+//用枚举定义（模块状态）
 typedef enum {
         HOS_STATE_NULL = 0,
         HOS_STATE_INITED,
@@ -39,10 +42,13 @@ typedef enum {
         HOS_STATE_STOP,
 } HOS_STATE_ENUM_T;
 
+//系统结构体(__HOS__)
 struct __hos {
+        //全局变量
         const char name[128];
         const long types;
         
+        //接口函数
         HOSHANDLE(*hos_init)(struct __hos *hos);
         HOS_STATE_ENUM_T state;
         HOSHANDLE handle;
@@ -51,6 +57,7 @@ struct __hos {
         void(*hos_deinit)(struct __hos *hos);
 };
 
+//通用接口中的（命令类型）
 typedef enum {
         HOS_CMD_NONE = 0,
         HOS_CMD_STREAM_START,
@@ -70,11 +77,14 @@ enum {
 };
 
 
-extern struct hos *hos_get(HOS_TYPE_ENUM_T type);
-extern struct hos *hos_next(struct __hos *hos);
+extern struct __hos *hos_get(HOS_TYPE_ENUM_T type);
+extern struct __hos *hos_next(struct __hos *hos);
 extern void hos_init_all(const struct __hos *ghos_all[]);
 extern void hos_deinit_all(void);
 extern void hos_buffer_init(struct __hos *hos);
 extern char *hos_buffer_push(struct __hos *hos, char *buf);
 extern char *hos_buffer_pop(struct __hos *hos);
+extern void hos_buffer_deInit(struct __hos *hos);
+extern HOS_STATE_ENUM_T hos_run(struct __hos *hos);
+extern int hos_command(struct __hos *hos, int cmd, void *params);
 #endif

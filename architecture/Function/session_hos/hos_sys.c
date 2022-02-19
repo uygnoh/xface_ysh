@@ -74,7 +74,7 @@ int HOSAPI(hos_command)(struct __hos *hos, int cmd, void *params)
 }
 
 static
-void HOSAPI(hos_deinit)(struct __host *hos)
+void HOSAPI(hos_deinit)(struct __hos *hos)
 {
         HOS_UNIT_STRUCT_T *punit = NULL;
 
@@ -109,7 +109,7 @@ HOSHANDLE HOSAPI(hos_init)(struct __hos *hos)
 	punit->hos = hos;
 	hos->hos_run     = &HOSAPI(hos_run);
 	hos->hos_command = &HOSAPI(hos_command);
-	hos->hos_deinit  = &HOSAPI(hos_deint);
+	hos->hos_deinit  = &HOSAPI(hos_deinit);
 	hos->state       = HOS_STATE_INITED;
 
 	/* hos */

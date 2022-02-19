@@ -1,0 +1,160 @@
+/*******************************************************************************
+        => #pragma 编译器的字节对齐原则
+*******************************************************************************/
+1 //数据类型的自身的对齐值
+        char                    (1)
+        short                   (2)
+        int float double        (4)
+2 //结构体自身对齐值
+        其成员中（自身对齐值最大）的那个值
+3 //指定对齐值：
+        #pragma pack(value)时指定对齐值value
+4 //数据成员，结构体的有效对齐值
+        自身对齐值和指定对齐值中小的那个值
+5 //重要概念
+        有效对齐N： 存放起始地址 % N = 0
+        对齐值圆整： 结构体成员变量占用总长度需要是对结构体有效对齐值的整数倍
+//#pragma示例（假定运行在32们系统）
+//_____________________________________________________________
+#pragma pack(2)         //指定按（2）字节对齐
+struct book {
+        char b;         //2
+        int a;          //4
+        short c;        //2     
+};
+#pragma pack()          //取消按字节对齐
+sizeof(struct book) = 8
+
+
+#pragma pack(1)         //指定按（1）字节对齐
+struct book {
+        char b;         //1
+        int a;          //4
+        short c;        //2     
+};
+#pragma pack()          //取消按字节对齐
+sizeof(struct book) = 7
+
+
+
+/*******************************************************************************
+        => 位段
+*******************************************************************************/
+C语言允许在一个结构体中以（位）为单位来指定其成员所占内存长度，
+这种以位为单位的成员称为“位段”或称为“位域”（bit field）. 利
+用们段能够用较少的位数存储数据，即节省空间， 又方便操作。
+// 类型说明符 [位段名] : 位长
+1 位段名可选，位长表示该位段占的二进制位数，不能超过该数据类型上限
+2 位段成员的类型说明符必须为int , signed int, unsigned int
+3 无名位段不能被访问，但会占用空间
+4 不能对位段进行取地址操作
+struct node {
+        unsigned int a:4;       //位段名为（a），占4位
+        unsigned int  :0;       //无名位段，占0位
+        unsigned int b:4;       //位段名为（b），占4位
+        int c:32;       //位段名为（c），占32位
+        int  :6;        //无名位段，占6位
+};
+
+#include <stdio.h>
+struct controller {
+        unsigned int adr :16;
+        unsigned int err :8;
+        unsigned int ope :8;
+};
+void out(struct controller *d)
+{
+        printf("ope: %u, err: %u, adr: %u\n",
+                d->ope, d->err, d->adr);
+}
+int main(void)
+{
+        struct controller disk;
+        disk.adr = 65535;
+        disk.err = 255;
+        disk.ope = 255;
+        
+        struct controller *p;
+        p = &disk;
+        out(p);
+        return (0);
+}
+
+
+
+/*******************************************************************************
+        => union 联合体
+*******************************************************************************/
+//将几种不同类型的变量存放到同一段内存中，这种数据结构称为联合或者共用体。
+1 所有成员使用的是内存中的相同位置
+2 联合的长度是它最长成员的长度
+3 联合变量的定义方式和结构体相同，只要将关键字换成（union）
+4 联合变量初始化必须是联合的第一个成员类型值
+
+int main(void)
+{
+        union U {
+                int a;
+                float b;
+                char c;
+        } u = {10};
+        printf("a: %d, b: %f, c: %c\n", u.a, u.b, u.c);
+        u.b = 3.5f;
+        printf("a: %d, b: %f, c: %c\n", u.a, u.b, u.c);
+        return (0);
+}
+
+
+
+/*******************************************************************************
+        => 字符指针数组
+*******************************************************************************/
+char *name[] = {"FreeBSD", "HOS", "Debian"};
+1 字符指针数组中存放的是字符串的首地址，而字符串本身存放在常量区，是不能够修改的
+2 字符指针数组存储字符串要比字符数组存储字符串的开销小
+3 使用二级指针也可以来操作字符指针数组
+
+
+void out_name(char *name[], int n)
+{
+        int i;
+        for (i = 0; i < n; i++) {
+                printf("%s\n", name[i]);
+        }
+}
+void out_name2(char **pp, int n)
+{
+        int i;
+        for (i = 0; i < n; i++) {
+                printf("%s ", *(pp+i));
+        }
+        printf("\n");
+}
+int main(void)
+{
+        char *name[] = {"FreeBSD", "HOS", "Debian"};
+        printf("第 name[0] 的字符串为: %s, 第 name[0] 的字符串地址为: %p\n", name[0], name[0]);
+        printf("字符数组的首地址: %p, 字符数组的首元素地址: %p \n", name, &name[0]);
+        out_name(name, 3);
+        out_name2(name, 3);
+}
+
+
+#include <stdio.h>
+int main(int argc, char *argv[])
+{
+        printf("argc: %d\n", argc);
+        
+        int i;
+        for (i = 0; i < argc; i++) {
+                printf("%s ", *(argv+i));
+        }
+        printf("\n");
+        return (0);
+}
+
+
+
+
+
+
