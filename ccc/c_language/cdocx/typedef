@@ -1,42 +1,41 @@
-###########################################################
-% 使用 typedef 定义函数指针
-###########################################################
-typedef long BaseType_t;
-typedef BaseType_t (*TaskHookFunction_t)( void * );
-TaskHookFunction_t xTaskGetApplicationTaskTag( TaskHandle_t xTask );
-
-typedef int (PTypeFun1)(int, int);  /* 声明一个函数类型 */
-typedef int (*PTypeFun2)(int, int); /* 声明一个函数指针类型 */
-int (*padd)(int, int);              /* 传统形式，定义一个函数指针变量 */
+/*******************************************************************************
+        => 使用 typedef 定义函数指针
+*******************************************************************************/
+typedef int (PTypeFun1)(int, int);      //声明一个函数类型
+typedef int (*PTypeFun2)(int, int);     //声明一个函数指针类型
+int (*padd)(int, int);                  //传统形式，定义一个函数指针变量
 
  /*
- * 我们为什么一定要使用 typedef 定义函数指针呢？
- * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
- * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。
- */
+  * 我们为什么一定要使用 typedef 定义函数指针呢？
+  * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
+  * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。
+  */
 #include <stdio.h>
 void FunA() 
 {
-    printf("call FunA\n");
+        printf("call FunA\n");
 }
 void FunB(int n) 
 {
-    printf("call FunB. n is : %d\n", n);
+        printf("call FunB. n is : %d\n", n);
 }
 typedef void (*PtrFunA)();
 typedef void (*PtrFunB)(int);
 /* 函数指针作为函数参数使用 */
 void usePtrFunA(PtrFunA p) 
 {
-    p();
+        p();
 }
 void usePtrFunB(PtrFunB p, int n) 
 {
-    p(n);
+        p(n);
 }
  
  
  
+/*******************************************************************************
+        => 使用 typedef 定义函数指针
+*******************************************************************************/
 /*
  *             < 函数指针作为函数返回值使用 >
  * 函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译
@@ -75,7 +74,7 @@ int main() {
 typedef int (PTypeFun1)(int, int);  /* 声明一个函数类型 */
 typedef int (*PTypeFun2)(int, int); /* 声明一个函数指针类型 */
 int (*padd)(int, int);              /* 传统形式，定义一个函数指针变量 */
- /*
+/*
  * 我们为什么一定要使用 typedef 定义函数指针呢？
  * 首先，使用 typedef 定义函数指针，代码看起来更简洁，也更不容易出错。
  * 其次，当函数指针作为其它函数的参数，特别是作为返回值时，直接使用的函数指针无法编译。

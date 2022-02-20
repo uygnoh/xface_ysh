@@ -59,7 +59,7 @@ int main()
 
                 /* stream open */
                 res = SessionCommand(session, SSCMD_STREAM_START, &filestream);
-                if(res) {
+                if (res) {
                         printf("Module command 'SSCMD_STREAM_START'     \
                                 error %d for stream %d, type = %d\n",   \
                                         res, index, (int)file->type);

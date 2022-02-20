@@ -8,7 +8,8 @@ typedef struct node {
 } NODE;
 
 //先序遍历
-void preorder(NODE *node) {
+void preorder(NODE *node) 
+{
         if (node != NULL) {
                 printf("%d\n", node->data);
                 preorder(node->left);
@@ -17,7 +18,8 @@ void preorder(NODE *node) {
 }
 
 //中序遍历
-void inorder(NODE *node) {
+void inorder(NODE *node) 
+{
         if (node != NULL) {
                 inorder(node->left);
                 printf("%d\n", node->data);
@@ -26,7 +28,8 @@ void inorder(NODE *node) {
 }
 
 //后序遍历
-void postorder(NODE *node) {
+void postorder(NODE *node) 
+{
         if (node != NULL) {
                 postorder(node->left);
                 postorder(node->right);
@@ -35,7 +38,8 @@ void postorder(NODE *node) {
 }
 
 //二叉树
-int main(void) {
+int main(void) 
+{
         NODE    n1;
         NODE    n2;
         NODE    n3;

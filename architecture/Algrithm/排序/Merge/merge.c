@@ -29,9 +29,10 @@ void merge(int arry[], int left, int middle, int right)
                         i++;
                 }
         }
+        /*
         for (i = left; i <= right; i++) {
                 printf("arry[i] = %d\n", arry[i]);
-        }
+        }*/
 }
 
 void merge_sort(int arry[], int left, int right)
