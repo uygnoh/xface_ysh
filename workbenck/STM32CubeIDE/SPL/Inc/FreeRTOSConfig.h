@@ -3,7 +3,7 @@
 *******************************************************************************/
 #ifndef __FREERTOS_CONFIG_H__
 #define __FREERTOS_CONFIG_H__
-#include "stm32f103xe.h"
+#include "stm32f10x.h"
 
 
 //针对不同的编译器调用不同的stdint.h文件
@@ -14,8 +14,8 @@
 
 
 //断言相关
-#define vAssertCalled(char, int) printf("Error:%s,%d\r\n",char,int)
-#define configASSERT(x) if((x)==0) vAssertCalled(__FILE__,__LINE__)
+//#define vAssertCalled(char, int) printf("Error:%s,%d\r\n",char,int)
+//#define configASSERT(x) if((x)==0) vAssertCalled(__FILE__,__LINE__)
 
 
 
@@ -31,7 +31,7 @@
 //查找下一个要运行的任务的方法，使用硬件方法(最大优先级为“32”)
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION         1
                                     
-//置“1”(使能低功耗tickless模式)，
+//置“1”(使能低功耗tick模式)，
 //清“0”(保持系统节拍（tick）中断一直运行)
 #define configUSE_TICKLESS_IDLE                         0
 

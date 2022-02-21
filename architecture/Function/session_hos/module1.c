@@ -220,14 +220,13 @@ HOSHANDLE HOSAPI(hos_init)(struct __hos *hos)
         printf("OsInit : %s ..\n", hos->name);
         memset(punit, 0, sizeof(HOS_UNIT_STRUCT_T));
 
-        punit->hos = hos;
-        hos->hos_run = &HOSAPI(hos_run);
+        punit->hos       = hos;
+        hos->hos_run     = &HOSAPI(hos_run);
         hos->hos_command = &HOSAPI(hos_command);
-        hos->hos_deinit = &HOSAPI(hos_deinit);
-        hos->state = HOS_STATE_INITED;
-
-        hos->state = HOS_STATE_RUNNING;
-        hos->handle = (HOSHANDLE)punit;
+        hos->hos_deinit  = &HOSAPI(hos_deinit);
+        hos->state       = HOS_STATE_INITED;
+        hos->state       = HOS_STATE_RUNNING;
+        hos->handle      = (HOSHANDLE)punit;
 
         return hos->handle;
 }
