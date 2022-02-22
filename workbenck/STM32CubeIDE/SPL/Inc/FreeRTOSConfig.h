@@ -4,7 +4,7 @@
 #ifndef __FREERTOS_CONFIG_H__
 #define __FREERTOS_CONFIG_H__
 #include "stm32f10x.h"
-
+//#include <stdio.h>
 
 //针对不同的编译器调用不同的stdint.h文件
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
@@ -14,8 +14,10 @@
 
 
 //断言相关
-//#define vAssertCalled(char, int) printf("Error:%s,%d\r\n",char,int)
-//#define configASSERT(x) if((x)==0) vAssertCalled(__FILE__,__LINE__)
+/*
+#define vAssertCalled(char, int) printf("Error:%s,%d\r\n",char,int)
+#define configASSERT(x) if((x)==0) vAssertCalled(__FILE__,__LINE__)
+*/
 
 
 
@@ -220,7 +222,6 @@
 *******************************************************************************/
 #define xPortPendSVHandler                              PendSV_Handler
 #define vPortSVCHandler                                 SVC_Handler
-
 
 
 #endif

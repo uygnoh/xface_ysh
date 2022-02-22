@@ -9,7 +9,8 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include Regf103/source/subdir.mk
+-include freertos/portable/subdir.mk
+-include freertos/subdir.mk
 -include Drivers/STM32F1xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -62,8 +63,8 @@ all: main-build
 main-build: STM32F103ZET6.elf secondary-outputs
 
 # Tool invocations
-STM32F103ZET6.elf: $(OBJS) $(USER_OBJS) /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F103ZETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "STM32F103ZET6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/STM32F103ZETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="STM32F103ZET6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+STM32F103ZET6.elf: $(OBJS) $(USER_OBJS) /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "STM32F103ZET6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/STM32F103ZETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="STM32F103ZET6.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

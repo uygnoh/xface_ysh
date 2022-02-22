@@ -18,21 +18,25 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/usart.h \
- ../Core/Inc/gpio.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/M32.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_uart.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_ds18b20.h \
- /home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_systick.h \
- ../Core/Inc/bsp_debug.h ../Core/Inc/bsp_led.h ../Core/Inc/bsp_uart.h
+ ../Core/Inc/usart.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/FreeRTOS.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/FreeRTOSConfig.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/projdefs.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/portable.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/deprecated_definitions.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/portable/portmacro.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/mpu_wrappers.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/list.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/task.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/list.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/queue.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/task.h
 
 ../Core/Inc/main.h:
 
@@ -74,40 +78,44 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h:
 
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h:
-
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h:
-
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 
+../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
+
+../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
+
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-
-../Core/Inc/adc.h:
-
-../Core/Inc/main.h:
 
 ../Core/Inc/usart.h:
 
+../Core/Inc/main.h:
+
 ../Core/Inc/gpio.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/FreeRTOS.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/M32.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/FreeRTOSConfig.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/common.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/projdefs.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_uart.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/portable.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_ds18b20.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/deprecated_definitions.h:
 
-/home/ysh/Desktop/github/__ysh__/workbenck/STM32CubeMX/STM32F103ZET6/Regf103/include/reg_systick.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/portable/portmacro.h:
 
-../Core/Inc/bsp_debug.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/mpu_wrappers.h:
 
-../Core/Inc/bsp_led.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/list.h:
 
-../Core/Inc/bsp_uart.h:
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/task.h:
+
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/list.h:
+
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/queue.h:
+
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/HAL/STM32F103ZET6/freertos/include/task.h:

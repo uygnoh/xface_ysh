@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -19,19 +19,40 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include "FreeRTOS.h"
+#include "list.h"
+#include "task.h"
+#include "queue.h"
+int __io_putchar(int ch)
+{
+    //注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
+
+// 创建任务函数
+//_____________________________________________________________
+#define HOS_PRIO               1
+#define HOS_STACK_SIZE         1024
+TaskHandle_t hos_handle = NULL;
+static void hos(void *pvParam);
 
 
-#include "common.h"
-#include "bsp_debug.h"
-#include "bsp_led.h"
-#include "bsp_uart.h"
+#define TASK01_PRIO             1
+#define TASK01_STACK_SIZE       1024
+TaskHandle_t task01_handle = NULL;
+void task01(void *pvParam);
 
+#define TASK02_PRIO             1
+#define TASK02_STACK_SIZE       1024
+TaskHandle_t task02_handle = NULL;
+void task02(void *pvParam);
 
 /* USER CODE END Includes */
 
@@ -74,8 +95,6 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,34 +115,40 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  //MX_USART1_UART_Init();
-  //MX_ADC1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
-
-//初始化结构体指针，（！！！！）
-        BSP = &LED;
-
-
-while (1) {
-        //get_temperature();
-        //printf("DS18B20: %.3f\n", ds18b20_read_temperature());
-
-        BSP->HOS(LED_02, led_on);
-        delay_ms(1000);
-        BSP->HOS(LED_02, led_off);
-        delay_ms(1000);
-        (*GPIOA).CRL = 0xFF;
-
-}
-
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  BaseType_t xReturn = pdPASS;
+  xReturn = xTaskCreate(
+          (TaskFunction_t)hos,                 //任务函数
+          (char *        )"HOS",               //任务名称
+          (uint16_t      )HOS_STACK_SIZE,       //任务栈大小
+          (void *        )NULL,                 //任务参数
+          (UBaseType_t   )HOS_PRIO,             //任务优先级
+          (TaskHandle_t *)&hos_handle);         //任务句柄
+  if (pdPASS == xReturn) {
+          printf("HOS create success!\n");
+          vTaskStartScheduler();
+          while (1);
+  } else {
+
+  }
+
+  //vTaskStartScheduler();
+  while (1) {
+
+
+
+
+
+
+
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -139,7 +164,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -168,21 +192,73 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
 }
 
 /* USER CODE BEGIN 4 */
-
-
-
-
-
+static void hos(void *pvParam)
+{
+        BaseType_t xReturn;
+        taskENTER_CRITICAL();
+        xReturn = xTaskCreate(
+                (TaskFunction_t)task01,               //任务函数
+                (char *        )"TASK01",             //任务名称
+                (uint16_t      )TASK01_STACK_SIZE,    //任务栈大小
+                (void *        )NULL,                 //任务参数
+                (UBaseType_t   )TASK01_PRIO,          //任务优先级
+                (TaskHandle_t *)&task01_handle);      //任务句柄
+        if (pdPASS == xReturn) {
+                printf("Create Task01 success!\n");
+        }
+        xReturn = xTaskCreate(
+                (TaskFunction_t)task02,               //任务函数
+                (char *        )"TASK02",             //任务名称
+                (uint16_t      )TASK02_STACK_SIZE,    //任务栈大小
+                (void *        )NULL,                 //任务参数
+                (UBaseType_t   )TASK02_PRIO,          //任务优先级
+                (TaskHandle_t *)&task02_handle);      //任务句柄
+        if (pdPASS == xReturn) {
+                printf("Create Task02 success!\n");
+        }
+        vTaskDelete(hos_handle);
+        printf("delete HOS success!\n");
+        taskEXIT_CRITICAL();
+}
+void task01(void *pvParam)
+{
+        for (;;) {
+                printf("task_01\n");
+                vTaskDelay(2000 / portTICK_PERIOD_MS);
+        }
+}
+void task02(void *pvParam)
+{
+        for (;;) {
+                printf("task_02\n");
+                vTaskDelay(2000 / portTICK_PERIOD_MS);
+        }
+}
 /* USER CODE END 4 */
+
+ /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM2 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM2) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

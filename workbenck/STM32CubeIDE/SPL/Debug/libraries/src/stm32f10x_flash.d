@@ -8,8 +8,10 @@ libraries/src/stm32f10x_flash.o: ../libraries/src/stm32f10x_flash.c \
  /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_gpio.h \
  /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_rcc.h \
  /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_spi.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_usart.h \
  /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/misc.h \
- /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/bsp/include/bsp.h
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/bsp/include/bsp.h \
+ /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/bsp/include/bsp_usart.h
 
 /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_flash.h:
 
@@ -29,6 +31,10 @@ libraries/src/stm32f10x_flash.o: ../libraries/src/stm32f10x_flash.c \
 
 /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_spi.h:
 
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/stm32f10x_usart.h:
+
 /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/libraries/inc/misc.h:
 
 /home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/bsp/include/bsp.h:
+
+/home/ysh/Desktop/github/workbenck/STM32CubeIDE/SPL/bsp/include/bsp_usart.h:

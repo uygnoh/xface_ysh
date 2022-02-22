@@ -23,5 +23,6 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/STM32F1xx_HAL_Driver/Src \
-Regf103/source \
+freertos \
+freertos/portable \
 
