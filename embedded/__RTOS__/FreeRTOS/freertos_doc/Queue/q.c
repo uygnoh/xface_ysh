@@ -226,7 +226,8 @@ BaseType_t xQueueGenericSend(
                         //so configure the timeout struct.
                                 vTaskSetTimeOutState(&xTimeOut);
                                 xEntryTimeSet = pdTRUE;
-                        } else {}
+                        } else {
+                        }
                         
                         
                         taskEXIT_CRITICAL();

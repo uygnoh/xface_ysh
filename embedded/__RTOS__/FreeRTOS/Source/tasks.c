@@ -4448,113 +4448,61 @@ TickType_t uxTaskResetEventItemValue( void )
 static void prvAddCurrentTaskToDelayedList( TickType_t xTicksToWait,
                                             const BaseType_t xCanBlockIndefinitely )
 {
-    TickType_t xTimeToWake;
-    const TickType_t xConstTickCount = xTickCount;
+        TickType_t xTimeToWake;
+        const TickType_t xConstTickCount = xTickCount;
 
-    #if ( INCLUDE_xTaskAbortDelay == 1 )
-        {
-            /* About to enter a delayed list, so ensure the ucDelayAborted flag is
-             * reset to pdFALSE so it can be detected as having been set to pdTRUE
-             * when the task leaves the Blocked state. */
-            pxCurrentTCB->ucDelayAborted = pdFALSE;
+        #if ( INCLUDE_xTaskAbortDelay == 1 )
+        pxCurrentTCB->ucDelayAborted = pdFALSE;
+        #endif
+
+        if (uxListRemove( &( pxCurrentTCB->xStateListItem)) == (UBaseType_t) 0) {
+                portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority ); 
+        } else {
+                mtCOVERAGE_TEST_MARKER();
         }
-    #endif
 
-    /* Remove the task from the ready list before adding it to the blocked list
-     * as the same list item is used for both lists. */
-    if( uxListRemove( &( pxCurrentTCB->xStateListItem ) ) == ( UBaseType_t ) 0 )
-    {
-        /* The current task must be in a ready list, so there is no need to
-         * check, and the port reset macro can be called directly. */
-        portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority ); /*lint !e931 pxCurrentTCB cannot change as it is the calling task.  pxCurrentTCB->uxPriority and uxTopReadyPriority cannot change as called with scheduler suspended or in a critical section. */
-    }
-    else
-    {
-        mtCOVERAGE_TEST_MARKER();
-    }
-
-    #if ( INCLUDE_vTaskSuspend == 1 )
-        {
-            if( ( xTicksToWait == portMAX_DELAY ) && ( xCanBlockIndefinitely != pdFALSE ) )
-            {
-                /* Add the task to the suspended task list instead of a delayed task
-                 * list to ensure it is not woken by a timing event.  It will block
-                 * indefinitely. */
-                listINSERT_END( &xSuspendedTaskList, &( pxCurrentTCB->xStateListItem ) );
-            }
-            else
-            {
-                /* Calculate the time at which the task should be woken if the event
-                 * does not occur.  This may overflow but this doesn't matter, the
-                 * kernel will manage it correctly. */
+#if ( INCLUDE_vTaskSuspend == 1 )
+        if ((xTicksToWait == portMAX_DELAY) && (xCanBlockIndefinitely != pdFALSE)) {
+                listINSERT_END(&xSuspendedTaskList, &(pxCurrentTCB->xStateListItem));
+        } else {
                 xTimeToWake = xConstTickCount + xTicksToWait;
-
-                /* The list item will be inserted in wake time order. */
                 listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
-
-                if( xTimeToWake < xConstTickCount )
-                {
-                    /* Wake time has overflowed.  Place this item in the overflow
-                     * list. */
-                    vListInsert( pxOverflowDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
+                if (xTimeToWake < xConstTickCount) {
+                        vListInsert(pxOverflowDelayedTaskList, &(pxCurrentTCB->xStateListItem));
+                } else {
+                        vListInsert(pxDelayedTaskList, &(pxCurrentTCB->xStateListItem));
+                        if ( xTimeToWake < xNextTaskUnblockTime ) {
+                                xNextTaskUnblockTime = xTimeToWake;
+                        } else {
+                                mtCOVERAGE_TEST_MARKER();
+                        }
                 }
-                else
-                {
-                    /* The wake time has not overflowed, so the current block list
-                     * is used. */
-                    vListInsert( pxDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
-
-                    /* If the task entering the blocked state was placed at the
-                     * head of the list of blocked tasks then xNextTaskUnblockTime
-                     * needs to be updated too. */
-                    if( xTimeToWake < xNextTaskUnblockTime )
-                    {
-                        xNextTaskUnblockTime = xTimeToWake;
-                    }
-                    else
-                    {
-                        mtCOVERAGE_TEST_MARKER();
-                    }
-                }
-            }
         }
-    #else /* INCLUDE_vTaskSuspend */
-        {
-            /* Calculate the time at which the task should be woken if the event
-             * does not occur.  This may overflow but this doesn't matter, the kernel
-             * will manage it correctly. */
-            xTimeToWake = xConstTickCount + xTicksToWait;
+#else /* INCLUDE_vTaskSuspend */
+        xTimeToWake = xConstTickCount + xTicksToWait;
 
-            /* The list item will be inserted in wake time order. */
-            listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
+        listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
 
-            if( xTimeToWake < xConstTickCount )
-            {
+        if ( xTimeToWake < xConstTickCount ) {
                 /* Wake time has overflowed.  Place this item in the overflow list. */
                 vListInsert( pxOverflowDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
-            }
-            else
-            {
+        } else {
                 /* The wake time has not overflowed, so the current block list is used. */
                 vListInsert( pxDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
 
                 /* If the task entering the blocked state was placed at the head of the
                  * list of blocked tasks then xNextTaskUnblockTime needs to be updated
                  * too. */
-                if( xTimeToWake < xNextTaskUnblockTime )
-                {
-                    xNextTaskUnblockTime = xTimeToWake;
+                if ( xTimeToWake < xNextTaskUnblockTime ) {
+                        xNextTaskUnblockTime = xTimeToWake;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
                 }
-                else
-                {
-                    mtCOVERAGE_TEST_MARKER();
-                }
-            }
-
-            /* Avoid compiler warning when INCLUDE_vTaskSuspend is not 1. */
-            ( void ) xCanBlockIndefinitely;
         }
-    #endif /* INCLUDE_vTaskSuspend */
+
+        /* Avoid compiler warning when INCLUDE_vTaskSuspend is not 1. */
+        ( void ) xCanBlockIndefinitely;
+#endif /* INCLUDE_vTaskSuspend */
 }
 
 /* Code below here allows additional code to be inserted into this source file,

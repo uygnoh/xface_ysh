@@ -52,7 +52,7 @@ void *pvPortMalloc(size_t xWantedSize)
 
 
 /*******************************************************************************
-                                heap_2
+        => heap_2
 *******************************************************************************/
 typedef struct A_BLOCK_LINK {
         struct A_BLOCK_LINK *pxNextFreeBlock;//指向链表中下一个空闲内存块

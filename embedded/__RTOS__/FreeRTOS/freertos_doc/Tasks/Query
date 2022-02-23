@@ -1,4 +1,18 @@
 /*******************************************************************************
+        => 查询任务的优先级别
+*******************************************************************************/
+void query_task(void *pvParmeters)
+{
+        UBaseType_t prio;
+        prio = uxTaskPriorityGet(xTaskHandle);
+        printf("xTask priority == %d\n", prio);
+        for (;;) {
+                vTaskDelay(200);
+        }
+}
+
+
+/*******************************************************************************
                 FreeRTOS任务查询
 *******************************************************************************/
 uxTaskPriorityGet()             //查询某个任务的优先级
@@ -21,8 +35,4 @@ vTaskGetRunTimeStats()          //获取每个任务的运行时间
 vTaskSetApplicationTaskTag()    //设置任务标签值
 SetThreadLocalStoragePointer()  //设置线程本地存储指针
 GetThreadLocalStoragePointer()  //获取线程本地存储指针
-
-
-
-
 

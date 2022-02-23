@@ -1,0 +1,270 @@
+/*******************************************************************************
+  函数名称: vTaskDelay()
+  输入参数: xTicksToDelay，延时时间
+  输出参数: 无
+  函数功能: 相对延时函数
+*******************************************************************************/
+#if (INCLUDE_vTaskDelay == 1)
+void vTaskDelay(const TickType_t xTicksToDelay)
+{
+        BaseType_t xAlreadyYielded = pdFALSE;
+        
+        //延时时间要大于（0）
+        if (xTicksToDelay > (TickType_t)0U) {
+                vTaskSupendAll();                       //任务挂起
+                //添加当前任务到延时列表中
+                prvAddCurrentTaskToDelayedList(xTicksToDelay, pdFALSE);
+                xAlreadyYielded = xTaskResumAll();      //任务恢复
+        }
+        
+        //看是否需要任务切换
+        if (xAlreadyYielded == pdFALSE) {
+                protYIELD_WITHIN_API();
+        }
+}
+
+//添加当前任务到延时列表中
+static void prvAddCurrentTaskToDelayedList( TickType_t xTicksToWait,//要延时的时间
+                                            const BaseType_t xCanBlockIndefinitely )
+{
+        TickType_t xTimeToWake;
+        //获取当前系统时钟值
+        const TickType_t xConstTickCount = xTickCount;
+
+        #if ( INCLUDE_xTaskAbortDelay == 1 )
+        pxCurrentTCB->ucDelayAborted = pdFALSE;
+        #endif
+
+        //把当前任务从就绪列表中移出
+        if (uxListRemove( &( pxCurrentTCB->xStateListItem)) == (UBaseType_t) 0) {
+                portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority ); 
+        } else {
+                mtCOVERAGE_TEST_MARKER();
+        }
+
+#if ( INCLUDE_vTaskSuspend == 1 )
+        if ((xTicksToWait == portMAX_DELAY) && (xCanBlockIndefinitely != pdFALSE)) {
+                //添加当前任务到挂起列表中
+                listINSERT_END(&xSuspendedTaskList, &(pxCurrentTCB->xStateListItem));
+        } else {
+                xTimeToWake = xConstTickCount + xTicksToWait;
+                listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
+                //如果（32位数据溢出）
+                if (xTimeToWake < xConstTickCount) {
+                        vListInsert(pxOverflowDelayedTaskList, &(pxCurrentTCB->xStateListItem));
+                } else {
+                        vListInsert(pxDelayedTaskList, &(pxCurrentTCB->xStateListItem));
+                        //xNextTaskUnblockTime保存的是下一个任务要唤醒的延时（时间点）
+                        if ( xTimeToWake < xNextTaskUnblockTime ) {
+                                xNextTaskUnblockTime = xTimeToWake;
+                        } else {
+                                mtCOVERAGE_TEST_MARKER();
+                        }
+                }
+        }
+#else /* INCLUDE_vTaskSuspend */
+        xTimeToWake = xConstTickCount + xTicksToWait;
+
+        listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
+
+        if ( xTimeToWake < xConstTickCount ) {
+                vListInsert( pxOverflowDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
+        } else {
+                vListInsert( pxDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
+
+                if ( xTimeToWake < xNextTaskUnblockTime ) {
+                        xNextTaskUnblockTime = xTimeToWake;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+        }
+
+        /* Avoid compiler warning when INCLUDE_vTaskSuspend is not 1. */
+        ( void ) xCanBlockIndefinitely;
+#endif /* INCLUDE_vTaskSuspend */
+}
+
+/*******************************************************************************
+  函数名称: vTaskDelayUntil()
+  输入参数: xTicksToDelay，延时时间
+  输出参数: 无
+  函数功能: 绝对延时函数
+*******************************************************************************/
+#if (INCLUDE_xTaskDelayUntil == 1)
+//______________________________________________________________________________
+BaseType_t xTaskDelayUntil( TickType_t * const pxPreviousWakeTime,
+                                const TickType_t xTimeIncrement )
+{
+        TickType_t xTimeToWake;
+        BaseType_t xAlreadyYielded, xShouldDelay = pdFALSE;
+        
+        //挂起所有任务
+        vTaskSuspendAll();
+
+        const TickType_t xConstTickCount = xTickCount;
+
+        xTimeToWake = *pxPreviousWakeTime + xTimeIncrement;
+
+        if ( xConstTickCount < *pxPreviousWakeTime ) {
+                if ( (xTimeToWake < *pxPreviousWakeTime) && (xTimeToWake > xConstTickCount) ) {
+                        xShouldDelay = pdTRUE;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+        } else {
+                if ( (xTimeToWake < *pxPreviousWakeTime) || (xTimeToWake > xConstTickCount) ) {
+                        xShouldDelay = pdTRUE;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+        }
+
+            
+        *pxPreviousWakeTime = xTimeToWake;
+
+        if ( xShouldDelay != pdFALSE ) {
+                traceTASK_DELAY_UNTIL( xTimeToWake );
+
+                prvAddCurrentTaskToDelayedList( xTimeToWake - xConstTickCount, pdFALSE );
+        } else {
+                mtCOVERAGE_TEST_MARKER();
+        }
+        
+        //恢复所有任务
+        xAlreadyYielded = xTaskResumeAll();
+
+
+        if ( xAlreadyYielded == pdFALSE ) {
+                portYIELD_WITHIN_API();
+        } else {
+                mtCOVERAGE_TEST_MARKER();
+        }
+
+        return xShouldDelay;
+}
+#endif /* INCLUDE_xTaskDelayUntil */
+
+/*******************************************************************************
+  函数名称: system_tick()
+  输入参数: 
+  输出参数: 
+  函数功能: 
+*******************************************************************************/
+// 设置系统时钟为（72000000Hz）
+void system_tick(uint8_t tick)
+{
+        uint32_t reload = 1;
+        HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+        reaload *= 72000000 / configTICK_RATE_HZ;        //设置溢出时间
+        SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;      //开启SysTick中断
+        SysTick->LOAD  = reload;                        //1/configTICK_RATE_HZ中断一次
+        SysTick->CTRL |= SysTick_CTRL_ENABLK_Msk;       //开启SysTick
+}
+
+void xPortSysTickHandler(void)
+{
+        vPortRaiseBASEPRI();
+        if (xTaskIncrementTick() != pdFALSE) {
+                //时行任务切换
+                portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
+        }
+        vPortClearBASEPRIFromISR();
+}
+
+BaseType_t xTaskIncrementTick( void )
+{
+        TCB_t * pxTCB;
+        TickType_t xItemValue;
+        BaseType_t xSwitchRequired = pdFALSE;
+
+        //uxSchedulerSuspended用来标记任务调度器是否被挂起
+        if ( uxSchedulerSuspended == ( UBaseType_t ) pdFALSE ) {
+                const TickType_t xConstTickCount = xTickCount + (TickType_t)1;
+                xTickCount = xConstTickCount;
+                if ( xConstTickCount == ( TickType_t ) 0U ) {
+                        taskSWITCH_DELAYED_LISTS();
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+
+                if ( xConstTickCount >= xNextTaskUnblockTime ) {
+                        for ( ; ; ) {
+                                if ( listLIST_IS_EMPTY( pxDelayedTaskList ) != pdFALSE ) {
+                                        xNextTaskUnblockTime = portMAX_DELAY;
+                                        break;
+                                //唤醒延时任务
+                                } else {
+                                        pxTCB = listGET_OWNER_OF_HEAD_ENTRY( pxDelayedTaskList );
+                                        xItemValue = listGET_LIST_ITEM_VALUE( 
+                                                &( pxTCB->xStateListItem ) );
+
+                                        if ( xConstTickCount < xItemValue ) {
+                                                xNextTaskUnblockTime = xItemValue;
+                                                break;
+                                        } else {
+                                                mtCOVERAGE_TEST_MARKER();
+                                        }
+
+                                        //把任务从状态列表项中移出
+                                        listREMOVE_ITEM( &( pxTCB->xStateListItem ) );
+
+                                        //超时时间到了，把任务从事件列表项中移出
+                                        if ( listLIST_ITEM_CONTAINER( 
+                                                &( pxTCB->xEventListItem ) ) != NULL ) {
+                                                        listREMOVE_ITEM( &( pxTCB->xEventListItem ) );
+                                        } else {
+                                                mtCOVERAGE_TEST_MARKER();
+                                        }
+
+                                        prvAddTaskToReadyList( pxTCB );
+
+                                        #if ( configUSE_PREEMPTION == 1 )
+                                        if ( pxTCB->uxPriority >= pxCurrentTCB->uxPriority ) {
+                                                xSwitchRequired = pdTRUE;
+                                        } else {
+                                                mtCOVERAGE_TEST_MARKER();
+                                        }
+                                        #endif /* configUSE_PREEMPTION */
+                                }
+                        }
+                }
+
+
+                #if ( ( configUSE_PREEMPTION == 1 ) && ( configUSE_TIME_SLICING == 1 ) )
+                if( listCURRENT_LIST_LENGTH( 
+                        &( pxReadyTasksLists[ pxCurrentTCB->uxPriority ] ) ) > ( UBaseType_t ) 1 ) {
+                                xSwitchRequired = pdTRUE;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+                #endif /* ( ( configUSE_PREEMPTION == 1 ) && ( configUSE_TIME_SLICING == 1 ) ) */
+
+
+                #if ( configUSE_TICK_HOOK == 1 )
+                if ( xPendedTicks == ( TickType_t ) 0 ) {
+                        vApplicationTickHook();
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+                #endif /* configUSE_TICK_HOOK */
+
+
+                #if ( configUSE_PREEMPTION == 1 )
+                if ( xYieldPending != pdFALSE ) {
+                        xSwitchRequired = pdTRUE;
+                } else {
+                        mtCOVERAGE_TEST_MARKER();
+                }
+                #endif /* configUSE_PREEMPTION */
+        } else {
+                ++xPendedTicks;
+
+                /* The tick hook gets called at regular intervals, even if the
+                * scheduler is locked. */
+                #if ( configUSE_TICK_HOOK == 1 )
+                vApplicationTickHook();
+                #endif
+        }
+
+        return xSwitchRequired;
+}
