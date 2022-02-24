@@ -14,10 +14,10 @@ __asm void xPortPendSVHandler(void)
         //在Cortex-M中浮 点运算是8字节的
         PRESERVE8
         
-		//将PSP的值存储到r0。当进入PendSVC Handler时，
-		//上一个任务运行的环境即：xPSR， PC（任务入口地址），
-		//R14，R12，R3，R2，R1，R0（任务的形参）这些CPU寄存器的值会自动存储到任务的栈中，
-		//剩下的r4~r11需要手动保存，   同时PSP会自动更新（在更新之前PSP指向任务栈的栈顶）
+        //将PSP的值存储到r0。当进入PendSVC Handler时，
+        //上一个任务运行的环境即：xPSR， PC（任务入口地址），
+        //R14，R12，R3，R2，R1，R0（任务的形参）这些CPU寄存器的值会自动存储到任务的栈中，
+        //剩下的r4~r11需要手动保存，   同时PSP会自动更新（在更新之前PSP指向任务栈的栈顶）
         mrs r0, psp
         isb
 
