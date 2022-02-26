@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccj1fK2A.s 			page 1
+ARM GAS  /tmp/ccXAdg8Y.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
   29:ThreadX/common/src/tx_thread_preemption_change.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_preemption_change.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_preemption_change.c **** 
-ARM GAS  /tmp/ccj1fK2A.s 			page 2
+ARM GAS  /tmp/ccXAdg8Y.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_preemption_change.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
   35              		.cfi_def_cfa_offset 16
   36              		.cfi_offset 4, -16
   37              		.cfi_offset 5, -12
-ARM GAS  /tmp/ccj1fK2A.s 			page 3
+ARM GAS  /tmp/ccXAdg8Y.s 			page 3
 
 
   38              		.cfi_offset 6, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
   47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
-ARM GAS  /tmp/ccj1fK2A.s 			page 4
+ARM GAS  /tmp/ccXAdg8Y.s 			page 4
 
 
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccj1fK2A.s 			page 5
+ARM GAS  /tmp/ccXAdg8Y.s 			page 5
 
 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
-ARM GAS  /tmp/ccj1fK2A.s 			page 6
+ARM GAS  /tmp/ccXAdg8Y.s 			page 6
 
 
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
-ARM GAS  /tmp/ccj1fK2A.s 			page 7
+ARM GAS  /tmp/ccXAdg8Y.s 			page 7
 
 
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
-ARM GAS  /tmp/ccj1fK2A.s 			page 8
+ARM GAS  /tmp/ccXAdg8Y.s 			page 8
 
 
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
-ARM GAS  /tmp/ccj1fK2A.s 			page 9
+ARM GAS  /tmp/ccXAdg8Y.s 			page 9
 
 
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
-ARM GAS  /tmp/ccj1fK2A.s 			page 10
+ARM GAS  /tmp/ccXAdg8Y.s 			page 10
 
 
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
-ARM GAS  /tmp/ccj1fK2A.s 			page 11
+ARM GAS  /tmp/ccXAdg8Y.s 			page 11
 
 
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
-ARM GAS  /tmp/ccj1fK2A.s 			page 12
+ARM GAS  /tmp/ccXAdg8Y.s 			page 12
 
 
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccj1fK2A.s 			page 13
+ARM GAS  /tmp/ccXAdg8Y.s 			page 13
 
 
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  102:ThreadX/common/src/tx_thread_preemption_change.c ****         /* Is the new threshold zero?  */
  103:ThreadX/common/src/tx_thread_preemption_change.c ****         if (new_threshold != ((UINT) 0))
  104:ThreadX/common/src/tx_thread_preemption_change.c ****         {
-ARM GAS  /tmp/ccj1fK2A.s 			page 14
+ARM GAS  /tmp/ccXAdg8Y.s 			page 14
 
 
  105:ThreadX/common/src/tx_thread_preemption_change.c **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  152:ThreadX/common/src/tx_thread_preemption_change.c **** 
  153:ThreadX/common/src/tx_thread_preemption_change.c **** #if TX_MAX_PRIORITIES > 32
  154:ThreadX/common/src/tx_thread_preemption_change.c **** 
-ARM GAS  /tmp/ccj1fK2A.s 			page 15
+ARM GAS  /tmp/ccXAdg8Y.s 			page 15
 
 
  155:ThreadX/common/src/tx_thread_preemption_change.c ****                 /* Determine if there are any other bits set in this preempt map.  */
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  190:ThreadX/common/src/tx_thread_preemption_change.c ****         {
  191:ThreadX/common/src/tx_thread_preemption_change.c **** 
  192:ThreadX/common/src/tx_thread_preemption_change.c ****             /* Is the new thread preemption-threshold less than the current highest priority?  If n
-ARM GAS  /tmp/ccj1fK2A.s 			page 16
+ARM GAS  /tmp/ccXAdg8Y.s 			page 16
 
 
  193:ThreadX/common/src/tx_thread_preemption_change.c ****             if (_tx_thread_highest_priority < new_threshold)
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  204:ThreadX/common/src/tx_thread_preemption_change.c ****                     /* Determine if this thread has preemption threshold set.  */
  205:ThreadX/common/src/tx_thread_preemption_change.c ****                     if (thread_ptr -> tx_thread_preempt_threshold != thread_ptr -> tx_thread_priori
  128              		.loc 1 205 0
-ARM GAS  /tmp/ccj1fK2A.s 			page 17
+ARM GAS  /tmp/ccXAdg8Y.s 			page 17
 
 
  129 0062 C16B     		ldr	r1, [r0, #60]
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  245:ThreadX/common/src/tx_thread_preemption_change.c ****                         _tx_thread_performance__execute_log_index++;
  246:ThreadX/common/src/tx_thread_preemption_change.c **** 
  247:ThreadX/common/src/tx_thread_preemption_change.c ****                         /* Check for wrap condition.  */
-ARM GAS  /tmp/ccj1fK2A.s 			page 18
+ARM GAS  /tmp/ccXAdg8Y.s 			page 18
 
 
  248:ThreadX/common/src/tx_thread_preemption_change.c ****                         if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  176              	.LBE25:
  177              	.LBE24:
  178              		.loc 2 575 0
-ARM GAS  /tmp/ccj1fK2A.s 			page 19
+ARM GAS  /tmp/ccXAdg8Y.s 			page 19
 
 
  179              		.syntax unified
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  215 009c 70BD     		pop	{r4, r5, r6, pc}
  216              	.LVL20:
  217              	.L9:
-ARM GAS  /tmp/ccj1fK2A.s 			page 20
+ARM GAS  /tmp/ccXAdg8Y.s 			page 20
 
 
   92:ThreadX/common/src/tx_thread_preemption_change.c **** 
@@ -1164,14 +1164,14 @@ ARM GAS  /tmp/ccj1fK2A.s 			page 1
  238              		.file 7 "/usr/include/newlib/stdlib.h"
  239              		.file 8 "ThreadX/common/inc/tx_api.h"
  240              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccj1fK2A.s 			page 21
+ARM GAS  /tmp/ccXAdg8Y.s 			page 21
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_preemption_change.c
-     /tmp/ccj1fK2A.s:18     .text._tx_thread_preemption_change:0000000000000000 $t
-     /tmp/ccj1fK2A.s:25     .text._tx_thread_preemption_change:0000000000000000 _tx_thread_preemption_change
-     /tmp/ccj1fK2A.s:225    .text._tx_thread_preemption_change:00000000000000a4 $d
+     /tmp/ccXAdg8Y.s:18     .text._tx_thread_preemption_change:0000000000000000 $t
+     /tmp/ccXAdg8Y.s:25     .text._tx_thread_preemption_change:0000000000000000 _tx_thread_preemption_change
+     /tmp/ccXAdg8Y.s:225    .text._tx_thread_preemption_change:00000000000000a4 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

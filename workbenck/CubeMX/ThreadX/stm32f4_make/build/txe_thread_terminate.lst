@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc6x7NgT.s 			page 1
+ARM GAS  /tmp/ccjvmcuh.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   29:ThreadX/common/src/txe_thread_terminate.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_thread_terminate.c **** 
   31:ThreadX/common/src/txe_thread_terminate.c **** 
-ARM GAS  /tmp/cc6x7NgT.s 			page 2
+ARM GAS  /tmp/ccjvmcuh.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_terminate.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   81:ThreadX/common/src/txe_thread_terminate.c ****     /* Check for an invalid thread pointer.  */
   82:ThreadX/common/src/txe_thread_terminate.c ****     if (thread_ptr == TX_NULL)
   33              		.loc 1 82 0
-ARM GAS  /tmp/cc6x7NgT.s 			page 3
+ARM GAS  /tmp/ccjvmcuh.s 			page 3
 
 
   34 0000 68B1     		cbz	r0, .L3
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   31:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  AUTHOR                                                                */
   32:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   33:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    Scott Larson, Microsoft Corporation                                 */
-ARM GAS  /tmp/cc6x7NgT.s 			page 4
+ARM GAS  /tmp/ccjvmcuh.s 			page 4
 
 
   34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   88:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif /* __ICCARM__ */
   89:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   90:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
-ARM GAS  /tmp/cc6x7NgT.s 			page 5
+ARM GAS  /tmp/ccjvmcuh.s 			page 5
 
 
   91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  145:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  146:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  147:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define various constants for the ThreadX Cortex-M port.  */
-ARM GAS  /tmp/cc6x7NgT.s 			page 6
+ARM GAS  /tmp/ccjvmcuh.s 			page 6
 
 
  148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  202:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  203:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INLINE_INITIALIZATION
  204:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cc6x7NgT.s 			page 7
+ARM GAS  /tmp/ccjvmcuh.s 			page 7
 
 
  205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  259:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  260:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
  261:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    tx_thread_shell_entry, and tx_thread_terminate.  */
-ARM GAS  /tmp/cc6x7NgT.s 			page 8
+ARM GAS  /tmp/ccjvmcuh.s 			page 8
 
 
  262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  316:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) ULONG __get_control_value(void)
  317:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  318:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
-ARM GAS  /tmp/cc6x7NgT.s 			page 9
+ARM GAS  /tmp/ccjvmcuh.s 			page 9
 
 
  319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  373:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
  374:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  __get_control_value();
  375:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
-ARM GAS  /tmp/cc6x7NgT.s 			page 10
+ARM GAS  /tmp/ccjvmcuh.s 			page 10
 
 
  376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  430:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  431:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  432:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* No VFP in use */
-ARM GAS  /tmp/cc6x7NgT.s 			page 11
+ARM GAS  /tmp/ccjvmcuh.s 			page 11
 
 
  433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   91:ThreadX/common/src/txe_thread_terminate.c ****     {
   92:ThreadX/common/src/txe_thread_terminate.c **** 
   93:ThreadX/common/src/txe_thread_terminate.c ****         /* Thread pointer is invalid, return appropriate error code.  */
-ARM GAS  /tmp/cc6x7NgT.s 			page 12
+ARM GAS  /tmp/ccjvmcuh.s 			page 12
 
 
   94:ThreadX/common/src/txe_thread_terminate.c ****         status =  TX_THREAD_ERROR;
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
   90              	.LVL6:
   91              	.L5:
  102:ThreadX/common/src/txe_thread_terminate.c ****     }
-ARM GAS  /tmp/cc6x7NgT.s 			page 13
+ARM GAS  /tmp/ccjvmcuh.s 			page 13
 
 
   92              		.loc 1 102 0
@@ -743,14 +743,14 @@ ARM GAS  /tmp/cc6x7NgT.s 			page 1
  111              		.file 7 "/usr/include/newlib/stdlib.h"
  112              		.file 8 "ThreadX/common/inc/tx_api.h"
  113              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/cc6x7NgT.s 			page 14
+ARM GAS  /tmp/ccjvmcuh.s 			page 14
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_terminate.c
-     /tmp/cc6x7NgT.s:18     .text._txe_thread_terminate:0000000000000000 $t
-     /tmp/cc6x7NgT.s:25     .text._txe_thread_terminate:0000000000000000 _txe_thread_terminate
-     /tmp/cc6x7NgT.s:100    .text._txe_thread_terminate:000000000000002c $d
+     /tmp/ccjvmcuh.s:18     .text._txe_thread_terminate:0000000000000000 $t
+     /tmp/ccjvmcuh.s:25     .text._txe_thread_terminate:0000000000000000 _txe_thread_terminate
+     /tmp/ccjvmcuh.s:100    .text._txe_thread_terminate:000000000000002c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_terminate

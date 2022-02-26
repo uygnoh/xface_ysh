@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccTPkdtm.s 			page 1
+ARM GAS  /tmp/ccTgY3NL.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   29:ThreadX/common/src/tx_thread_info_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_info_get.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_info_get.c **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 2
+ARM GAS  /tmp/ccTgY3NL.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_info_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   86:ThreadX/common/src/tx_thread_info_get.c **** {
   28              		.loc 1 86 0
   29              		.cfi_startproc
-ARM GAS  /tmp/ccTPkdtm.s 			page 3
+ARM GAS  /tmp/ccTgY3NL.s 			page 3
 
 
   30              		@ args = 20, pretend = 0, frame = 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   32:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   33:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    Scott Larson, Microsoft Corporation                                 */
   34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccTPkdtm.s 			page 4
+ARM GAS  /tmp/ccTgY3NL.s 			page 4
 
 
   35:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  DESCRIPTION                                                           */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   89:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   90:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
   91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
-ARM GAS  /tmp/ccTPkdtm.s 			page 5
+ARM GAS  /tmp/ccTgY3NL.s 			page 5
 
 
   92:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_ghs.h"
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  146:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  147:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define various constants for the ThreadX Cortex-M port.  */
  148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 6
+ARM GAS  /tmp/ccTgY3NL.s 			page 6
 
 
  149:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_DISABLE                          1           /* Disable interrupts               */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  203:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INLINE_INITIALIZATION
  204:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 7
+ARM GAS  /tmp/ccTgY3NL.s 			page 7
 
 
  206:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  260:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
  261:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    tx_thread_shell_entry, and tx_thread_terminate.  */
  262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 8
+ARM GAS  /tmp/ccTgY3NL.s 			page 8
 
 
  263:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  317:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  318:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
  319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 9
+ARM GAS  /tmp/ccTgY3NL.s 			page 9
 
 
  320:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm volatile ("MRS control_value,CONTROL");
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  374:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  __get_control_value();
  375:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
  376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
-ARM GAS  /tmp/ccTPkdtm.s 			page 10
+ARM GAS  /tmp/ccTgY3NL.s 			page 10
 
 
  377:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  431:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  432:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* No VFP in use */
  433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccTPkdtm.s 			page 11
+ARM GAS  /tmp/ccTgY3NL.s 			page 11
 
 
  434:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  488:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  489:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE is defined, use MISRA function. */
  490:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_ipsr_get(VOID);
-ARM GAS  /tmp/ccTPkdtm.s 			page 12
+ARM GAS  /tmp/ccTgY3NL.s 			page 12
 
 
  491:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _tx_misra_ipsr_get())
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   58              		.thumb
   59              		.syntax unified
   60              	.LBE13:
-ARM GAS  /tmp/ccTPkdtm.s 			page 13
+ARM GAS  /tmp/ccTgY3NL.s 			page 13
 
 
   61              	.LBE12:
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
   95:ThreadX/common/src/tx_thread_info_get.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_INFO_GET, thread_ptr, thread_ptr -> tx_thread_state, 0,
   96:ThreadX/common/src/tx_thread_info_get.c **** 
   97:ThreadX/common/src/tx_thread_info_get.c ****     /* Log this kernel call.  */
-ARM GAS  /tmp/ccTPkdtm.s 			page 14
+ARM GAS  /tmp/ccTgY3NL.s 			page 14
 
 
   98:ThreadX/common/src/tx_thread_info_get.c ****     TX_EL_THREAD_INFO_GET_INSERT
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  127:ThreadX/common/src/tx_thread_info_get.c **** 
  128:ThreadX/common/src/tx_thread_info_get.c ****         *priority =  thread_ptr -> tx_thread_user_priority;
   96              		.loc 1 128 0
-ARM GAS  /tmp/ccTPkdtm.s 			page 15
+ARM GAS  /tmp/ccTgY3NL.s 			page 15
 
 
   97 0036 D0F89420 		ldr	r2, [r0, #148]
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  123              	.L9:
  124              	.LVL4:
  125              	.LBB14:
-ARM GAS  /tmp/ccTPkdtm.s 			page 16
+ARM GAS  /tmp/ccTgY3NL.s 			page 16
 
 
  126              	.LBB15:
@@ -936,12 +936,12 @@ ARM GAS  /tmp/ccTPkdtm.s 			page 1
  150              		.file 7 "/usr/include/newlib/stdlib.h"
  151              		.file 8 "ThreadX/common/inc/tx_api.h"
  152              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccTPkdtm.s 			page 17
+ARM GAS  /tmp/ccTgY3NL.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_info_get.c
-     /tmp/ccTPkdtm.s:18     .text._tx_thread_info_get:0000000000000000 $t
-     /tmp/ccTPkdtm.s:25     .text._tx_thread_info_get:0000000000000000 _tx_thread_info_get
+     /tmp/ccTgY3NL.s:18     .text._tx_thread_info_get:0000000000000000 $t
+     /tmp/ccTgY3NL.s:25     .text._tx_thread_info_get:0000000000000000 _tx_thread_info_get
 
 NO UNDEFINED SYMBOLS

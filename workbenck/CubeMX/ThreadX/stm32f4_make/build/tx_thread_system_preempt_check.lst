@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccAjQvUb.s 			page 1
+ARM GAS  /tmp/ccaFwMCx.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   29:ThreadX/common/src/tx_thread_system_preempt_check.c **** #include "tx_thread.h"
   30:ThreadX/common/src/tx_thread_system_preempt_check.c **** 
   31:ThreadX/common/src/tx_thread_system_preempt_check.c **** 
-ARM GAS  /tmp/ccAjQvUb.s 			page 2
+ARM GAS  /tmp/ccaFwMCx.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_system_preempt_check.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   81:ThreadX/common/src/tx_thread_system_preempt_check.c ****     /* Combine the system state and preempt disable flags into one for comparison.  */
   82:ThreadX/common/src/tx_thread_system_preempt_check.c ****     TX_THREAD_SYSTEM_RETURN_CHECK(combined_flags)
   33              		.loc 1 82 0
-ARM GAS  /tmp/ccAjQvUb.s 			page 3
+ARM GAS  /tmp/ccaFwMCx.s 			page 3
 
 
   34 0000 0A4B     		ldr	r3, .L3
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   20:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
   21:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
   22:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccAjQvUb.s 			page 4
+ARM GAS  /tmp/ccaFwMCx.s 			page 4
 
 
   23:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   77:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define compiler library include files.  */
   78:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   79:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <stdlib.h>
-ARM GAS  /tmp/ccAjQvUb.s 			page 5
+ARM GAS  /tmp/ccaFwMCx.s 			page 5
 
 
   80:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <string.h>
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  134:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  135:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the system timer thread's default stack size and priority.  These are only applicable
  136:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    if TX_TIMER_PROCESS_IN_ISR is not defined.  */
-ARM GAS  /tmp/ccAjQvUb.s 			page 6
+ARM GAS  /tmp/ccaFwMCx.s 			page 6
 
 
  137:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  191:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    how the ThreadX library was built.  */
  192:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  193:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
-ARM GAS  /tmp/ccAjQvUb.s 			page 7
+ARM GAS  /tmp/ccaFwMCx.s 			page 7
 
 
  194:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  248:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_EXTENSION
  249:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_EXTENSION
  250:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccAjQvUb.s 			page 8
+ARM GAS  /tmp/ccaFwMCx.s 			page 8
 
 
  251:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  305:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  306:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  307:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_control_value(ULONG control_value)
-ARM GAS  /tmp/ccAjQvUb.s 			page 9
+ARM GAS  /tmp/ccaFwMCx.s 			page 9
 
 
  308:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  362:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread i
  363:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the F
  364:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    the lazy FPU save, then restore the CONTROL.FPCA state. */
-ARM GAS  /tmp/ccAjQvUb.s 			page 10
+ARM GAS  /tmp/ccaFwMCx.s 			page 10
 
 
  365:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  419:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
  420:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_misra_vfp_touch();             
  421:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
-ARM GAS  /tmp/ccAjQvUb.s 			page 11
+ARM GAS  /tmp/ccaFwMCx.s 			page 11
 
 
  422:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  476:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int  ipsr_value;
  477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,IPSR ": "=r" (ipsr_value) );
  478:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
-ARM GAS  /tmp/ccAjQvUb.s 			page 12
+ARM GAS  /tmp/ccaFwMCx.s 			page 12
 
 
  479:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  533:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_posture(void)
  534:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  535:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int posture;
-ARM GAS  /tmp/ccAjQvUb.s 			page 13
+ARM GAS  /tmp/ccaFwMCx.s 			page 13
 
 
  536:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   58              	.LVL5:
   59 0018 1A60     		str	r2, [r3]
   60              	.LVL6:
-ARM GAS  /tmp/ccAjQvUb.s 			page 14
+ARM GAS  /tmp/ccaFwMCx.s 			page 14
 
 
   61              	.LBB22:
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
   98:ThreadX/common/src/tx_thread_system_preempt_check.c ****         {
   99:ThreadX/common/src/tx_thread_system_preempt_check.c **** 
  100:ThreadX/common/src/tx_thread_system_preempt_check.c **** #ifdef TX_ENABLE_STACK_CHECKING
-ARM GAS  /tmp/ccAjQvUb.s 			page 15
+ARM GAS  /tmp/ccaFwMCx.s 			page 15
 
 
  101:ThreadX/common/src/tx_thread_system_preempt_check.c **** 
@@ -889,14 +889,14 @@ ARM GAS  /tmp/ccAjQvUb.s 			page 1
  128              		.file 7 "/usr/include/newlib/stdlib.h"
  129              		.file 8 "ThreadX/common/inc/tx_api.h"
  130              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccAjQvUb.s 			page 16
+ARM GAS  /tmp/ccaFwMCx.s 			page 16
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_system_preempt_check.c
-     /tmp/ccAjQvUb.s:18     .text._tx_thread_system_preempt_check:0000000000000000 $t
-     /tmp/ccAjQvUb.s:25     .text._tx_thread_system_preempt_check:0000000000000000 _tx_thread_system_preempt_check
-     /tmp/ccAjQvUb.s:115    .text._tx_thread_system_preempt_check:000000000000002c $d
+     /tmp/ccaFwMCx.s:18     .text._tx_thread_system_preempt_check:0000000000000000 $t
+     /tmp/ccaFwMCx.s:25     .text._tx_thread_system_preempt_check:0000000000000000 _tx_thread_system_preempt_check
+     /tmp/ccaFwMCx.s:115    .text._tx_thread_system_preempt_check:000000000000002c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_preempt_disable

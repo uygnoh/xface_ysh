@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccNf4rC5.s 			page 1
+ARM GAS  /tmp/ccmIWW5i.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
   29:ThreadX/common/src/tx_trace_object_unregister.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_trace_object_unregister.c **** 
   31:ThreadX/common/src/tx_trace_object_unregister.c **** 
-ARM GAS  /tmp/ccNf4rC5.s 			page 2
+ARM GAS  /tmp/ccmIWW5i.s 			page 2
 
 
   32:ThreadX/common/src/tx_trace_object_unregister.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
   80:ThreadX/common/src/tx_trace_object_unregister.c **** 
   81:ThreadX/common/src/tx_trace_object_unregister.c **** 
   82:ThreadX/common/src/tx_trace_object_unregister.c ****     /* Determine if the registry area is setup.  */
-ARM GAS  /tmp/ccNf4rC5.s 			page 3
+ARM GAS  /tmp/ccmIWW5i.s 			page 3
 
 
   83:ThreadX/common/src/tx_trace_object_unregister.c ****     if (_tx_trace_registry_start_ptr != TX_NULL)
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
    6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
    7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
    8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
-ARM GAS  /tmp/ccNf4rC5.s 			page 4
+ARM GAS  /tmp/ccmIWW5i.s 			page 4
 
 
    9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
   63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
   64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccNf4rC5.s 			page 5
+ARM GAS  /tmp/ccmIWW5i.s 			page 5
 
 
   66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
  121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
-ARM GAS  /tmp/ccNf4rC5.s 			page 6
+ARM GAS  /tmp/ccmIWW5i.s 			page 6
 
 
  123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
  179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
-ARM GAS  /tmp/ccNf4rC5.s 			page 7
+ARM GAS  /tmp/ccmIWW5i.s 			page 7
 
 
  180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccNf4rC5.s 			page 8
+ARM GAS  /tmp/ccmIWW5i.s 			page 8
 
 
  237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
  292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
  293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccNf4rC5.s 			page 9
+ARM GAS  /tmp/ccmIWW5i.s 			page 9
 
 
  294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
  349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
  350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccNf4rC5.s 			page 10
+ARM GAS  /tmp/ccmIWW5i.s 			page 10
 
 
  351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
  406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
  407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
-ARM GAS  /tmp/ccNf4rC5.s 			page 11
+ARM GAS  /tmp/ccmIWW5i.s 			page 11
 
 
  408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
  463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
-ARM GAS  /tmp/ccNf4rC5.s 			page 12
+ARM GAS  /tmp/ccmIWW5i.s 			page 12
 
 
  465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
  520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
  521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
-ARM GAS  /tmp/ccNf4rC5.s 			page 13
+ARM GAS  /tmp/ccmIWW5i.s 			page 13
 
 
  522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
  567:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  568:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int int_posture;
  569:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccNf4rC5.s 			page 14
+ARM GAS  /tmp/ccmIWW5i.s 			page 14
 
 
  570:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     int_posture = __get_interrupt_posture();
@@ -828,12 +828,12 @@ ARM GAS  /tmp/ccNf4rC5.s 			page 1
   80              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
   81              		.file 6 "/usr/include/newlib/sys/reent.h"
   82              		.file 7 "/usr/include/newlib/stdlib.h"
-ARM GAS  /tmp/ccNf4rC5.s 			page 15
+ARM GAS  /tmp/ccmIWW5i.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_trace_object_unregister.c
-     /tmp/ccNf4rC5.s:18     .text._tx_trace_object_unregister:0000000000000000 $t
-     /tmp/ccNf4rC5.s:25     .text._tx_trace_object_unregister:0000000000000000 _tx_trace_object_unregister
+     /tmp/ccmIWW5i.s:18     .text._tx_trace_object_unregister:0000000000000000 $t
+     /tmp/ccmIWW5i.s:25     .text._tx_trace_object_unregister:0000000000000000 _tx_trace_object_unregister
 
 NO UNDEFINED SYMBOLS

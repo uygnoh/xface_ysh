@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccGwif8g.s 			page 1
+ARM GAS  /tmp/ccah5ktM.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
   29:ThreadX/common/src/txe_thread_create.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_thread_create.c **** #include "tx_thread.h"
   31:ThreadX/common/src/txe_thread_create.c **** #include "tx_timer.h"
-ARM GAS  /tmp/ccGwif8g.s 			page 2
+ARM GAS  /tmp/ccah5ktM.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_create.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
   86:ThreadX/common/src/txe_thread_create.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
   87:ThreadX/common/src/txe_thread_create.c **** /*                                            resulting in version 6.1    */
   88:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
-ARM GAS  /tmp/ccGwif8g.s 			page 3
+ARM GAS  /tmp/ccah5ktM.s 			page 3
 
 
   89:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  118:ThreadX/common/src/txe_thread_create.c ****         status =  TX_THREAD_ERROR;
  119:ThreadX/common/src/txe_thread_create.c ****     }
  120:ThreadX/common/src/txe_thread_create.c **** 
-ARM GAS  /tmp/ccGwif8g.s 			page 4
+ARM GAS  /tmp/ccah5ktM.s 			page 4
 
 
  121:ThreadX/common/src/txe_thread_create.c ****     /* Now check for invalid thread control block size.  */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
   44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
   45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccGwif8g.s 			page 5
+ARM GAS  /tmp/ccah5ktM.s 			page 5
 
 
   46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
  102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
-ARM GAS  /tmp/ccGwif8g.s 			page 6
+ARM GAS  /tmp/ccah5ktM.s 			page 6
 
 
  103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
  158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
  159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccGwif8g.s 			page 7
+ARM GAS  /tmp/ccah5ktM.s 			page 7
 
 
  160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
  215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
  216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccGwif8g.s 			page 8
+ARM GAS  /tmp/ccah5ktM.s 			page 8
 
 
  217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
  272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
  273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
-ARM GAS  /tmp/ccGwif8g.s 			page 9
+ARM GAS  /tmp/ccah5ktM.s 			page 9
 
 
  274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
  329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
  330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
-ARM GAS  /tmp/ccGwif8g.s 			page 10
+ARM GAS  /tmp/ccah5ktM.s 			page 10
 
 
  331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
  386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
  387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
-ARM GAS  /tmp/ccGwif8g.s 			page 11
+ARM GAS  /tmp/ccah5ktM.s 			page 11
 
 
  388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
  443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
  444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
-ARM GAS  /tmp/ccGwif8g.s 			page 12
+ARM GAS  /tmp/ccah5ktM.s 			page 12
 
 
  445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
  500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
-ARM GAS  /tmp/ccGwif8g.s 			page 13
+ARM GAS  /tmp/ccah5ktM.s 			page 13
 
 
  502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
  548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccGwif8g.s 			page 14
+ARM GAS  /tmp/ccah5ktM.s 			page 14
 
 
  550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
   87              	.LBB25:
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
   88              		.loc 2 562 0
-ARM GAS  /tmp/ccGwif8g.s 			page 15
+ARM GAS  /tmp/ccah5ktM.s 			page 15
 
 
   89              		.syntax unified
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  162:ThreadX/common/src/txe_thread_create.c ****                 break;
  163:ThreadX/common/src/txe_thread_create.c ****             }
  164:ThreadX/common/src/txe_thread_create.c **** 
-ARM GAS  /tmp/ccGwif8g.s 			page 16
+ARM GAS  /tmp/ccah5ktM.s 			page 16
 
 
  165:ThreadX/common/src/txe_thread_create.c ****             /* Check the stack pointer to see if it overlaps with this thread's stack.  */
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  132 004c 78B9     		cbnz	r0, .L4
  166:ThreadX/common/src/txe_thread_create.c ****             {
  133              		.loc 1 166 0
-ARM GAS  /tmp/ccGwif8g.s 			page 17
+ARM GAS  /tmp/ccah5ktM.s 			page 17
 
 
  134 004e E668     		ldr	r6, [r4, #12]
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  180              	.LBE29:
  181              	.LBE28:
  182              		.loc 2 575 0
-ARM GAS  /tmp/ccGwif8g.s 			page 18
+ARM GAS  /tmp/ccah5ktM.s 			page 18
 
 
  183              		.syntax unified
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  221:ThreadX/common/src/txe_thread_create.c ****         /* Check for invalid starting address of stack.  */
  222:ThreadX/common/src/txe_thread_create.c ****         else if (stack_start == TX_NULL)
  214              		.loc 1 222 0
-ARM GAS  /tmp/ccGwif8g.s 			page 19
+ARM GAS  /tmp/ccah5ktM.s 			page 19
 
 
  215 008e 002F     		cmp	r7, #0
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  260:ThreadX/common/src/txe_thread_create.c **** 
  261:ThreadX/common/src/txe_thread_create.c ****         /* Check the start selection.  */
  262:ThreadX/common/src/txe_thread_create.c ****         else if (auto_start > TX_AUTO_START)
-ARM GAS  /tmp/ccGwif8g.s 			page 20
+ARM GAS  /tmp/ccah5ktM.s 			page 20
 
 
  232              		.loc 1 262 0
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  260 00be 204A     		ldr	r2, .L24+20
  261              	.LVL21:
  262 00c0 1268     		ldr	r2, [r2]
-ARM GAS  /tmp/ccGwif8g.s 			page 21
+ARM GAS  /tmp/ccah5ktM.s 			page 21
 
 
  263 00c2 1343     		orrs	r3, r2, r3
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  297 00ee 4346     		mov	r3, r8
  298 00f0 3246     		mov	r2, r6
  299 00f2 4946     		mov	r1, r9
-ARM GAS  /tmp/ccGwif8g.s 			page 22
+ARM GAS  /tmp/ccah5ktM.s 			page 22
 
 
  300 00f4 2846     		mov	r0, r5
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  341              		.loc 1 234 0
  342 0114 0320     		movs	r0, #3
  343 0116 F6E7     		b	.L1
-ARM GAS  /tmp/ccGwif8g.s 			page 23
+ARM GAS  /tmp/ccah5ktM.s 			page 23
 
 
  344              	.L17:
@@ -1372,14 +1372,14 @@ ARM GAS  /tmp/ccGwif8g.s 			page 1
  387              		.file 9 "ThreadX/common/inc/tx_initialize.h"
  388              		.file 10 "ThreadX/common/inc/tx_thread.h"
  389              		.file 11 "ThreadX/common/inc/tx_timer.h"
-ARM GAS  /tmp/ccGwif8g.s 			page 24
+ARM GAS  /tmp/ccah5ktM.s 			page 24
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_create.c
-     /tmp/ccGwif8g.s:18     .text._txe_thread_create:0000000000000000 $t
-     /tmp/ccGwif8g.s:25     .text._txe_thread_create:0000000000000000 _txe_thread_create
-     /tmp/ccGwif8g.s:370    .text._txe_thread_create:000000000000012c $d
+     /tmp/ccah5ktM.s:18     .text._txe_thread_create:0000000000000000 $t
+     /tmp/ccah5ktM.s:25     .text._txe_thread_create:0000000000000000 _txe_thread_create
+     /tmp/ccah5ktM.s:370    .text._txe_thread_create:000000000000012c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

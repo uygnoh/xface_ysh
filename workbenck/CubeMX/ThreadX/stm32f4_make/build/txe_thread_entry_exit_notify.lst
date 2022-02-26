@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccWK4udr.s 			page 1
+ARM GAS  /tmp/cc6OROLS.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccWK4udr.s 			page 1
   29:ThreadX/common/src/txe_thread_entry_exit_notify.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_thread_entry_exit_notify.c **** 
   31:ThreadX/common/src/txe_thread_entry_exit_notify.c **** 
-ARM GAS  /tmp/ccWK4udr.s 			page 2
+ARM GAS  /tmp/cc6OROLS.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_entry_exit_notify.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccWK4udr.s 			page 1
   81:ThreadX/common/src/txe_thread_entry_exit_notify.c ****     /* Check for an invalid thread pointer.  */
   82:ThreadX/common/src/txe_thread_entry_exit_notify.c ****     if (thread_ptr == TX_NULL)
   33              		.loc 1 82 0
-ARM GAS  /tmp/ccWK4udr.s 			page 3
+ARM GAS  /tmp/cc6OROLS.s 			page 3
 
 
   34 0000 58B1     		cbz	r0, .L3
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccWK4udr.s 			page 1
   63              	.LCFI1:
   64              		.cfi_def_cfa_offset 0
   65              		.cfi_restore 3
-ARM GAS  /tmp/ccWK4udr.s 			page 4
+ARM GAS  /tmp/cc6OROLS.s 			page 4
 
 
   66              		.cfi_restore 14
@@ -204,14 +204,14 @@ ARM GAS  /tmp/ccWK4udr.s 			page 1
   86              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
   87              		.file 8 "ThreadX/common/inc/tx_api.h"
   88              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccWK4udr.s 			page 5
+ARM GAS  /tmp/cc6OROLS.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_entry_exit_notify.c
-     /tmp/ccWK4udr.s:18     .text._txe_thread_entry_exit_notify:0000000000000000 $t
-     /tmp/ccWK4udr.s:25     .text._txe_thread_entry_exit_notify:0000000000000000 _txe_thread_entry_exit_notify
-     /tmp/ccWK4udr.s:75     .text._txe_thread_entry_exit_notify:0000000000000020 $d
+     /tmp/cc6OROLS.s:18     .text._txe_thread_entry_exit_notify:0000000000000000 $t
+     /tmp/cc6OROLS.s:25     .text._txe_thread_entry_exit_notify:0000000000000000 _txe_thread_entry_exit_notify
+     /tmp/cc6OROLS.s:75     .text._txe_thread_entry_exit_notify:0000000000000020 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_entry_exit_notify

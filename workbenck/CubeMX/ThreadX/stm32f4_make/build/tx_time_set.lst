@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc4efwmK.s 			page 1
+ARM GAS  /tmp/ccsW7y0a.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
   29:ThreadX/common/src/tx_time_set.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_time_set.c **** #include "tx_timer.h"
   31:ThreadX/common/src/tx_time_set.c **** 
-ARM GAS  /tmp/cc4efwmK.s 			page 2
+ARM GAS  /tmp/ccsW7y0a.s 			page 2
 
 
   32:ThreadX/common/src/tx_time_set.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
    1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
    2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
    3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-ARM GAS  /tmp/cc4efwmK.s 			page 3
+ARM GAS  /tmp/ccsW7y0a.s 			page 3
 
 
    4:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
   58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
   59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/cc4efwmK.s 			page 4
+ARM GAS  /tmp/ccsW7y0a.s 			page 4
 
 
   61:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
  116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
  117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
-ARM GAS  /tmp/cc4efwmK.s 			page 5
+ARM GAS  /tmp/ccsW7y0a.s 			page 5
 
 
  118:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
  173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc4efwmK.s 			page 6
+ARM GAS  /tmp/ccsW7y0a.s 			page 6
 
 
  175:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
  230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
  231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
-ARM GAS  /tmp/cc4efwmK.s 			page 7
+ARM GAS  /tmp/ccsW7y0a.s 			page 7
 
 
  232:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
  288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc4efwmK.s 			page 8
+ARM GAS  /tmp/ccsW7y0a.s 			page 8
 
 
  289:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_control_get(void);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
  345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
-ARM GAS  /tmp/cc4efwmK.s 			page 9
+ARM GAS  /tmp/ccsW7y0a.s 			page 9
 
 
  346:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  __get_control_value();    
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
  401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
  402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
-ARM GAS  /tmp/cc4efwmK.s 			page 10
+ARM GAS  /tmp/ccsW7y0a.s 			page 10
 
 
  403:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
  458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
  459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
-ARM GAS  /tmp/cc4efwmK.s 			page 11
+ARM GAS  /tmp/ccsW7y0a.s 			page 11
 
 
  460:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
  516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
-ARM GAS  /tmp/cc4efwmK.s 			page 12
+ARM GAS  /tmp/ccsW7y0a.s 			page 12
 
 
  517:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
  563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/cc4efwmK.s 			page 13
+ARM GAS  /tmp/ccsW7y0a.s 			page 13
 
 
  565:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
   71              		.loc 1 93 0
   72 000e 7047     		bx	lr
   73              	.L3:
-ARM GAS  /tmp/cc4efwmK.s 			page 14
+ARM GAS  /tmp/ccsW7y0a.s 			page 14
 
 
   74              		.align	2
@@ -795,14 +795,14 @@ ARM GAS  /tmp/cc4efwmK.s 			page 1
   86              		.file 7 "/usr/include/newlib/stdlib.h"
   87              		.file 8 "ThreadX/common/inc/tx_api.h"
   88              		.file 9 "ThreadX/common/inc/tx_timer.h"
-ARM GAS  /tmp/cc4efwmK.s 			page 15
+ARM GAS  /tmp/ccsW7y0a.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_time_set.c
-     /tmp/cc4efwmK.s:18     .text._tx_time_set:0000000000000000 $t
-     /tmp/cc4efwmK.s:25     .text._tx_time_set:0000000000000000 _tx_time_set
-     /tmp/cc4efwmK.s:76     .text._tx_time_set:0000000000000010 $d
+     /tmp/ccsW7y0a.s:18     .text._tx_time_set:0000000000000000 $t
+     /tmp/ccsW7y0a.s:25     .text._tx_time_set:0000000000000000 _tx_time_set
+     /tmp/ccsW7y0a.s:76     .text._tx_time_set:0000000000000010 $d
 
 UNDEFINED SYMBOLS
 _tx_timer_system_clock

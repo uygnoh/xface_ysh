@@ -37,20 +37,46 @@ undefined reference to `__RAM_segment_used_end__'
 } >RAM
 
 
+
+/*******************************************************************************
+        => ThreadX 任务状态
+*******************************************************************************/
+Ready State             //就绪态
+Suspended State         //挂起态
+Executing State         //执行态
+Terminated State        //终止执行态
+Complete State          //执行完成态
+
+
+
+/*******************************************************************************
+        =>  ThreadX的启动流程
+*******************************************************************************/
+1 tx_kernel_enter               //进入ThreadX内核
+2 _tx_initialize_low_level      //初始化滴答定时器，使能PendSV，SVC和SysTick中断
+3 _tx_initialize_high_level     //初始化信号量，事件标志组，消息队列等
+4 tx_application_define         //应用程序回调函数，用户可在里面创建任务
+5 _tx_thread_scheduler          //启用调度器
 //启动操作系统内核
 main.c 文件中包含 threadx 系统头文件 tx_api.h ，
 并在 while(1) 之前调用 tx_kernel_enter() 函数，此时会报错
 undefined reference to `tx_application_define'
 //所以需要自己定义 tx_application_define 这个函数，并在这
 //个函数中启动一个线程来进行 LED 的闪烁，示例代码如下：
+
 #include "tx_api.h"
-TX_THREAD                       demo_thread;
-#define DEMO_STACK_SIZE         1024
-static uint8_t thread_stack[DEMO_STACK_SIZE];
+#define TASK00_ARGV             0u
+#define TASK00_PRIO             2u
+#define TASK00_PRIORITY         2u
+#define TASK00_STACK_SIZE       4096u
+static TX_THREAD task00_tcb;
+static uint64_t task00_stack[TASK00_STACK_SIZE / 8];
+
+void demo_thread_entry(ULONG thread_input);
+void tx_application_define(void *first_unused_memory);
 
 void demo_thread_entry(ULONG thread_input)
 {
-        /* This thread simply sits in while-forever-sleep loop.  */
         while (1) {
                 HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
                 tx_thread_sleep(1000);
@@ -60,19 +86,19 @@ void demo_thread_entry(ULONG thread_input)
 }
 void tx_application_define(void *first_unused_memory)
 {
-        /* Create the main thread.  */
         tx_thread_create(
-                &demo_thread,
-                 "demo thread",
-                 demo_thread_entry,
-                 0,
-                 thread_stack,
-                 DEMO_STACK_SIZE,
-                 1,
-                 1,
-                 TX_NO_TIME_SLICE,
-                 TX_AUTO_START  );
+                &task00_tcb,            //任务控制块地址
+                "TASK00_NAME",          //任务名称
+                task00_entry,           //任务入口函数
+                TASK00_ARGV,            //任务参数
+                &task00_stack[0],       //任务栈起始地址
+                TASK00_STACK_SIZE,      //任务栈大小
+                TASK00_PRIO,            //任务优先级
+                TASK00_PRIORITY,        //任务抢占阈值
+                TX_NO_TIME_SLICE,       //不开启时间片
+                TX_AUTO_START   );      //创建后立即启动
 }
+
 
 
 
@@ -301,9 +327,6 @@ _vectors:
 4 // 修改时钟频率
 找到threadX的底层初始化汇编文件tx_initialize_low_level_sample.S，
 修改系统主频为80Mhz，修改系统tick为1000个tick：
-
-
-
 
 
 

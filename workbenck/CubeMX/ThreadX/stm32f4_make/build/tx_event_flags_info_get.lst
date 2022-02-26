@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc2XFkiI.s 			page 1
+ARM GAS  /tmp/ccyd5prU.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
   29:ThreadX/common/src/tx_event_flags_info_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_event_flags_info_get.c **** #include "tx_event_flags.h"
   31:ThreadX/common/src/tx_event_flags_info_get.c **** 
-ARM GAS  /tmp/cc2XFkiI.s 			page 2
+ARM GAS  /tmp/ccyd5prU.s 			page 2
 
 
   32:ThreadX/common/src/tx_event_flags_info_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
   28              		.loc 1 85 0
   29              		.cfi_startproc
   30              		@ args = 8, pretend = 0, frame = 0
-ARM GAS  /tmp/cc2XFkiI.s 			page 3
+ARM GAS  /tmp/ccyd5prU.s 			page 3
 
 
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
   38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
   39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
   40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
-ARM GAS  /tmp/cc2XFkiI.s 			page 4
+ARM GAS  /tmp/ccyd5prU.s 			page 4
 
 
   41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
   95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
   97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
-ARM GAS  /tmp/cc2XFkiI.s 			page 5
+ARM GAS  /tmp/ccyd5prU.s 			page 5
 
 
   98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
  154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
-ARM GAS  /tmp/cc2XFkiI.s 			page 6
+ARM GAS  /tmp/ccyd5prU.s 			page 6
 
 
  155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
  210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
  211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
-ARM GAS  /tmp/cc2XFkiI.s 			page 7
+ARM GAS  /tmp/ccyd5prU.s 			page 7
 
 
  212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
  268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
-ARM GAS  /tmp/cc2XFkiI.s 			page 8
+ARM GAS  /tmp/ccyd5prU.s 			page 8
 
 
  269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
  325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
-ARM GAS  /tmp/cc2XFkiI.s 			page 9
+ARM GAS  /tmp/ccyd5prU.s 			page 9
 
 
  326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
  381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
  382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
-ARM GAS  /tmp/cc2XFkiI.s 			page 10
+ARM GAS  /tmp/ccyd5prU.s 			page 10
 
 
  383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
  438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc2XFkiI.s 			page 11
+ARM GAS  /tmp/ccyd5prU.s 			page 11
 
 
  440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
-ARM GAS  /tmp/cc2XFkiI.s 			page 12
+ARM GAS  /tmp/ccyd5prU.s 			page 12
 
 
  497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
-ARM GAS  /tmp/cc2XFkiI.s 			page 13
+ARM GAS  /tmp/ccyd5prU.s 			page 13
 
 
  545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  100:ThreadX/common/src/tx_event_flags_info_get.c ****        destinations.  */
  101:ThreadX/common/src/tx_event_flags_info_get.c **** 
  102:ThreadX/common/src/tx_event_flags_info_get.c ****     /* Retrieve the name of the event flag group.  */
-ARM GAS  /tmp/cc2XFkiI.s 			page 14
+ARM GAS  /tmp/ccyd5prU.s 			page 14
 
 
  103:ThreadX/common/src/tx_event_flags_info_get.c ****     if (name != TX_NULL)
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
   92              		.loc 1 129 0
   93 0026 4369     		ldr	r3, [r0, #20]
   94              	.LVL3:
-ARM GAS  /tmp/cc2XFkiI.s 			page 15
+ARM GAS  /tmp/ccyd5prU.s 			page 15
 
 
   95 0028 2B60     		str	r3, [r5]
@@ -898,18 +898,18 @@ ARM GAS  /tmp/cc2XFkiI.s 			page 1
  134              		.file 4 "/usr/include/newlib/sys/_types.h"
  135              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
  136              		.file 6 "/usr/include/newlib/sys/reent.h"
-ARM GAS  /tmp/cc2XFkiI.s 			page 16
+ARM GAS  /tmp/ccyd5prU.s 			page 16
 
 
  137              		.file 7 "/usr/include/newlib/stdlib.h"
  138              		.file 8 "ThreadX/common/inc/tx_api.h"
  139              		.file 9 "ThreadX/common/inc/tx_event_flags.h"
-ARM GAS  /tmp/cc2XFkiI.s 			page 17
+ARM GAS  /tmp/ccyd5prU.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_event_flags_info_get.c
-     /tmp/cc2XFkiI.s:18     .text._tx_event_flags_info_get:0000000000000000 $t
-     /tmp/cc2XFkiI.s:25     .text._tx_event_flags_info_get:0000000000000000 _tx_event_flags_info_get
+     /tmp/ccyd5prU.s:18     .text._tx_event_flags_info_get:0000000000000000 $t
+     /tmp/ccyd5prU.s:25     .text._tx_event_flags_info_get:0000000000000000 _tx_event_flags_info_get
 
 NO UNDEFINED SYMBOLS

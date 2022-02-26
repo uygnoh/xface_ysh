@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccY7QTBh.s 			page 1
+ARM GAS  /tmp/ccIgjIFt.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
   29:ThreadX/common/src/tx_byte_pool_search.c **** #include "tx_thread.h"
   30:ThreadX/common/src/tx_byte_pool_search.c **** #include "tx_byte_pool.h"
   31:ThreadX/common/src/tx_byte_pool_search.c **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 2
+ARM GAS  /tmp/ccIgjIFt.s 			page 2
 
 
   32:ThreadX/common/src/tx_byte_pool_search.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
   86:ThreadX/common/src/tx_byte_pool_search.c **** /**************************************************************************/
   87:ThreadX/common/src/tx_byte_pool_search.c **** UCHAR  *_tx_byte_pool_search(TX_BYTE_POOL *pool_ptr, ULONG memory_size)
   88:ThreadX/common/src/tx_byte_pool_search.c **** {
-ARM GAS  /tmp/ccY7QTBh.s 			page 3
+ARM GAS  /tmp/ccIgjIFt.s 			page 3
 
 
   28              		.loc 1 88 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
   36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
   38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
-ARM GAS  /tmp/ccY7QTBh.s 			page 4
+ARM GAS  /tmp/ccIgjIFt.s 			page 4
 
 
   39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
   93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
   94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 5
+ARM GAS  /tmp/ccIgjIFt.s 			page 5
 
 
   96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
  151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 6
+ARM GAS  /tmp/ccIgjIFt.s 			page 6
 
 
  153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
  208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
  209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
-ARM GAS  /tmp/ccY7QTBh.s 			page 7
+ARM GAS  /tmp/ccIgjIFt.s 			page 7
 
 
  210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
  265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
  266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
-ARM GAS  /tmp/ccY7QTBh.s 			page 8
+ARM GAS  /tmp/ccIgjIFt.s 			page 8
 
 
  267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
  322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 9
+ARM GAS  /tmp/ccIgjIFt.s 			page 9
 
 
  324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
  379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
-ARM GAS  /tmp/ccY7QTBh.s 			page 10
+ARM GAS  /tmp/ccIgjIFt.s 			page 10
 
 
  381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
  436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
-ARM GAS  /tmp/ccY7QTBh.s 			page 11
+ARM GAS  /tmp/ccIgjIFt.s 			page 11
 
 
  438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
  493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
  494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 12
+ARM GAS  /tmp/ccIgjIFt.s 			page 12
 
 
  495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
  542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccY7QTBh.s 			page 13
+ARM GAS  /tmp/ccIgjIFt.s 			page 13
 
 
  543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  101:ThreadX/common/src/tx_byte_pool_search.c **** UCHAR           *work_ptr;
  102:ThreadX/common/src/tx_byte_pool_search.c **** ULONG           total_theoretical_available;
  103:ThreadX/common/src/tx_byte_pool_search.c **** 
-ARM GAS  /tmp/ccY7QTBh.s 			page 14
+ARM GAS  /tmp/ccIgjIFt.s 			page 14
 
 
  104:ThreadX/common/src/tx_byte_pool_search.c **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
   90 0028 2EE0     		b	.L11
   91              	.LVL7:
   92              	.L16:
-ARM GAS  /tmp/ccY7QTBh.s 			page 15
+ARM GAS  /tmp/ccIgjIFt.s 			page 15
 
 
   93              	.LBB24:
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  160:ThreadX/common/src/tx_byte_pool_search.c ****                     first_free_block_found =  TX_TRUE;
  117              		.loc 1 160 0
  118 003a 4FF0010C 		mov	ip, #1
-ARM GAS  /tmp/ccY7QTBh.s 			page 16
+ARM GAS  /tmp/ccIgjIFt.s 			page 16
 
 
  119              	.LVL12:
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  194:ThreadX/common/src/tx_byte_pool_search.c ****                            by updating the current block with the next blocks pointer.  */
  195:ThreadX/common/src/tx_byte_pool_search.c ****                         next_block_link_ptr =  TX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(next_ptr)
  196:ThreadX/common/src/tx_byte_pool_search.c ****                         *this_block_link_ptr =  *next_block_link_ptr;
-ARM GAS  /tmp/ccY7QTBh.s 			page 17
+ARM GAS  /tmp/ccIgjIFt.s 			page 17
 
 
  197:ThreadX/common/src/tx_byte_pool_search.c **** 
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  159 0064 4569     		ldr	r5, [r0, #20]
  160 0066 B542     		cmp	r5, r6
  161 0068 13D1     		bne	.L8
-ARM GAS  /tmp/ccY7QTBh.s 			page 18
+ARM GAS  /tmp/ccIgjIFt.s 			page 18
 
 
  216:ThreadX/common/src/tx_byte_pool_search.c ****                         }
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  240:ThreadX/common/src/tx_byte_pool_search.c ****                 }
  241:ThreadX/common/src/tx_byte_pool_search.c ****             }
  242:ThreadX/common/src/tx_byte_pool_search.c ****             else
-ARM GAS  /tmp/ccY7QTBh.s 			page 19
+ARM GAS  /tmp/ccIgjIFt.s 			page 19
 
 
  243:ThreadX/common/src/tx_byte_pool_search.c ****             {
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  222 0088 5668     		ldr	r6, [r2, #4]
  223 008a 174D     		ldr	r5, .L21+4
  224 008c AE42     		cmp	r6, r5
-ARM GAS  /tmp/ccY7QTBh.s 			page 20
+ARM GAS  /tmp/ccIgjIFt.s 			page 20
 
 
  225 008e D0D0     		beq	.L19
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  294:ThreadX/common/src/tx_byte_pool_search.c ****                 free_ptr =              TX_UCHAR_TO_ALIGN_TYPE_POINTER_CONVERT(work_ptr);
  295:ThreadX/common/src/tx_byte_pool_search.c ****                 *free_ptr =             TX_BYTE_BLOCK_FREE;
  258              		.loc 1 295 0
-ARM GAS  /tmp/ccY7QTBh.s 			page 21
+ARM GAS  /tmp/ccIgjIFt.s 			page 21
 
 
  259 00ae 0E4B     		ldr	r3, .L21+4
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  282 00c8 9342     		cmp	r3, r2
  283 00ca 04D0     		beq	.L20
  284              	.LVL39:
-ARM GAS  /tmp/ccY7QTBh.s 			page 22
+ARM GAS  /tmp/ccIgjIFt.s 			page 22
 
 
  285              	.L14:
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  310              	.LVL43:
  311              	.L12:
  312              	.LBB34:
-ARM GAS  /tmp/ccY7QTBh.s 			page 23
+ARM GAS  /tmp/ccIgjIFt.s 			page 23
 
 
  313              	.LBB35:
@@ -1357,14 +1357,14 @@ ARM GAS  /tmp/ccY7QTBh.s 			page 1
  344              		.file 8 "ThreadX/common/inc/tx_api.h"
  345              		.file 9 "ThreadX/common/inc/tx_thread.h"
  346              		.file 10 "ThreadX/common/inc/tx_byte_pool.h"
-ARM GAS  /tmp/ccY7QTBh.s 			page 24
+ARM GAS  /tmp/ccIgjIFt.s 			page 24
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_byte_pool_search.c
-     /tmp/ccY7QTBh.s:18     .text._tx_byte_pool_search:0000000000000000 $t
-     /tmp/ccY7QTBh.s:25     .text._tx_byte_pool_search:0000000000000000 _tx_byte_pool_search
-     /tmp/ccY7QTBh.s:332    .text._tx_byte_pool_search:00000000000000e4 $d
+     /tmp/ccIgjIFt.s:18     .text._tx_byte_pool_search:0000000000000000 $t
+     /tmp/ccIgjIFt.s:25     .text._tx_byte_pool_search:0000000000000000 _tx_byte_pool_search
+     /tmp/ccIgjIFt.s:332    .text._tx_byte_pool_search:00000000000000e4 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_current_ptr

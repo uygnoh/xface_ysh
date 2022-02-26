@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cct4PXAS.s 			page 1
+ARM GAS  /tmp/ccteL0Q1.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
   29:ThreadX/common/src/tx_event_flags_set.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_event_flags_set.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_event_flags_set.c **** #include "tx_event_flags.h"
-ARM GAS  /tmp/cct4PXAS.s 			page 2
+ARM GAS  /tmp/ccteL0Q1.s 			page 2
 
 
   32:ThreadX/common/src/tx_event_flags_set.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
   32              	.LVL0:
   33              	.LBB36:
   34              	.LBB37:
-ARM GAS  /tmp/cct4PXAS.s 			page 3
+ARM GAS  /tmp/ccteL0Q1.s 			page 3
 
 
   35              	.LBB38:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
   52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
   54:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  01-31-2022      Scott Larson            Modified comments, updated    */
-ARM GAS  /tmp/cct4PXAS.s 			page 4
+ARM GAS  /tmp/ccteL0Q1.s 			page 4
 
 
   55:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            typedef to fix misra        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
  110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
  111:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned int                            UINT;
-ARM GAS  /tmp/cct4PXAS.s 			page 5
+ARM GAS  /tmp/ccteL0Q1.s 			page 5
 
 
  112:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef long                                    LONG;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
  168:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
-ARM GAS  /tmp/cct4PXAS.s 			page 6
+ARM GAS  /tmp/ccteL0Q1.s 			page 6
 
 
  169:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
  225:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_1
-ARM GAS  /tmp/cct4PXAS.s 			page 7
+ARM GAS  /tmp/ccteL0Q1.s 			page 7
 
 
  226:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
  282:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
-ARM GAS  /tmp/cct4PXAS.s 			page 8
+ARM GAS  /tmp/ccteL0Q1.s 			page 8
 
 
  283:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  339:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTR
-ARM GAS  /tmp/cct4PXAS.s 			page 9
+ARM GAS  /tmp/ccteL0Q1.s 			page 9
 
 
  340:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    in order to ensure no lazy stacking will occur. */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
  395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
  396:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
-ARM GAS  /tmp/cct4PXAS.s 			page 10
+ARM GAS  /tmp/ccteL0Q1.s 			page 10
 
 
  397:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
  452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  453:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/cct4PXAS.s 			page 11
+ARM GAS  /tmp/ccteL0Q1.s 			page 11
 
 
  454:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
  509:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  510:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cct4PXAS.s 			page 12
+ARM GAS  /tmp/ccteL0Q1.s 			page 12
 
 
  511:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
  557:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  558:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
-ARM GAS  /tmp/cct4PXAS.s 			page 13
+ARM GAS  /tmp/ccteL0Q1.s 			page 13
 
 
  559:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(int_posture);
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  110:ThreadX/common/src/tx_event_flags_set.c ****     TX_DISABLE
  111:ThreadX/common/src/tx_event_flags_set.c **** 
  112:ThreadX/common/src/tx_event_flags_set.c **** #ifdef TX_EVENT_FLAGS_ENABLE_PERFORMANCE_INFO
-ARM GAS  /tmp/cct4PXAS.s 			page 14
+ARM GAS  /tmp/ccteL0Q1.s 			page 14
 
 
  113:ThreadX/common/src/tx_event_flags_set.c **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  156:ThreadX/common/src/tx_event_flags_set.c ****             /* Remember the events to clear.  */
  157:ThreadX/common/src/tx_event_flags_set.c ****             group_ptr -> tx_event_flags_group_delayed_clear =
  158:ThreadX/common/src/tx_event_flags_set.c ****                                         group_ptr -> tx_event_flags_group_delayed_clear | ~flags_to
-ARM GAS  /tmp/cct4PXAS.s 			page 15
+ARM GAS  /tmp/ccteL0Q1.s 			page 15
 
 
  159:ThreadX/common/src/tx_event_flags_set.c ****         }
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  192:ThreadX/common/src/tx_event_flags_set.c **** 
  193:ThreadX/common/src/tx_event_flags_set.c ****         /* Determine if there are any delayed flags to clear.  */
  194:ThreadX/common/src/tx_event_flags_set.c ****         if (group_ptr -> tx_event_flags_group_delayed_clear != ((ULONG) 0))
-ARM GAS  /tmp/cct4PXAS.s 			page 16
+ARM GAS  /tmp/ccteL0Q1.s 			page 16
 
 
  195:ThreadX/common/src/tx_event_flags_set.c ****         {
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  249:ThreadX/common/src/tx_event_flags_set.c ****                         /* No, not all the requested flags are present. Clear the flags present var
  250:ThreadX/common/src/tx_event_flags_set.c ****                         flags_satisfied =  ((ULONG) 0);
  251:ThreadX/common/src/tx_event_flags_set.c ****                     }
-ARM GAS  /tmp/cct4PXAS.s 			page 17
+ARM GAS  /tmp/ccteL0Q1.s 			page 17
 
 
  252:ThreadX/common/src/tx_event_flags_set.c ****                 }
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  306:ThreadX/common/src/tx_event_flags_set.c **** 
  307:ThreadX/common/src/tx_event_flags_set.c ****                     /* Resume thread.  */
  308:ThreadX/common/src/tx_event_flags_set.c ****                     _tx_thread_system_resume(thread_ptr);
-ARM GAS  /tmp/cct4PXAS.s 			page 18
+ARM GAS  /tmp/ccteL0Q1.s 			page 18
 
 
  309:ThreadX/common/src/tx_event_flags_set.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  363:ThreadX/common/src/tx_event_flags_set.c ****                         suspended_count =  group_ptr -> tx_event_flags_group_suspended_count;
  364:ThreadX/common/src/tx_event_flags_set.c **** 
  365:ThreadX/common/src/tx_event_flags_set.c ****                         /* Update the current events with any new ones that might
-ARM GAS  /tmp/cct4PXAS.s 			page 19
+ARM GAS  /tmp/ccteL0Q1.s 			page 19
 
 
  366:ThreadX/common/src/tx_event_flags_set.c ****                            have been set in a nested set events call from an ISR.  */
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  420:ThreadX/common/src/tx_event_flags_set.c ****                         /* Yes, this request can be handled now.  */
  421:ThreadX/common/src/tx_event_flags_set.c **** 
  422:ThreadX/common/src/tx_event_flags_set.c ****                         /* Set the preempt check flag.  */
-ARM GAS  /tmp/cct4PXAS.s 			page 20
+ARM GAS  /tmp/ccteL0Q1.s 			page 20
 
 
  423:ThreadX/common/src/tx_event_flags_set.c ****                         preempt_check =  TX_TRUE;
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  477:ThreadX/common/src/tx_event_flags_set.c ****                             /* Update the list head pointer, if removing the head of the
  478:ThreadX/common/src/tx_event_flags_set.c ****                                list.  */
  479:ThreadX/common/src/tx_event_flags_set.c ****                             if (suspended_list == thread_ptr)
-ARM GAS  /tmp/cct4PXAS.s 			page 21
+ARM GAS  /tmp/ccteL0Q1.s 			page 21
 
 
  480:ThreadX/common/src/tx_event_flags_set.c ****                             {
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  534:ThreadX/common/src/tx_event_flags_set.c ****                     /* Clear the delayed event flag clear value.  */
  535:ThreadX/common/src/tx_event_flags_set.c ****                     group_ptr -> tx_event_flags_group_delayed_clear =  ((ULONG) 0);
  536:ThreadX/common/src/tx_event_flags_set.c ****                 }
-ARM GAS  /tmp/cct4PXAS.s 			page 22
+ARM GAS  /tmp/ccteL0Q1.s 			page 22
 
 
  537:ThreadX/common/src/tx_event_flags_set.c **** #endif
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  591:ThreadX/common/src/tx_event_flags_set.c ****                    list.  Make sure we reset the search.  */
  592:ThreadX/common/src/tx_event_flags_set.c ****                 group_ptr -> tx_event_flags_group_reset_search =  TX_TRUE;
  593:ThreadX/common/src/tx_event_flags_set.c ****             }
-ARM GAS  /tmp/cct4PXAS.s 			page 23
+ARM GAS  /tmp/ccteL0Q1.s 			page 23
 
 
  594:ThreadX/common/src/tx_event_flags_set.c ****         }
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  109              		.cfi_offset 8, -20
  110              		.cfi_offset 9, -16
  111              		.cfi_offset 10, -12
-ARM GAS  /tmp/cct4PXAS.s 			page 24
+ARM GAS  /tmp/ccteL0Q1.s 			page 24
 
 
  112              		.cfi_offset 11, -8
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  155 005c 0131     		adds	r1, r1, #1
  156 005e 3160     		str	r1, [r6]
  322:ThreadX/common/src/tx_event_flags_set.c ****                 thread_ptr =      suspended_list;
-ARM GAS  /tmp/cct4PXAS.s 			page 25
+ARM GAS  /tmp/ccteL0Q1.s 			page 25
 
 
  157              		.loc 1 322 0
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  200 0090 0560     		str	r5, [r0]
  201              	.LVL24:
  278:ThreadX/common/src/tx_event_flags_set.c ****                     {
-ARM GAS  /tmp/cct4PXAS.s 			page 26
+ARM GAS  /tmp/ccteL0Q1.s 			page 26
 
 
  202              		.loc 1 278 0
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  248              		.loc 2 539 0
  249              		.syntax unified
-ARM GAS  /tmp/cct4PXAS.s 			page 27
+ARM GAS  /tmp/ccteL0Q1.s 			page 27
 
 
  250              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  296              		.loc 1 475 0
  297 00e0 2967     		str	r1, [r5, #112]
  479:ThreadX/common/src/tx_event_flags_set.c ****                             {
-ARM GAS  /tmp/cct4PXAS.s 			page 28
+ARM GAS  /tmp/ccteL0Q1.s 			page 28
 
 
  298              		.loc 1 479 0
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  343              	.LBB51:
  344              	.LBB52:
  345              	.LBB53:
-ARM GAS  /tmp/cct4PXAS.s 			page 29
+ARM GAS  /tmp/ccteL0Q1.s 			page 29
 
 
  539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -1738,7 +1738,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  391 0122 D3F880A0 		ldr	r10, [r3, #128]
  392              	.LVL51:
  383:ThreadX/common/src/tx_event_flags_set.c ****                     {
-ARM GAS  /tmp/cct4PXAS.s 			page 30
+ARM GAS  /tmp/ccteL0Q1.s 			page 30
 
 
  393              		.loc 1 383 0
@@ -1798,7 +1798,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  437              	.L39:
  483:ThreadX/common/src/tx_event_flags_set.c ****                             }
  438              		.loc 1 483 0
-ARM GAS  /tmp/cct4PXAS.s 			page 31
+ARM GAS  /tmp/ccteL0Q1.s 			page 31
 
 
  439 0160 D3F870E0 		ldr	lr, [r3, #112]
@@ -1858,7 +1858,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  483              	.LBB54:
  484              	.LBB55:
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cct4PXAS.s 			page 32
+ARM GAS  /tmp/ccteL0Q1.s 			page 32
 
 
  485              		.loc 2 562 0
@@ -1918,7 +1918,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  534 01a8 81F31088 		MSR  PRIMASK,r1
  535              	@ 0 "" 2
  536              		.thumb
-ARM GAS  /tmp/cct4PXAS.s 			page 33
+ARM GAS  /tmp/ccteL0Q1.s 			page 33
 
 
  537              		.syntax unified
@@ -1978,7 +1978,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  585              	@ 0 "" 2
  586              	.LVL77:
  587              		.thumb
-ARM GAS  /tmp/cct4PXAS.s 			page 34
+ARM GAS  /tmp/ccteL0Q1.s 			page 34
 
 
  588              		.syntax unified
@@ -2038,7 +2038,7 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  635              	.L44:
  636              		.align	2
  637              	.L43:
-ARM GAS  /tmp/cct4PXAS.s 			page 35
+ARM GAS  /tmp/ccteL0Q1.s 			page 35
 
 
  638 01f0 00000000 		.word	_tx_thread_preempt_disable
@@ -2054,14 +2054,14 @@ ARM GAS  /tmp/cct4PXAS.s 			page 1
  649              		.file 8 "ThreadX/common/inc/tx_api.h"
  650              		.file 9 "ThreadX/common/inc/tx_thread.h"
  651              		.file 10 "ThreadX/common/inc/tx_event_flags.h"
-ARM GAS  /tmp/cct4PXAS.s 			page 36
+ARM GAS  /tmp/ccteL0Q1.s 			page 36
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_event_flags_set.c
-     /tmp/cct4PXAS.s:18     .text._tx_event_flags_set:0000000000000000 $t
-     /tmp/cct4PXAS.s:25     .text._tx_event_flags_set:0000000000000000 _tx_event_flags_set
-     /tmp/cct4PXAS.s:638    .text._tx_event_flags_set:00000000000001f0 $d
+     /tmp/ccteL0Q1.s:18     .text._tx_event_flags_set:0000000000000000 $t
+     /tmp/ccteL0Q1.s:25     .text._tx_event_flags_set:0000000000000000 _tx_event_flags_set
+     /tmp/ccteL0Q1.s:638    .text._tx_event_flags_set:00000000000001f0 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

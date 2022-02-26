@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc1jkhpS.s 			page 1
+ARM GAS  /tmp/ccmR3o88.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
   29:ThreadX/common/src/tx_thread_resume.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_resume.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_resume.c **** #include "tx_initialize.h"
-ARM GAS  /tmp/cc1jkhpS.s 			page 2
+ARM GAS  /tmp/ccmR3o88.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_resume.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
   37              		.cfi_offset 4, -12
   38              		.cfi_offset 5, -8
   39              		.cfi_offset 14, -4
-ARM GAS  /tmp/cc1jkhpS.s 			page 3
+ARM GAS  /tmp/ccmR3o88.s 			page 3
 
 
   40              	.LVL1:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
-ARM GAS  /tmp/cc1jkhpS.s 			page 4
+ARM GAS  /tmp/ccmR3o88.s 			page 4
 
 
   52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
-ARM GAS  /tmp/cc1jkhpS.s 			page 5
+ARM GAS  /tmp/ccmR3o88.s 			page 5
 
 
  109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cc1jkhpS.s 			page 6
+ARM GAS  /tmp/ccmR3o88.s 			page 6
 
 
  166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
-ARM GAS  /tmp/cc1jkhpS.s 			page 7
+ARM GAS  /tmp/ccmR3o88.s 			page 7
 
 
  223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cc1jkhpS.s 			page 8
+ARM GAS  /tmp/ccmR3o88.s 			page 8
 
 
  280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
-ARM GAS  /tmp/cc1jkhpS.s 			page 9
+ARM GAS  /tmp/ccmR3o88.s 			page 9
 
 
  337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
-ARM GAS  /tmp/cc1jkhpS.s 			page 10
+ARM GAS  /tmp/ccmR3o88.s 			page 10
 
 
  394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 11
+ARM GAS  /tmp/ccmR3o88.s 			page 11
 
 
  451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 12
+ARM GAS  /tmp/ccmR3o88.s 			page 12
 
 
  508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 13
+ARM GAS  /tmp/ccmR3o88.s 			page 13
 
 
  556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  102:ThreadX/common/src/tx_thread_resume.c **** 
  103:ThreadX/common/src/tx_thread_resume.c **** #ifdef TX_ENABLE_STACK_CHECKING
  104:ThreadX/common/src/tx_thread_resume.c **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 14
+ARM GAS  /tmp/ccmR3o88.s 			page 14
 
 
  105:ThreadX/common/src/tx_thread_resume.c ****     /* Check this thread's stack.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  155:ThreadX/common/src/tx_thread_resume.c ****             saved_thread_ptr =  TX_NULL;
  156:ThreadX/common/src/tx_thread_resume.c ****         }
  157:ThreadX/common/src/tx_thread_resume.c **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 15
+ARM GAS  /tmp/ccmR3o88.s 			page 15
 
 
  158:ThreadX/common/src/tx_thread_resume.c **** #ifndef TX_INLINE_THREAD_RESUME_SUSPEND
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  212:ThreadX/common/src/tx_thread_resume.c ****         entry_ptr =  _tx_trace_buffer_current_ptr;
  213:ThreadX/common/src/tx_thread_resume.c **** #endif
  214:ThreadX/common/src/tx_thread_resume.c **** 
-ARM GAS  /tmp/cc1jkhpS.s 			page 16
+ARM GAS  /tmp/ccmR3o88.s 			page 16
 
 
  215:ThreadX/common/src/tx_thread_resume.c ****         /* Log the thread status change.  */
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  269:ThreadX/common/src/tx_thread_resume.c **** 
  270:ThreadX/common/src/tx_thread_resume.c ****             /* Set the active bit to remember that the priority map has something set.  */
  271:ThreadX/common/src/tx_thread_resume.c ****             TX_DIV32_BIT_SET(priority, priority_bit)
-ARM GAS  /tmp/cc1jkhpS.s 			page 17
+ARM GAS  /tmp/ccmR3o88.s 			page 17
 
 
  272:ThreadX/common/src/tx_thread_resume.c ****             _tx_thread_priority_map_active =  _tx_thread_priority_map_active | priority_bit;
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  326:ThreadX/common/src/tx_thread_resume.c ****                             _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_I
  327:ThreadX/common/src/tx_thread_resume.c ****                         }
  328:ThreadX/common/src/tx_thread_resume.c **** #endif
-ARM GAS  /tmp/cc1jkhpS.s 			page 18
+ARM GAS  /tmp/ccmR3o88.s 			page 18
 
 
  329:ThreadX/common/src/tx_thread_resume.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  383:ThreadX/common/src/tx_thread_resume.c ****                             _tx_thread_performance__execute_log_index++;
  384:ThreadX/common/src/tx_thread_resume.c **** 
  385:ThreadX/common/src/tx_thread_resume.c ****                             /* Check for wrap condition.  */
-ARM GAS  /tmp/cc1jkhpS.s 			page 19
+ARM GAS  /tmp/ccmR3o88.s 			page 19
 
 
  386:ThreadX/common/src/tx_thread_resume.c ****                             if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  440:ThreadX/common/src/tx_thread_resume.c **** 
  441:ThreadX/common/src/tx_thread_resume.c ****                             /* Preemption is needed - return to the system!  */
  442:ThreadX/common/src/tx_thread_resume.c ****                             _tx_thread_system_return();
-ARM GAS  /tmp/cc1jkhpS.s 			page 20
+ARM GAS  /tmp/ccmR3o88.s 			page 20
 
 
  443:ThreadX/common/src/tx_thread_resume.c ****                         }
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  497:ThreadX/common/src/tx_thread_resume.c ****             /* Is the timestamp the same?  */
  498:ThreadX/common/src/tx_thread_resume.c ****             if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
  499:ThreadX/common/src/tx_thread_resume.c ****             {
-ARM GAS  /tmp/cc1jkhpS.s 			page 21
+ARM GAS  /tmp/ccmR3o88.s 			page 21
 
 
  500:ThreadX/common/src/tx_thread_resume.c **** 
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
   82              	@ 0 "" 2
   83              	.LVL3:
   84              		.thumb
-ARM GAS  /tmp/cc1jkhpS.s 			page 22
+ARM GAS  /tmp/ccmR3o88.s 			page 22
 
 
   85              		.syntax unified
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
   95              		.loc 2 477 0
   96              		.syntax unified
-ARM GAS  /tmp/cc1jkhpS.s 			page 23
+ARM GAS  /tmp/ccmR3o88.s 			page 23
 
 
   97              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  142 0046 83F31088 		MSR  PRIMASK,r3
  143              	@ 0 "" 2
  144              	.LVL10:
-ARM GAS  /tmp/cc1jkhpS.s 			page 24
+ARM GAS  /tmp/ccmR3o88.s 			page 24
 
 
  145              		.thumb
@@ -1438,20 +1438,20 @@ ARM GAS  /tmp/cc1jkhpS.s 			page 1
  192              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
  193              		.file 6 "/usr/include/newlib/sys/reent.h"
  194              		.file 7 "/usr/include/newlib/stdlib.h"
-ARM GAS  /tmp/cc1jkhpS.s 			page 25
+ARM GAS  /tmp/ccmR3o88.s 			page 25
 
 
  195              		.file 8 "ThreadX/common/inc/tx_api.h"
  196              		.file 9 "ThreadX/common/inc/tx_thread.h"
  197              		.file 10 "ThreadX/common/inc/tx_initialize.h"
-ARM GAS  /tmp/cc1jkhpS.s 			page 26
+ARM GAS  /tmp/ccmR3o88.s 			page 26
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_resume.c
-     /tmp/cc1jkhpS.s:18     .text._tx_thread_resume:0000000000000000 $t
-     /tmp/cc1jkhpS.s:25     .text._tx_thread_resume:0000000000000000 _tx_thread_resume
-     /tmp/cc1jkhpS.s:182    .text._tx_thread_resume:0000000000000068 $d
+     /tmp/ccmR3o88.s:18     .text._tx_thread_resume:0000000000000000 $t
+     /tmp/ccmR3o88.s:25     .text._tx_thread_resume:0000000000000000 _tx_thread_resume
+     /tmp/ccmR3o88.s:182    .text._tx_thread_resume:0000000000000068 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

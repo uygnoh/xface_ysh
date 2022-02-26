@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccow17iq.s 			page 1
+ARM GAS  /tmp/cc42Yg3N.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
   29:ThreadX/common/src/txe_byte_allocate.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_byte_allocate.c **** #include "tx_thread.h"
   31:ThreadX/common/src/txe_byte_allocate.c **** #include "tx_timer.h"
-ARM GAS  /tmp/ccow17iq.s 			page 2
+ARM GAS  /tmp/cc42Yg3N.s 			page 2
 
 
   32:ThreadX/common/src/txe_byte_allocate.c **** #include "tx_byte_pool.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
   28              		.loc 1 85 0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /tmp/ccow17iq.s 			page 3
+ARM GAS  /tmp/cc42Yg3N.s 			page 3
 
 
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  117:ThreadX/common/src/txe_byte_allocate.c ****         status =  TX_PTR_ERROR;
  118:ThreadX/common/src/txe_byte_allocate.c ****     }
  119:ThreadX/common/src/txe_byte_allocate.c **** 
-ARM GAS  /tmp/ccow17iq.s 			page 4
+ARM GAS  /tmp/cc42Yg3N.s 			page 4
 
 
  120:ThreadX/common/src/txe_byte_allocate.c ****     /* Check for an invalid memory size.  */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
   54              		.loc 1 173 0
   55 0010 68B9     		cbnz	r0, .L4
   56              	.LBB8:
-ARM GAS  /tmp/ccow17iq.s 			page 5
+ARM GAS  /tmp/cc42Yg3N.s 			page 5
 
 
   57              	.LBB9:
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
   53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
   54:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  01-31-2022      Scott Larson            Modified comments, updated    */
   55:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            typedef to fix misra        */
-ARM GAS  /tmp/ccow17iq.s 			page 6
+ARM GAS  /tmp/cc42Yg3N.s 			page 6
 
 
   56:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            violation,                  */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
  111:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned int                            UINT;
  112:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef long                                    LONG;
-ARM GAS  /tmp/ccow17iq.s 			page 7
+ARM GAS  /tmp/cc42Yg3N.s 			page 7
 
 
  113:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long                           ULONG;
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
  168:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
  169:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccow17iq.s 			page 8
+ARM GAS  /tmp/cc42Yg3N.s 			page 8
 
 
  170:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
  225:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_1
  226:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-ARM GAS  /tmp/ccow17iq.s 			page 9
+ARM GAS  /tmp/cc42Yg3N.s 			page 9
 
 
  227:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
  282:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
  283:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccow17iq.s 			page 10
+ARM GAS  /tmp/cc42Yg3N.s 			page 10
 
 
  284:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  339:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTR
  340:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    in order to ensure no lazy stacking will occur. */
-ARM GAS  /tmp/ccow17iq.s 			page 11
+ARM GAS  /tmp/cc42Yg3N.s 			page 11
 
 
  341:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
  396:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
  397:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
-ARM GAS  /tmp/ccow17iq.s 			page 12
+ARM GAS  /tmp/cc42Yg3N.s 			page 12
 
 
  398:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  453:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
  454:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/ccow17iq.s 			page 13
+ARM GAS  /tmp/cc42Yg3N.s 			page 13
 
 
  455:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  180:ThreadX/common/src/txe_byte_allocate.c ****             /* Now, make sure the call is from an interrupt and not initialization.  */
  181:ThreadX/common/src/txe_byte_allocate.c ****             if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
   84              		.loc 1 181 0
-ARM GAS  /tmp/ccow17iq.s 			page 14
+ARM GAS  /tmp/cc42Yg3N.s 			page 14
 
 
   85 0022 174D     		ldr	r5, .L18+4
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  116              	@ 0 "" 2
  117              		.thumb
  118              		.syntax unified
-ARM GAS  /tmp/ccow17iq.s 			page 15
+ARM GAS  /tmp/cc42Yg3N.s 			page 15
 
 
  119              	.LBE13:
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  164              	.LVL11:
  165              	.L17:
  166 0070 2046     		mov	r0, r4
-ARM GAS  /tmp/ccow17iq.s 			page 16
+ARM GAS  /tmp/cc42Yg3N.s 			page 16
 
 
  167              	.LVL12:
@@ -937,14 +937,14 @@ ARM GAS  /tmp/ccow17iq.s 			page 1
  198              		.file 10 "ThreadX/common/inc/tx_thread.h"
  199              		.file 11 "ThreadX/common/inc/tx_timer.h"
  200              		.file 12 "ThreadX/common/inc/tx_byte_pool.h"
-ARM GAS  /tmp/ccow17iq.s 			page 17
+ARM GAS  /tmp/cc42Yg3N.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_byte_allocate.c
-     /tmp/ccow17iq.s:18     .text._txe_byte_allocate:0000000000000000 $t
-     /tmp/ccow17iq.s:25     .text._txe_byte_allocate:0000000000000000 _txe_byte_allocate
-     /tmp/ccow17iq.s:182    .text._txe_byte_allocate:000000000000007c $d
+     /tmp/cc42Yg3N.s:18     .text._txe_byte_allocate:0000000000000000 $t
+     /tmp/cc42Yg3N.s:25     .text._txe_byte_allocate:0000000000000000 _txe_byte_allocate
+     /tmp/cc42Yg3N.s:182    .text._txe_byte_allocate:000000000000007c $d
 
 UNDEFINED SYMBOLS
 _tx_byte_allocate

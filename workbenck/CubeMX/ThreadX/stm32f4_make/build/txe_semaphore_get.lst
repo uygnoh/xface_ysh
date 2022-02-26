@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccLtdUu9.s 			page 1
+ARM GAS  /tmp/ccYq7ars.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
   29:ThreadX/common/src/txe_semaphore_get.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_semaphore_get.c **** #include "tx_timer.h"
   31:ThreadX/common/src/txe_semaphore_get.c **** #include "tx_semaphore.h"
-ARM GAS  /tmp/ccLtdUu9.s 			page 2
+ARM GAS  /tmp/ccYq7ars.s 			page 2
 
 
   32:ThreadX/common/src/txe_semaphore_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
   81:ThreadX/common/src/txe_semaphore_get.c **** #ifndef TX_TIMER_PROCESS_IN_ISR
   82:ThreadX/common/src/txe_semaphore_get.c **** TX_THREAD   *current_thread;
   83:ThreadX/common/src/txe_semaphore_get.c **** #endif
-ARM GAS  /tmp/ccLtdUu9.s 			page 3
+ARM GAS  /tmp/ccYq7ars.s 			page 3
 
 
   84:ThreadX/common/src/txe_semaphore_get.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
    8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
    9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   10:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/ccLtdUu9.s 			page 4
+ARM GAS  /tmp/ccYq7ars.s 			page 4
 
 
   11:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
   65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
   67:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLtdUu9.s 			page 5
+ARM GAS  /tmp/ccYq7ars.s 			page 5
 
 
   68:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_INCLUDE_USER_DEFINE_FILE
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
  123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
  124:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccLtdUu9.s 			page 6
+ARM GAS  /tmp/ccYq7ars.s 			page 6
 
 
  125:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
  180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  181:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EL_TICKS_PER_SECOND                  1000000
-ARM GAS  /tmp/ccLtdUu9.s 			page 7
+ARM GAS  /tmp/ccYq7ars.s 			page 7
 
 
  182:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
  238:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLtdUu9.s 			page 8
+ARM GAS  /tmp/ccYq7ars.s 			page 8
 
 
  239:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
  295:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLtdUu9.s 			page 9
+ARM GAS  /tmp/ccYq7ars.s 			page 9
 
 
  296:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define some helper functions (these are intrinsics in some compilers). */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  352:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
-ARM GAS  /tmp/ccLtdUu9.s 			page 10
+ARM GAS  /tmp/ccYq7ars.s 			page 10
 
 
  353:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
  408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
  409:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
-ARM GAS  /tmp/ccLtdUu9.s 			page 11
+ARM GAS  /tmp/ccYq7ars.s 			page 11
 
 
  410:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
  465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  466:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLtdUu9.s 			page 12
+ARM GAS  /tmp/ccYq7ars.s 			page 12
 
 
  467:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __CC_ARM /* ARM Compiler 5 */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
   77 0026 1846     		mov	r0, r3
  129:ThreadX/common/src/txe_semaphore_get.c ****                 {
  130:ThreadX/common/src/txe_semaphore_get.c **** 
-ARM GAS  /tmp/ccLtdUu9.s 			page 13
+ARM GAS  /tmp/ccYq7ars.s 			page 13
 
 
  131:ThreadX/common/src/txe_semaphore_get.c ****                     /* A non-thread is trying to suspend, return appropriate error code.  */
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  110              	.LVL10:
  111              	.L7:
  132:ThreadX/common/src/txe_semaphore_get.c ****                 }
-ARM GAS  /tmp/ccLtdUu9.s 			page 14
+ARM GAS  /tmp/ccYq7ars.s 			page 14
 
 
  112              		.loc 1 132 0
@@ -807,14 +807,14 @@ ARM GAS  /tmp/ccLtdUu9.s 			page 1
  135              		.file 9 "ThreadX/common/inc/tx_thread.h"
  136              		.file 10 "ThreadX/common/inc/tx_timer.h"
  137              		.file 11 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/ccLtdUu9.s 			page 15
+ARM GAS  /tmp/ccYq7ars.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_semaphore_get.c
-     /tmp/ccLtdUu9.s:18     .text._txe_semaphore_get:0000000000000000 $t
-     /tmp/ccLtdUu9.s:25     .text._txe_semaphore_get:0000000000000000 _txe_semaphore_get
-     /tmp/ccLtdUu9.s:120    .text._txe_semaphore_get:0000000000000040 $d
+     /tmp/ccYq7ars.s:18     .text._txe_semaphore_get:0000000000000000 $t
+     /tmp/ccYq7ars.s:25     .text._txe_semaphore_get:0000000000000000 _txe_semaphore_get
+     /tmp/ccYq7ars.s:120    .text._txe_semaphore_get:0000000000000040 $d
 
 UNDEFINED SYMBOLS
 _tx_semaphore_get

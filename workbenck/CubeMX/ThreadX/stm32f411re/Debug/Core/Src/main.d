@@ -26,9 +26,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- ../Core/Inc/gpio.h ../Core/Inc/main.h ../Core/Inc/common.h \
- /home/ysh/Desktop/github/workbenck/CubeMX/ThreadX/stm32f411re/ThreadX/common/inc/tx_api.h \
- /home/ysh/Desktop/github/workbenck/CubeMX/ThreadX/stm32f411re/ThreadX/ports/cortex_m4/gnu/inc/tx_port.h
+ ../Core/Inc/gpio.h ../Core/Inc/main.h ../Core/Inc/common.h
 
 ../Core/Inc/main.h:
 
@@ -91,7 +89,3 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/main.h:
 
 ../Core/Inc/common.h:
-
-/home/ysh/Desktop/github/workbenck/CubeMX/ThreadX/stm32f411re/ThreadX/common/inc/tx_api.h:
-
-/home/ysh/Desktop/github/workbenck/CubeMX/ThreadX/stm32f411re/ThreadX/ports/cortex_m4/gnu/inc/tx_port.h:

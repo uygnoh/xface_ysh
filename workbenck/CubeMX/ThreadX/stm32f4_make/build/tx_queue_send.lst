@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccUeSVan.s 			page 1
+ARM GAS  /tmp/ccA1TJpI.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   29:ThreadX/common/src/tx_queue_send.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_queue_send.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_queue_send.c **** #include "tx_queue.h"
-ARM GAS  /tmp/ccUeSVan.s 			page 2
+ARM GAS  /tmp/ccA1TJpI.s 			page 2
 
 
   32:ThreadX/common/src/tx_queue_send.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   32              	.LVL0:
   33 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
   34              	.LCFI0:
-ARM GAS  /tmp/ccUeSVan.s 			page 3
+ARM GAS  /tmp/ccA1TJpI.s 			page 3
 
 
   35              		.cfi_def_cfa_offset 24
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
-ARM GAS  /tmp/ccUeSVan.s 			page 4
+ARM GAS  /tmp/ccA1TJpI.s 			page 4
 
 
   44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccUeSVan.s 			page 5
+ARM GAS  /tmp/ccA1TJpI.s 			page 5
 
 
  101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
-ARM GAS  /tmp/ccUeSVan.s 			page 6
+ARM GAS  /tmp/ccA1TJpI.s 			page 6
 
 
  158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
-ARM GAS  /tmp/ccUeSVan.s 			page 7
+ARM GAS  /tmp/ccA1TJpI.s 			page 7
 
 
  215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
-ARM GAS  /tmp/ccUeSVan.s 			page 8
+ARM GAS  /tmp/ccA1TJpI.s 			page 8
 
 
  272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
-ARM GAS  /tmp/ccUeSVan.s 			page 9
+ARM GAS  /tmp/ccA1TJpI.s 			page 9
 
 
  329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
-ARM GAS  /tmp/ccUeSVan.s 			page 10
+ARM GAS  /tmp/ccA1TJpI.s 			page 10
 
 
  386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/ccUeSVan.s 			page 11
+ARM GAS  /tmp/ccA1TJpI.s 			page 11
 
 
  443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
-ARM GAS  /tmp/ccUeSVan.s 			page 12
+ARM GAS  /tmp/ccA1TJpI.s 			page 12
 
 
  500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
-ARM GAS  /tmp/ccUeSVan.s 			page 13
+ARM GAS  /tmp/ccA1TJpI.s 			page 13
 
 
  548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   99:ThreadX/common/src/tx_queue_send.c ****     status =  TX_SUCCESS;
  100:ThreadX/common/src/tx_queue_send.c **** 
  101:ThreadX/common/src/tx_queue_send.c ****     /* Disable interrupts to place message in the queue.  */
-ARM GAS  /tmp/ccUeSVan.s 			page 14
+ARM GAS  /tmp/ccA1TJpI.s 			page 14
 
 
  102:ThreadX/common/src/tx_queue_send.c ****     TX_DISABLE
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
   84 001c 2361     		str	r3, [r4, #16]
   85              	.LVL5:
  139:ThreadX/common/src/tx_queue_send.c **** 
-ARM GAS  /tmp/ccUeSVan.s 			page 15
+ARM GAS  /tmp/ccA1TJpI.s 			page 15
 
 
  140:ThreadX/common/src/tx_queue_send.c ****             /* Setup source and destination pointers.  */
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  155:ThreadX/common/src/tx_queue_send.c ****             }
  156:ThreadX/common/src/tx_queue_send.c **** 
  157:ThreadX/common/src/tx_queue_send.c ****             /* Adjust the write pointer.  */
-ARM GAS  /tmp/ccUeSVan.s 			page 16
+ARM GAS  /tmp/ccA1TJpI.s 			page 16
 
 
  158:ThreadX/common/src/tx_queue_send.c ****             queue_ptr -> tx_queue_write =  destination;
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  155              		.loc 1 154 0
  156 0056 A269     		ldr	r2, [r4, #24]
  157              	.LVL22:
-ARM GAS  /tmp/ccUeSVan.s 			page 17
+ARM GAS  /tmp/ccA1TJpI.s 			page 17
 
 
  158 0058 F3E7     		b	.L7
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  218:ThreadX/common/src/tx_queue_send.c ****             }
  219:ThreadX/common/src/tx_queue_send.c **** 
  220:ThreadX/common/src/tx_queue_send.c ****             /* Decrement the suspension count.  */
-ARM GAS  /tmp/ccUeSVan.s 			page 18
+ARM GAS  /tmp/ccA1TJpI.s 			page 18
 
 
  221:ThreadX/common/src/tx_queue_send.c ****             queue_ptr -> tx_queue_suspended_count =  suspended_count;
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  208              		.loc 1 215 0
  209 0084 456F     		ldr	r5, [r0, #116]
  210              	.LVL37:
-ARM GAS  /tmp/ccUeSVan.s 			page 19
+ARM GAS  /tmp/ccA1TJpI.s 			page 19
 
 
  216:ThreadX/common/src/tx_queue_send.c ****                 previous_thread -> tx_thread_suspended_next =   next_thread;
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  242 00a4 0133     		adds	r3, r3, #1
  243 00a6 1360     		str	r3, [r2]
  244              	.LVL45:
-ARM GAS  /tmp/ccUeSVan.s 			page 20
+ARM GAS  /tmp/ccA1TJpI.s 			page 20
 
 
  245              	.LBB24:
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  274 00be 39D0     		beq	.L14
  280:ThreadX/common/src/tx_queue_send.c ****     {
  281:ThreadX/common/src/tx_queue_send.c **** 
-ARM GAS  /tmp/ccUeSVan.s 			page 21
+ARM GAS  /tmp/ccA1TJpI.s 			page 21
 
 
  282:ThreadX/common/src/tx_queue_send.c ****         /* Determine if the preempt disable flag is non-zero.  */
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  317:ThreadX/common/src/tx_queue_send.c **** 
  318:ThreadX/common/src/tx_queue_send.c **** #ifndef TX_NOT_INTERRUPTABLE
  319:ThreadX/common/src/tx_queue_send.c **** 
-ARM GAS  /tmp/ccUeSVan.s 			page 22
+ARM GAS  /tmp/ccA1TJpI.s 			page 22
 
 
  320:ThreadX/common/src/tx_queue_send.c ****             /* Increment the suspension sequence number, which is used to identify
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  316              	.LVL55:
  352:ThreadX/common/src/tx_queue_send.c **** 
  353:ThreadX/common/src/tx_queue_send.c **** #ifndef TX_DISABLE_NOTIFY_CALLBACKS
-ARM GAS  /tmp/ccUeSVan.s 			page 23
+ARM GAS  /tmp/ccA1TJpI.s 			page 23
 
 
  354:ThreadX/common/src/tx_queue_send.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  380:ThreadX/common/src/tx_queue_send.c ****             /* Call actual thread suspension routine.  */
  381:ThreadX/common/src/tx_queue_send.c ****             _tx_thread_system_suspend(thread_ptr);
  344              		.loc 1 381 0
-ARM GAS  /tmp/ccUeSVan.s 			page 24
+ARM GAS  /tmp/ccA1TJpI.s 			page 24
 
 
  345 0106 2846     		mov	r0, r5
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  419:ThreadX/common/src/tx_queue_send.c ****         TX_RESTORE
  420:ThreadX/common/src/tx_queue_send.c **** 
  421:ThreadX/common/src/tx_queue_send.c ****         /* Return error completion.  */
-ARM GAS  /tmp/ccUeSVan.s 			page 25
+ARM GAS  /tmp/ccA1TJpI.s 			page 25
 
 
  422:ThreadX/common/src/tx_queue_send.c ****         status =  TX_QUEUE_FULL;
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  402              	.LBB31:
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  403              		.loc 2 562 0
-ARM GAS  /tmp/ccUeSVan.s 			page 26
+ARM GAS  /tmp/ccA1TJpI.s 			page 26
 
 
  404              		.syntax unified
@@ -1545,14 +1545,14 @@ ARM GAS  /tmp/ccUeSVan.s 			page 1
  443              		.file 8 "ThreadX/common/inc/tx_api.h"
  444              		.file 9 "ThreadX/common/inc/tx_thread.h"
  445              		.file 10 "ThreadX/common/inc/tx_queue.h"
-ARM GAS  /tmp/ccUeSVan.s 			page 27
+ARM GAS  /tmp/ccA1TJpI.s 			page 27
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_queue_send.c
-     /tmp/ccUeSVan.s:18     .text._tx_queue_send:0000000000000000 $t
-     /tmp/ccUeSVan.s:25     .text._tx_queue_send:0000000000000000 _tx_queue_send
-     /tmp/ccUeSVan.s:430    .text._tx_queue_send:0000000000000144 $d
+     /tmp/ccA1TJpI.s:18     .text._tx_queue_send:0000000000000000 $t
+     /tmp/ccA1TJpI.s:25     .text._tx_queue_send:0000000000000000 _tx_queue_send
+     /tmp/ccA1TJpI.s:430    .text._tx_queue_send:0000000000000144 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

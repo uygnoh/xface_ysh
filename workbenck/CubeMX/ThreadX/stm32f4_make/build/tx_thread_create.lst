@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccRs4bY9.s 			page 1
+ARM GAS  /tmp/ccvEkonu.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
   29:ThreadX/common/src/tx_thread_create.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_create.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_create.c **** #include "tx_initialize.h"
-ARM GAS  /tmp/ccRs4bY9.s 			page 2
+ARM GAS  /tmp/ccvEkonu.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_create.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
   86:ThreadX/common/src/tx_thread_create.c **** /*                                            resulting in version 6.1    */
   87:ThreadX/common/src/tx_thread_create.c **** /*  06-02-2021      William E. Lamie        Modified comment(s), and      */
   88:ThreadX/common/src/tx_thread_create.c **** /*                                            supported TX_MISRA_ENABLE,  */
-ARM GAS  /tmp/ccRs4bY9.s 			page 3
+ARM GAS  /tmp/ccvEkonu.s 			page 3
 
 
   89:ThreadX/common/src/tx_thread_create.c **** /*  08-02-2021      Scott Larson            Removed unneeded cast,        */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  116:ThreadX/common/src/tx_thread_create.c ****     TX_MEMSET(stack_start, ((UCHAR) TX_STACK_FILL), stack_size);
   55              		.loc 1 116 0
   56 0016 3246     		mov	r2, r6
-ARM GAS  /tmp/ccRs4bY9.s 			page 4
+ARM GAS  /tmp/ccvEkonu.s 			page 4
 
 
   57              	.LVL2:
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
   70              		.loc 1 157 0
   71 002a C4F828B0 		str	fp, [r4, #40]
  158:ThreadX/common/src/tx_thread_create.c ****     thread_ptr -> tx_thread_entry =             entry_function;
-ARM GAS  /tmp/ccRs4bY9.s 			page 5
+ARM GAS  /tmp/ccvEkonu.s 			page 5
 
 
   72              		.loc 1 158 0
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  182:ThreadX/common/src/tx_thread_create.c ****     {
  183:ThreadX/common/src/tx_thread_create.c **** 
  184:ThreadX/common/src/tx_thread_create.c ****         /* Preemption-threshold specified. Since specific preemption-threshold is not supported,
-ARM GAS  /tmp/ccRs4bY9.s 			page 6
+ARM GAS  /tmp/ccvEkonu.s 			page 6
 
 
  185:ThreadX/common/src/tx_thread_create.c ****            disable all preemption.  */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
   12:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   13:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
   14:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/ccRs4bY9.s 			page 7
+ARM GAS  /tmp/ccvEkonu.s 			page 7
 
 
   15:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
   69:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   70:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Yes, include the user defines in tx_user.h. The defines in this file may
   71:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    alternately be defined on the command line.  */
-ARM GAS  /tmp/ccRs4bY9.s 			page 8
+ARM GAS  /tmp/ccvEkonu.s 			page 8
 
 
   72:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  126:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  127:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
  128:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    thread creation is less than this value, the thread create call will return an error.  */
-ARM GAS  /tmp/ccRs4bY9.s 			page 9
+ARM GAS  /tmp/ccvEkonu.s 			page 9
 
 
  129:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  183:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the method of how to get the upper and lower 32-bits of the time stamp. By default, simpl
  184:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    simulate the time-stamp source with a counter.  */
  185:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccRs4bY9.s 			page 10
+ARM GAS  /tmp/ccvEkonu.s 			page 10
 
 
  186:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbu()                              _tx_el_time_base_upper
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  240:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  241:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port extensions of the remaining ThreadX objects.  */
  242:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccRs4bY9.s 			page 11
+ARM GAS  /tmp/ccvEkonu.s 			page 11
 
 
  243:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_EXTENSION
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  297:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __GNUC__ /* GCC and ARM Compiler 6 */
  298:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  299:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline ULONG __get_control_value(void)
-ARM GAS  /tmp/ccRs4bY9.s 			page 12
+ARM GAS  /tmp/ccvEkonu.s 			page 12
 
 
  300:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  354:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_misra_control_get();  
  355:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
  356:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_misra_control_set(_tx_vfp_state);      
-ARM GAS  /tmp/ccRs4bY9.s 			page 13
+ARM GAS  /tmp/ccvEkonu.s 			page 13
 
 
  357:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  411:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  412:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
  413:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_misra_fpccr_get();    
-ARM GAS  /tmp/ccRs4bY9.s 			page 14
+ARM GAS  /tmp/ccvEkonu.s 			page 14
 
 
  414:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  468:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  469:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** register unsigned int _ipsr __asm("ipsr");
  470:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _ipsr)
-ARM GAS  /tmp/ccRs4bY9.s 			page 15
+ARM GAS  /tmp/ccvEkonu.s 			page 15
 
 
  471:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  525:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  526:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  527:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the interrupt disable/restore macros for each compiler. */
-ARM GAS  /tmp/ccRs4bY9.s 			page 16
+ARM GAS  /tmp/ccvEkonu.s 			page 16
 
 
  528:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  573:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(TX_PORT_BASEPRI);
  574:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  575:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSID i" : : : "memory");
-ARM GAS  /tmp/ccRs4bY9.s 			page 17
+ARM GAS  /tmp/ccvEkonu.s 			page 17
 
 
  129              		.loc 2 575 0
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  241:ThreadX/common/src/tx_thread_create.c ****         /* Place the new thread in the list.  */
  242:ThreadX/common/src/tx_thread_create.c ****         next_thread -> tx_thread_created_previous =  thread_ptr;
  243:ThreadX/common/src/tx_thread_create.c ****         previous_thread -> tx_thread_created_next =  thread_ptr;
-ARM GAS  /tmp/ccRs4bY9.s 			page 18
+ARM GAS  /tmp/ccvEkonu.s 			page 18
 
 
  244:ThreadX/common/src/tx_thread_create.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  176              	.LBE25:
  177              	.LBE24:
  274:ThreadX/common/src/tx_thread_create.c ****     {
-ARM GAS  /tmp/ccRs4bY9.s 			page 19
+ARM GAS  /tmp/ccvEkonu.s 			page 19
 
 
  275:ThreadX/common/src/tx_thread_create.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  204 00c0 D3F88C20 		ldr	r2, [r3, #140]
  205              	.LVL14:
  242:ThreadX/common/src/tx_thread_create.c ****         previous_thread -> tx_thread_created_next =  thread_ptr;
-ARM GAS  /tmp/ccRs4bY9.s 			page 20
+ARM GAS  /tmp/ccvEkonu.s 			page 20
 
 
  206              		.loc 1 242 0
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  321:ThreadX/common/src/tx_thread_create.c **** 
  322:ThreadX/common/src/tx_thread_create.c ****         /* Restore previous interrupt posture.  */
  323:ThreadX/common/src/tx_thread_create.c ****         TX_RESTORE
-ARM GAS  /tmp/ccRs4bY9.s 			page 21
+ARM GAS  /tmp/ccvEkonu.s 			page 21
 
 
  324:ThreadX/common/src/tx_thread_create.c **** 
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  271 00f2 EFF31081 		MRS  r1, PRIMASK 
  272              	@ 0 "" 2
  273              		.thumb
-ARM GAS  /tmp/ccRs4bY9.s 			page 22
+ARM GAS  /tmp/ccvEkonu.s 			page 22
 
 
  274              		.syntax unified
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  364:ThreadX/common/src/tx_thread_create.c **** 
  365:ThreadX/common/src/tx_thread_create.c ****         /* Restore interrupts.  */
  366:ThreadX/common/src/tx_thread_create.c ****         TX_RESTORE
-ARM GAS  /tmp/ccRs4bY9.s 			page 23
+ARM GAS  /tmp/ccvEkonu.s 			page 23
 
 
  367:ThreadX/common/src/tx_thread_create.c **** 
@@ -1363,14 +1363,14 @@ ARM GAS  /tmp/ccRs4bY9.s 			page 1
  333              		.file 10 "ThreadX/common/inc/tx_initialize.h"
  334              		.file 11 "/usr/include/newlib/string.h"
  335              		.file 12 "<built-in>"
-ARM GAS  /tmp/ccRs4bY9.s 			page 24
+ARM GAS  /tmp/ccvEkonu.s 			page 24
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_create.c
-     /tmp/ccRs4bY9.s:18     .text._tx_thread_create:0000000000000000 $t
-     /tmp/ccRs4bY9.s:25     .text._tx_thread_create:0000000000000000 _tx_thread_create
-     /tmp/ccRs4bY9.s:313    .text._tx_thread_create:0000000000000110 $d
+     /tmp/ccvEkonu.s:18     .text._tx_thread_create:0000000000000000 $t
+     /tmp/ccvEkonu.s:25     .text._tx_thread_create:0000000000000000 _tx_thread_create
+     /tmp/ccvEkonu.s:313    .text._tx_thread_create:0000000000000110 $d
 
 UNDEFINED SYMBOLS
 memset

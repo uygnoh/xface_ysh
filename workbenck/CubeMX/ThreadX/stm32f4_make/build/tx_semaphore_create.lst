@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccqDfM7D.s 			page 1
+ARM GAS  /tmp/ccy4F1CZ.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
   29:ThreadX/common/src/tx_semaphore_create.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_semaphore_create.c **** #include "tx_semaphore.h"
   31:ThreadX/common/src/tx_semaphore_create.c **** 
-ARM GAS  /tmp/ccqDfM7D.s 			page 2
+ARM GAS  /tmp/ccy4F1CZ.s 			page 2
 
 
   32:ThreadX/common/src/tx_semaphore_create.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
   37              		.cfi_offset 5, -12
   38              		.cfi_offset 6, -8
   39              		.cfi_offset 14, -4
-ARM GAS  /tmp/ccqDfM7D.s 			page 3
+ARM GAS  /tmp/ccy4F1CZ.s 			page 3
 
 
   40 0002 0446     		mov	r4, r0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
   23:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   24:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
   25:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccqDfM7D.s 			page 4
+ARM GAS  /tmp/ccy4F1CZ.s 			page 4
 
 
   26:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
   80:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <string.h>
   81:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   82:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__
-ARM GAS  /tmp/ccqDfM7D.s 			page 5
+ARM GAS  /tmp/ccy4F1CZ.s 			page 5
 
 
   83:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <intrinsics.h>                     /* IAR Intrinsics */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  137:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  138:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_STACK_SIZE
  139:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
-ARM GAS  /tmp/ccqDfM7D.s 			page 6
+ARM GAS  /tmp/ccy4F1CZ.s 			page 6
 
 
  140:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  194:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  195:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  196:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the in-line initialization constant so that modules with in-line
-ARM GAS  /tmp/ccqDfM7D.s 			page 7
+ARM GAS  /tmp/ccy4F1CZ.s 			page 7
 
 
  197:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    initialization capabilities can prevent their initialization from being
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  251:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  252:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the user extension field of the thread control block.  Nothing
  253:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    additional is needed for this port so it is defined as white space.  */
-ARM GAS  /tmp/ccqDfM7D.s 			page 8
+ARM GAS  /tmp/ccy4F1CZ.s 			page 8
 
 
  254:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  308:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  309:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
  310:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccqDfM7D.s 			page 9
+ARM GAS  /tmp/ccy4F1CZ.s 			page 9
 
 
  311:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  365:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  366:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  367:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccqDfM7D.s 			page 10
+ARM GAS  /tmp/ccy4F1CZ.s 			page 10
 
 
  368:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  422:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
  423:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_misra_cont
  424:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
-ARM GAS  /tmp/ccqDfM7D.s 			page 11
+ARM GAS  /tmp/ccy4F1CZ.s 			page 11
 
 
  425:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_misra_control_set(_tx_vfp_s
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  479:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  480:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  481:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_ipsr_value())
-ARM GAS  /tmp/ccqDfM7D.s 			page 12
+ARM GAS  /tmp/ccy4F1CZ.s 			page 12
 
 
  482:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  536:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
  537:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, BASEPRI ": "=r" (posture));
  538:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccqDfM7D.s 			page 13
+ARM GAS  /tmp/ccy4F1CZ.s 			page 13
 
 
  539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, PRIMASK ": "=r" (posture));
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
   76              	.LBE10:
   90:ThreadX/common/src/tx_semaphore_create.c **** 
   91:ThreadX/common/src/tx_semaphore_create.c ****     /* Disable interrupts to place the semaphore on the created list.  */
-ARM GAS  /tmp/ccqDfM7D.s 			page 14
+ARM GAS  /tmp/ccy4F1CZ.s 			page 14
 
 
   92:ThreadX/common/src/tx_semaphore_create.c ****     TX_DISABLE
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  122:ThreadX/common/src/tx_semaphore_create.c **** 
  123:ThreadX/common/src/tx_semaphore_create.c ****     /* Increment the created count.  */
  124:ThreadX/common/src/tx_semaphore_create.c ****     _tx_semaphore_created_count++;
-ARM GAS  /tmp/ccqDfM7D.s 			page 15
+ARM GAS  /tmp/ccy4F1CZ.s 			page 15
 
 
  101              		.loc 1 124 0
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  132              	.L7:
  133              		.align	2
  134              	.L6:
-ARM GAS  /tmp/ccqDfM7D.s 			page 16
+ARM GAS  /tmp/ccy4F1CZ.s 			page 16
 
 
  135 004c 414D4553 		.word	1397050689
@@ -916,14 +916,14 @@ ARM GAS  /tmp/ccqDfM7D.s 			page 1
  148              		.file 8 "ThreadX/common/inc/tx_api.h"
  149              		.file 9 "ThreadX/common/inc/tx_semaphore.h"
  150              		.file 10 "<built-in>"
-ARM GAS  /tmp/ccqDfM7D.s 			page 17
+ARM GAS  /tmp/ccy4F1CZ.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_semaphore_create.c
-     /tmp/ccqDfM7D.s:18     .text._tx_semaphore_create:0000000000000000 $t
-     /tmp/ccqDfM7D.s:25     .text._tx_semaphore_create:0000000000000000 _tx_semaphore_create
-     /tmp/ccqDfM7D.s:135    .text._tx_semaphore_create:000000000000004c $d
+     /tmp/ccy4F1CZ.s:18     .text._tx_semaphore_create:0000000000000000 $t
+     /tmp/ccy4F1CZ.s:25     .text._tx_semaphore_create:0000000000000000 _tx_semaphore_create
+     /tmp/ccy4F1CZ.s:135    .text._tx_semaphore_create:000000000000004c $d
 
 UNDEFINED SYMBOLS
 memset

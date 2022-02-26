@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccOyLnz6.s 			page 1
+ARM GAS  /tmp/ccuAsDet.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
   29:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_NO_TIMER
   30:ThreadX/common/src/tx_thread_suspend.c **** #include "tx_timer.h"
   31:ThreadX/common/src/tx_thread_suspend.c **** #endif
-ARM GAS  /tmp/ccOyLnz6.s 			page 2
+ARM GAS  /tmp/ccuAsDet.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_suspend.c **** #endif
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
   33 0000 38B5     		push	{r3, r4, r5, lr}
   34              	.LCFI0:
   35              		.cfi_def_cfa_offset 16
-ARM GAS  /tmp/ccOyLnz6.s 			page 3
+ARM GAS  /tmp/ccuAsDet.s 			page 3
 
 
   36              		.cfi_offset 3, -16
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
   46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
   47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccOyLnz6.s 			page 4
+ARM GAS  /tmp/ccuAsDet.s 			page 4
 
 
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
-ARM GAS  /tmp/ccOyLnz6.s 			page 5
+ARM GAS  /tmp/ccuAsDet.s 			page 5
 
 
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
  161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
-ARM GAS  /tmp/ccOyLnz6.s 			page 6
+ARM GAS  /tmp/ccuAsDet.s 			page 6
 
 
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 7
+ARM GAS  /tmp/ccuAsDet.s 			page 7
 
 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
-ARM GAS  /tmp/ccOyLnz6.s 			page 8
+ARM GAS  /tmp/ccuAsDet.s 			page 8
 
 
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
-ARM GAS  /tmp/ccOyLnz6.s 			page 9
+ARM GAS  /tmp/ccuAsDet.s 			page 9
 
 
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
  389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
-ARM GAS  /tmp/ccOyLnz6.s 			page 10
+ARM GAS  /tmp/ccuAsDet.s 			page 10
 
 
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
  446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
-ARM GAS  /tmp/ccOyLnz6.s 			page 11
+ARM GAS  /tmp/ccuAsDet.s 			page 11
 
 
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
  503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 12
+ARM GAS  /tmp/ccuAsDet.s 			page 12
 
 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
  551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
-ARM GAS  /tmp/ccOyLnz6.s 			page 13
+ARM GAS  /tmp/ccuAsDet.s 			page 13
 
 
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
   99:ThreadX/common/src/tx_thread_suspend.c ****     /* Log this kernel call.  */
  100:ThreadX/common/src/tx_thread_suspend.c ****     TX_EL_THREAD_SUSPEND_INSERT
  101:ThreadX/common/src/tx_thread_suspend.c **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 14
+ARM GAS  /tmp/ccuAsDet.s 			page 14
 
 
  102:ThreadX/common/src/tx_thread_suspend.c ****     /* Check the specified thread's current status.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  130:ThreadX/common/src/tx_thread_suspend.c ****         /* Determine if the status is still successful.  */
  131:ThreadX/common/src/tx_thread_suspend.c ****         if (status == TX_SUCCESS)
  132:ThreadX/common/src/tx_thread_suspend.c ****         {
-ARM GAS  /tmp/ccOyLnz6.s 			page 15
+ARM GAS  /tmp/ccuAsDet.s 			page 15
 
 
  133:ThreadX/common/src/tx_thread_suspend.c **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  159:ThreadX/common/src/tx_thread_suspend.c ****             _tx_thread_system_suspend(thread_ptr);
  119              		.loc 1 159 0
  120 0038 FFF7FEFF 		bl	_tx_thread_system_suspend
-ARM GAS  /tmp/ccOyLnz6.s 			page 16
+ARM GAS  /tmp/ccuAsDet.s 			page 16
 
 
  121              	.LVL6:
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  144 0052 032C     		cmp	r4, #3
  145 0054 0AD0     		beq	.L9
  189:ThreadX/common/src/tx_thread_suspend.c ****     {
-ARM GAS  /tmp/ccOyLnz6.s 			page 17
+ARM GAS  /tmp/ccuAsDet.s 			page 17
 
 
  190:ThreadX/common/src/tx_thread_suspend.c **** 
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  215:ThreadX/common/src/tx_thread_suspend.c **** 
  216:ThreadX/common/src/tx_thread_suspend.c **** UINT            priority;
  217:ThreadX/common/src/tx_thread_suspend.c **** UINT            base_priority;
-ARM GAS  /tmp/ccOyLnz6.s 			page 18
+ARM GAS  /tmp/ccuAsDet.s 			page 18
 
 
  218:ThreadX/common/src/tx_thread_suspend.c **** ULONG           priority_map;
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  272:ThreadX/common/src/tx_thread_suspend.c ****         {
  273:ThreadX/common/src/tx_thread_suspend.c **** 
  274:ThreadX/common/src/tx_thread_suspend.c ****             /* Yes, we are in a thread context.  */
-ARM GAS  /tmp/ccOyLnz6.s 			page 19
+ARM GAS  /tmp/ccuAsDet.s 			page 19
 
 
  275:ThreadX/common/src/tx_thread_suspend.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  329:ThreadX/common/src/tx_thread_suspend.c **** 
  330:ThreadX/common/src/tx_thread_suspend.c ****                 /* Save time stamp.  */
  331:ThreadX/common/src/tx_thread_suspend.c ****                 time_stamp =  entry_ptr -> tx_trace_buffer_entry_time_stamp;
-ARM GAS  /tmp/ccOyLnz6.s 			page 20
+ARM GAS  /tmp/ccuAsDet.s 			page 20
 
 
  332:ThreadX/common/src/tx_thread_suspend.c ****             }
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  386:ThreadX/common/src/tx_thread_suspend.c **** #endif
  387:ThreadX/common/src/tx_thread_suspend.c ****                     }
  388:ThreadX/common/src/tx_thread_suspend.c **** #endif
-ARM GAS  /tmp/ccOyLnz6.s 			page 21
+ARM GAS  /tmp/ccuAsDet.s 			page 21
 
 
  389:ThreadX/common/src/tx_thread_suspend.c ****                 }
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  443:ThreadX/common/src/tx_thread_suspend.c **** 
  444:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
  445:ThreadX/common/src/tx_thread_suspend.c **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 22
+ARM GAS  /tmp/ccuAsDet.s 			page 22
 
 
  446:ThreadX/common/src/tx_thread_suspend.c ****                 /* Calculate the index to find the next highest priority thread ready for execution
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  500:ThreadX/common/src/tx_thread_suspend.c ****                     TX_RESTORE
  501:ThreadX/common/src/tx_thread_suspend.c **** 
  502:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if preemption should take place. This is only possible if the curr
-ARM GAS  /tmp/ccOyLnz6.s 			page 23
+ARM GAS  /tmp/ccuAsDet.s 			page 23
 
 
  503:ThreadX/common/src/tx_thread_suspend.c ****                        not the same as the execute thread pointer AND the system state and preempt 
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  557:ThreadX/common/src/tx_thread_suspend.c ****                     /* Restore interrupts.  */
  558:ThreadX/common/src/tx_thread_suspend.c ****                     TX_RESTORE
  559:ThreadX/common/src/tx_thread_suspend.c **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 24
+ARM GAS  /tmp/ccuAsDet.s 			page 24
 
 
  560:ThreadX/common/src/tx_thread_suspend.c ****                     /* Interrupts are enabled briefly here to keep the interrupt
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  614:ThreadX/common/src/tx_thread_suspend.c ****                             /* Is the timestamp the same?  */
  615:ThreadX/common/src/tx_thread_suspend.c ****                             if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
  616:ThreadX/common/src/tx_thread_suspend.c ****                             {
-ARM GAS  /tmp/ccOyLnz6.s 			page 25
+ARM GAS  /tmp/ccuAsDet.s 			page 25
 
 
  617:ThreadX/common/src/tx_thread_suspend.c **** 
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  671:ThreadX/common/src/tx_thread_suspend.c **** #endif
  672:ThreadX/common/src/tx_thread_suspend.c **** 
  673:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
-ARM GAS  /tmp/ccOyLnz6.s 			page 26
+ARM GAS  /tmp/ccuAsDet.s 			page 26
 
 
  674:ThreadX/common/src/tx_thread_suspend.c **** 
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  728:ThreadX/common/src/tx_thread_suspend.c ****                 {
  729:ThreadX/common/src/tx_thread_suspend.c **** 
  730:ThreadX/common/src/tx_thread_suspend.c ****                     /* Set the index to the beginning.  */
-ARM GAS  /tmp/ccOyLnz6.s 			page 27
+ARM GAS  /tmp/ccuAsDet.s 			page 27
 
 
  731:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_performance__execute_log_index =  ((UINT) 0);
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  785:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
  786:ThreadX/common/src/tx_thread_suspend.c **** 
  787:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if an idle system return is present.  */
-ARM GAS  /tmp/ccOyLnz6.s 			page 28
+ARM GAS  /tmp/ccuAsDet.s 			page 28
 
 
  788:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_execute_ptr == TX_NULL)
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  842:ThreadX/common/src/tx_thread_suspend.c ****     /* Restore interrupts.  */
  843:ThreadX/common/src/tx_thread_suspend.c ****     TX_RESTORE
  844:ThreadX/common/src/tx_thread_suspend.c **** 
-ARM GAS  /tmp/ccOyLnz6.s 			page 29
+ARM GAS  /tmp/ccuAsDet.s 			page 29
 
 
  845:ThreadX/common/src/tx_thread_suspend.c ****     /* Return completion status.  */
@@ -1716,14 +1716,14 @@ ARM GAS  /tmp/ccOyLnz6.s 			page 1
  200              		.file 7 "/usr/include/newlib/stdlib.h"
  201              		.file 8 "ThreadX/common/inc/tx_api.h"
  202              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccOyLnz6.s 			page 30
+ARM GAS  /tmp/ccuAsDet.s 			page 30
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_suspend.c
-     /tmp/ccOyLnz6.s:18     .text._tx_thread_suspend:0000000000000000 $t
-     /tmp/ccOyLnz6.s:25     .text._tx_thread_suspend:0000000000000000 _tx_thread_suspend
-     /tmp/ccOyLnz6.s:188    .text._tx_thread_suspend:0000000000000070 $d
+     /tmp/ccuAsDet.s:18     .text._tx_thread_suspend:0000000000000000 $t
+     /tmp/ccuAsDet.s:25     .text._tx_thread_suspend:0000000000000000 _tx_thread_suspend
+     /tmp/ccuAsDet.s:188    .text._tx_thread_suspend:0000000000000070 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_suspend

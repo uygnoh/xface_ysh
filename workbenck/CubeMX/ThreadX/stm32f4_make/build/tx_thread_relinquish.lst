@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc3CYFOM.s 			page 1
+ARM GAS  /tmp/cc1OFjga.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
   29:ThreadX/common/src/tx_thread_relinquish.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_relinquish.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_relinquish.c **** #ifndef TX_NO_TIMER
-ARM GAS  /tmp/cc3CYFOM.s 			page 2
+ARM GAS  /tmp/cc1OFjga.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_relinquish.c **** #include "tx_timer.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
   34              	.LCFI0:
   35              		.cfi_def_cfa_offset 4
   36              		.cfi_offset 4, -4
-ARM GAS  /tmp/cc3CYFOM.s 			page 3
+ARM GAS  /tmp/cc1OFjga.s 			page 3
 
 
   80:ThreadX/common/src/tx_thread_relinquish.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
   37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
   38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
   39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
-ARM GAS  /tmp/cc3CYFOM.s 			page 4
+ARM GAS  /tmp/cc1OFjga.s 			page 4
 
 
   40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
   94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
-ARM GAS  /tmp/cc3CYFOM.s 			page 5
+ARM GAS  /tmp/cc1OFjga.s 			page 5
 
 
   97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
-ARM GAS  /tmp/cc3CYFOM.s 			page 6
+ARM GAS  /tmp/cc1OFjga.s 			page 6
 
 
  154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
  209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
  210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
-ARM GAS  /tmp/cc3CYFOM.s 			page 7
+ARM GAS  /tmp/cc1OFjga.s 			page 7
 
 
  211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
  266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
-ARM GAS  /tmp/cc3CYFOM.s 			page 8
+ARM GAS  /tmp/cc1OFjga.s 			page 8
 
 
  268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
-ARM GAS  /tmp/cc3CYFOM.s 			page 9
+ARM GAS  /tmp/cc1OFjga.s 			page 9
 
 
  325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
  381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
-ARM GAS  /tmp/cc3CYFOM.s 			page 10
+ARM GAS  /tmp/cc1OFjga.s 			page 10
 
 
  382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
  438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc3CYFOM.s 			page 11
+ARM GAS  /tmp/cc1OFjga.s 			page 11
 
 
  439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
  494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc3CYFOM.s 			page 12
+ARM GAS  /tmp/cc1OFjga.s 			page 12
 
 
  496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
  542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc3CYFOM.s 			page 13
+ARM GAS  /tmp/cc1OFjga.s 			page 13
 
 
  544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  102:ThreadX/common/src/tx_thread_relinquish.c ****     _tx_timer_time_slice =  thread_ptr -> tx_thread_new_time_slice;
   64              		.loc 1 102 0
   65 000c D969     		ldr	r1, [r3, #28]
-ARM GAS  /tmp/cc3CYFOM.s 			page 14
+ARM GAS  /tmp/cc1OFjga.s 			page 14
 
 
   66 000e 164A     		ldr	r2, .L6+4
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
   96              	.LBB32:
   97              	.LBB33:
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cc3CYFOM.s 			page 15
+ARM GAS  /tmp/cc1OFjga.s 			page 15
 
 
   98              		.loc 2 562 0
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  125              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
  126 004c EFF30583 		 MRS  r3,IPSR 
  127              	@ 0 "" 2
-ARM GAS  /tmp/cc3CYFOM.s 			page 16
+ARM GAS  /tmp/cc1OFjga.s 			page 16
 
 
  128              		.thumb
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  151:ThreadX/common/src/tx_thread_relinquish.c ****         _tx_thread_performance_relinquish_count++;
  152:ThreadX/common/src/tx_thread_relinquish.c **** 
  153:ThreadX/common/src/tx_thread_relinquish.c ****         /* Increment the non-idle return count.  */
-ARM GAS  /tmp/cc3CYFOM.s 			page 17
+ARM GAS  /tmp/cc1OFjga.s 			page 17
 
 
  154:ThreadX/common/src/tx_thread_relinquish.c ****         _tx_thread_performance_non_idle_return_count++;
@@ -1005,14 +1005,14 @@ ARM GAS  /tmp/cc3CYFOM.s 			page 1
  195              		.file 8 "ThreadX/common/inc/tx_api.h"
  196              		.file 9 "ThreadX/common/inc/tx_thread.h"
  197              		.file 10 "ThreadX/common/inc/tx_timer.h"
-ARM GAS  /tmp/cc3CYFOM.s 			page 18
+ARM GAS  /tmp/cc1OFjga.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_relinquish.c
-     /tmp/cc3CYFOM.s:18     .text._tx_thread_relinquish:0000000000000000 $t
-     /tmp/cc3CYFOM.s:25     .text._tx_thread_relinquish:0000000000000000 _tx_thread_relinquish
-     /tmp/cc3CYFOM.s:179    .text._tx_thread_relinquish:0000000000000064 $d
+     /tmp/cc1OFjga.s:18     .text._tx_thread_relinquish:0000000000000000 $t
+     /tmp/cc1OFjga.s:25     .text._tx_thread_relinquish:0000000000000000 _tx_thread_relinquish
+     /tmp/cc1OFjga.s:179    .text._tx_thread_relinquish:0000000000000064 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_current_ptr

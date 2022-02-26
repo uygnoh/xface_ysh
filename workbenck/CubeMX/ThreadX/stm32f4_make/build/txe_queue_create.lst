@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc59C1mp.s 			page 1
+ARM GAS  /tmp/ccLcThRR.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
   29:ThreadX/common/src/txe_queue_create.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_queue_create.c **** #include "tx_timer.h"
   31:ThreadX/common/src/txe_queue_create.c **** #include "tx_thread.h"
-ARM GAS  /tmp/cc59C1mp.s 			page 2
+ARM GAS  /tmp/ccLcThRR.s 			page 2
 
 
   32:ThreadX/common/src/txe_queue_create.c **** #include "tx_queue.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
   28              		.loc 1 85 0
   29              		.cfi_startproc
   30              		@ args = 8, pretend = 0, frame = 0
-ARM GAS  /tmp/cc59C1mp.s 			page 3
+ARM GAS  /tmp/ccLcThRR.s 			page 3
 
 
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
    1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
    2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
    3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
-ARM GAS  /tmp/cc59C1mp.s 			page 4
+ARM GAS  /tmp/ccLcThRR.s 			page 4
 
 
    4:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
   58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
   59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/cc59C1mp.s 			page 5
+ARM GAS  /tmp/ccLcThRR.s 			page 5
 
 
   61:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
  116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
  117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
-ARM GAS  /tmp/cc59C1mp.s 			page 6
+ARM GAS  /tmp/ccLcThRR.s 			page 6
 
 
  118:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
  173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc59C1mp.s 			page 7
+ARM GAS  /tmp/ccLcThRR.s 			page 7
 
 
  175:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
  230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
  231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
-ARM GAS  /tmp/cc59C1mp.s 			page 8
+ARM GAS  /tmp/ccLcThRR.s 			page 8
 
 
  232:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
  288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc59C1mp.s 			page 9
+ARM GAS  /tmp/ccLcThRR.s 			page 9
 
 
  289:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_control_get(void);
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
  345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
-ARM GAS  /tmp/cc59C1mp.s 			page 10
+ARM GAS  /tmp/ccLcThRR.s 			page 10
 
 
  346:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  __get_control_value();    
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
  401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
  402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
-ARM GAS  /tmp/cc59C1mp.s 			page 11
+ARM GAS  /tmp/ccLcThRR.s 			page 11
 
 
  403:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
  458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
  459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
-ARM GAS  /tmp/cc59C1mp.s 			page 12
+ARM GAS  /tmp/ccLcThRR.s 			page 12
 
 
  460:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
  516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
-ARM GAS  /tmp/cc59C1mp.s 			page 13
+ARM GAS  /tmp/ccLcThRR.s 			page 13
 
 
  517:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
  563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/cc59C1mp.s 			page 14
+ARM GAS  /tmp/ccLcThRR.s 			page 14
 
 
  565:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  127:ThreadX/common/src/txe_queue_create.c ****         /* Next see if it is already in the created list.  */
  128:ThreadX/common/src/txe_queue_create.c ****         next_queue =   _tx_queue_created_ptr;
   94              		.loc 1 128 0
-ARM GAS  /tmp/cc59C1mp.s 			page 15
+ARM GAS  /tmp/ccLcThRR.s 			page 15
 
 
   95 0024 2B48     		ldr	r0, .L21+4
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  133              		.syntax unified
  134              	.LBE29:
  135              	.LBE28:
-ARM GAS  /tmp/cc59C1mp.s 			page 16
+ARM GAS  /tmp/ccLcThRR.s 			page 16
 
 
  136              		.loc 2 575 0
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  163:ThreadX/common/src/txe_queue_create.c ****             status =  TX_QUEUE_ERROR;
  164:ThreadX/common/src/txe_queue_create.c ****         }
  165:ThreadX/common/src/txe_queue_create.c **** 
-ARM GAS  /tmp/cc59C1mp.s 			page 17
+ARM GAS  /tmp/ccLcThRR.s 			page 17
 
 
  166:ThreadX/common/src/txe_queue_create.c ****         /* Check the starting address of the queue.  */
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  205:ThreadX/common/src/txe_queue_create.c ****             /* Check for invalid caller of this function.  First check for a calling thread.  */
  206:ThreadX/common/src/txe_queue_create.c ****             if (thread_ptr == &_tx_timer_thread)
  184              		.loc 1 206 0
-ARM GAS  /tmp/cc59C1mp.s 			page 18
+ARM GAS  /tmp/ccLcThRR.s 			page 18
 
 
  185 0070 1B4B     		ldr	r3, .L21+16
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  223 008c 1343     		orrs	r3, r3, r2
  224 008e B3F1F03F 		cmp	r3, #-252645136
  225 0092 1BD3     		bcc	.L16
-ARM GAS  /tmp/cc59C1mp.s 			page 19
+ARM GAS  /tmp/ccLcThRR.s 			page 19
 
 
  226              	.L7:
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  258              		.loc 1 239 0
  259 00ae 7047     		bx	lr
  260              	.LVL19:
-ARM GAS  /tmp/cc59C1mp.s 			page 20
+ARM GAS  /tmp/ccLcThRR.s 			page 20
 
 
  261              	.L9:
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  308              	.LVL23:
  238:ThreadX/common/src/txe_queue_create.c **** }
  309              		.loc 1 238 0
-ARM GAS  /tmp/cc59C1mp.s 			page 21
+ARM GAS  /tmp/ccLcThRR.s 			page 21
 
 
  310 00ce F0E7     		b	.L1
@@ -1225,14 +1225,14 @@ ARM GAS  /tmp/cc59C1mp.s 			page 1
  332              		.file 10 "ThreadX/common/inc/tx_timer.h"
  333              		.file 11 "ThreadX/common/inc/tx_thread.h"
  334              		.file 12 "ThreadX/common/inc/tx_queue.h"
-ARM GAS  /tmp/cc59C1mp.s 			page 22
+ARM GAS  /tmp/ccLcThRR.s 			page 22
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_queue_create.c
-     /tmp/cc59C1mp.s:18     .text._txe_queue_create:0000000000000000 $t
-     /tmp/cc59C1mp.s:25     .text._txe_queue_create:0000000000000000 _txe_queue_create
-     /tmp/cc59C1mp.s:314    .text._txe_queue_create:00000000000000d0 $d
+     /tmp/ccLcThRR.s:18     .text._txe_queue_create:0000000000000000 $t
+     /tmp/ccLcThRR.s:25     .text._txe_queue_create:0000000000000000 _txe_queue_create
+     /tmp/ccLcThRR.s:314    .text._txe_queue_create:00000000000000d0 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

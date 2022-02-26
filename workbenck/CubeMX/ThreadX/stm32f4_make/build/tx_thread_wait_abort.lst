@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cceWvP2D.s 			page 1
+ARM GAS  /tmp/ccEwQGz4.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
   29:ThreadX/common/src/tx_thread_wait_abort.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_wait_abort.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_wait_abort.c **** 
-ARM GAS  /tmp/cceWvP2D.s 			page 2
+ARM GAS  /tmp/ccEwQGz4.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_wait_abort.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
   36              		.cfi_offset 3, -16
   37              		.cfi_offset 4, -12
   38              		.cfi_offset 5, -8
-ARM GAS  /tmp/cceWvP2D.s 			page 3
+ARM GAS  /tmp/ccEwQGz4.s 			page 3
 
 
   39              		.cfi_offset 14, -4
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
-ARM GAS  /tmp/cceWvP2D.s 			page 4
+ARM GAS  /tmp/ccEwQGz4.s 			page 4
 
 
   52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
-ARM GAS  /tmp/cceWvP2D.s 			page 5
+ARM GAS  /tmp/ccEwQGz4.s 			page 5
 
 
  109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cceWvP2D.s 			page 6
+ARM GAS  /tmp/ccEwQGz4.s 			page 6
 
 
  166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
-ARM GAS  /tmp/cceWvP2D.s 			page 7
+ARM GAS  /tmp/ccEwQGz4.s 			page 7
 
 
  223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cceWvP2D.s 			page 8
+ARM GAS  /tmp/ccEwQGz4.s 			page 8
 
 
  280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
-ARM GAS  /tmp/cceWvP2D.s 			page 9
+ARM GAS  /tmp/ccEwQGz4.s 			page 9
 
 
  337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
-ARM GAS  /tmp/cceWvP2D.s 			page 10
+ARM GAS  /tmp/ccEwQGz4.s 			page 10
 
 
  394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cceWvP2D.s 			page 11
+ARM GAS  /tmp/ccEwQGz4.s 			page 11
 
 
  451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cceWvP2D.s 			page 12
+ARM GAS  /tmp/ccEwQGz4.s 			page 12
 
 
  508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cceWvP2D.s 			page 13
+ARM GAS  /tmp/ccEwQGz4.s 			page 13
 
 
  556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
   98:ThreadX/common/src/tx_thread_wait_abort.c **** 
   99:ThreadX/common/src/tx_thread_wait_abort.c ****         /* Thread is either ready, completed, terminated, or in a pure
  100:ThreadX/common/src/tx_thread_wait_abort.c ****            suspension condition.  */
-ARM GAS  /tmp/cceWvP2D.s 			page 14
+ARM GAS  /tmp/ccEwQGz4.s 			page 14
 
 
  101:ThreadX/common/src/tx_thread_wait_abort.c **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  146:ThreadX/common/src/tx_thread_wait_abort.c **** #ifndef TX_NOT_INTERRUPTABLE
  147:ThreadX/common/src/tx_thread_wait_abort.c **** 
  148:ThreadX/common/src/tx_thread_wait_abort.c ****             /* Pickup the suspension sequence number that is used later to verify that the
-ARM GAS  /tmp/cceWvP2D.s 			page 15
+ARM GAS  /tmp/ccEwQGz4.s 			page 15
 
 
  149:ThreadX/common/src/tx_thread_wait_abort.c ****                cleanup is still necessary.  */
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  175:ThreadX/common/src/tx_thread_wait_abort.c ****                 (suspend_cleanup)(thread_ptr, suspension_sequence);
  104              		.loc 1 175 0
  105 0032 2046     		mov	r0, r4
-ARM GAS  /tmp/cceWvP2D.s 			page 16
+ARM GAS  /tmp/ccEwQGz4.s 			page 16
 
 
  106 0034 A847     		blx	r5
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  200:ThreadX/common/src/tx_thread_wait_abort.c **** 
  201:ThreadX/common/src/tx_thread_wait_abort.c ****             /* Lift the suspension on the previously waiting thread.  */
  202:ThreadX/common/src/tx_thread_wait_abort.c ****             _tx_thread_system_resume(thread_ptr);
-ARM GAS  /tmp/cceWvP2D.s 			page 17
+ARM GAS  /tmp/ccEwQGz4.s 			page 17
 
 
  203:ThreadX/common/src/tx_thread_wait_abort.c **** #endif
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  235:ThreadX/common/src/tx_thread_wait_abort.c ****     return(status);
  236:ThreadX/common/src/tx_thread_wait_abort.c **** }
  156              		.loc 1 236 0
-ARM GAS  /tmp/cceWvP2D.s 			page 18
+ARM GAS  /tmp/ccEwQGz4.s 			page 18
 
 
  157 0052 38BD     		pop	{r3, r4, r5, pc}
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  204              	.L10:
  205              	.LBE35:
  206              	.LBE34:
-ARM GAS  /tmp/cceWvP2D.s 			page 19
+ARM GAS  /tmp/ccEwQGz4.s 			page 19
 
 
  202:ThreadX/common/src/tx_thread_wait_abort.c **** #endif
@@ -1105,14 +1105,14 @@ ARM GAS  /tmp/cceWvP2D.s 			page 1
  227              		.file 7 "/usr/include/newlib/stdlib.h"
  228              		.file 8 "ThreadX/common/inc/tx_api.h"
  229              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/cceWvP2D.s 			page 20
+ARM GAS  /tmp/ccEwQGz4.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_wait_abort.c
-     /tmp/cceWvP2D.s:18     .text._tx_thread_wait_abort:0000000000000000 $t
-     /tmp/cceWvP2D.s:25     .text._tx_thread_wait_abort:0000000000000000 _tx_thread_wait_abort
-     /tmp/cceWvP2D.s:217    .text._tx_thread_wait_abort:0000000000000084 $d
+     /tmp/ccEwQGz4.s:18     .text._tx_thread_wait_abort:0000000000000000 $t
+     /tmp/ccEwQGz4.s:25     .text._tx_thread_wait_abort:0000000000000000 _tx_thread_wait_abort
+     /tmp/ccEwQGz4.s:217    .text._tx_thread_wait_abort:0000000000000084 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

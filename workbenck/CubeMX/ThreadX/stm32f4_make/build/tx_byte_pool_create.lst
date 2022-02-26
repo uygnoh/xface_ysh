@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc48ebxR.s 			page 1
+ARM GAS  /tmp/ccynDcL4.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
   29:ThreadX/common/src/tx_byte_pool_create.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_byte_pool_create.c **** #include "tx_byte_pool.h"
   31:ThreadX/common/src/tx_byte_pool_create.c **** 
-ARM GAS  /tmp/cc48ebxR.s 			page 2
+ARM GAS  /tmp/ccynDcL4.s 			page 2
 
 
   32:ThreadX/common/src/tx_byte_pool_create.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
   36              		.cfi_offset 3, -24
   37              		.cfi_offset 4, -20
   38              		.cfi_offset 5, -16
-ARM GAS  /tmp/cc48ebxR.s 			page 3
+ARM GAS  /tmp/ccynDcL4.s 			page 3
 
 
   39              		.cfi_offset 6, -12
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
   65 001e 6661     		str	r6, [r4, #20]
  106:ThreadX/common/src/tx_byte_pool_create.c **** 
  107:ThreadX/common/src/tx_byte_pool_create.c ****     /* Initially, the pool will have two blocks.  One large block at the
-ARM GAS  /tmp/cc48ebxR.s 			page 4
+ARM GAS  /tmp/ccynDcL4.s 			page 4
 
 
  108:ThreadX/common/src/tx_byte_pool_create.c ****        beginning that is available and a small allocated block at the end
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  140:ThreadX/common/src/tx_byte_pool_create.c ****     free_ptr =             TX_UCHAR_TO_ALIGN_TYPE_POINTER_CONVERT(block_ptr);
  141:ThreadX/common/src/tx_byte_pool_create.c ****     *free_ptr =            TX_BYTE_BLOCK_FREE;
   88              		.loc 1 141 0
-ARM GAS  /tmp/cc48ebxR.s 			page 5
+ARM GAS  /tmp/ccynDcL4.s 			page 5
 
 
   89 003a 104B     		ldr	r3, .L6
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
   44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
-ARM GAS  /tmp/cc48ebxR.s 			page 6
+ARM GAS  /tmp/ccynDcL4.s 			page 6
 
 
   45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
-ARM GAS  /tmp/cc48ebxR.s 			page 7
+ARM GAS  /tmp/ccynDcL4.s 			page 7
 
 
  102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
  158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
-ARM GAS  /tmp/cc48ebxR.s 			page 8
+ARM GAS  /tmp/ccynDcL4.s 			page 8
 
 
  159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
  215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
-ARM GAS  /tmp/cc48ebxR.s 			page 9
+ARM GAS  /tmp/ccynDcL4.s 			page 9
 
 
  216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
  272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
-ARM GAS  /tmp/cc48ebxR.s 			page 10
+ARM GAS  /tmp/ccynDcL4.s 			page 10
 
 
  273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
  329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
-ARM GAS  /tmp/cc48ebxR.s 			page 11
+ARM GAS  /tmp/ccynDcL4.s 			page 11
 
 
  330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
  386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
-ARM GAS  /tmp/cc48ebxR.s 			page 12
+ARM GAS  /tmp/ccynDcL4.s 			page 12
 
 
  387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
  443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/cc48ebxR.s 			page 13
+ARM GAS  /tmp/ccynDcL4.s 			page 13
 
 
  444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
  500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc48ebxR.s 			page 14
+ARM GAS  /tmp/ccynDcL4.s 			page 14
 
 
  501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
  548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/cc48ebxR.s 			page 15
+ARM GAS  /tmp/ccynDcL4.s 			page 15
 
 
  549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  156:ThreadX/common/src/tx_byte_pool_create.c **** 
  157:ThreadX/common/src/tx_byte_pool_create.c ****         /* The created byte pool list is empty.  Add byte pool to empty list.  */
  158:ThreadX/common/src/tx_byte_pool_create.c ****         _tx_byte_pool_created_ptr =                  pool_ptr;
-ARM GAS  /tmp/cc48ebxR.s 			page 16
+ARM GAS  /tmp/ccynDcL4.s 			page 16
 
 
  159:ThreadX/common/src/tx_byte_pool_create.c ****         pool_ptr -> tx_byte_pool_created_next =      pool_ptr;
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  156              		.syntax unified
  157              	.LBE15:
  158              	.LBE14:
-ARM GAS  /tmp/cc48ebxR.s 			page 17
+ARM GAS  /tmp/ccynDcL4.s 			page 17
 
 
  180:ThreadX/common/src/tx_byte_pool_create.c **** 
@@ -1015,14 +1015,14 @@ ARM GAS  /tmp/cc48ebxR.s 			page 1
  189              		.file 8 "ThreadX/common/inc/tx_api.h"
  190              		.file 9 "ThreadX/common/inc/tx_byte_pool.h"
  191              		.file 10 "<built-in>"
-ARM GAS  /tmp/cc48ebxR.s 			page 18
+ARM GAS  /tmp/ccynDcL4.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_byte_pool_create.c
-     /tmp/cc48ebxR.s:18     .text._tx_byte_pool_create:0000000000000000 $t
-     /tmp/cc48ebxR.s:25     .text._tx_byte_pool_create:0000000000000000 _tx_byte_pool_create
-     /tmp/cc48ebxR.s:175    .text._tx_byte_pool_create:000000000000007c $d
+     /tmp/ccynDcL4.s:18     .text._tx_byte_pool_create:0000000000000000 $t
+     /tmp/ccynDcL4.s:25     .text._tx_byte_pool_create:0000000000000000 _tx_byte_pool_create
+     /tmp/ccynDcL4.s:175    .text._tx_byte_pool_create:000000000000007c $d
 
 UNDEFINED SYMBOLS
 memset

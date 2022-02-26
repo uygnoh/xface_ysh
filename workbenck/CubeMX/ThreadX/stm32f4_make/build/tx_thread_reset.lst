@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccDxqJiN.s 			page 1
+ARM GAS  /tmp/ccg4JqN3.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
   29:ThreadX/common/src/tx_thread_reset.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_reset.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_reset.c **** 
-ARM GAS  /tmp/ccDxqJiN.s 			page 2
+ARM GAS  /tmp/ccg4JqN3.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_reset.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
   37              		.file 2 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
    1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
    2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccDxqJiN.s 			page 3
+ARM GAS  /tmp/ccg4JqN3.s 			page 3
 
 
    3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
   57:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            fixed predefined macro,     */
   58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
   59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccDxqJiN.s 			page 4
+ARM GAS  /tmp/ccg4JqN3.s 			page 4
 
 
   60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  114:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long long                      ULONG64;
  115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
  116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
-ARM GAS  /tmp/ccDxqJiN.s 			page 5
+ARM GAS  /tmp/ccg4JqN3.s 			page 5
 
 
  117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  171:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_MASK
  172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
  173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccDxqJiN.s 			page 6
+ARM GAS  /tmp/ccg4JqN3.s 			page 6
 
 
  174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  228:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ghs__)
  229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
  230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
-ARM GAS  /tmp/ccDxqJiN.s 			page 7
+ARM GAS  /tmp/ccg4JqN3.s 			page 7
 
 
  231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  285:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP)
  286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
-ARM GAS  /tmp/ccDxqJiN.s 			page 8
+ARM GAS  /tmp/ccg4JqN3.s 			page 8
 
 
  288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  342:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
-ARM GAS  /tmp/ccDxqJiN.s 			page 9
+ARM GAS  /tmp/ccg4JqN3.s 			page 9
 
 
  345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  399:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
  401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
-ARM GAS  /tmp/ccDxqJiN.s 			page 10
+ARM GAS  /tmp/ccg4JqN3.s 			page 10
 
 
  402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  456:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
  457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
  458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
-ARM GAS  /tmp/ccDxqJiN.s 			page 11
+ARM GAS  /tmp/ccg4JqN3.s 			page 11
 
 
  459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  513:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_DISABLE_INLINE
  514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
-ARM GAS  /tmp/ccDxqJiN.s 			page 12
+ARM GAS  /tmp/ccg4JqN3.s 			page 12
 
 
  516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  561:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
  563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccDxqJiN.s 			page 13
+ARM GAS  /tmp/ccg4JqN3.s 			page 13
 
 
  564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  103:ThreadX/common/src/tx_thread_reset.c ****         /* Check for proper status of this thread to reset.  */
  104:ThreadX/common/src/tx_thread_reset.c ****         if (thread_ptr -> tx_thread_state != TX_COMPLETED)
   63              		.loc 1 104 0
-ARM GAS  /tmp/ccDxqJiN.s 			page 14
+ARM GAS  /tmp/ccg4JqN3.s 			page 14
 
 
   64 000e 026B     		ldr	r2, [r0, #48]
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  126:ThreadX/common/src/tx_thread_reset.c **** 
  127:ThreadX/common/src/tx_thread_reset.c ****         /* Restore interrupts.  */
  128:ThreadX/common/src/tx_thread_reset.c ****         TX_RESTORE
-ARM GAS  /tmp/ccDxqJiN.s 			page 15
+ARM GAS  /tmp/ccg4JqN3.s 			page 15
 
 
  129:ThreadX/common/src/tx_thread_reset.c **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  129              		.loc 1 147 0
  130 003c 0322     		movs	r2, #3
  131 003e 2263     		str	r2, [r4, #48]
-ARM GAS  /tmp/ccDxqJiN.s 			page 16
+ARM GAS  /tmp/ccg4JqN3.s 			page 16
 
 
  132 0040 0020     		movs	r0, #0
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  166              		.loc 2 562 0
  167              		.syntax unified
-ARM GAS  /tmp/ccDxqJiN.s 			page 17
+ARM GAS  /tmp/ccg4JqN3.s 			page 17
 
 
  168              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
@@ -988,14 +988,14 @@ ARM GAS  /tmp/ccDxqJiN.s 			page 1
  193              		.file 8 "ThreadX/common/inc/tx_api.h"
  194              		.file 9 "ThreadX/common/inc/tx_thread.h"
  195              		.file 10 "/usr/include/newlib/string.h"
-ARM GAS  /tmp/ccDxqJiN.s 			page 18
+ARM GAS  /tmp/ccg4JqN3.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_reset.c
-     /tmp/ccDxqJiN.s:18     .text._tx_thread_reset:0000000000000000 $t
-     /tmp/ccDxqJiN.s:25     .text._tx_thread_reset:0000000000000000 _tx_thread_reset
-     /tmp/ccDxqJiN.s:181    .text._tx_thread_reset:0000000000000054 $d
+     /tmp/ccg4JqN3.s:18     .text._tx_thread_reset:0000000000000000 $t
+     /tmp/ccg4JqN3.s:25     .text._tx_thread_reset:0000000000000000 _tx_thread_reset
+     /tmp/ccg4JqN3.s:181    .text._tx_thread_reset:0000000000000054 $d
 
 UNDEFINED SYMBOLS
 memset

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccw0gLoS.s 			page 1
+ARM GAS  /tmp/ccuCSnsb.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
   29:ThreadX/common/src/tx_queue_flush.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_queue_flush.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_queue_flush.c **** #include "tx_queue.h"
-ARM GAS  /tmp/ccw0gLoS.s 			page 2
+ARM GAS  /tmp/ccuCSnsb.s 			page 2
 
 
   32:ThreadX/common/src/tx_queue_flush.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
   35              		.cfi_def_cfa_offset 16
   36              		.cfi_offset 3, -16
   37              		.cfi_offset 4, -12
-ARM GAS  /tmp/ccw0gLoS.s 			page 3
+ARM GAS  /tmp/ccuCSnsb.s 			page 3
 
 
   38              		.cfi_offset 5, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
   47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
-ARM GAS  /tmp/ccw0gLoS.s 			page 4
+ARM GAS  /tmp/ccuCSnsb.s 			page 4
 
 
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccw0gLoS.s 			page 5
+ARM GAS  /tmp/ccuCSnsb.s 			page 5
 
 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
-ARM GAS  /tmp/ccw0gLoS.s 			page 6
+ARM GAS  /tmp/ccuCSnsb.s 			page 6
 
 
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
-ARM GAS  /tmp/ccw0gLoS.s 			page 7
+ARM GAS  /tmp/ccuCSnsb.s 			page 7
 
 
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
-ARM GAS  /tmp/ccw0gLoS.s 			page 8
+ARM GAS  /tmp/ccuCSnsb.s 			page 8
 
 
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
-ARM GAS  /tmp/ccw0gLoS.s 			page 9
+ARM GAS  /tmp/ccuCSnsb.s 			page 9
 
 
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
-ARM GAS  /tmp/ccw0gLoS.s 			page 10
+ARM GAS  /tmp/ccuCSnsb.s 			page 10
 
 
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
-ARM GAS  /tmp/ccw0gLoS.s 			page 11
+ARM GAS  /tmp/ccuCSnsb.s 			page 11
 
 
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
-ARM GAS  /tmp/ccw0gLoS.s 			page 12
+ARM GAS  /tmp/ccuCSnsb.s 			page 12
 
 
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccw0gLoS.s 			page 13
+ARM GAS  /tmp/ccuCSnsb.s 			page 13
 
 
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
   64              		.loc 1 101 0
   65 0008 0269     		ldr	r2, [r0, #16]
   66 000a 8AB1     		cbz	r2, .L7
-ARM GAS  /tmp/ccw0gLoS.s 			page 14
+ARM GAS  /tmp/ccuCSnsb.s 			page 14
 
 
  102:ThreadX/common/src/tx_queue_flush.c ****     {
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
   94 002e 01E0     		b	.L2
   95              	.LVL3:
   96              	.L7:
-ARM GAS  /tmp/ccw0gLoS.s 			page 15
+ARM GAS  /tmp/ccuCSnsb.s 			page 15
 
 
   88:ThreadX/common/src/tx_queue_flush.c ****     suspension_list =  TX_NULL;
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  127              	.LBB29:
  128              	.LBB30:
  129              	.LBB31:
-ARM GAS  /tmp/ccw0gLoS.s 			page 16
+ARM GAS  /tmp/ccuCSnsb.s 			page 16
 
 
  539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  177:ThreadX/common/src/tx_queue_flush.c ****             TX_RESTORE
  178:ThreadX/common/src/tx_queue_flush.c **** #else
  179:ThreadX/common/src/tx_queue_flush.c **** 
-ARM GAS  /tmp/ccw0gLoS.s 			page 17
+ARM GAS  /tmp/ccuCSnsb.s 			page 17
 
 
  180:ThreadX/common/src/tx_queue_flush.c ****             /* Temporarily disable preemption again.  */
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  198              	.LBE36:
  199              		.loc 2 575 0
  200              		.syntax unified
-ARM GAS  /tmp/ccw0gLoS.s 			page 18
+ARM GAS  /tmp/ccuCSnsb.s 			page 18
 
 
  201              	@ 575 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  235 0084 00000000 		.word	_tx_thread_preempt_disable
  236              		.cfi_endproc
  237              	.LFE8:
-ARM GAS  /tmp/ccw0gLoS.s 			page 19
+ARM GAS  /tmp/ccuCSnsb.s 			page 19
 
 
  239              		.text
@@ -1091,14 +1091,14 @@ ARM GAS  /tmp/ccw0gLoS.s 			page 1
  246              		.file 8 "ThreadX/common/inc/tx_api.h"
  247              		.file 9 "ThreadX/common/inc/tx_thread.h"
  248              		.file 10 "ThreadX/common/inc/tx_queue.h"
-ARM GAS  /tmp/ccw0gLoS.s 			page 20
+ARM GAS  /tmp/ccuCSnsb.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_queue_flush.c
-     /tmp/ccw0gLoS.s:18     .text._tx_queue_flush:0000000000000000 $t
-     /tmp/ccw0gLoS.s:25     .text._tx_queue_flush:0000000000000000 _tx_queue_flush
-     /tmp/ccw0gLoS.s:235    .text._tx_queue_flush:0000000000000084 $d
+     /tmp/ccuCSnsb.s:18     .text._tx_queue_flush:0000000000000000 $t
+     /tmp/ccuCSnsb.s:25     .text._tx_queue_flush:0000000000000000 _tx_queue_flush
+     /tmp/ccuCSnsb.s:235    .text._tx_queue_flush:0000000000000084 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

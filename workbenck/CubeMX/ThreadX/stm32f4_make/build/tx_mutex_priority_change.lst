@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccZDOttE.s 			page 1
+ARM GAS  /tmp/cc1daNMX.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
   29:ThreadX/common/src/tx_mutex_priority_change.c **** #include "tx_thread.h"
   30:ThreadX/common/src/tx_mutex_priority_change.c **** #include "tx_mutex.h"
   31:ThreadX/common/src/tx_mutex_priority_change.c **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 2
+ARM GAS  /tmp/cc1daNMX.s 			page 2
 
 
   32:ThreadX/common/src/tx_mutex_priority_change.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
   86:ThreadX/common/src/tx_mutex_priority_change.c **** /**************************************************************************/
   87:ThreadX/common/src/tx_mutex_priority_change.c **** VOID  _tx_mutex_priority_change(TX_THREAD *thread_ptr, UINT new_priority)
   88:ThreadX/common/src/tx_mutex_priority_change.c **** {
-ARM GAS  /tmp/ccZDOttE.s 			page 3
+ARM GAS  /tmp/cc1daNMX.s 			page 3
 
 
   28              		.loc 1 88 0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
   36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
   38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
-ARM GAS  /tmp/ccZDOttE.s 			page 4
+ARM GAS  /tmp/cc1daNMX.s 			page 4
 
 
   39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
   93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
   94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 5
+ARM GAS  /tmp/cc1daNMX.s 			page 5
 
 
   96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
  151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 6
+ARM GAS  /tmp/cc1daNMX.s 			page 6
 
 
  153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
  208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
  209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
-ARM GAS  /tmp/ccZDOttE.s 			page 7
+ARM GAS  /tmp/cc1daNMX.s 			page 7
 
 
  210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
  265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
  266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
-ARM GAS  /tmp/ccZDOttE.s 			page 8
+ARM GAS  /tmp/cc1daNMX.s 			page 8
 
 
  267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
  322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 9
+ARM GAS  /tmp/cc1daNMX.s 			page 9
 
 
  324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
  379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
-ARM GAS  /tmp/ccZDOttE.s 			page 10
+ARM GAS  /tmp/cc1daNMX.s 			page 10
 
 
  381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
  436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
-ARM GAS  /tmp/ccZDOttE.s 			page 11
+ARM GAS  /tmp/cc1daNMX.s 			page 11
 
 
  438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
  493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
  494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 12
+ARM GAS  /tmp/cc1daNMX.s 			page 12
 
 
  495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
  542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccZDOttE.s 			page 13
+ARM GAS  /tmp/cc1daNMX.s 			page 13
 
 
  543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  101:ThreadX/common/src/tx_mutex_priority_change.c **** UINT            map_index;
  102:ThreadX/common/src/tx_mutex_priority_change.c **** #endif
  103:ThreadX/common/src/tx_mutex_priority_change.c **** #endif
-ARM GAS  /tmp/ccZDOttE.s 			page 14
+ARM GAS  /tmp/cc1daNMX.s 			page 14
 
 
  104:ThreadX/common/src/tx_mutex_priority_change.c **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  131:ThreadX/common/src/tx_mutex_priority_change.c ****             thread_ptr -> tx_thread_preempt_threshold =  new_priority;
  132:ThreadX/common/src/tx_mutex_priority_change.c ****         }
  133:ThreadX/common/src/tx_mutex_priority_change.c **** 
-ARM GAS  /tmp/ccZDOttE.s 			page 15
+ARM GAS  /tmp/cc1daNMX.s 			page 15
 
 
  134:ThreadX/common/src/tx_mutex_priority_change.c **** #ifndef TX_NOT_INTERRUPTABLE
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  188:ThreadX/common/src/tx_mutex_priority_change.c **** 
  189:ThreadX/common/src/tx_mutex_priority_change.c ****         /* Set the state to priority change.  */
  190:ThreadX/common/src/tx_mutex_priority_change.c ****         thread_ptr -> tx_thread_state =    TX_PRIORITY_CHANGE;
-ARM GAS  /tmp/ccZDOttE.s 			page 16
+ARM GAS  /tmp/cc1daNMX.s 			page 16
 
 
  191:ThreadX/common/src/tx_mutex_priority_change.c **** 
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  245:ThreadX/common/src/tx_mutex_priority_change.c ****         next_execute_ptr =  _tx_thread_execute_ptr;
  246:ThreadX/common/src/tx_mutex_priority_change.c **** 
  247:ThreadX/common/src/tx_mutex_priority_change.c ****         /* Determine if this thread is not the next thread to execute.  */
-ARM GAS  /tmp/ccZDOttE.s 			page 17
+ARM GAS  /tmp/cc1daNMX.s 			page 17
 
 
  248:ThreadX/common/src/tx_mutex_priority_change.c ****         if (thread_ptr != next_execute_ptr)
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  302:ThreadX/common/src/tx_mutex_priority_change.c ****                         }
  303:ThreadX/common/src/tx_mutex_priority_change.c **** 
  304:ThreadX/common/src/tx_mutex_priority_change.c **** #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
-ARM GAS  /tmp/ccZDOttE.s 			page 18
+ARM GAS  /tmp/cc1daNMX.s 			page 18
 
 
  305:ThreadX/common/src/tx_mutex_priority_change.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  187:ThreadX/common/src/tx_mutex_priority_change.c **** 
  108              		.loc 1 187 0
  109 002c 2749     		ldr	r1, .L13+4
-ARM GAS  /tmp/ccZDOttE.s 			page 19
+ARM GAS  /tmp/cc1daNMX.s 			page 19
 
 
  110              	.LVL6:
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  158              		.syntax unified
  159              	.LBE33:
  160              	.LBE32:
-ARM GAS  /tmp/ccZDOttE.s 			page 20
+ARM GAS  /tmp/cc1daNMX.s 			page 20
 
 
  212:ThreadX/common/src/tx_mutex_priority_change.c **** 
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  245:ThreadX/common/src/tx_mutex_priority_change.c **** 
  209              		.loc 1 245 0
  210 006a 174B     		ldr	r3, .L13
-ARM GAS  /tmp/ccZDOttE.s 			page 21
+ARM GAS  /tmp/cc1daNMX.s 			page 21
 
 
  211 006c 1B68     		ldr	r3, [r3]
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  257 0092 F6D2     		bcs	.L8
  274:ThreadX/common/src/tx_mutex_priority_change.c ****                         }
  258              		.loc 1 274 0
-ARM GAS  /tmp/ccZDOttE.s 			page 22
+ARM GAS  /tmp/cc1daNMX.s 			page 22
 
 
  259 0094 0E4B     		ldr	r3, .L13+8
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  307              		.file 3 "/usr/include/newlib/sys/lock.h"
  308              		.file 4 "/usr/include/newlib/sys/_types.h"
  309              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
-ARM GAS  /tmp/ccZDOttE.s 			page 23
+ARM GAS  /tmp/cc1daNMX.s 			page 23
 
 
  310              		.file 6 "/usr/include/newlib/sys/reent.h"
@@ -1326,14 +1326,14 @@ ARM GAS  /tmp/ccZDOttE.s 			page 1
  312              		.file 8 "ThreadX/common/inc/tx_api.h"
  313              		.file 9 "ThreadX/common/inc/tx_thread.h"
  314              		.file 10 "ThreadX/common/inc/tx_mutex.h"
-ARM GAS  /tmp/ccZDOttE.s 			page 24
+ARM GAS  /tmp/cc1daNMX.s 			page 24
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_mutex_priority_change.c
-     /tmp/ccZDOttE.s:18     .text._tx_mutex_priority_change:0000000000000000 $t
-     /tmp/ccZDOttE.s:25     .text._tx_mutex_priority_change:0000000000000000 _tx_mutex_priority_change
-     /tmp/ccZDOttE.s:298    .text._tx_mutex_priority_change:00000000000000c8 $d
+     /tmp/cc1daNMX.s:18     .text._tx_mutex_priority_change:0000000000000000 $t
+     /tmp/cc1daNMX.s:25     .text._tx_mutex_priority_change:0000000000000000 _tx_mutex_priority_change
+     /tmp/cc1daNMX.s:298    .text._tx_mutex_priority_change:00000000000000c8 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_suspend

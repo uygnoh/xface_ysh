@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccLLfvm2.s 			page 1
+ARM GAS  /tmp/ccSZZXhm.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
   29:ThreadX/common/src/txe_semaphore_create.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_semaphore_create.c **** #include "tx_thread.h"
   31:ThreadX/common/src/txe_semaphore_create.c **** #include "tx_timer.h"
-ARM GAS  /tmp/ccLLfvm2.s 			page 2
+ARM GAS  /tmp/ccSZZXhm.s 			page 2
 
 
   32:ThreadX/common/src/txe_semaphore_create.c **** #include "tx_semaphore.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              	.LVL0:
   33 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
-ARM GAS  /tmp/ccLLfvm2.s 			page 3
+ARM GAS  /tmp/ccSZZXhm.s 			page 3
 
 
   34              	.LCFI0:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  115:ThreadX/common/src/txe_semaphore_create.c ****         /* Disable interrupts.  */
  116:ThreadX/common/src/txe_semaphore_create.c ****         TX_DISABLE
  117:ThreadX/common/src/txe_semaphore_create.c **** 
-ARM GAS  /tmp/ccLLfvm2.s 			page 4
+ARM GAS  /tmp/ccSZZXhm.s 			page 4
 
 
  118:ThreadX/common/src/txe_semaphore_create.c ****         /* Increment the preempt disable flag.  */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  172:ThreadX/common/src/txe_semaphore_create.c ****             {
  173:ThreadX/common/src/txe_semaphore_create.c **** 
  174:ThreadX/common/src/txe_semaphore_create.c ****                 /* Invalid caller of this function, return appropriate error code.  */
-ARM GAS  /tmp/ccLLfvm2.s 			page 5
+ARM GAS  /tmp/ccSZZXhm.s 			page 5
 
 
  175:ThreadX/common/src/txe_semaphore_create.c ****                 status =  TX_CALLER_ERROR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
    6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
    7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
    8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
-ARM GAS  /tmp/ccLLfvm2.s 			page 6
+ARM GAS  /tmp/ccSZZXhm.s 			page 6
 
 
    9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
   63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
   64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLLfvm2.s 			page 7
+ARM GAS  /tmp/ccSZZXhm.s 			page 7
 
 
   66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
  121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
-ARM GAS  /tmp/ccLLfvm2.s 			page 8
+ARM GAS  /tmp/ccSZZXhm.s 			page 8
 
 
  123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
  179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
-ARM GAS  /tmp/ccLLfvm2.s 			page 9
+ARM GAS  /tmp/ccSZZXhm.s 			page 9
 
 
  180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLLfvm2.s 			page 10
+ARM GAS  /tmp/ccSZZXhm.s 			page 10
 
 
  237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
  292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
  293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccLLfvm2.s 			page 11
+ARM GAS  /tmp/ccSZZXhm.s 			page 11
 
 
  294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
  349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
  350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccLLfvm2.s 			page 12
+ARM GAS  /tmp/ccSZZXhm.s 			page 12
 
 
  351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
  406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
  407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
-ARM GAS  /tmp/ccLLfvm2.s 			page 13
+ARM GAS  /tmp/ccSZZXhm.s 			page 13
 
 
  408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
  463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
-ARM GAS  /tmp/ccLLfvm2.s 			page 14
+ARM GAS  /tmp/ccSZZXhm.s 			page 14
 
 
  465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
  520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
  521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
-ARM GAS  /tmp/ccLLfvm2.s 			page 15
+ARM GAS  /tmp/ccSZZXhm.s 			page 15
 
 
  522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  566:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
  567:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  568:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int int_posture;
-ARM GAS  /tmp/ccLLfvm2.s 			page 16
+ARM GAS  /tmp/ccSZZXhm.s 			page 16
 
 
  569:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  121 0038 AC42     		cmp	r4, r5
  122 003a 02D0     		beq	.L4
  139:ThreadX/common/src/txe_semaphore_create.c ****             }
-ARM GAS  /tmp/ccLLfvm2.s 			page 17
+ARM GAS  /tmp/ccSZZXhm.s 			page 17
 
 
  123              		.loc 1 139 0 discriminator 2
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  172              	.LVL13:
  156:ThreadX/common/src/txe_semaphore_create.c ****         {
  173              		.loc 1 156 0
-ARM GAS  /tmp/ccLLfvm2.s 			page 18
+ARM GAS  /tmp/ccSZZXhm.s 			page 18
 
 
  174 0058 AC42     		cmp	r4, r5
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  221              	.LVL16:
  222              	.L7:
  102:ThreadX/common/src/txe_semaphore_create.c ****     }
-ARM GAS  /tmp/ccLLfvm2.s 			page 19
+ARM GAS  /tmp/ccSZZXhm.s 			page 19
 
 
  223              		.loc 1 102 0
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  272              	.Letext0:
  273              		.file 3 "/usr/include/newlib/sys/lock.h"
  274              		.file 4 "/usr/include/newlib/sys/_types.h"
-ARM GAS  /tmp/ccLLfvm2.s 			page 20
+ARM GAS  /tmp/ccSZZXhm.s 			page 20
 
 
  275              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
@@ -1149,14 +1149,14 @@ ARM GAS  /tmp/ccLLfvm2.s 			page 1
  280              		.file 10 "ThreadX/common/inc/tx_thread.h"
  281              		.file 11 "ThreadX/common/inc/tx_timer.h"
  282              		.file 12 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/ccLLfvm2.s 			page 21
+ARM GAS  /tmp/ccSZZXhm.s 			page 21
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_semaphore_create.c
-     /tmp/ccLLfvm2.s:18     .text._txe_semaphore_create:0000000000000000 $t
-     /tmp/ccLLfvm2.s:25     .text._txe_semaphore_create:0000000000000000 _txe_semaphore_create
-     /tmp/ccLLfvm2.s:262    .text._txe_semaphore_create:00000000000000a8 $d
+     /tmp/ccSZZXhm.s:18     .text._txe_semaphore_create:0000000000000000 $t
+     /tmp/ccSZZXhm.s:25     .text._txe_semaphore_create:0000000000000000 _txe_semaphore_create
+     /tmp/ccSZZXhm.s:262    .text._txe_semaphore_create:00000000000000a8 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

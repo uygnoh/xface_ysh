@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccFA3ac3.s 			page 1
+ARM GAS  /tmp/ccWhVvkn.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
   29:ThreadX/common/src/txe_semaphore_delete.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_semaphore_delete.c **** #include "tx_timer.h"
   31:ThreadX/common/src/txe_semaphore_delete.c **** #include "tx_semaphore.h"
-ARM GAS  /tmp/ccFA3ac3.s 			page 2
+ARM GAS  /tmp/ccWhVvkn.s 			page 2
 
 
   32:ThreadX/common/src/txe_semaphore_delete.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
   81:ThreadX/common/src/txe_semaphore_delete.c **** TX_THREAD       *thread_ptr;
   82:ThreadX/common/src/txe_semaphore_delete.c **** #endif
   83:ThreadX/common/src/txe_semaphore_delete.c **** 
-ARM GAS  /tmp/ccFA3ac3.s 			page 3
+ARM GAS  /tmp/ccWhVvkn.s 			page 3
 
 
   84:ThreadX/common/src/txe_semaphore_delete.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
   24:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
   25:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   26:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
-ARM GAS  /tmp/ccFA3ac3.s 			page 4
+ARM GAS  /tmp/ccWhVvkn.s 			page 4
 
 
   27:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
   81:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   82:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__
   83:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <intrinsics.h>                     /* IAR Intrinsics */
-ARM GAS  /tmp/ccFA3ac3.s 			page 5
+ARM GAS  /tmp/ccWhVvkn.s 			page 5
 
 
   84:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __asm__ __asm                       /* Define to make all inline asm look similar */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  138:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_STACK_SIZE
  139:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
  140:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccFA3ac3.s 			page 6
+ARM GAS  /tmp/ccWhVvkn.s 			page 6
 
 
  141:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  195:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  196:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the in-line initialization constant so that modules with in-line
  197:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    initialization capabilities can prevent their initialization from being
-ARM GAS  /tmp/ccFA3ac3.s 			page 7
+ARM GAS  /tmp/ccWhVvkn.s 			page 7
 
 
  198:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    a function call.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  252:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the user extension field of the thread control block.  Nothing
  253:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    additional is needed for this port so it is defined as white space.  */
  254:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccFA3ac3.s 			page 8
+ARM GAS  /tmp/ccWhVvkn.s 			page 8
 
 
  255:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_USER_EXTENSION
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  309:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
  310:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  311:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccFA3ac3.s 			page 9
+ARM GAS  /tmp/ccWhVvkn.s 			page 9
 
 
  312:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  366:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  367:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  368:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
-ARM GAS  /tmp/ccFA3ac3.s 			page 10
+ARM GAS  /tmp/ccWhVvkn.s 			page 10
 
 
  369:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  423:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_misra_cont
  424:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
  425:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_misra_control_set(_tx_vfp_s
-ARM GAS  /tmp/ccFA3ac3.s 			page 11
+ARM GAS  /tmp/ccWhVvkn.s 			page 11
 
 
  426:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
   51              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
   52 000c EFF30582 		 MRS  r2,IPSR 
   53              	@ 0 "" 2
-ARM GAS  /tmp/ccFA3ac3.s 			page 12
+ARM GAS  /tmp/ccWhVvkn.s 			page 12
 
 
   54              		.thumb
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  135:ThreadX/common/src/txe_semaphore_delete.c ****     if (status == TX_SUCCESS)
  136:ThreadX/common/src/txe_semaphore_delete.c ****     {
  137:ThreadX/common/src/txe_semaphore_delete.c **** 
-ARM GAS  /tmp/ccFA3ac3.s 			page 13
+ARM GAS  /tmp/ccWhVvkn.s 			page 13
 
 
  138:ThreadX/common/src/txe_semaphore_delete.c ****         /* Call actual semaphore delete function.  */
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  113              	.L11:
  114 0038 414D4553 		.word	1397050689
  115 003c 00000000 		.word	_tx_thread_system_state
-ARM GAS  /tmp/ccFA3ac3.s 			page 14
+ARM GAS  /tmp/ccWhVvkn.s 			page 14
 
 
  116 0040 00000000 		.word	_tx_thread_current_ptr
@@ -796,14 +796,14 @@ ARM GAS  /tmp/ccFA3ac3.s 			page 1
  129              		.file 9 "ThreadX/common/inc/tx_thread.h"
  130              		.file 10 "ThreadX/common/inc/tx_timer.h"
  131              		.file 11 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/ccFA3ac3.s 			page 15
+ARM GAS  /tmp/ccWhVvkn.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_semaphore_delete.c
-     /tmp/ccFA3ac3.s:18     .text._txe_semaphore_delete:0000000000000000 $t
-     /tmp/ccFA3ac3.s:25     .text._txe_semaphore_delete:0000000000000000 _txe_semaphore_delete
-     /tmp/ccFA3ac3.s:114    .text._txe_semaphore_delete:0000000000000038 $d
+     /tmp/ccWhVvkn.s:18     .text._txe_semaphore_delete:0000000000000000 $t
+     /tmp/ccWhVvkn.s:25     .text._txe_semaphore_delete:0000000000000000 _txe_semaphore_delete
+     /tmp/ccWhVvkn.s:114    .text._txe_semaphore_delete:0000000000000038 $d
 
 UNDEFINED SYMBOLS
 _tx_semaphore_delete

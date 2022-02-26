@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cct8DMJY.s 			page 1
+ARM GAS  /tmp/ccVx5Mvn.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
   29:ThreadX/common/src/tx_semaphore_put.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_semaphore_put.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_semaphore_put.c **** #include "tx_semaphore.h"
-ARM GAS  /tmp/cct8DMJY.s 			page 2
+ARM GAS  /tmp/ccVx5Mvn.s 			page 2
 
 
   32:ThreadX/common/src/tx_semaphore_put.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
   37              		.cfi_offset 4, -12
   38              		.cfi_offset 5, -8
   39              		.cfi_offset 14, -4
-ARM GAS  /tmp/cct8DMJY.s 			page 3
+ARM GAS  /tmp/ccVx5Mvn.s 			page 3
 
 
   40 0002 0446     		mov	r4, r0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
-ARM GAS  /tmp/cct8DMJY.s 			page 4
+ARM GAS  /tmp/ccVx5Mvn.s 			page 4
 
 
   52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
-ARM GAS  /tmp/cct8DMJY.s 			page 5
+ARM GAS  /tmp/ccVx5Mvn.s 			page 5
 
 
  109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cct8DMJY.s 			page 6
+ARM GAS  /tmp/ccVx5Mvn.s 			page 6
 
 
  166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
-ARM GAS  /tmp/cct8DMJY.s 			page 7
+ARM GAS  /tmp/ccVx5Mvn.s 			page 7
 
 
  223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cct8DMJY.s 			page 8
+ARM GAS  /tmp/ccVx5Mvn.s 			page 8
 
 
  280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
-ARM GAS  /tmp/cct8DMJY.s 			page 9
+ARM GAS  /tmp/ccVx5Mvn.s 			page 9
 
 
  337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
-ARM GAS  /tmp/cct8DMJY.s 			page 10
+ARM GAS  /tmp/ccVx5Mvn.s 			page 10
 
 
  394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cct8DMJY.s 			page 11
+ARM GAS  /tmp/ccVx5Mvn.s 			page 11
 
 
  451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cct8DMJY.s 			page 12
+ARM GAS  /tmp/ccVx5Mvn.s 			page 12
 
 
  508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cct8DMJY.s 			page 13
+ARM GAS  /tmp/ccVx5Mvn.s 			page 13
 
 
  556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  102:ThreadX/common/src/tx_semaphore_put.c ****     /* If trace is enabled, insert this event into the trace buffer.  */
  103:ThreadX/common/src/tx_semaphore_put.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_SEMAPHORE_PUT, semaphore_ptr, semaphore_ptr -> tx_semaphore_co
  104:ThreadX/common/src/tx_semaphore_put.c **** 
-ARM GAS  /tmp/cct8DMJY.s 			page 14
+ARM GAS  /tmp/ccVx5Mvn.s 			page 14
 
 
  105:ThreadX/common/src/tx_semaphore_put.c ****     /* Log this kernel call.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  131:ThreadX/common/src/tx_semaphore_put.c ****         {
  132:ThreadX/common/src/tx_semaphore_put.c **** 
  133:ThreadX/common/src/tx_semaphore_put.c ****             /* Yes, call the appropriate notify callback function.  */
-ARM GAS  /tmp/cct8DMJY.s 			page 15
+ARM GAS  /tmp/ccVx5Mvn.s 			page 15
 
 
  134:ThreadX/common/src/tx_semaphore_put.c ****             (semaphore_put_notify)(semaphore_ptr);
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  171:ThreadX/common/src/tx_semaphore_put.c ****         }
  172:ThreadX/common/src/tx_semaphore_put.c **** 
  173:ThreadX/common/src/tx_semaphore_put.c ****         /* Decrement the suspension count.  */
-ARM GAS  /tmp/cct8DMJY.s 			page 16
+ARM GAS  /tmp/ccVx5Mvn.s 			page 16
 
 
  174:ThreadX/common/src/tx_semaphore_put.c ****         semaphore_ptr -> tx_semaphore_suspended_count =  suspended_count;
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  134              		.thumb
  135              		.syntax unified
  136              	.LBE19:
-ARM GAS  /tmp/cct8DMJY.s 			page 17
+ARM GAS  /tmp/ccVx5Mvn.s 			page 17
 
 
  137              	.LBE18:
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  163              		.loc 1 170 0
  164 0058 2967     		str	r1, [r5, #112]
  165 005a E6E7     		b	.L5
-ARM GAS  /tmp/cct8DMJY.s 			page 18
+ARM GAS  /tmp/ccVx5Mvn.s 			page 18
 
 
  166              	.L8:
@@ -1037,14 +1037,14 @@ ARM GAS  /tmp/cct8DMJY.s 			page 1
  180              		.file 8 "ThreadX/common/inc/tx_api.h"
  181              		.file 9 "ThreadX/common/inc/tx_thread.h"
  182              		.file 10 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/cct8DMJY.s 			page 19
+ARM GAS  /tmp/ccVx5Mvn.s 			page 19
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_semaphore_put.c
-     /tmp/cct8DMJY.s:18     .text._tx_semaphore_put:0000000000000000 $t
-     /tmp/cct8DMJY.s:25     .text._tx_semaphore_put:0000000000000000 _tx_semaphore_put
-     /tmp/cct8DMJY.s:169    .text._tx_semaphore_put:000000000000005c $d
+     /tmp/ccVx5Mvn.s:18     .text._tx_semaphore_put:0000000000000000 $t
+     /tmp/ccVx5Mvn.s:25     .text._tx_semaphore_put:0000000000000000 _tx_semaphore_put
+     /tmp/ccVx5Mvn.s:169    .text._tx_semaphore_put:000000000000005c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

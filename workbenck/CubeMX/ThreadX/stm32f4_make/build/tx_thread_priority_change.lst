@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cchWLxoH.s 			page 1
+ARM GAS  /tmp/ccZfbrC4.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   29:ThreadX/common/src/tx_thread_priority_change.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_thread_priority_change.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_thread_priority_change.c **** 
-ARM GAS  /tmp/cchWLxoH.s 			page 2
+ARM GAS  /tmp/ccZfbrC4.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_priority_change.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   86:ThreadX/common/src/tx_thread_priority_change.c **** /*                                            resulting in version 6.1    */
   87:ThreadX/common/src/tx_thread_priority_change.c **** /*                                                                        */
   88:ThreadX/common/src/tx_thread_priority_change.c **** /**************************************************************************/
-ARM GAS  /tmp/cchWLxoH.s 			page 3
+ARM GAS  /tmp/ccZfbrC4.s 			page 3
 
 
   89:ThreadX/common/src/tx_thread_priority_change.c **** UINT  _tx_thread_priority_change(TX_THREAD *thread_ptr, UINT new_priority, UINT *old_priority)
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   35:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  DESCRIPTION                                                           */
   36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/cchWLxoH.s 			page 4
+ARM GAS  /tmp/ccZfbrC4.s 			page 4
 
 
   37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
   92:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_ghs.h"
   93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
-ARM GAS  /tmp/cchWLxoH.s 			page 5
+ARM GAS  /tmp/ccZfbrC4.s 			page 5
 
 
   94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  149:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_DISABLE                          1           /* Disable interrupts               */
  150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
-ARM GAS  /tmp/cchWLxoH.s 			page 6
+ARM GAS  /tmp/ccZfbrC4.s 			page 6
 
 
  151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  206:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
-ARM GAS  /tmp/cchWLxoH.s 			page 7
+ARM GAS  /tmp/ccZfbrC4.s 			page 7
 
 
  208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  263:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
-ARM GAS  /tmp/cchWLxoH.s 			page 8
+ARM GAS  /tmp/ccZfbrC4.s 			page 8
 
 
  265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  320:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm volatile ("MRS control_value,CONTROL");
  321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
-ARM GAS  /tmp/cchWLxoH.s 			page 9
+ARM GAS  /tmp/ccZfbrC4.s 			page 9
 
 
  322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
  377:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
  378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
-ARM GAS  /tmp/cchWLxoH.s 			page 10
+ARM GAS  /tmp/ccZfbrC4.s 			page 10
 
 
  379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  434:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
  435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
-ARM GAS  /tmp/cchWLxoH.s 			page 11
+ARM GAS  /tmp/ccZfbrC4.s 			page 11
 
 
  436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  490:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_ipsr_get(VOID);
  491:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _tx_misra_ipsr_get())
  492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
-ARM GAS  /tmp/cchWLxoH.s 			page 12
+ARM GAS  /tmp/ccZfbrC4.s 			page 12
 
 
  493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   54              	.LBE21:
   55              	.LBE20:
  540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cchWLxoH.s 			page 13
+ARM GAS  /tmp/ccZfbrC4.s 			page 13
 
 
  541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  101:ThreadX/common/src/tx_thread_priority_change.c **** 
  102:ThreadX/common/src/tx_thread_priority_change.c ****     /* Save the previous priority.  */
  103:ThreadX/common/src/tx_thread_priority_change.c ****     *old_priority =  thread_ptr -> tx_thread_user_priority;
-ARM GAS  /tmp/cchWLxoH.s 			page 14
+ARM GAS  /tmp/ccZfbrC4.s 			page 14
 
 
   65              		.loc 1 103 0
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
   94              		.syntax unified
   95              	.L5:
   96              	.LBE23:
-ARM GAS  /tmp/cchWLxoH.s 			page 15
+ARM GAS  /tmp/ccZfbrC4.s 			page 15
 
 
   97              	.LBE22:
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  181:ThreadX/common/src/tx_thread_priority_change.c ****             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
  182:ThreadX/common/src/tx_thread_priority_change.c ****         }
  183:ThreadX/common/src/tx_thread_priority_change.c **** 
-ARM GAS  /tmp/cchWLxoH.s 			page 16
+ARM GAS  /tmp/ccZfbrC4.s 			page 16
 
 
  184:ThreadX/common/src/tx_thread_priority_change.c ****         /* Resume the thread with the new priority.  */
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  238:ThreadX/common/src/tx_thread_priority_change.c ****         _tx_thread_preempt_disable--;
  239:ThreadX/common/src/tx_thread_priority_change.c **** 
  240:ThreadX/common/src/tx_thread_priority_change.c ****         /* Pickup the next thread to execute.  */
-ARM GAS  /tmp/cchWLxoH.s 			page 17
+ARM GAS  /tmp/ccZfbrC4.s 			page 17
 
 
  241:ThreadX/common/src/tx_thread_priority_change.c ****         next_execute_ptr =  _tx_thread_execute_ptr;
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  134:ThreadX/common/src/tx_thread_priority_change.c ****         }
  105              		.loc 1 134 0
  106 0034 C363     		str	r3, [r0, #60]
-ARM GAS  /tmp/cchWLxoH.s 			page 18
+ARM GAS  /tmp/ccZfbrC4.s 			page 18
 
 
  107 0036 F7E7     		b	.L4
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  151              		.loc 1 211 0
  152 0064 C4F89850 		str	r5, [r4, #152]
  215:ThreadX/common/src/tx_thread_priority_change.c ****         {
-ARM GAS  /tmp/cchWLxoH.s 			page 19
+ARM GAS  /tmp/ccZfbrC4.s 			page 19
 
 
  153              		.loc 1 215 0
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  248:ThreadX/common/src/tx_thread_priority_change.c ****             {
  200              		.loc 1 248 0
  201 0090 226B     		ldr	r2, [r4, #48]
-ARM GAS  /tmp/cchWLxoH.s 			page 20
+ARM GAS  /tmp/ccZfbrC4.s 			page 20
 
 
  202 0092 2AB9     		cbnz	r2, .L8
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  247 00b8 034B     		ldr	r3, .L11+8
  248 00ba 43F82240 		str	r4, [r3, r2, lsl #2]
  249 00be EFE7     		b	.L8
-ARM GAS  /tmp/cchWLxoH.s 			page 21
+ARM GAS  /tmp/ccZfbrC4.s 			page 21
 
 
  250              	.L12:
@@ -1218,14 +1218,14 @@ ARM GAS  /tmp/cchWLxoH.s 			page 1
  265              		.file 7 "/usr/include/newlib/stdlib.h"
  266              		.file 8 "ThreadX/common/inc/tx_api.h"
  267              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/cchWLxoH.s 			page 22
+ARM GAS  /tmp/ccZfbrC4.s 			page 22
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_priority_change.c
-     /tmp/cchWLxoH.s:18     .text._tx_thread_priority_change:0000000000000000 $t
-     /tmp/cchWLxoH.s:25     .text._tx_thread_priority_change:0000000000000000 _tx_thread_priority_change
-     /tmp/cchWLxoH.s:253    .text._tx_thread_priority_change:00000000000000c0 $d
+     /tmp/ccZfbrC4.s:18     .text._tx_thread_priority_change:0000000000000000 $t
+     /tmp/ccZfbrC4.s:25     .text._tx_thread_priority_change:0000000000000000 _tx_thread_priority_change
+     /tmp/ccZfbrC4.s:253    .text._tx_thread_priority_change:00000000000000c0 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_suspend

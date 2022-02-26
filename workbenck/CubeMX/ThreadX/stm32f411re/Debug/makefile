@@ -10,6 +10,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include ThreadX/ports/cortex_m4/gnu/src/subdir.mk
+-include ThreadX/ports/cortex_m4/gnu/example_build/subdir.mk
 -include ThreadX/common/src/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk

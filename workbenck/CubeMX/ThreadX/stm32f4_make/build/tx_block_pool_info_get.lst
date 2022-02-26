@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccxyKknw.s 			page 1
+ARM GAS  /tmp/ccVhJdXF.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
   29:ThreadX/common/src/tx_block_pool_info_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_block_pool_info_get.c **** #include "tx_block_pool.h"
   31:ThreadX/common/src/tx_block_pool_info_get.c **** 
-ARM GAS  /tmp/ccxyKknw.s 			page 2
+ARM GAS  /tmp/ccVhJdXF.s 			page 2
 
 
   32:ThreadX/common/src/tx_block_pool_info_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
   30              		@ args = 12, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              		@ link register save eliminated.
-ARM GAS  /tmp/ccxyKknw.s 			page 3
+ARM GAS  /tmp/ccVhJdXF.s 			page 3
 
 
   33              	.LVL0:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
   39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
   40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
   41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
-ARM GAS  /tmp/ccxyKknw.s 			page 4
+ARM GAS  /tmp/ccVhJdXF.s 			page 4
 
 
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
   96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
   97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
   98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
-ARM GAS  /tmp/ccxyKknw.s 			page 5
+ARM GAS  /tmp/ccVhJdXF.s 			page 5
 
 
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
  154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
  155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
-ARM GAS  /tmp/ccxyKknw.s 			page 6
+ARM GAS  /tmp/ccVhJdXF.s 			page 6
 
 
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
  211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
  212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccxyKknw.s 			page 7
+ARM GAS  /tmp/ccVhJdXF.s 			page 7
 
 
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
  268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
  269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
-ARM GAS  /tmp/ccxyKknw.s 			page 8
+ARM GAS  /tmp/ccVhJdXF.s 			page 8
 
 
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
  325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
-ARM GAS  /tmp/ccxyKknw.s 			page 9
+ARM GAS  /tmp/ccVhJdXF.s 			page 9
 
 
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
  382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
  383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
-ARM GAS  /tmp/ccxyKknw.s 			page 10
+ARM GAS  /tmp/ccVhJdXF.s 			page 10
 
 
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
-ARM GAS  /tmp/ccxyKknw.s 			page 11
+ARM GAS  /tmp/ccVhJdXF.s 			page 11
 
 
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
  497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
-ARM GAS  /tmp/ccxyKknw.s 			page 12
+ARM GAS  /tmp/ccVhJdXF.s 			page 12
 
 
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
  545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
-ARM GAS  /tmp/ccxyKknw.s 			page 13
+ARM GAS  /tmp/ccVhJdXF.s 			page 13
 
 
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
   99:ThreadX/common/src/tx_block_pool_info_get.c **** 
  100:ThreadX/common/src/tx_block_pool_info_get.c ****     /* Retrieve the name of the block pool.  */
  101:ThreadX/common/src/tx_block_pool_info_get.c ****     if (name != TX_NULL)
-ARM GAS  /tmp/ccxyKknw.s 			page 14
+ARM GAS  /tmp/ccVhJdXF.s 			page 14
 
 
   67              		.loc 1 101 0
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  129:ThreadX/common/src/tx_block_pool_info_get.c ****     if (suspended_count != TX_NULL)
   94              		.loc 1 129 0
   95 0026 0DB1     		cbz	r5, .L6
-ARM GAS  /tmp/ccxyKknw.s 			page 15
+ARM GAS  /tmp/ccVhJdXF.s 			page 15
 
 
  130:ThreadX/common/src/tx_block_pool_info_get.c ****     {
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  131              		.cfi_endproc
  132              	.LFE8:
  134              		.text
-ARM GAS  /tmp/ccxyKknw.s 			page 16
+ARM GAS  /tmp/ccVhJdXF.s 			page 16
 
 
  135              	.Letext0:
@@ -909,12 +909,12 @@ ARM GAS  /tmp/ccxyKknw.s 			page 1
  140              		.file 7 "/usr/include/newlib/stdlib.h"
  141              		.file 8 "ThreadX/common/inc/tx_api.h"
  142              		.file 9 "ThreadX/common/inc/tx_block_pool.h"
-ARM GAS  /tmp/ccxyKknw.s 			page 17
+ARM GAS  /tmp/ccVhJdXF.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_block_pool_info_get.c
-     /tmp/ccxyKknw.s:18     .text._tx_block_pool_info_get:0000000000000000 $t
-     /tmp/ccxyKknw.s:25     .text._tx_block_pool_info_get:0000000000000000 _tx_block_pool_info_get
+     /tmp/ccVhJdXF.s:18     .text._tx_block_pool_info_get:0000000000000000 $t
+     /tmp/ccVhJdXF.s:25     .text._tx_block_pool_info_get:0000000000000000 _tx_block_pool_info_get
 
 NO UNDEFINED SYMBOLS

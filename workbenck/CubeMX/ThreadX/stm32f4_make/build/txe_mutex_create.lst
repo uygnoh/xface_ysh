@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc1fTvy0.s 			page 1
+ARM GAS  /tmp/ccH0wHXt.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
   29:ThreadX/common/src/txe_mutex_create.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_mutex_create.c **** #include "tx_thread.h"
   31:ThreadX/common/src/txe_mutex_create.c **** #include "tx_timer.h"
-ARM GAS  /tmp/cc1fTvy0.s 			page 2
+ARM GAS  /tmp/ccH0wHXt.s 			page 2
 
 
   32:ThreadX/common/src/txe_mutex_create.c **** #include "tx_mutex.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
   30              		@ args = 0, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              	.LVL0:
-ARM GAS  /tmp/cc1fTvy0.s 			page 3
+ARM GAS  /tmp/ccH0wHXt.s 			page 3
 
 
   33 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  115:ThreadX/common/src/txe_mutex_create.c **** 
  116:ThreadX/common/src/txe_mutex_create.c ****         /* Disable interrupts.  */
  117:ThreadX/common/src/txe_mutex_create.c ****         TX_DISABLE
-ARM GAS  /tmp/cc1fTvy0.s 			page 4
+ARM GAS  /tmp/ccH0wHXt.s 			page 4
 
 
  118:ThreadX/common/src/txe_mutex_create.c **** 
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  172:ThreadX/common/src/txe_mutex_create.c **** 
  173:ThreadX/common/src/txe_mutex_create.c ****                     /* Inherit option is illegal.  */
  174:ThreadX/common/src/txe_mutex_create.c ****                     status =  TX_INHERIT_ERROR;
-ARM GAS  /tmp/cc1fTvy0.s 			page 5
+ARM GAS  /tmp/ccH0wHXt.s 			page 5
 
 
  175:ThreadX/common/src/txe_mutex_create.c ****                 }
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
   62 0016 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
   63              	.LVL4:
   64              	.L16:
-ARM GAS  /tmp/cc1fTvy0.s 			page 6
+ARM GAS  /tmp/ccH0wHXt.s 			page 6
 
 
   65              	.LBB20:
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
   52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/cc1fTvy0.s 			page 7
+ARM GAS  /tmp/ccH0wHXt.s 			page 7
 
 
   53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
  109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
-ARM GAS  /tmp/cc1fTvy0.s 			page 8
+ARM GAS  /tmp/ccH0wHXt.s 			page 8
 
 
  110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/cc1fTvy0.s 			page 9
+ARM GAS  /tmp/ccH0wHXt.s 			page 9
 
 
  167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
  223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1fTvy0.s 			page 10
+ARM GAS  /tmp/ccH0wHXt.s 			page 10
 
 
  224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/cc1fTvy0.s 			page 11
+ARM GAS  /tmp/ccH0wHXt.s 			page 11
 
 
  281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
  337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1fTvy0.s 			page 12
+ARM GAS  /tmp/ccH0wHXt.s 			page 12
 
 
  338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
  394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
-ARM GAS  /tmp/cc1fTvy0.s 			page 13
+ARM GAS  /tmp/ccH0wHXt.s 			page 13
 
 
  395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
-ARM GAS  /tmp/cc1fTvy0.s 			page 14
+ARM GAS  /tmp/ccH0wHXt.s 			page 14
 
 
  452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
-ARM GAS  /tmp/cc1fTvy0.s 			page 15
+ARM GAS  /tmp/ccH0wHXt.s 			page 15
 
 
  509:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/cc1fTvy0.s 			page 16
+ARM GAS  /tmp/ccH0wHXt.s 			page 16
 
 
  556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  127:ThreadX/common/src/txe_mutex_create.c ****         {
  111              		.loc 1 127 0
  112 002e 0023     		movs	r3, #0
-ARM GAS  /tmp/cc1fTvy0.s 			page 17
+ARM GAS  /tmp/ccH0wHXt.s 			page 17
 
 
  113              	.LVL9:
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  161              		.loc 2 562 0
  162              		.syntax unified
-ARM GAS  /tmp/cc1fTvy0.s 			page 18
+ARM GAS  /tmp/ccH0wHXt.s 			page 18
 
 
  163              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  209 0078 CBD0     		beq	.L2
  210              	.LBB34:
  211              	.LBB35:
-ARM GAS  /tmp/cc1fTvy0.s 			page 19
+ARM GAS  /tmp/ccH0wHXt.s 			page 19
 
 
  477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  257 00a2 2846     		mov	r0, r5
  258              	.LVL23:
  259 00a4 FFF7FEFF 		bl	_tx_mutex_create
-ARM GAS  /tmp/cc1fTvy0.s 			page 20
+ARM GAS  /tmp/ccH0wHXt.s 			page 20
 
 
  260              	.LVL24:
@@ -1166,14 +1166,14 @@ ARM GAS  /tmp/cc1fTvy0.s 			page 1
  283              		.file 10 "ThreadX/common/inc/tx_thread.h"
  284              		.file 11 "ThreadX/common/inc/tx_timer.h"
  285              		.file 12 "ThreadX/common/inc/tx_mutex.h"
-ARM GAS  /tmp/cc1fTvy0.s 			page 21
+ARM GAS  /tmp/ccH0wHXt.s 			page 21
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_mutex_create.c
-     /tmp/cc1fTvy0.s:18     .text._txe_mutex_create:0000000000000000 $t
-     /tmp/cc1fTvy0.s:25     .text._txe_mutex_create:0000000000000000 _txe_mutex_create
-     /tmp/cc1fTvy0.s:265    .text._txe_mutex_create:00000000000000ac $d
+     /tmp/ccH0wHXt.s:18     .text._txe_mutex_create:0000000000000000 $t
+     /tmp/ccH0wHXt.s:25     .text._txe_mutex_create:0000000000000000 _txe_mutex_create
+     /tmp/ccH0wHXt.s:265    .text._txe_mutex_create:00000000000000ac $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccZvY9oO.s 			page 1
+ARM GAS  /tmp/ccHXRHDe.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccZvY9oO.s 			page 1
   29:ThreadX/common/src/tx_trace_initialize.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_trace_initialize.c **** #ifdef TX_ENABLE_EVENT_TRACE
   31:ThreadX/common/src/tx_trace_initialize.c **** 
-ARM GAS  /tmp/ccZvY9oO.s 			page 2
+ARM GAS  /tmp/ccHXRHDe.s 			page 2
 
 
   32:ThreadX/common/src/tx_trace_initialize.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccZvY9oO.s 			page 1
   86:ThreadX/common/src/tx_trace_initialize.c **** /* Define a counter that is used to track the number of available registry entries.  */
   87:ThreadX/common/src/tx_trace_initialize.c **** 
   88:ThreadX/common/src/tx_trace_initialize.c **** ULONG                             _tx_trace_available_registry_entries;
-ARM GAS  /tmp/ccZvY9oO.s 			page 3
+ARM GAS  /tmp/ccHXRHDe.s 			page 3
 
 
   89:ThreadX/common/src/tx_trace_initialize.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccZvY9oO.s 			page 1
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              		@ link register save eliminated.
  140:ThreadX/common/src/tx_trace_initialize.c **** 
-ARM GAS  /tmp/ccZvY9oO.s 			page 4
+ARM GAS  /tmp/ccHXRHDe.s 			page 4
 
 
  141:ThreadX/common/src/tx_trace_initialize.c **** #ifdef TX_ENABLE_EVENT_TRACE
@@ -206,12 +206,12 @@ ARM GAS  /tmp/ccZvY9oO.s 			page 1
   43              		.file 5 "/usr/include/newlib/sys/reent.h"
   44              		.file 6 "/usr/include/newlib/stdlib.h"
   45              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
-ARM GAS  /tmp/ccZvY9oO.s 			page 5
+ARM GAS  /tmp/ccHXRHDe.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_trace_initialize.c
-     /tmp/ccZvY9oO.s:18     .text._tx_trace_initialize:0000000000000000 $t
-     /tmp/ccZvY9oO.s:25     .text._tx_trace_initialize:0000000000000000 _tx_trace_initialize
+     /tmp/ccHXRHDe.s:18     .text._tx_trace_initialize:0000000000000000 $t
+     /tmp/ccHXRHDe.s:25     .text._tx_trace_initialize:0000000000000000 _tx_trace_initialize
 
 NO UNDEFINED SYMBOLS

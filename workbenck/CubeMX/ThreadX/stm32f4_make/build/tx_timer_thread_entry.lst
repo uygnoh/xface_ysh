@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccDY1iRs.s 			page 1
+ARM GAS  /tmp/cctMTcCS.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
   29:ThreadX/common/src/tx_timer_thread_entry.c **** #include "tx_timer.h"
   30:ThreadX/common/src/tx_timer_thread_entry.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 2
+ARM GAS  /tmp/cctMTcCS.s 			page 2
 
 
   32:ThreadX/common/src/tx_timer_thread_entry.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
   81:ThreadX/common/src/tx_timer_thread_entry.c **** 
   82:ThreadX/common/src/tx_timer_thread_entry.c **** TX_TIMER_INTERNAL           *expired_timers;
   83:ThreadX/common/src/tx_timer_thread_entry.c **** TX_TIMER_INTERNAL           *reactivate_timer;
-ARM GAS  /tmp/ccDY1iRs.s 			page 3
+ARM GAS  /tmp/cctMTcCS.s 			page 3
 
 
   84:ThreadX/common/src/tx_timer_thread_entry.c **** TX_TIMER_INTERNAL           *next_timer;
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  116:ThreadX/common/src/tx_timer_thread_entry.c ****             /* Save the current timer expiration list pointer.  */
  117:ThreadX/common/src/tx_timer_thread_entry.c ****             expired_timers =  *_tx_timer_current_ptr;
  118:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 4
+ARM GAS  /tmp/cctMTcCS.s 			page 4
 
 
  119:ThreadX/common/src/tx_timer_thread_entry.c ****             /* Modify the head pointer in the first timer in the list, if there
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  165:ThreadX/common/src/tx_timer_thread_entry.c **** 
  166:ThreadX/common/src/tx_timer_thread_entry.c ****                     /* Yes, this is the only timer in the list.  */
  167:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 5
+ARM GAS  /tmp/cctMTcCS.s 			page 5
 
 
  168:ThreadX/common/src/tx_timer_thread_entry.c ****                     /* Set the head pointer to NULL.  */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  217:ThreadX/common/src/tx_timer_thread_entry.c ****                         }
  218:ThreadX/common/src/tx_timer_thread_entry.c ****                     }
  219:ThreadX/common/src/tx_timer_thread_entry.c **** #endif
-ARM GAS  /tmp/ccDY1iRs.s 			page 6
+ARM GAS  /tmp/cctMTcCS.s 			page 6
 
 
  220:ThreadX/common/src/tx_timer_thread_entry.c **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
   70 001e E568     		ldr	r5, [r4, #12]
   71              	.LVL5:
  270:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 7
+ARM GAS  /tmp/cctMTcCS.s 			page 7
 
 
  271:ThreadX/common/src/tx_timer_thread_entry.c ****                     /* Copy the reinitialize ticks into the remaining ticks.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
    6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
    7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
    8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
-ARM GAS  /tmp/ccDY1iRs.s 			page 8
+ARM GAS  /tmp/cctMTcCS.s 			page 8
 
 
    9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
   63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
   64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 9
+ARM GAS  /tmp/cctMTcCS.s 			page 9
 
 
   66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
  121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
-ARM GAS  /tmp/ccDY1iRs.s 			page 10
+ARM GAS  /tmp/cctMTcCS.s 			page 10
 
 
  123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
  179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
-ARM GAS  /tmp/ccDY1iRs.s 			page 11
+ARM GAS  /tmp/cctMTcCS.s 			page 11
 
 
  180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 12
+ARM GAS  /tmp/cctMTcCS.s 			page 12
 
 
  237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
  292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
  293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 13
+ARM GAS  /tmp/cctMTcCS.s 			page 13
 
 
  294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
  349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
  350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccDY1iRs.s 			page 14
+ARM GAS  /tmp/cctMTcCS.s 			page 14
 
 
  351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
  406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
  407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
-ARM GAS  /tmp/ccDY1iRs.s 			page 15
+ARM GAS  /tmp/cctMTcCS.s 			page 15
 
 
  408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
  463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
-ARM GAS  /tmp/ccDY1iRs.s 			page 16
+ARM GAS  /tmp/cctMTcCS.s 			page 16
 
 
  465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
  520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
  521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
-ARM GAS  /tmp/ccDY1iRs.s 			page 17
+ARM GAS  /tmp/cctMTcCS.s 			page 17
 
 
  522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  302:ThreadX/common/src/tx_timer_thread_entry.c **** 
  303:ThreadX/common/src/tx_timer_thread_entry.c ****                 /* Call the timer-expiration function, if non-NULL.  */
  304:ThreadX/common/src/tx_timer_thread_entry.c ****                 if (timeout_function != TX_NULL)
-ARM GAS  /tmp/ccDY1iRs.s 			page 18
+ARM GAS  /tmp/cctMTcCS.s 			page 18
 
 
  103              		.loc 1 304 0
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  133 0044 304B     		ldr	r3, .L27+12
  134 0046 0022     		movs	r2, #0
  135 0048 1A60     		str	r2, [r3]
-ARM GAS  /tmp/ccDY1iRs.s 			page 19
+ARM GAS  /tmp/cctMTcCS.s 			page 19
 
 
  315:ThreadX/common/src/tx_timer_thread_entry.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  183 005e 2369     		ldr	r3, [r4, #16]
  184              	.LVL14:
  160:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 20
+ARM GAS  /tmp/cctMTcCS.s 			page 20
 
 
  185              		.loc 1 160 0
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  293:ThreadX/common/src/tx_timer_thread_entry.c ****                     }
  226              		.loc 1 293 0
  227 008a 0021     		movs	r1, #0
-ARM GAS  /tmp/ccDY1iRs.s 			page 21
+ARM GAS  /tmp/cctMTcCS.s 			page 21
 
 
  228 008c A161     		str	r1, [r4, #24]
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  368:ThreadX/common/src/tx_timer_thread_entry.c ****                     /* At this point, we are ready to put the timer back on one of
  369:ThreadX/common/src/tx_timer_thread_entry.c ****                        the timer lists.  */
  370:ThreadX/common/src/tx_timer_thread_entry.c **** 
-ARM GAS  /tmp/ccDY1iRs.s 			page 22
+ARM GAS  /tmp/cctMTcCS.s 			page 22
 
 
  371:ThreadX/common/src/tx_timer_thread_entry.c ****                     /* Calculate the proper place for the timer.  */
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  240              	.L23:
  417:ThreadX/common/src/tx_timer_thread_entry.c **** #endif
  418:ThreadX/common/src/tx_timer_thread_entry.c ****                 }
-ARM GAS  /tmp/ccDY1iRs.s 			page 23
+ARM GAS  /tmp/cctMTcCS.s 			page 23
 
 
  419:ThreadX/common/src/tx_timer_thread_entry.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  280              	.LBE44:
  117:ThreadX/common/src/tx_timer_thread_entry.c **** 
  281              		.loc 1 117 0
-ARM GAS  /tmp/ccDY1iRs.s 			page 24
+ARM GAS  /tmp/cctMTcCS.s 			page 24
 
 
  282 00aa 164B     		ldr	r3, .L27+8
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  328              		.syntax unified
  329              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
  330 00d6 EFF31082 		MRS  r2, PRIMASK 
-ARM GAS  /tmp/ccDY1iRs.s 			page 25
+ARM GAS  /tmp/cctMTcCS.s 			page 25
 
 
  331              	@ 0 "" 2
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  359 00ec 0133     		adds	r3, r3, #1
  360 00ee 0B60     		str	r3, [r1]
  361              	.LVL28:
-ARM GAS  /tmp/ccDY1iRs.s 			page 26
+ARM GAS  /tmp/cctMTcCS.s 			page 26
 
 
  362              	.LBB54:
@@ -1556,14 +1556,14 @@ ARM GAS  /tmp/ccDY1iRs.s 			page 1
  408              		.file 8 "ThreadX/common/inc/tx_api.h"
  409              		.file 9 "ThreadX/common/inc/tx_timer.h"
  410              		.file 10 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccDY1iRs.s 			page 27
+ARM GAS  /tmp/cctMTcCS.s 			page 27
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_timer_thread_entry.c
-     /tmp/ccDY1iRs.s:18     .text._tx_timer_thread_entry:0000000000000000 $t
-     /tmp/ccDY1iRs.s:25     .text._tx_timer_thread_entry:0000000000000000 _tx_timer_thread_entry
-     /tmp/ccDY1iRs.s:390    .text._tx_timer_thread_entry:00000000000000fc $d
+     /tmp/cctMTcCS.s:18     .text._tx_timer_thread_entry:0000000000000000 $t
+     /tmp/cctMTcCS.s:25     .text._tx_timer_thread_entry:0000000000000000 _tx_timer_thread_entry
+     /tmp/cctMTcCS.s:390    .text._tx_timer_thread_entry:00000000000000fc $d
 
 UNDEFINED SYMBOLS
 _tx_timer_system_activate

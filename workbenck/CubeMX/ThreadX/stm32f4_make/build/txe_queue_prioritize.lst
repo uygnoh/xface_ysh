@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccPDguRI.s 			page 1
+ARM GAS  /tmp/cc3bwcab.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccPDguRI.s 			page 1
   29:ThreadX/common/src/txe_queue_prioritize.c **** #include "tx_queue.h"
   30:ThreadX/common/src/txe_queue_prioritize.c **** 
   31:ThreadX/common/src/txe_queue_prioritize.c **** 
-ARM GAS  /tmp/ccPDguRI.s 			page 2
+ARM GAS  /tmp/cc3bwcab.s 			page 2
 
 
   32:ThreadX/common/src/txe_queue_prioritize.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccPDguRI.s 			page 1
   72:ThreadX/common/src/txe_queue_prioritize.c **** 
   35              		.loc 1 72 0
   36 0002 08B5     		push	{r3, lr}
-ARM GAS  /tmp/ccPDguRI.s 			page 3
+ARM GAS  /tmp/cc3bwcab.s 			page 3
 
 
   37              	.LCFI0:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccPDguRI.s 			page 1
   68 0018 7047     		bx	lr
   69              	.L11:
   70 001a 00BF     		.align	2
-ARM GAS  /tmp/ccPDguRI.s 			page 4
+ARM GAS  /tmp/cc3bwcab.s 			page 4
 
 
   71              	.L10:
@@ -195,14 +195,14 @@ ARM GAS  /tmp/ccPDguRI.s 			page 1
   83              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
   84              		.file 8 "ThreadX/common/inc/tx_api.h"
   85              		.file 9 "ThreadX/common/inc/tx_queue.h"
-ARM GAS  /tmp/ccPDguRI.s 			page 5
+ARM GAS  /tmp/cc3bwcab.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_queue_prioritize.c
-     /tmp/ccPDguRI.s:18     .text._txe_queue_prioritize:0000000000000000 $t
-     /tmp/ccPDguRI.s:25     .text._txe_queue_prioritize:0000000000000000 _txe_queue_prioritize
-     /tmp/ccPDguRI.s:72     .text._txe_queue_prioritize:000000000000001c $d
+     /tmp/cc3bwcab.s:18     .text._txe_queue_prioritize:0000000000000000 $t
+     /tmp/cc3bwcab.s:25     .text._txe_queue_prioritize:0000000000000000 _txe_queue_prioritize
+     /tmp/cc3bwcab.s:72     .text._txe_queue_prioritize:000000000000001c $d
 
 UNDEFINED SYMBOLS
 _tx_queue_prioritize

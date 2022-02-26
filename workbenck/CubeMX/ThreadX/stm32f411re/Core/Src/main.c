@@ -22,35 +22,13 @@
 #include "gpio.h"
 #include "common.h"
 
-
+extern int main_user();
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tx_api.h"
-unsigned long my_thread_counter = 0;
-TX_THREAD my_thread;
-void my_thread_entry(ULONG thread_input);
-void tx_application_define(void *first_unused_memory);
+/* This is a small demo of the high-performance ThreadX kernel.  It includes examples of eight
+   threads of different priorities, using a message queue, semaphore, mutex, event flags group,
+   byte pool, and block pool.  */
 
-
-void tx_application_define(void *first_unused_memory)
-{
-    /* Create my_thread! */
-    tx_thread_create(&my_thread, "My Thread",
-    my_thread_entry, 0x1234, first_unused_memory, 1024,
-    3, 3, TX_NO_TIME_SLICE, TX_AUTO_START);
-}
-void my_thread_entry(ULONG thread_input)
-{
-    /* Enter into a forever loop. */
-    while(1)
-    {
-        /* Increment thread counter. */
-        my_thread_counter++;
-        /* Sleep for 1 tick. */
-        printf("my_thread_counter = %ld\n", my_thread_counter);
-        tx_thread_sleep(1);
-    }
-}
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,7 +96,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  tx_kernel_enter();
+
+      /* Enter the ThreadX kernel. */
+  main_user();
+
   while (1)
   {
 

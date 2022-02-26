@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccIdFexd.s 			page 1
+ARM GAS  /tmp/cca10uOD.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
   29:ThreadX/common/src/tx_thread_system_resume.c **** #endif
   30:ThreadX/common/src/tx_thread_system_resume.c **** #include "tx_trace.h"
   31:ThreadX/common/src/tx_thread_system_resume.c **** #include "tx_timer.h"
-ARM GAS  /tmp/ccIdFexd.s 			page 2
+ARM GAS  /tmp/cca10uOD.s 			page 2
 
 
   32:ThreadX/common/src/tx_thread_system_resume.c **** #include "tx_thread.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
   30              		@ args = 0, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              	.LVL0:
-ARM GAS  /tmp/ccIdFexd.s 			page 3
+ARM GAS  /tmp/cca10uOD.s 			page 3
 
 
   33 0000 38B5     		push	{r3, r4, r5, lr}
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
   44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
-ARM GAS  /tmp/ccIdFexd.s 			page 4
+ARM GAS  /tmp/cca10uOD.s 			page 4
 
 
   45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
-ARM GAS  /tmp/ccIdFexd.s 			page 5
+ARM GAS  /tmp/cca10uOD.s 			page 5
 
 
  102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
  158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
-ARM GAS  /tmp/ccIdFexd.s 			page 6
+ARM GAS  /tmp/cca10uOD.s 			page 6
 
 
  159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
  215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
-ARM GAS  /tmp/ccIdFexd.s 			page 7
+ARM GAS  /tmp/cca10uOD.s 			page 7
 
 
  216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
  272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
-ARM GAS  /tmp/ccIdFexd.s 			page 8
+ARM GAS  /tmp/cca10uOD.s 			page 8
 
 
  273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
  329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
-ARM GAS  /tmp/ccIdFexd.s 			page 9
+ARM GAS  /tmp/cca10uOD.s 			page 9
 
 
  330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
  386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
-ARM GAS  /tmp/ccIdFexd.s 			page 10
+ARM GAS  /tmp/cca10uOD.s 			page 10
 
 
  387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
  443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/ccIdFexd.s 			page 11
+ARM GAS  /tmp/cca10uOD.s 			page 11
 
 
  444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
  500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 12
+ARM GAS  /tmp/cca10uOD.s 			page 12
 
 
  501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
  548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccIdFexd.s 			page 13
+ARM GAS  /tmp/cca10uOD.s 			page 13
 
 
  549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  102:ThreadX/common/src/tx_thread_system_resume.c **** #endif
  103:ThreadX/common/src/tx_thread_system_resume.c **** 
  104:ThreadX/common/src/tx_thread_system_resume.c **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 14
+ARM GAS  /tmp/cca10uOD.s 			page 14
 
 
  105:ThreadX/common/src/tx_thread_system_resume.c **** #ifdef TX_ENABLE_STACK_CHECKING
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  150:ThreadX/common/src/tx_thread_system_resume.c ****     }
  151:ThreadX/common/src/tx_thread_system_resume.c **** #endif
  152:ThreadX/common/src/tx_thread_system_resume.c **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 15
+ARM GAS  /tmp/cca10uOD.s 			page 15
 
 
  153:ThreadX/common/src/tx_thread_system_resume.c ****     /* Decrease the preempt disabled count.  */
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  185:ThreadX/common/src/tx_thread_system_resume.c **** 
  186:ThreadX/common/src/tx_thread_system_resume.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
  187:ThreadX/common/src/tx_thread_system_resume.c **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 16
+ARM GAS  /tmp/cca10uOD.s 			page 16
 
 
  188:ThreadX/common/src/tx_thread_system_resume.c ****                 /* Increment the total number of thread resumptions.  */
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  236:ThreadX/common/src/tx_thread_system_resume.c **** 
  237:ThreadX/common/src/tx_thread_system_resume.c ****                             /* Simply setup the execute pointer.  */
  238:ThreadX/common/src/tx_thread_system_resume.c ****                             _tx_thread_execute_ptr =  thread_ptr;
-ARM GAS  /tmp/ccIdFexd.s 			page 17
+ARM GAS  /tmp/cca10uOD.s 			page 17
 
 
  239:ThreadX/common/src/tx_thread_system_resume.c ****                         }
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  293:ThreadX/common/src/tx_thread_system_resume.c ****                                         execute_ptr -> tx_thread_performance_interrupt_preemption_c
  294:ThreadX/common/src/tx_thread_system_resume.c ****                                     }
  295:ThreadX/common/src/tx_thread_system_resume.c ****                                 }
-ARM GAS  /tmp/ccIdFexd.s 			page 18
+ARM GAS  /tmp/cca10uOD.s 			page 18
 
 
  296:ThreadX/common/src/tx_thread_system_resume.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  350:ThreadX/common/src/tx_thread_system_resume.c ****                                 /* Restore interrupts.  */
  351:ThreadX/common/src/tx_thread_system_resume.c ****                                 TX_RESTORE
  352:ThreadX/common/src/tx_thread_system_resume.c **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 19
+ARM GAS  /tmp/cca10uOD.s 			page 19
 
 
  353:ThreadX/common/src/tx_thread_system_resume.c **** #ifdef TX_ENABLE_STACK_CHECKING
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  112 0042 2362     		str	r3, [r4, #32]
  113 0044 3FE0     		b	.L5
  114              	.LVL7:
-ARM GAS  /tmp/ccIdFexd.s 			page 20
+ARM GAS  /tmp/cca10uOD.s 			page 20
 
 
  115              	.L2:
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  158 007a 24D9     		bls	.L5
  252:ThreadX/common/src/tx_thread_system_resume.c ****                                 {
  159              		.loc 1 252 0
-ARM GAS  /tmp/ccIdFexd.s 			page 21
+ARM GAS  /tmp/cca10uOD.s 			page 21
 
 
  160 007c DA6A     		ldr	r2, [r3, #44]
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  583:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  584:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     /* Set PendSV to invoke ThreadX scheduler.  */
  585:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     *((ULONG *) 0xE000ED04) = ((ULONG) 0x10000000);
-ARM GAS  /tmp/ccIdFexd.s 			page 22
+ARM GAS  /tmp/cca10uOD.s 			page 22
 
 
  201              		.loc 2 585 0
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  250              		.syntax unified
  251 00b6 1DE0     		b	.L1
  252              	.LVL24:
-ARM GAS  /tmp/ccIdFexd.s 			page 23
+ARM GAS  /tmp/cca10uOD.s 			page 23
 
 
  253              	.L14:
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  429:ThreadX/common/src/tx_thread_system_resume.c ****                     thread_ptr -> tx_thread_suspending =   TX_FALSE;
  430:ThreadX/common/src/tx_thread_system_resume.c **** 
  431:ThreadX/common/src/tx_thread_system_resume.c ****                     /* Restore the state to ready.  */
-ARM GAS  /tmp/ccIdFexd.s 			page 24
+ARM GAS  /tmp/cca10uOD.s 			page 24
 
 
  432:ThreadX/common/src/tx_thread_system_resume.c ****                     thread_ptr -> tx_thread_state =        TX_READY;
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  486:ThreadX/common/src/tx_thread_system_resume.c ****        resume event. In that case, do nothing here.  */
  487:ThreadX/common/src/tx_thread_system_resume.c ****     if (entry_ptr != TX_NULL)
  488:ThreadX/common/src/tx_thread_system_resume.c ****     {
-ARM GAS  /tmp/ccIdFexd.s 			page 25
+ARM GAS  /tmp/cca10uOD.s 			page 25
 
 
  489:ThreadX/common/src/tx_thread_system_resume.c **** 
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  521:ThreadX/common/src/tx_thread_system_resume.c ****         TX_THREAD_STACK_CHECK(thread_ptr)
  522:ThreadX/common/src/tx_thread_system_resume.c **** #endif
  523:ThreadX/common/src/tx_thread_system_resume.c **** 
-ARM GAS  /tmp/ccIdFexd.s 			page 26
+ARM GAS  /tmp/cca10uOD.s 			page 26
 
 
  524:ThreadX/common/src/tx_thread_system_resume.c ****         /* Now determine if preemption should take place. This is only possible if the current thre
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  340              		.thumb
  341              		.syntax unified
  342              	.LBE65:
-ARM GAS  /tmp/ccIdFexd.s 			page 27
+ARM GAS  /tmp/cca10uOD.s 			page 27
 
 
  343              	.LBE64:
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  444:ThreadX/common/src/tx_thread_system_resume.c ****                     thread_ptr -> tx_thread_state =            TX_SUSPENDED;
  378              		.loc 1 444 0
  379 010a 0023     		movs	r3, #0
-ARM GAS  /tmp/ccIdFexd.s 			page 28
+ARM GAS  /tmp/cca10uOD.s 			page 28
 
 
  380 010c 6363     		str	r3, [r4, #52]
@@ -1650,14 +1650,14 @@ ARM GAS  /tmp/ccIdFexd.s 			page 1
  406              		.file 8 "ThreadX/common/inc/tx_api.h"
  407              		.file 9 "ThreadX/common/inc/tx_timer.h"
  408              		.file 10 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccIdFexd.s 			page 29
+ARM GAS  /tmp/cca10uOD.s 			page 29
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_thread_system_resume.c
-     /tmp/ccIdFexd.s:18     .text._tx_thread_system_resume:0000000000000000 $t
-     /tmp/ccIdFexd.s:25     .text._tx_thread_system_resume:0000000000000000 _tx_thread_system_resume
-     /tmp/ccIdFexd.s:388    .text._tx_thread_system_resume:0000000000000114 $d
+     /tmp/cca10uOD.s:18     .text._tx_thread_system_resume:0000000000000000 $t
+     /tmp/cca10uOD.s:25     .text._tx_thread_system_resume:0000000000000000 _tx_thread_system_resume
+     /tmp/cca10uOD.s:388    .text._tx_thread_system_resume:0000000000000114 $d
 
 UNDEFINED SYMBOLS
 _tx_timer_system_deactivate

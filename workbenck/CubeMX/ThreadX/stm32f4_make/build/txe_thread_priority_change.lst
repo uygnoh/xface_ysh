@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccaUMweA.s 			page 1
+ARM GAS  /tmp/ccur1Vt4.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
   29:ThreadX/common/src/txe_thread_priority_change.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_thread_priority_change.c **** 
   31:ThreadX/common/src/txe_thread_priority_change.c **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 2
+ARM GAS  /tmp/ccur1Vt4.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_priority_change.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
   81:ThreadX/common/src/txe_thread_priority_change.c **** UINT        status;
   82:ThreadX/common/src/txe_thread_priority_change.c **** 
   83:ThreadX/common/src/txe_thread_priority_change.c **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 3
+ARM GAS  /tmp/ccur1Vt4.s 			page 3
 
 
   84:ThreadX/common/src/txe_thread_priority_change.c ****     /* Check for an invalid thread pointer.  */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
    5:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       This software is licensed under the Microsoft Software License   */
    6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
    7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-ARM GAS  /tmp/ccaUMweA.s 			page 4
+ARM GAS  /tmp/ccur1Vt4.s 			page 4
 
 
    8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
   62:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_PORT_H
   63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
   64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 5
+ARM GAS  /tmp/ccur1Vt4.s 			page 5
 
 
   65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  119:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the priority levels for ThreadX.  Legal values range
  120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
  121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 6
+ARM GAS  /tmp/ccur1Vt4.s 			page 6
 
 
  122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  176:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define constants for Green Hills EventAnalyzer.  */
  177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
-ARM GAS  /tmp/ccaUMweA.s 			page 7
+ARM GAS  /tmp/ccur1Vt4.s 			page 7
 
 
  179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  233:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2
  234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 8
+ARM GAS  /tmp/ccur1Vt4.s 			page 8
 
 
  236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  290:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_control_set(ULONG value);
  291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
  292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
-ARM GAS  /tmp/ccaUMweA.s 			page 9
+ARM GAS  /tmp/ccur1Vt4.s 			page 9
 
 
  293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  347:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
  348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
  349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
-ARM GAS  /tmp/ccaUMweA.s 			page 10
+ARM GAS  /tmp/ccur1Vt4.s 			page 10
 
 
  350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  404:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
  406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
-ARM GAS  /tmp/ccaUMweA.s 			page 11
+ARM GAS  /tmp/ccur1Vt4.s 			page 11
 
 
  407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  461:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
  463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccaUMweA.s 			page 12
+ARM GAS  /tmp/ccur1Vt4.s 			page 12
 
 
  464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
   78              		.cfi_def_cfa_offset 0
   79              		.cfi_restore 4
   80              		.cfi_restore 14
-ARM GAS  /tmp/ccaUMweA.s 			page 13
+ARM GAS  /tmp/ccur1Vt4.s 			page 13
 
 
   89:ThreadX/common/src/txe_thread_priority_change.c ****     }
@@ -778,19 +778,19 @@ ARM GAS  /tmp/ccaUMweA.s 			page 1
  125              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
  126              		.file 6 "/usr/include/newlib/sys/reent.h"
  127              		.file 7 "/usr/include/newlib/stdlib.h"
-ARM GAS  /tmp/ccaUMweA.s 			page 14
+ARM GAS  /tmp/ccur1Vt4.s 			page 14
 
 
  128              		.file 8 "ThreadX/common/inc/tx_api.h"
  129              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccaUMweA.s 			page 15
+ARM GAS  /tmp/ccur1Vt4.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_priority_change.c
-     /tmp/ccaUMweA.s:18     .text._txe_thread_priority_change:0000000000000000 $t
-     /tmp/ccaUMweA.s:25     .text._txe_thread_priority_change:0000000000000000 _txe_thread_priority_change
-     /tmp/ccaUMweA.s:116    .text._txe_thread_priority_change:000000000000003c $d
+     /tmp/ccur1Vt4.s:18     .text._txe_thread_priority_change:0000000000000000 $t
+     /tmp/ccur1Vt4.s:25     .text._txe_thread_priority_change:0000000000000000 _txe_thread_priority_change
+     /tmp/ccur1Vt4.s:116    .text._txe_thread_priority_change:000000000000003c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_priority_change

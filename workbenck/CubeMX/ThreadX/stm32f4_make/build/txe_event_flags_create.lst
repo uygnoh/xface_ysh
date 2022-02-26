@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccgQ4DrO.s 			page 1
+ARM GAS  /tmp/ccQbYP5c.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
   29:ThreadX/common/src/txe_event_flags_create.c **** #include "tx_initialize.h"
   30:ThreadX/common/src/txe_event_flags_create.c **** #include "tx_thread.h"
   31:ThreadX/common/src/txe_event_flags_create.c **** #include "tx_timer.h"
-ARM GAS  /tmp/ccgQ4DrO.s 			page 2
+ARM GAS  /tmp/ccQbYP5c.s 			page 2
 
 
   32:ThreadX/common/src/txe_event_flags_create.c **** #include "tx_event_flags.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              	.LVL0:
   83:ThreadX/common/src/txe_event_flags_create.c **** 
-ARM GAS  /tmp/ccgQ4DrO.s 			page 3
+ARM GAS  /tmp/ccQbYP5c.s 			page 3
 
 
   84:ThreadX/common/src/txe_event_flags_create.c **** TX_INTERRUPT_SAVE_AREA
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
   11:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   12:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   13:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/ccgQ4DrO.s 			page 4
+ARM GAS  /tmp/ccQbYP5c.s 			page 4
 
 
   14:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
   68:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_INCLUDE_USER_DEFINE_FILE
   69:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
   70:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Yes, include the user defines in tx_user.h. The defines in this file may
-ARM GAS  /tmp/ccgQ4DrO.s 			page 5
+ARM GAS  /tmp/ccQbYP5c.s 			page 5
 
 
   71:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    alternately be defined on the command line.  */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  125:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  126:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  127:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
-ARM GAS  /tmp/ccgQ4DrO.s 			page 6
+ARM GAS  /tmp/ccQbYP5c.s 			page 6
 
 
  128:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    thread creation is less than this value, the thread create call will return an error.  */
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  182:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  183:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the method of how to get the upper and lower 32-bits of the time stamp. By default, simpl
  184:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    simulate the time-stamp source with a counter.  */
-ARM GAS  /tmp/ccgQ4DrO.s 			page 7
+ARM GAS  /tmp/ccQbYP5c.s 			page 7
 
 
  185:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  239:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  240:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  241:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port extensions of the remaining ThreadX objects.  */
-ARM GAS  /tmp/ccgQ4DrO.s 			page 8
+ARM GAS  /tmp/ccQbYP5c.s 			page 8
 
 
  242:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  296:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define some helper functions (these are intrinsics in some compilers). */
  297:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __GNUC__ /* GCC and ARM Compiler 6 */
  298:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccgQ4DrO.s 			page 9
+ARM GAS  /tmp/ccQbYP5c.s 			page 9
 
 
  299:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline ULONG __get_control_value(void)
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  353:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
  354:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_misra_control_get();  
  355:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
-ARM GAS  /tmp/ccgQ4DrO.s 			page 10
+ARM GAS  /tmp/ccQbYP5c.s 			page 10
 
 
  356:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_misra_control_set(_tx_vfp_state);      
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  410:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
  411:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
  412:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
-ARM GAS  /tmp/ccgQ4DrO.s 			page 11
+ARM GAS  /tmp/ccQbYP5c.s 			page 11
 
 
  413:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_misra_fpccr_get();    
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  467:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __CC_ARM /* ARM Compiler 5 */
  468:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  469:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** register unsigned int _ipsr __asm("ipsr");
-ARM GAS  /tmp/ccgQ4DrO.s 			page 12
+ARM GAS  /tmp/ccQbYP5c.s 			page 12
 
 
  470:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _ipsr)
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  524:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  525:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  526:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccgQ4DrO.s 			page 13
+ARM GAS  /tmp/ccQbYP5c.s 			page 13
 
 
  527:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the interrupt disable/restore macros for each compiler. */
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  571:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  572:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
  573:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(TX_PORT_BASEPRI);
-ARM GAS  /tmp/ccgQ4DrO.s 			page 14
+ARM GAS  /tmp/ccQbYP5c.s 			page 14
 
 
  574:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
   94 0022 0023     		movs	r3, #0
   95              	.LVL4:
   96              	.L3:
-ARM GAS  /tmp/ccgQ4DrO.s 			page 15
+ARM GAS  /tmp/ccQbYP5c.s 			page 15
 
 
   97              		.loc 1 126 0 is_stmt 0 discriminator 1
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  136              	.LBE26:
  140:ThreadX/common/src/txe_event_flags_create.c ****             }
  141:ThreadX/common/src/txe_event_flags_create.c ****         }
-ARM GAS  /tmp/ccgQ4DrO.s 			page 16
+ARM GAS  /tmp/ccQbYP5c.s 			page 16
 
 
  142:ThreadX/common/src/txe_event_flags_create.c **** 
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  163              	.LVL10:
  169:ThreadX/common/src/txe_event_flags_create.c **** 
  170:ThreadX/common/src/txe_event_flags_create.c ****             /* Check for invalid caller of this function.  First check for a calling thread.  */
-ARM GAS  /tmp/ccgQ4DrO.s 			page 17
+ARM GAS  /tmp/ccQbYP5c.s 			page 17
 
 
  171:ThreadX/common/src/txe_event_flags_create.c ****             if (thread_ptr == &_tx_timer_thread)
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  201 006e 104B     		ldr	r3, .L17+20
  202 0070 1B68     		ldr	r3, [r3]
  203 0072 1343     		orrs	r3, r3, r2
-ARM GAS  /tmp/ccgQ4DrO.s 			page 18
+ARM GAS  /tmp/ccQbYP5c.s 			page 18
 
 
  204 0074 B3F1F03F 		cmp	r3, #-252645136
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  236              	.LCFI2:
  237              		.cfi_def_cfa_offset 16
  238              		.cfi_offset 4, -16
-ARM GAS  /tmp/ccgQ4DrO.s 			page 19
+ARM GAS  /tmp/ccQbYP5c.s 			page 19
 
 
  239              		.cfi_offset 5, -12
@@ -1129,14 +1129,14 @@ ARM GAS  /tmp/ccgQ4DrO.s 			page 1
  281              		.file 10 "ThreadX/common/inc/tx_thread.h"
  282              		.file 11 "ThreadX/common/inc/tx_timer.h"
  283              		.file 12 "ThreadX/common/inc/tx_event_flags.h"
-ARM GAS  /tmp/ccgQ4DrO.s 			page 20
+ARM GAS  /tmp/ccQbYP5c.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_event_flags_create.c
-     /tmp/ccgQ4DrO.s:18     .text._txe_event_flags_create:0000000000000000 $t
-     /tmp/ccgQ4DrO.s:25     .text._txe_event_flags_create:0000000000000000 _txe_event_flags_create
-     /tmp/ccgQ4DrO.s:263    .text._txe_event_flags_create:000000000000009c $d
+     /tmp/ccQbYP5c.s:18     .text._txe_event_flags_create:0000000000000000 $t
+     /tmp/ccQbYP5c.s:25     .text._txe_event_flags_create:0000000000000000 _txe_event_flags_create
+     /tmp/ccQbYP5c.s:263    .text._txe_event_flags_create:000000000000009c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc3bIFPT.s 			page 1
+ARM GAS  /tmp/cce857x0.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
   29:ThreadX/common/src/tx_queue_create.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_queue_create.c **** #include "tx_queue.h"
   31:ThreadX/common/src/tx_queue_create.c **** 
-ARM GAS  /tmp/cc3bIFPT.s 			page 2
+ARM GAS  /tmp/cce857x0.s 			page 2
 
 
   32:ThreadX/common/src/tx_queue_create.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
   34              	.LCFI0:
   35              		.cfi_def_cfa_offset 24
   36              		.cfi_offset 3, -24
-ARM GAS  /tmp/cc3bIFPT.s 			page 3
+ARM GAS  /tmp/cce857x0.s 			page 3
 
 
   37              		.cfi_offset 4, -20
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  106:ThreadX/common/src/tx_queue_create.c ****     queue_ptr -> tx_queue_start =  TX_VOID_TO_ULONG_POINTER_CONVERT(queue_start);
   65              		.loc 1 106 0
   66 0022 A661     		str	r6, [r4, #24]
-ARM GAS  /tmp/cc3bIFPT.s 			page 4
+ARM GAS  /tmp/cce857x0.s 			page 4
 
 
  107:ThreadX/common/src/tx_queue_create.c ****     queue_ptr -> tx_queue_end =    TX_ULONG_POINTER_ADD(queue_ptr -> tx_queue_start, used_words);
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
   27:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   28:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    tx_port.h                                         Cortex-M4/GNU     */
   29:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                           6.1.10       */
-ARM GAS  /tmp/cc3bIFPT.s 			page 5
+ARM GAS  /tmp/cce857x0.s 			page 5
 
 
   30:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
   84:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __asm__ __asm                       /* Define to make all inline asm look similar */
   85:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
   86:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <yvals.h>
-ARM GAS  /tmp/cc3bIFPT.s 			page 6
+ARM GAS  /tmp/cce857x0.s 			page 6
 
 
   87:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  141:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  142:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_PRIORITY
  143:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
-ARM GAS  /tmp/cc3bIFPT.s 			page 7
+ARM GAS  /tmp/cce857x0.s 			page 7
 
 
  144:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  198:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    a function call.  */
  199:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  200:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
-ARM GAS  /tmp/cc3bIFPT.s 			page 8
+ARM GAS  /tmp/cce857x0.s 			page 8
 
 
  201:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_DISABLE_INLINE
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  255:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_USER_EXTENSION
  256:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_USER_EXTENSION
  257:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/cc3bIFPT.s 			page 9
+ARM GAS  /tmp/cce857x0.s 			page 9
 
 
  258:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  312:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
  313:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  314:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* ARM Compiler 5 */
-ARM GAS  /tmp/cc3bIFPT.s 			page 10
+ARM GAS  /tmp/cce857x0.s 			page 10
 
 
  315:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  369:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
  370:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
  371:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
-ARM GAS  /tmp/cc3bIFPT.s 			page 11
+ARM GAS  /tmp/cce857x0.s 			page 11
 
 
  372:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  426:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
  427:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
  428:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
-ARM GAS  /tmp/cc3bIFPT.s 			page 12
+ARM GAS  /tmp/cce857x0.s 			page 12
 
 
  429:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  483:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)   /* IAR */
  484:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  485:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
-ARM GAS  /tmp/cc3bIFPT.s 			page 13
+ARM GAS  /tmp/cce857x0.s 			page 13
 
 
  486:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
   84              		.loc 2 539 0
   85              		.syntax unified
   86              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
-ARM GAS  /tmp/cc3bIFPT.s 			page 14
+ARM GAS  /tmp/cce857x0.s 			page 14
 
 
   87 0032 EFF31081 		MRS  r1, PRIMASK 
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  121:ThreadX/common/src/tx_queue_create.c **** 
  122:ThreadX/common/src/tx_queue_create.c ****     /* Setup the queue ID to make it valid.  */
  123:ThreadX/common/src/tx_queue_create.c ****     queue_ptr -> tx_queue_id =  TX_QUEUE_ID;
-ARM GAS  /tmp/cc3bIFPT.s 			page 15
+ARM GAS  /tmp/cce857x0.s 			page 15
 
 
  102              		.loc 1 123 0
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  152:ThreadX/common/src/tx_queue_create.c ****     _tx_queue_created_count++;
  128              		.loc 1 152 0
  129 0050 074A     		ldr	r2, .L6+4
-ARM GAS  /tmp/cc3bIFPT.s 			page 16
+ARM GAS  /tmp/cce857x0.s 			page 16
 
 
  130 0052 1368     		ldr	r3, [r2]
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  161              	.L6:
  162 006c 55455551 		.word	1364542805
  163 0070 00000000 		.word	_tx_queue_created_count
-ARM GAS  /tmp/cc3bIFPT.s 			page 17
+ARM GAS  /tmp/cce857x0.s 			page 17
 
 
  164 0074 00000000 		.word	_tx_queue_created_ptr
@@ -974,14 +974,14 @@ ARM GAS  /tmp/cc3bIFPT.s 			page 1
  175              		.file 8 "ThreadX/common/inc/tx_api.h"
  176              		.file 9 "ThreadX/common/inc/tx_queue.h"
  177              		.file 10 "<built-in>"
-ARM GAS  /tmp/cc3bIFPT.s 			page 18
+ARM GAS  /tmp/cce857x0.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_queue_create.c
-     /tmp/cc3bIFPT.s:18     .text._tx_queue_create:0000000000000000 $t
-     /tmp/cc3bIFPT.s:25     .text._tx_queue_create:0000000000000000 _tx_queue_create
-     /tmp/cc3bIFPT.s:162    .text._tx_queue_create:000000000000006c $d
+     /tmp/cce857x0.s:18     .text._tx_queue_create:0000000000000000 $t
+     /tmp/cce857x0.s:25     .text._tx_queue_create:0000000000000000 _tx_queue_create
+     /tmp/cce857x0.s:162    .text._tx_queue_create:000000000000006c $d
 
 UNDEFINED SYMBOLS
 memset

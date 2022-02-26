@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccepFZEO.s 			page 1
+ARM GAS  /tmp/ccuY2Gga.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
   29:ThreadX/common/src/tx_semaphore_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_semaphore_get.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_semaphore_get.c **** #include "tx_semaphore.h"
-ARM GAS  /tmp/ccepFZEO.s 			page 2
+ARM GAS  /tmp/ccuY2Gga.s 			page 2
 
 
   32:ThreadX/common/src/tx_semaphore_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
   36              		.cfi_offset 3, -16
   37              		.cfi_offset 4, -12
   38              		.cfi_offset 5, -8
-ARM GAS  /tmp/ccepFZEO.s 			page 3
+ARM GAS  /tmp/ccuY2Gga.s 			page 3
 
 
   39              		.cfi_offset 14, -4
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccepFZEO.s 			page 4
+ARM GAS  /tmp/ccuY2Gga.s 			page 4
 
 
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
-ARM GAS  /tmp/ccepFZEO.s 			page 5
+ARM GAS  /tmp/ccuY2Gga.s 			page 5
 
 
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
-ARM GAS  /tmp/ccepFZEO.s 			page 6
+ARM GAS  /tmp/ccuY2Gga.s 			page 6
 
 
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
-ARM GAS  /tmp/ccepFZEO.s 			page 7
+ARM GAS  /tmp/ccuY2Gga.s 			page 7
 
 
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
-ARM GAS  /tmp/ccepFZEO.s 			page 8
+ARM GAS  /tmp/ccuY2Gga.s 			page 8
 
 
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccepFZEO.s 			page 9
+ARM GAS  /tmp/ccuY2Gga.s 			page 9
 
 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
-ARM GAS  /tmp/ccepFZEO.s 			page 10
+ARM GAS  /tmp/ccuY2Gga.s 			page 10
 
 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccepFZEO.s 			page 11
+ARM GAS  /tmp/ccuY2Gga.s 			page 11
 
 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
-ARM GAS  /tmp/ccepFZEO.s 			page 12
+ARM GAS  /tmp/ccuY2Gga.s 			page 12
 
 
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccepFZEO.s 			page 13
+ARM GAS  /tmp/ccuY2Gga.s 			page 13
 
 
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  102:ThreadX/common/src/tx_semaphore_get.c ****     /* If trace is enabled, insert this event into the trace buffer.  */
  103:ThreadX/common/src/tx_semaphore_get.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_SEMAPHORE_GET, semaphore_ptr, wait_option, semaphore_ptr -> tx
  104:ThreadX/common/src/tx_semaphore_get.c **** 
-ARM GAS  /tmp/ccepFZEO.s 			page 14
+ARM GAS  /tmp/ccuY2Gga.s 			page 14
 
 
  105:ThreadX/common/src/tx_semaphore_get.c ****     /* Log this kernel call.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
   74              		.loc 1 148 0
   75 0016 1D4B     		ldr	r3, .L11+4
   76 0018 1C68     		ldr	r4, [r3]
-ARM GAS  /tmp/ccepFZEO.s 			page 15
+ARM GAS  /tmp/ccuY2Gga.s 			page 15
 
 
   77              	.LVL2:
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  183:ThreadX/common/src/tx_semaphore_get.c ****                 next_thread -> tx_thread_suspended_previous =   thread_ptr;
  184:ThreadX/common/src/tx_semaphore_get.c ****             }
  185:ThreadX/common/src/tx_semaphore_get.c **** 
-ARM GAS  /tmp/ccepFZEO.s 			page 16
+ARM GAS  /tmp/ccuY2Gga.s 			page 16
 
 
  186:ThreadX/common/src/tx_semaphore_get.c ****             /* Increment the number of suspensions.  */
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  127              	.LBE20:
  209:ThreadX/common/src/tx_semaphore_get.c **** 
  210:ThreadX/common/src/tx_semaphore_get.c ****             /* Restore interrupts.  */
-ARM GAS  /tmp/ccepFZEO.s 			page 17
+ARM GAS  /tmp/ccuY2Gga.s 			page 17
 
 
  211:ThreadX/common/src/tx_semaphore_get.c ****             TX_RESTORE
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  232:ThreadX/common/src/tx_semaphore_get.c ****     return(status);
  233:ThreadX/common/src/tx_semaphore_get.c **** }
  158              		.loc 1 233 0
-ARM GAS  /tmp/ccepFZEO.s 			page 18
+ARM GAS  /tmp/ccuY2Gga.s 			page 18
 
 
  159 0066 38BD     		pop	{r3, r4, r5, pc}
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  204              	.LVL19:
  205              		.thumb
  206              		.syntax unified
-ARM GAS  /tmp/ccepFZEO.s 			page 19
+ARM GAS  /tmp/ccuY2Gga.s 			page 19
 
 
  207              	.LBE27:
@@ -1108,14 +1108,14 @@ ARM GAS  /tmp/ccepFZEO.s 			page 1
  230              		.file 8 "ThreadX/common/inc/tx_api.h"
  231              		.file 9 "ThreadX/common/inc/tx_thread.h"
  232              		.file 10 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/ccepFZEO.s 			page 20
+ARM GAS  /tmp/ccuY2Gga.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_semaphore_get.c
-     /tmp/ccepFZEO.s:18     .text._tx_semaphore_get:0000000000000000 $t
-     /tmp/ccepFZEO.s:25     .text._tx_semaphore_get:0000000000000000 _tx_semaphore_get
-     /tmp/ccepFZEO.s:217    .text._tx_semaphore_get:0000000000000088 $d
+     /tmp/ccuY2Gga.s:18     .text._tx_semaphore_get:0000000000000000 $t
+     /tmp/ccuY2Gga.s:25     .text._tx_semaphore_get:0000000000000000 _tx_semaphore_get
+     /tmp/ccuY2Gga.s:217    .text._tx_semaphore_get:0000000000000088 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_suspend

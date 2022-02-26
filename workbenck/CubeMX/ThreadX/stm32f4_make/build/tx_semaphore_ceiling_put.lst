@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccqvO59w.s 			page 1
+ARM GAS  /tmp/cc4MhsvT.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
   29:ThreadX/common/src/tx_semaphore_ceiling_put.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_semaphore_ceiling_put.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_semaphore_ceiling_put.c **** #include "tx_semaphore.h"
-ARM GAS  /tmp/ccqvO59w.s 			page 2
+ARM GAS  /tmp/cc4MhsvT.s 			page 2
 
 
   32:ThreadX/common/src/tx_semaphore_ceiling_put.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
   35              		.cfi_def_cfa_offset 16
   36              		.cfi_offset 3, -16
   37              		.cfi_offset 4, -12
-ARM GAS  /tmp/ccqvO59w.s 			page 3
+ARM GAS  /tmp/cc4MhsvT.s 			page 3
 
 
   38              		.cfi_offset 5, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
   46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
   47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccqvO59w.s 			page 4
+ARM GAS  /tmp/cc4MhsvT.s 			page 4
 
 
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
-ARM GAS  /tmp/ccqvO59w.s 			page 5
+ARM GAS  /tmp/cc4MhsvT.s 			page 5
 
 
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
  161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
-ARM GAS  /tmp/ccqvO59w.s 			page 6
+ARM GAS  /tmp/cc4MhsvT.s 			page 6
 
 
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccqvO59w.s 			page 7
+ARM GAS  /tmp/cc4MhsvT.s 			page 7
 
 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
-ARM GAS  /tmp/ccqvO59w.s 			page 8
+ARM GAS  /tmp/cc4MhsvT.s 			page 8
 
 
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
-ARM GAS  /tmp/ccqvO59w.s 			page 9
+ARM GAS  /tmp/cc4MhsvT.s 			page 9
 
 
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
  389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
-ARM GAS  /tmp/ccqvO59w.s 			page 10
+ARM GAS  /tmp/cc4MhsvT.s 			page 10
 
 
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
  446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
-ARM GAS  /tmp/ccqvO59w.s 			page 11
+ARM GAS  /tmp/cc4MhsvT.s 			page 11
 
 
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
  503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccqvO59w.s 			page 12
+ARM GAS  /tmp/cc4MhsvT.s 			page 12
 
 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
  551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
-ARM GAS  /tmp/ccqvO59w.s 			page 13
+ARM GAS  /tmp/cc4MhsvT.s 			page 13
 
 
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  101:ThreadX/common/src/tx_semaphore_ceiling_put.c ****     /* Increment the total semaphore put counter.  */
  102:ThreadX/common/src/tx_semaphore_ceiling_put.c ****     _tx_semaphore_performance_put_count++;
  103:ThreadX/common/src/tx_semaphore_ceiling_put.c **** 
-ARM GAS  /tmp/ccqvO59w.s 			page 14
+ARM GAS  /tmp/cc4MhsvT.s 			page 14
 
 
  104:ThreadX/common/src/tx_semaphore_ceiling_put.c ****     /* Increment the number of puts on this semaphore.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
   82              	.LBB19:
  562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
   83              		.loc 2 562 0
-ARM GAS  /tmp/ccqvO59w.s 			page 15
+ARM GAS  /tmp/cc4MhsvT.s 			page 15
 
 
   84              		.syntax unified
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  118 002c 16E0     		b	.L1
  119              	.LVL10:
  120              	.L2:
-ARM GAS  /tmp/ccqvO59w.s 			page 16
+ARM GAS  /tmp/cc4MhsvT.s 			page 16
 
 
  159:ThreadX/common/src/tx_semaphore_ceiling_put.c ****         }
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  199:ThreadX/common/src/tx_semaphore_ceiling_put.c ****         /* Clear cleanup routine to avoid timeout.  */
  200:ThreadX/common/src/tx_semaphore_ceiling_put.c ****         thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
  135              		.loc 1 200 0
-ARM GAS  /tmp/ccqvO59w.s 			page 17
+ARM GAS  /tmp/cc4MhsvT.s 			page 17
 
 
  136 003a 0023     		movs	r3, #0
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  227:ThreadX/common/src/tx_semaphore_ceiling_put.c ****         _tx_thread_system_resume(thread_ptr);
  163              		.loc 1 227 0
  164 0050 FFF7FEFF 		bl	_tx_thread_system_resume
-ARM GAS  /tmp/ccqvO59w.s 			page 18
+ARM GAS  /tmp/cc4MhsvT.s 			page 18
 
 
  165              	.LVL19:
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  195              		.loc 1 158 0
  196 006a 0020     		movs	r0, #0
  197              	.LVL26:
-ARM GAS  /tmp/ccqvO59w.s 			page 19
+ARM GAS  /tmp/cc4MhsvT.s 			page 19
 
 
  198 006c F6E7     		b	.L1
@@ -1106,14 +1106,14 @@ ARM GAS  /tmp/ccqvO59w.s 			page 1
  219              		.file 8 "ThreadX/common/inc/tx_api.h"
  220              		.file 9 "ThreadX/common/inc/tx_thread.h"
  221              		.file 10 "ThreadX/common/inc/tx_semaphore.h"
-ARM GAS  /tmp/ccqvO59w.s 			page 20
+ARM GAS  /tmp/cc4MhsvT.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_semaphore_ceiling_put.c
-     /tmp/ccqvO59w.s:18     .text._tx_semaphore_ceiling_put:0000000000000000 $t
-     /tmp/ccqvO59w.s:25     .text._tx_semaphore_ceiling_put:0000000000000000 _tx_semaphore_ceiling_put
-     /tmp/ccqvO59w.s:208    .text._tx_semaphore_ceiling_put:0000000000000074 $d
+     /tmp/cc4MhsvT.s:18     .text._tx_semaphore_ceiling_put:0000000000000000 $t
+     /tmp/cc4MhsvT.s:25     .text._tx_semaphore_ceiling_put:0000000000000000 _tx_semaphore_ceiling_put
+     /tmp/cc4MhsvT.s:208    .text._tx_semaphore_ceiling_put:0000000000000074 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_resume

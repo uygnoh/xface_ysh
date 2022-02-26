@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccrMJl7z.s 			page 1
+ARM GAS  /tmp/ccWrkqfT.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
   29:ThreadX/common/src/tx_mutex_prioritize.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_mutex_prioritize.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_mutex_prioritize.c **** #include "tx_mutex.h"
-ARM GAS  /tmp/ccrMJl7z.s 			page 2
+ARM GAS  /tmp/ccWrkqfT.s 			page 2
 
 
   32:ThreadX/common/src/tx_mutex_prioritize.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
   37              		.cfi_offset 4, -20
   38              		.cfi_offset 5, -16
   39              		.cfi_offset 6, -12
-ARM GAS  /tmp/ccrMJl7z.s 			page 3
+ARM GAS  /tmp/ccWrkqfT.s 			page 3
 
 
   40              		.cfi_offset 7, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
   48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
   49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
   50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
-ARM GAS  /tmp/ccrMJl7z.s 			page 4
+ARM GAS  /tmp/ccWrkqfT.s 			page 4
 
 
   51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
  106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
-ARM GAS  /tmp/ccrMJl7z.s 			page 5
+ARM GAS  /tmp/ccWrkqfT.s 			page 5
 
 
  108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
  164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
-ARM GAS  /tmp/ccrMJl7z.s 			page 6
+ARM GAS  /tmp/ccWrkqfT.s 			page 6
 
 
  165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
  221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
-ARM GAS  /tmp/ccrMJl7z.s 			page 7
+ARM GAS  /tmp/ccWrkqfT.s 			page 7
 
 
  222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
  277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
  278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
-ARM GAS  /tmp/ccrMJl7z.s 			page 8
+ARM GAS  /tmp/ccWrkqfT.s 			page 8
 
 
  279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
  334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
  335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccrMJl7z.s 			page 9
+ARM GAS  /tmp/ccWrkqfT.s 			page 9
 
 
  336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
  391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
  392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
-ARM GAS  /tmp/ccrMJl7z.s 			page 10
+ARM GAS  /tmp/ccWrkqfT.s 			page 10
 
 
  393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
  448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
  449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccrMJl7z.s 			page 11
+ARM GAS  /tmp/ccWrkqfT.s 			page 11
 
 
  450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
  506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
-ARM GAS  /tmp/ccrMJl7z.s 			page 12
+ARM GAS  /tmp/ccWrkqfT.s 			page 12
 
 
  507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
  553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccrMJl7z.s 			page 13
+ARM GAS  /tmp/ccWrkqfT.s 			page 13
 
 
  555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  101:ThreadX/common/src/tx_mutex_prioritize.c ****     /* Pickup the suspended count.  */
  102:ThreadX/common/src/tx_mutex_prioritize.c ****     suspended_count =  mutex_ptr -> tx_mutex_suspended_count;
   65              		.loc 1 102 0
-ARM GAS  /tmp/ccrMJl7z.s 			page 14
+ARM GAS  /tmp/ccWrkqfT.s 			page 14
 
 
   66 0008 C569     		ldr	r5, [r0, #28]
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  143:ThreadX/common/src/tx_mutex_prioritize.c ****         /* Disable preemption.  */
  144:ThreadX/common/src/tx_mutex_prioritize.c ****         _tx_thread_preempt_disable++;
   80              		.loc 1 144 0
-ARM GAS  /tmp/ccrMJl7z.s 			page 15
+ARM GAS  /tmp/ccWrkqfT.s 			page 15
 
 
   81 0016 214E     		ldr	r6, .L17
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  128              		.thumb
  129              		.syntax unified
  130 003a 2DE0     		b	.L3
-ARM GAS  /tmp/ccrMJl7z.s 			page 16
+ARM GAS  /tmp/ccWrkqfT.s 			page 16
 
 
  131              	.LVL11:
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  169              	@ 0 "" 2
  170              		.thumb
  171              		.syntax unified
-ARM GAS  /tmp/ccrMJl7z.s 			page 17
+ARM GAS  /tmp/ccWrkqfT.s 			page 17
 
 
  172              	.LBE31:
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  202:ThreadX/common/src/tx_mutex_prioritize.c **** 
  203:ThreadX/common/src/tx_mutex_prioritize.c ****                 /* Default the highest priority thread to the thread at the front of the list.  */
  204:ThreadX/common/src/tx_mutex_prioritize.c ****                 priority_thread_ptr =  head_ptr;
-ARM GAS  /tmp/ccrMJl7z.s 			page 18
+ARM GAS  /tmp/ccWrkqfT.s 			page 18
 
 
  205:ThreadX/common/src/tx_mutex_prioritize.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  221 0076 2A60     		str	r2, [r5]
  217:ThreadX/common/src/tx_mutex_prioritize.c **** 
  218:ThreadX/common/src/tx_mutex_prioritize.c ****         /* Now determine if the highest priority thread is at the front
-ARM GAS  /tmp/ccrMJl7z.s 			page 19
+ARM GAS  /tmp/ccWrkqfT.s 			page 19
 
 
  219:ThreadX/common/src/tx_mutex_prioritize.c ****            of the list.  */
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  252              		.loc 2 562 0
  253              		.syntax unified
  254              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
-ARM GAS  /tmp/ccrMJl7z.s 			page 20
+ARM GAS  /tmp/ccWrkqfT.s 			page 20
 
 
  255 0090 84F31088 		MSR  PRIMASK,r4
@@ -1196,14 +1196,14 @@ ARM GAS  /tmp/ccrMJl7z.s 			page 1
  283              		.file 8 "ThreadX/common/inc/tx_api.h"
  284              		.file 9 "ThreadX/common/inc/tx_thread.h"
  285              		.file 10 "ThreadX/common/inc/tx_mutex.h"
-ARM GAS  /tmp/ccrMJl7z.s 			page 21
+ARM GAS  /tmp/ccWrkqfT.s 			page 21
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_mutex_prioritize.c
-     /tmp/ccrMJl7z.s:18     .text._tx_mutex_prioritize:0000000000000000 $t
-     /tmp/ccrMJl7z.s:25     .text._tx_mutex_prioritize:0000000000000000 _tx_mutex_prioritize
-     /tmp/ccrMJl7z.s:272    .text._tx_mutex_prioritize:000000000000009c $d
+     /tmp/ccWrkqfT.s:18     .text._tx_mutex_prioritize:0000000000000000 $t
+     /tmp/ccWrkqfT.s:25     .text._tx_mutex_prioritize:0000000000000000 _tx_mutex_prioritize
+     /tmp/ccWrkqfT.s:272    .text._tx_mutex_prioritize:000000000000009c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_preempt_check

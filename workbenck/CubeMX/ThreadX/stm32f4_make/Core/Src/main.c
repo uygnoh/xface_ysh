@@ -1,17 +1,41 @@
 #include "main.h"
 #include "gpio.h"
+#include "tx_api.h"
+void tx_application_define(void *first_unused_memory);
+void my_thread_entry(ULONG thread_input);
+unsigned long my_thread_counter = 0;
+TX_THREAD my_thread;
 
+void tx_application_define(void *first_unused_memory)
+{
+    /* Create my_thread! */
+    tx_thread_create(&my_thread, "My Thread",
+    my_thread_entry, 0x1234, first_unused_memory, 1024,
+    3, 3, TX_NO_TIME_SLICE, TX_AUTO_START);
+}
+void my_thread_entry(ULONG thread_input)
+{
+    /* Enter into a forever loop. */
+    while(1)
+    {
+        /* Increment thread counter. */
+        my_thread_counter++;
+        /* Sleep for 1 tick. */
+
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+        tx_thread_sleep(100);
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+        tx_thread_sleep(100);
+    }
+}
 int main(void)
 {
         HAL_Init();
         SystemClock_Config();
         MX_GPIO_Init();
-
+        tx_kernel_enter();
         while (1) {
-HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 
-HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-HAL_Delay(100);
         }
 }
 

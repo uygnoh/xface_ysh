@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccimhaAD.s 			page 1
+ARM GAS  /tmp/ccul4tRP.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
   29:ThreadX/common/src/tx_event_flags_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_event_flags_get.c **** #include "tx_thread.h"
   31:ThreadX/common/src/tx_event_flags_get.c **** #include "tx_event_flags.h"
-ARM GAS  /tmp/ccimhaAD.s 			page 2
+ARM GAS  /tmp/ccul4tRP.s 			page 2
 
 
   32:ThreadX/common/src/tx_event_flags_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
   30              		@ args = 4, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              	.LVL0:
-ARM GAS  /tmp/ccimhaAD.s 			page 3
+ARM GAS  /tmp/ccul4tRP.s 			page 3
 
 
   33 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
   41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
-ARM GAS  /tmp/ccimhaAD.s 			page 4
+ARM GAS  /tmp/ccul4tRP.s 			page 4
 
 
   44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
   98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccimhaAD.s 			page 5
+ARM GAS  /tmp/ccul4tRP.s 			page 5
 
 
  101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
-ARM GAS  /tmp/ccimhaAD.s 			page 6
+ARM GAS  /tmp/ccul4tRP.s 			page 6
 
 
  158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
-ARM GAS  /tmp/ccimhaAD.s 			page 7
+ARM GAS  /tmp/ccul4tRP.s 			page 7
 
 
  215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
-ARM GAS  /tmp/ccimhaAD.s 			page 8
+ARM GAS  /tmp/ccul4tRP.s 			page 8
 
 
  272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
-ARM GAS  /tmp/ccimhaAD.s 			page 9
+ARM GAS  /tmp/ccul4tRP.s 			page 9
 
 
  329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
-ARM GAS  /tmp/ccimhaAD.s 			page 10
+ARM GAS  /tmp/ccul4tRP.s 			page 10
 
 
  386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
-ARM GAS  /tmp/ccimhaAD.s 			page 11
+ARM GAS  /tmp/ccul4tRP.s 			page 11
 
 
  443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
-ARM GAS  /tmp/ccimhaAD.s 			page 12
+ARM GAS  /tmp/ccul4tRP.s 			page 12
 
 
  500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
-ARM GAS  /tmp/ccimhaAD.s 			page 13
+ARM GAS  /tmp/ccul4tRP.s 			page 13
 
 
  548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  101:ThreadX/common/src/tx_event_flags_get.c **** #endif
  102:ThreadX/common/src/tx_event_flags_get.c **** 
  103:ThreadX/common/src/tx_event_flags_get.c **** 
-ARM GAS  /tmp/ccimhaAD.s 			page 14
+ARM GAS  /tmp/ccul4tRP.s 			page 14
 
 
  104:ThreadX/common/src/tx_event_flags_get.c ****     /* Disable interrupts to examine the event flags group.  */
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  152:ThreadX/common/src/tx_event_flags_get.c ****     }
  153:ThreadX/common/src/tx_event_flags_get.c **** 
  154:ThreadX/common/src/tx_event_flags_get.c ****     /* Determine if the request is satisfied.  */
-ARM GAS  /tmp/ccimhaAD.s 			page 15
+ARM GAS  /tmp/ccul4tRP.s 			page 15
 
 
  155:ThreadX/common/src/tx_event_flags_get.c ****     if (flags_satisfied != ((ULONG) 0))
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  197:ThreadX/common/src/tx_event_flags_get.c ****         flags_satisfied =  (current_flags & requested_flags);
   83              		.loc 1 197 0
   84 001a 04EA0106 		and	r6, r4, r1
-ARM GAS  /tmp/ccimhaAD.s 			page 16
+ARM GAS  /tmp/ccul4tRP.s 			page 16
 
 
   85              	.LVL5:
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  247:ThreadX/common/src/tx_event_flags_get.c ****             /* Was a set request interrupted?  */
  248:ThreadX/common/src/tx_event_flags_get.c ****             if (interrupted_set_request == TX_TRUE)
  249:ThreadX/common/src/tx_event_flags_get.c ****             {
-ARM GAS  /tmp/ccimhaAD.s 			page 17
+ARM GAS  /tmp/ccul4tRP.s 			page 17
 
 
  250:ThreadX/common/src/tx_event_flags_get.c **** 
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  294:ThreadX/common/src/tx_event_flags_get.c ****                 _tx_event_flags_performance_suspension_count++;
  295:ThreadX/common/src/tx_event_flags_get.c **** 
  296:ThreadX/common/src/tx_event_flags_get.c ****                 /* Increment the number of event flags suspensions on this semaphore.  */
-ARM GAS  /tmp/ccimhaAD.s 			page 18
+ARM GAS  /tmp/ccul4tRP.s 			page 18
 
 
  297:ThreadX/common/src/tx_event_flags_get.c ****                 group_ptr -> tx_event_flags_group___performance_suspension_count++;
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  123 004c 4369     		ldr	r3, [r0, #20]
  124              	.LVL11:
  328:ThreadX/common/src/tx_event_flags_get.c **** 
-ARM GAS  /tmp/ccimhaAD.s 			page 19
+ARM GAS  /tmp/ccul4tRP.s 			page 19
 
 
  329:ThreadX/common/src/tx_event_flags_get.c ****                 /* Setup suspension list.  */
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  364:ThreadX/common/src/tx_event_flags_get.c **** #else
  365:ThreadX/common/src/tx_event_flags_get.c **** 
  366:ThreadX/common/src/tx_event_flags_get.c ****                 /* Set the suspending flag.  */
-ARM GAS  /tmp/ccimhaAD.s 			page 20
+ARM GAS  /tmp/ccul4tRP.s 			page 20
 
 
  367:ThreadX/common/src/tx_event_flags_get.c ****                 thread_ptr -> tx_thread_suspending =  TX_TRUE;
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  183              		.syntax unified
  184              	.LBE25:
  185              	.LBE24:
-ARM GAS  /tmp/ccimhaAD.s 			page 21
+ARM GAS  /tmp/ccul4tRP.s 			page 21
 
 
  186              		.loc 2 575 0
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  215              		.loc 1 212 0
  216 008c 04EA0106 		and	r6, r4, r1
  217              	.LVL21:
-ARM GAS  /tmp/ccimhaAD.s 			page 22
+ARM GAS  /tmp/ccul4tRP.s 			page 22
 
 
  218              	.L5:
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  343:ThreadX/common/src/tx_event_flags_get.c ****                     thread_ptr -> tx_thread_suspended_next =        next_thread;
  261              		.loc 1 343 0
  262 00ba 0369     		ldr	r3, [r0, #16]
-ARM GAS  /tmp/ccimhaAD.s 			page 23
+ARM GAS  /tmp/ccul4tRP.s 			page 23
 
 
  263              	.LVL31:
@@ -1378,19 +1378,19 @@ ARM GAS  /tmp/ccimhaAD.s 			page 1
  310              		.file 6 "/usr/include/newlib/sys/reent.h"
  311              		.file 7 "/usr/include/newlib/stdlib.h"
  312              		.file 8 "ThreadX/common/inc/tx_api.h"
-ARM GAS  /tmp/ccimhaAD.s 			page 24
+ARM GAS  /tmp/ccul4tRP.s 			page 24
 
 
  313              		.file 9 "ThreadX/common/inc/tx_thread.h"
  314              		.file 10 "ThreadX/common/inc/tx_event_flags.h"
-ARM GAS  /tmp/ccimhaAD.s 			page 25
+ARM GAS  /tmp/ccul4tRP.s 			page 25
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_event_flags_get.c
-     /tmp/ccimhaAD.s:18     .text._tx_event_flags_get:0000000000000000 $t
-     /tmp/ccimhaAD.s:25     .text._tx_event_flags_get:0000000000000000 _tx_event_flags_get
-     /tmp/ccimhaAD.s:299    .text._tx_event_flags_get:00000000000000d4 $d
+     /tmp/ccul4tRP.s:18     .text._tx_event_flags_get:0000000000000000 $t
+     /tmp/ccul4tRP.s:25     .text._tx_event_flags_get:0000000000000000 _tx_event_flags_get
+     /tmp/ccul4tRP.s:299    .text._tx_event_flags_get:00000000000000d4 $d
 
 UNDEFINED SYMBOLS
 _tx_thread_system_suspend

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccA1Rtem.s 			page 1
+ARM GAS  /tmp/ccORQkpR.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
   29:ThreadX/common/src/txe_thread_delete.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_thread_delete.c **** 
   31:ThreadX/common/src/txe_thread_delete.c **** 
-ARM GAS  /tmp/ccA1Rtem.s 			page 2
+ARM GAS  /tmp/ccORQkpR.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_delete.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
   39              	.LBB5:
   40              		.file 2 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
    1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
-ARM GAS  /tmp/ccA1Rtem.s 			page 3
+ARM GAS  /tmp/ccORQkpR.s 			page 3
 
 
    2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
   56:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            violation,                  */
   57:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            fixed predefined macro,     */
   58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
-ARM GAS  /tmp/ccA1Rtem.s 			page 4
+ARM GAS  /tmp/ccORQkpR.s 			page 4
 
 
   59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  113:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long                           ULONG;
  114:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long long                      ULONG64;
  115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
-ARM GAS  /tmp/ccA1Rtem.s 			page 5
+ARM GAS  /tmp/ccORQkpR.s 			page 5
 
 
  116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  170:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  171:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_MASK
  172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
-ARM GAS  /tmp/ccA1Rtem.s 			page 6
+ARM GAS  /tmp/ccORQkpR.s 			page 6
 
 
  173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  227:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
  228:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ghs__)
  229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
-ARM GAS  /tmp/ccA1Rtem.s 			page 7
+ARM GAS  /tmp/ccORQkpR.s 			page 7
 
 
  230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  284:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  285:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP)
  286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccA1Rtem.s 			page 8
+ARM GAS  /tmp/ccORQkpR.s 			page 8
 
 
  287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  341:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  342:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
  343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccA1Rtem.s 			page 9
+ARM GAS  /tmp/ccORQkpR.s 			page 9
 
 
  344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  398:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
  399:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
-ARM GAS  /tmp/ccA1Rtem.s 			page 10
+ARM GAS  /tmp/ccORQkpR.s 			page 10
 
 
  401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  455:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
  456:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
  457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
-ARM GAS  /tmp/ccA1Rtem.s 			page 11
+ARM GAS  /tmp/ccORQkpR.s 			page 11
 
 
  458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
   93:ThreadX/common/src/txe_thread_delete.c ****     }
   94:ThreadX/common/src/txe_thread_delete.c **** 
   95:ThreadX/common/src/txe_thread_delete.c ****     /* Now check for invalid thread ID.  */
-ARM GAS  /tmp/ccA1Rtem.s 			page 12
+ARM GAS  /tmp/ccORQkpR.s 			page 12
 
 
   96:ThreadX/common/src/txe_thread_delete.c ****     else if (thread_ptr -> tx_thread_id != TX_THREAD_ID)
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
   92              	.LFE8:
   94              		.text
   95              	.Letext0:
-ARM GAS  /tmp/ccA1Rtem.s 			page 13
+ARM GAS  /tmp/ccORQkpR.s 			page 13
 
 
   96              		.file 3 "/usr/include/newlib/sys/lock.h"
@@ -728,14 +728,14 @@ ARM GAS  /tmp/ccA1Rtem.s 			page 1
  100              		.file 7 "/usr/include/newlib/stdlib.h"
  101              		.file 8 "ThreadX/common/inc/tx_api.h"
  102              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccA1Rtem.s 			page 14
+ARM GAS  /tmp/ccORQkpR.s 			page 14
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_delete.c
-     /tmp/ccA1Rtem.s:18     .text._txe_thread_delete:0000000000000000 $t
-     /tmp/ccA1Rtem.s:25     .text._txe_thread_delete:0000000000000000 _txe_thread_delete
-     /tmp/ccA1Rtem.s:89     .text._txe_thread_delete:000000000000002c $d
+     /tmp/ccORQkpR.s:18     .text._txe_thread_delete:0000000000000000 $t
+     /tmp/ccORQkpR.s:25     .text._txe_thread_delete:0000000000000000 _txe_thread_delete
+     /tmp/ccORQkpR.s:89     .text._txe_thread_delete:000000000000002c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_delete

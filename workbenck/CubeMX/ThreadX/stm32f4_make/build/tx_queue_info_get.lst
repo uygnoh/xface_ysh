@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccoi0zK2.s 			page 1
+ARM GAS  /tmp/ccgNUVUk.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   29:ThreadX/common/src/tx_queue_info_get.c **** #include "tx_trace.h"
   30:ThreadX/common/src/tx_queue_info_get.c **** #include "tx_queue.h"
   31:ThreadX/common/src/tx_queue_info_get.c **** 
-ARM GAS  /tmp/ccoi0zK2.s 			page 2
+ARM GAS  /tmp/ccgNUVUk.s 			page 2
 
 
   32:ThreadX/common/src/tx_queue_info_get.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              		@ link register save eliminated.
   33              	.LVL0:
-ARM GAS  /tmp/ccoi0zK2.s 			page 3
+ARM GAS  /tmp/ccgNUVUk.s 			page 3
 
 
   34 0000 F0B4     		push	{r4, r5, r6, r7}
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
   41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
   42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
-ARM GAS  /tmp/ccoi0zK2.s 			page 4
+ARM GAS  /tmp/ccgNUVUk.s 			page 4
 
 
   43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
   98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
   99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
-ARM GAS  /tmp/ccoi0zK2.s 			page 5
+ARM GAS  /tmp/ccgNUVUk.s 			page 5
 
 
  100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
  155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
  156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccoi0zK2.s 			page 6
+ARM GAS  /tmp/ccgNUVUk.s 			page 6
 
 
  157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
  212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
-ARM GAS  /tmp/ccoi0zK2.s 			page 7
+ARM GAS  /tmp/ccgNUVUk.s 			page 7
 
 
  214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
  269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
  270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
-ARM GAS  /tmp/ccoi0zK2.s 			page 8
+ARM GAS  /tmp/ccgNUVUk.s 			page 8
 
 
  271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
  326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
  327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
-ARM GAS  /tmp/ccoi0zK2.s 			page 9
+ARM GAS  /tmp/ccgNUVUk.s 			page 9
 
 
  328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
  383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
  384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
-ARM GAS  /tmp/ccoi0zK2.s 			page 10
+ARM GAS  /tmp/ccgNUVUk.s 			page 10
 
 
  385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
  440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
  441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
-ARM GAS  /tmp/ccoi0zK2.s 			page 11
+ARM GAS  /tmp/ccgNUVUk.s 			page 11
 
 
  442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
  497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
  498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
-ARM GAS  /tmp/ccoi0zK2.s 			page 12
+ARM GAS  /tmp/ccgNUVUk.s 			page 12
 
 
  499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
  545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
  546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
-ARM GAS  /tmp/ccoi0zK2.s 			page 13
+ARM GAS  /tmp/ccgNUVUk.s 			page 13
 
 
  547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   99:ThreadX/common/src/tx_queue_info_get.c ****     /* Retrieve the name of the queue.  */
  100:ThreadX/common/src/tx_queue_info_get.c ****     if (name != TX_NULL)
   67              		.loc 1 100 0
-ARM GAS  /tmp/ccoi0zK2.s 			page 14
+ARM GAS  /tmp/ccgNUVUk.s 			page 14
 
 
   68 000e 09B1     		cbz	r1, .L2
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
   94              		.loc 1 128 0
   95 0026 0DB1     		cbz	r5, .L6
  129:ThreadX/common/src/tx_queue_info_get.c ****     {
-ARM GAS  /tmp/ccoi0zK2.s 			page 15
+ARM GAS  /tmp/ccgNUVUk.s 			page 15
 
 
  130:ThreadX/common/src/tx_queue_info_get.c **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  132              	.LFE8:
  134              		.text
  135              	.Letext0:
-ARM GAS  /tmp/ccoi0zK2.s 			page 16
+ARM GAS  /tmp/ccgNUVUk.s 			page 16
 
 
  136              		.file 3 "/usr/include/newlib/sys/lock.h"
@@ -908,12 +908,12 @@ ARM GAS  /tmp/ccoi0zK2.s 			page 1
  140              		.file 7 "/usr/include/newlib/stdlib.h"
  141              		.file 8 "ThreadX/common/inc/tx_api.h"
  142              		.file 9 "ThreadX/common/inc/tx_queue.h"
-ARM GAS  /tmp/ccoi0zK2.s 			page 17
+ARM GAS  /tmp/ccgNUVUk.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 tx_queue_info_get.c
-     /tmp/ccoi0zK2.s:18     .text._tx_queue_info_get:0000000000000000 $t
-     /tmp/ccoi0zK2.s:25     .text._tx_queue_info_get:0000000000000000 _tx_queue_info_get
+     /tmp/ccgNUVUk.s:18     .text._tx_queue_info_get:0000000000000000 $t
+     /tmp/ccgNUVUk.s:25     .text._tx_queue_info_get:0000000000000000 _tx_queue_info_get
 
 NO UNDEFINED SYMBOLS

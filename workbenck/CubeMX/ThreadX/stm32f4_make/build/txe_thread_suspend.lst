@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccEBsCUS.s 			page 1
+ARM GAS  /tmp/ccoC1Iln.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccEBsCUS.s 			page 1
   29:ThreadX/common/src/txe_thread_suspend.c **** #include "tx_thread.h"
   30:ThreadX/common/src/txe_thread_suspend.c **** 
   31:ThreadX/common/src/txe_thread_suspend.c **** 
-ARM GAS  /tmp/ccEBsCUS.s 			page 2
+ARM GAS  /tmp/ccoC1Iln.s 			page 2
 
 
   32:ThreadX/common/src/txe_thread_suspend.c **** /**************************************************************************/
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccEBsCUS.s 			page 1
   81:ThreadX/common/src/txe_thread_suspend.c ****     if (thread_ptr == TX_NULL)
   33              		.loc 1 81 0
   34 0000 48B1     		cbz	r0, .L3
-ARM GAS  /tmp/ccEBsCUS.s 			page 3
+ARM GAS  /tmp/ccoC1Iln.s 			page 3
 
 
   75:ThreadX/common/src/txe_thread_suspend.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccEBsCUS.s 			page 1
   85:ThreadX/common/src/txe_thread_suspend.c ****     }
   64              		.loc 1 85 0
   65 0016 0E20     		movs	r0, #14
-ARM GAS  /tmp/ccEBsCUS.s 			page 4
+ARM GAS  /tmp/ccoC1Iln.s 			page 4
 
 
   66              	.LVL5:
@@ -200,14 +200,14 @@ ARM GAS  /tmp/ccEBsCUS.s 			page 1
   83              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
   84              		.file 8 "ThreadX/common/inc/tx_api.h"
   85              		.file 9 "ThreadX/common/inc/tx_thread.h"
-ARM GAS  /tmp/ccEBsCUS.s 			page 5
+ARM GAS  /tmp/ccoC1Iln.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 txe_thread_suspend.c
-     /tmp/ccEBsCUS.s:18     .text._txe_thread_suspend:0000000000000000 $t
-     /tmp/ccEBsCUS.s:25     .text._txe_thread_suspend:0000000000000000 _txe_thread_suspend
-     /tmp/ccEBsCUS.s:72     .text._txe_thread_suspend:000000000000001c $d
+     /tmp/ccoC1Iln.s:18     .text._txe_thread_suspend:0000000000000000 $t
+     /tmp/ccoC1Iln.s:25     .text._txe_thread_suspend:0000000000000000 _txe_thread_suspend
+     /tmp/ccoC1Iln.s:72     .text._txe_thread_suspend:000000000000001c $d
 
 UNDEFINED SYMBOLS
 _tx_thread_suspend
