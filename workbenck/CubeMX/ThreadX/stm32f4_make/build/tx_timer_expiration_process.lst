@@ -1,0 +1,1230 @@
+ARM GAS  /tmp/cc90j151.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"tx_timer_expiration_process.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._tx_timer_expiration_process,"ax",%progbits
+  18              		.align	1
+  19              		.global	_tx_timer_expiration_process
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_tx_timer_expiration_process:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/tx_timer_expiration_process.c"
+   1:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+   2:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+   3:ThreadX/common/src/tx_timer_expiration_process.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+   5:ThreadX/common/src/tx_timer_expiration_process.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/tx_timer_expiration_process.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/tx_timer_expiration_process.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/tx_timer_expiration_process.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  10:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  11:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  12:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  13:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  14:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  15:ThreadX/common/src/tx_timer_expiration_process.c **** /**                                                                       */
+  16:ThreadX/common/src/tx_timer_expiration_process.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/tx_timer_expiration_process.c **** /**                                                                       */
+  18:ThreadX/common/src/tx_timer_expiration_process.c **** /**   Timer                                                               */
+  19:ThreadX/common/src/tx_timer_expiration_process.c **** /**                                                                       */
+  20:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  21:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  22:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  23:ThreadX/common/src/tx_timer_expiration_process.c **** #define TX_SOURCE_CODE
+  24:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  25:ThreadX/common/src/tx_timer_expiration_process.c **** #ifndef TX_NO_TIMER
+  26:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  27:ThreadX/common/src/tx_timer_expiration_process.c **** /* Include necessary system files.  */
+  28:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  29:ThreadX/common/src/tx_timer_expiration_process.c **** #include "tx_api.h"
+  30:ThreadX/common/src/tx_timer_expiration_process.c **** #include "tx_timer.h"
+  31:ThreadX/common/src/tx_timer_expiration_process.c **** #include "tx_thread.h"
+ARM GAS  /tmp/cc90j151.s 			page 2
+
+
+  32:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  33:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  34:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  35:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  36:ThreadX/common/src/tx_timer_expiration_process.c **** /*  FUNCTION                                               RELEASE        */
+  37:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  38:ThreadX/common/src/tx_timer_expiration_process.c **** /*    _tx_timer_expiration_process                        PORTABLE C      */
+  39:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                           6.1          */
+  40:ThreadX/common/src/tx_timer_expiration_process.c **** /*  AUTHOR                                                                */
+  41:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  42:ThreadX/common/src/tx_timer_expiration_process.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  43:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  44:ThreadX/common/src/tx_timer_expiration_process.c **** /*  DESCRIPTION                                                           */
+  45:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  46:ThreadX/common/src/tx_timer_expiration_process.c **** /*    This function processes thread and application timer expirations.   */
+  47:ThreadX/common/src/tx_timer_expiration_process.c **** /*    It is called from the _tx_timer_interrupt handler and either        */
+  48:ThreadX/common/src/tx_timer_expiration_process.c **** /*    processes the timer expiration in the ISR or defers to the system   */
+  49:ThreadX/common/src/tx_timer_expiration_process.c **** /*    timer thread. The actual processing is determined during            */
+  50:ThreadX/common/src/tx_timer_expiration_process.c **** /*    compilation.                                                        */
+  51:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  52:ThreadX/common/src/tx_timer_expiration_process.c **** /*  INPUT                                                                 */
+  53:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  54:ThreadX/common/src/tx_timer_expiration_process.c **** /*    None                                                                */
+  55:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  56:ThreadX/common/src/tx_timer_expiration_process.c **** /*  OUTPUT                                                                */
+  57:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  58:ThreadX/common/src/tx_timer_expiration_process.c **** /*    None                                                                */
+  59:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  60:ThreadX/common/src/tx_timer_expiration_process.c **** /*  CALLS                                                                 */
+  61:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  62:ThreadX/common/src/tx_timer_expiration_process.c **** /*    _tx_thread_system_resume          Thread resume processing          */
+  63:ThreadX/common/src/tx_timer_expiration_process.c **** /*    _tx_thread_system_ni_resume       Non-interruptable resume thread   */
+  64:ThreadX/common/src/tx_timer_expiration_process.c **** /*    _tx_timer_system_activate         Timer reactivate processing       */
+  65:ThreadX/common/src/tx_timer_expiration_process.c **** /*    Timer Expiration Function                                           */
+  66:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  67:ThreadX/common/src/tx_timer_expiration_process.c **** /*  CALLED BY                                                             */
+  68:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  69:ThreadX/common/src/tx_timer_expiration_process.c **** /*    _tx_timer_interrupt               Timer interrupt handler           */
+  70:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  71:ThreadX/common/src/tx_timer_expiration_process.c **** /*  RELEASE HISTORY                                                       */
+  72:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  73:ThreadX/common/src/tx_timer_expiration_process.c **** /*    DATE              NAME                      DESCRIPTION             */
+  74:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  75:ThreadX/common/src/tx_timer_expiration_process.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  76:ThreadX/common/src/tx_timer_expiration_process.c **** /*  09-30-2020     Scott Larson             Modified comment(s), and      */
+  77:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                            opt out of function when    */
+  78:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                            TX_NO_TIMER is defined,     */
+  79:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                            resulting in version 6.1    */
+  80:ThreadX/common/src/tx_timer_expiration_process.c **** /*                                                                        */
+  81:ThreadX/common/src/tx_timer_expiration_process.c **** /**************************************************************************/
+  82:ThreadX/common/src/tx_timer_expiration_process.c **** VOID  _tx_timer_expiration_process(VOID)
+  83:ThreadX/common/src/tx_timer_expiration_process.c **** {
+  28              		.loc 1 83 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+ARM GAS  /tmp/cc90j151.s 			page 3
+
+
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  37              	.LBB10:
+  38              	.LBB11:
+  39              	.LBB12:
+  40              	.LBB13:
+  41              		.file 2 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+   1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+   2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   5:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
+   9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  10:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  11:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  12:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  13:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  14:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  15:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  16:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /** ThreadX Component                                                     */
+  17:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  18:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**   Port Specific                                                       */
+  19:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  20:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  21:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  22:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  23:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  24:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  25:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  26:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+  27:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  28:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    tx_port.h                                         Cortex-M4/GNU     */
+  29:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                           6.1.10       */
+  30:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  31:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  AUTHOR                                                                */
+  32:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  33:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    Scott Larson, Microsoft Corporation                                 */
+  34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  35:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  DESCRIPTION                                                           */
+  36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
+  38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
+  39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
+  40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
+  41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
+  42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
+  43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
+  44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
+  45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
+  47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
+  48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+ARM GAS  /tmp/cc90j151.s 			page 4
+
+
+  49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
+  50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
+  52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+  54:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  01-31-2022      Scott Larson            Modified comments, updated    */
+  55:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            typedef to fix misra        */
+  56:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            violation,                  */
+  57:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            fixed predefined macro,     */
+  58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
+  59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  61:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  62:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_PORT_H
+  63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
+  64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
+  67:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  68:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_INCLUDE_USER_DEFINE_FILE
+  69:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  70:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Yes, include the user defines in tx_user.h. The defines in this file may
+  71:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    alternately be defined on the command line.  */
+  72:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  73:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_user.h"
+  74:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  75:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  76:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  77:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define compiler library include files.  */
+  78:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  79:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <stdlib.h>
+  80:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <string.h>
+  81:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  82:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__
+  83:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <intrinsics.h>                     /* IAR Intrinsics */
+  84:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __asm__ __asm                       /* Define to make all inline asm look similar */
+  85:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+  86:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <yvals.h>
+  87:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  88:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif /* __ICCARM__ */
+  89:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  90:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+  91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
+  92:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_ghs.h"
+  93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+  94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
+  97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
+  98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
+  99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
+ 102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
+ 103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
+ARM GAS  /tmp/cc90j151.s 			page 5
+
+
+ 106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
+ 108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
+ 109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
+ 110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
+ 111:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned int                            UINT;
+ 112:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef long                                    LONG;
+ 113:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long                           ULONG;
+ 114:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long long                      ULONG64;
+ 115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
+ 116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
+ 117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
+ 118:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 119:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the priority levels for ThreadX.  Legal values range
+ 120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
+ 121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
+ 123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
+ 124:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 125:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 126:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 127:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
+ 128:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    thread creation is less than this value, the thread create call will return an error.  */
+ 129:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 130:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MINIMUM_STACK
+ 131:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MINIMUM_STACK                        200         /* Minimum stack size for this port  */
+ 132:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 133:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 134:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 135:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the system timer thread's default stack size and priority.  These are only applicable
+ 136:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    if TX_TIMER_PROCESS_IN_ISR is not defined.  */
+ 137:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 138:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_STACK_SIZE
+ 139:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
+ 140:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 141:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 142:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_PRIORITY
+ 143:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
+ 144:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 145:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 146:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 147:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define various constants for the ThreadX Cortex-M port.  */
+ 148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 149:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_DISABLE                          1           /* Disable interrupts               */
+ 150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
+ 151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
+ 154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
+ 155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
+ 156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+ 158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
+ 159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
+ 161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ARM GAS  /tmp/cc90j151.s 			page 6
+
+
+ 163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
+ 164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+ 165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
+ 168:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
+ 169:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 170:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 171:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_MASK
+ 172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
+ 173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 175:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+ 176:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define constants for Green Hills EventAnalyzer.  */
+ 177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
+ 179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
+ 180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 181:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EL_TICKS_PER_SECOND                  1000000
+ 182:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 183:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the method of how to get the upper and lower 32-bits of the time stamp. By default, simpl
+ 184:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    simulate the time-stamp source with a counter.  */
+ 185:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 186:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbu()                              _tx_el_time_base_upper
+ 187:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbl()                              ++_tx_el_time_base_lower
+ 188:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+ 189:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 190:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port specific options for the _tx_build_options variable. This variable indicates
+ 191:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    how the ThreadX library was built.  */
+ 192:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 193:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
+ 194:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 195:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 196:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the in-line initialization constant so that modules with in-line
+ 197:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    initialization capabilities can prevent their initialization from being
+ 198:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    a function call.  */
+ 199:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 200:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 201:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_DISABLE_INLINE
+ 202:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 203:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INLINE_INITIALIZATION
+ 204:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 206:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
+ 208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
+ 209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
+ 210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
+ 211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
+ 212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
+ 215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
+ 216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ARM GAS  /tmp/cc90j151.s 			page 7
+
+
+ 220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
+ 221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
+ 222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
+ 223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
+ 225:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_1
+ 226:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 227:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
+ 228:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ghs__)
+ 229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
+ 230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
+ 231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
+ 232:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 233:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2
+ 234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
+ 238:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 239:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 240:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 241:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port extensions of the remaining ThreadX objects.  */
+ 242:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 243:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_EXTENSION
+ 244:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_EXTENSION
+ 245:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_EXTENSION
+ 246:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_EXTENSION
+ 247:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_EXTENSION
+ 248:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_EXTENSION
+ 249:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_EXTENSION
+ 250:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 251:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 252:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the user extension field of the thread control block.  Nothing
+ 253:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    additional is needed for this port so it is defined as white space.  */
+ 254:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 255:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_USER_EXTENSION
+ 256:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_USER_EXTENSION
+ 257:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 258:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 259:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 260:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
+ 261:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    tx_thread_shell_entry, and tx_thread_terminate.  */
+ 262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 263:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
+ 266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
+ 268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
+ 269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
+ 270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
+ 272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
+ 273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
+ 274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
+ARM GAS  /tmp/cc90j151.s 			page 8
+
+
+ 277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
+ 278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
+ 279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+ 282:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
+ 283:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 284:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 285:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP)
+ 286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 289:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_control_get(void);
+ 290:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_control_set(ULONG value);
+ 291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
+ 292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
+ 293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
+ 295:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 296:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define some helper functions (these are intrinsics in some compilers). */
+ 297:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __GNUC__ /* GCC and ARM Compiler 6 */
+ 298:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 299:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline ULONG __get_control_value(void)
+ 300:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 301:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 302:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 303:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,CONTROL ": "=r" (control_value) );
+ 304:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 305:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 306:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 307:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_control_value(ULONG control_value)
+ 308:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 309:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
+ 310:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 311:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 312:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ 313:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 314:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* ARM Compiler 5 */
+ 315:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 316:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) ULONG __get_control_value(void)
+ 317:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 318:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 320:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm volatile ("MRS control_value,CONTROL");
+ 321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
+ 325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
+ 327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
+ 329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
+ 330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
+ 331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
+ 333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ARM GAS  /tmp/cc90j151.s 			page 9
+
+
+ 334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
+ 335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 339:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTR
+ 340:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    in order to ensure no lazy stacking will occur. */
+ 341:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 342:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 346:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  __get_control_value();    
+ 347:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
+ 349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 352:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 353:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 354:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_misra_control_get();  
+ 355:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 356:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_misra_control_set(_tx_vfp_state);      
+ 357:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 358:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 359:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 360:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 361:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A thread can be terminated by another thread, so we first check if it's self-terminating and not
+ 362:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread i
+ 363:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the F
+ 364:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    the lazy FPU save, then restore the CONTROL.FPCA state. */
+ 365:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 366:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 367:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 368:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 369:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 370:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 371:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 372:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 373:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 374:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  __get_control_value();
+ 375:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
+ 377:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
+ 382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
+ 387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ 388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
+ 389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ARM GAS  /tmp/cc90j151.s 			page 10
+
+
+ 391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
+ 392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
+ 394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 396:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 397:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 398:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 399:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 403:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 404:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
+ 407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
+ 409:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 410:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 411:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 412:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 413:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_misra_fpccr_get();    
+ 414:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 415:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 416:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 417:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 418:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = _tx_misra_control_g
+ 419:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ 420:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_misra_vfp_touch();             
+ 421:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 422:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ 423:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_misra_cont
+ 424:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 425:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_misra_control_set(_tx_vfp_s
+ 426:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 427:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 428:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 429:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 430:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 431:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 432:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* No VFP in use */
+ 433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 434:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+ 435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+ 436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
+ 438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
+ 441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
+ 443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
+ 444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
+ 445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
+ 446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
+ 447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
+ARM GAS  /tmp/cc90j151.s 			page 11
+
+
+ 448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
+ 449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
+ 452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 453:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
+ 454:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
+ 455:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
+ 456:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
+ 457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
+ 458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
+ 459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+ 460:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 461:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
+ 463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
+ 465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 466:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 467:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __CC_ARM /* ARM Compiler 5 */
+ 468:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 469:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** register unsigned int _ipsr __asm("ipsr");
+ 470:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _ipsr)
+ 471:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 472:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and ARM Compiler 6 */
+ 473:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 474:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_ipsr_value(void)
+ 475:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 476:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int  ipsr_value;
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,IPSR ": "=r" (ipsr_value) );
+ 478:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+ 479:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 480:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 481:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_ipsr_value())
+ 482:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 483:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)   /* IAR */
+ 484:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 485:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
+ 486:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 487:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE for different compilers */
+ 488:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 489:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE is defined, use MISRA function. */
+ 490:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_ipsr_get(VOID);
+ 491:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _tx_misra_ipsr_get())
+ 492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
+ 494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
+ 497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
+ 498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
+ 499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
+ 500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
+ 502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
+ 503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ARM GAS  /tmp/cc90j151.s 			page 12
+
+
+ 505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
+ 506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
+ 507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
+ 509:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 510:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 511:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 512:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 513:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_DISABLE_INLINE
+ 514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
+ 516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
+ 517:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
+ 518:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* AC5 Compiler */
+ 519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
+ 520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
+ 521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
+ 522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
+ 523:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 524:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 525:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 526:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 527:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the interrupt disable/restore macros for each compiler. */
+ 528:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 529:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__GNUC__) || defined(__ICCARM__)
+ 530:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 531:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*** GCC/AC6 and IAR ***/
+ 532:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 533:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_posture(void)
+ 534:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 535:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int posture;
+ 536:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 537:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, BASEPRI ": "=r" (posture));
+ 538:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, PRIMASK ": "=r" (posture));
+  42              		.loc 2 539 0
+  43              		.syntax unified
+  44              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  45 0002 EFF31081 		MRS  r1, PRIMASK 
+  46              	@ 0 "" 2
+  47              		.thumb
+  48              		.syntax unified
+  49              	.LBE13:
+  50              	.LBE12:
+ 540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
+ 542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
+ 546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
+ 548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
+ 551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
+ARM GAS  /tmp/cc90j151.s 			page 13
+
+
+ 553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
+ 557:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 558:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 559:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(int_posture);
+ 560:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     //__asm__ volatile ("MSR  BASEPRI,%0": : "r" (int_posture): "memory");
+ 561:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
+ 563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 565:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 566:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
+ 567:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 568:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int int_posture;
+ 569:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 570:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     int_posture = __get_interrupt_posture();
+ 571:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 572:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 573:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(TX_PORT_BASEPRI);
+ 574:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 575:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSID i" : : : "memory");
+  51              		.loc 2 575 0
+  52              		.syntax unified
+  53              	@ 575 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  54 0006 72B6     		CPSID i
+  55              	@ 0 "" 2
+  56              		.thumb
+  57              		.syntax unified
+  58              	.LBE11:
+  59              	.LBE10:
+  84:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  85:ThreadX/common/src/tx_timer_expiration_process.c **** TX_INTERRUPT_SAVE_AREA
+  86:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  87:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_TIMER_PROCESS_IN_ISR
+  88:ThreadX/common/src/tx_timer_expiration_process.c **** 
+  89:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           *expired_timers;
+  90:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           *reactivate_timer;
+  91:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           *next_timer;
+  92:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           *previous_timer;
+  93:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_REACTIVATE_INLINE
+  94:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           **timer_list;               /* Timer list pointer           */
+  95:ThreadX/common/src/tx_timer_expiration_process.c **** UINT                        expiration_time;            /* Value used for pointer offset*/
+  96:ThreadX/common/src/tx_timer_expiration_process.c **** ULONG                       delta;
+  97:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+  98:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER_INTERNAL           *current_timer;
+  99:ThreadX/common/src/tx_timer_expiration_process.c **** VOID                        (*timeout_function)(ULONG id);
+ 100:ThreadX/common/src/tx_timer_expiration_process.c **** ULONG                       timeout_param =  ((ULONG) 0);
+ 101:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
+ 102:ThreadX/common/src/tx_timer_expiration_process.c **** TX_TIMER                    *timer_ptr;
+ 103:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 104:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 105:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 106:ThreadX/common/src/tx_timer_expiration_process.c **** #ifndef TX_TIMER_PROCESS_IN_ISR
+ 107:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 108:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Don't process in the ISR, wakeup the system timer thread to process the
+ARM GAS  /tmp/cc90j151.s 			page 14
+
+
+ 109:ThreadX/common/src/tx_timer_expiration_process.c ****        timer expiration.  */
+ 110:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 111:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Disable interrupts.  */
+ 112:ThreadX/common/src/tx_timer_expiration_process.c ****     TX_DISABLE
+ 113:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 114:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_NOT_INTERRUPTABLE
+ 115:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 116:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Resume the thread!  */
+ 117:ThreadX/common/src/tx_timer_expiration_process.c ****     _tx_thread_system_ni_resume(&_tx_timer_thread);
+ 118:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 119:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Restore interrupts.  */
+ 120:ThreadX/common/src/tx_timer_expiration_process.c ****     TX_RESTORE
+ 121:ThreadX/common/src/tx_timer_expiration_process.c **** #else
+ 122:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 123:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Increment the preempt disable flag.  */
+ 124:ThreadX/common/src/tx_timer_expiration_process.c ****     _tx_thread_preempt_disable++;
+  60              		.loc 1 124 0
+  61 0008 044A     		ldr	r2, .L3
+  62 000a 1368     		ldr	r3, [r2]
+  63 000c 0133     		adds	r3, r3, #1
+  64 000e 1360     		str	r3, [r2]
+  65              	.LBB14:
+  66              	.LBB15:
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  67              		.loc 2 562 0
+  68              		.syntax unified
+  69              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  70 0010 81F31088 		MSR  PRIMASK,r1
+  71              	@ 0 "" 2
+  72              		.thumb
+  73              		.syntax unified
+  74              	.LBE15:
+  75              	.LBE14:
+ 125:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 126:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Restore interrupts.  */
+ 127:ThreadX/common/src/tx_timer_expiration_process.c ****     TX_RESTORE
+ 128:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 129:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Call the system resume function to activate the timer thread.  */
+ 130:ThreadX/common/src/tx_timer_expiration_process.c ****     _tx_thread_system_resume(&_tx_timer_thread);
+  76              		.loc 1 130 0
+  77 0014 0248     		ldr	r0, .L3+4
+  78 0016 FFF7FEFF 		bl	_tx_thread_system_resume
+  79              	.LVL0:
+ 131:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 132:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 133:ThreadX/common/src/tx_timer_expiration_process.c **** #else
+ 134:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 135:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Process the timer expiration directly in the ISR. This increases the interrupt
+ 136:ThreadX/common/src/tx_timer_expiration_process.c ****        processing, however, it eliminates the need for a system timer thread and associated
+ 137:ThreadX/common/src/tx_timer_expiration_process.c ****        resources.  */
+ 138:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 139:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Disable interrupts.  */
+ 140:ThreadX/common/src/tx_timer_expiration_process.c ****     TX_DISABLE
+ 141:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 142:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Determine if the timer processing is already active.  This needs to be checked outside
+ 143:ThreadX/common/src/tx_timer_expiration_process.c ****        of the processing loop because it remains set throughout nested timer interrupt conditions. 
+ 144:ThreadX/common/src/tx_timer_expiration_process.c ****     if (_tx_timer_processing_active == TX_FALSE)
+ARM GAS  /tmp/cc90j151.s 			page 15
+
+
+ 145:ThreadX/common/src/tx_timer_expiration_process.c ****     {
+ 146:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 147:ThreadX/common/src/tx_timer_expiration_process.c ****         /* Timer processing is not nested.  */
+ 148:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 149:ThreadX/common/src/tx_timer_expiration_process.c ****         /* Determine if the timer expiration has already been cleared.  */
+ 150:ThreadX/common/src/tx_timer_expiration_process.c ****         if (_tx_timer_expired != ((UINT) 0))
+ 151:ThreadX/common/src/tx_timer_expiration_process.c ****         {
+ 152:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 153:ThreadX/common/src/tx_timer_expiration_process.c ****             /* Proceed with timer processing.  */
+ 154:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 155:ThreadX/common/src/tx_timer_expiration_process.c ****             /* Set the timer interrupt processing active flag.  */
+ 156:ThreadX/common/src/tx_timer_expiration_process.c ****             _tx_timer_processing_active =  TX_TRUE;
+ 157:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 158:ThreadX/common/src/tx_timer_expiration_process.c ****             /* Now go into an infinite loop to process timer expirations.  */
+ 159:ThreadX/common/src/tx_timer_expiration_process.c ****             do
+ 160:ThreadX/common/src/tx_timer_expiration_process.c ****             {
+ 161:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 162:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* First, move the current list pointer and clear the timer
+ 163:ThreadX/common/src/tx_timer_expiration_process.c ****                    expired value.  This allows the interrupt handling portion
+ 164:ThreadX/common/src/tx_timer_expiration_process.c ****                    to continue looking for timer expirations.  */
+ 165:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 166:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Save the current timer expiration list pointer.  */
+ 167:ThreadX/common/src/tx_timer_expiration_process.c ****                 expired_timers =  *_tx_timer_current_ptr;
+ 168:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 169:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Modify the head pointer in the first timer in the list, if there
+ 170:ThreadX/common/src/tx_timer_expiration_process.c ****                    is one!  */
+ 171:ThreadX/common/src/tx_timer_expiration_process.c ****                 if (expired_timers != TX_NULL)
+ 172:ThreadX/common/src/tx_timer_expiration_process.c ****                 {
+ 173:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 174:ThreadX/common/src/tx_timer_expiration_process.c ****                     expired_timers -> tx_timer_internal_list_head =  &expired_timers;
+ 175:ThreadX/common/src/tx_timer_expiration_process.c ****                 }
+ 176:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 177:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Set the current list pointer to NULL.  */
+ 178:ThreadX/common/src/tx_timer_expiration_process.c ****                 *_tx_timer_current_ptr =  TX_NULL;
+ 179:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 180:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Move the current pointer up one timer entry wrap if we get to
+ 181:ThreadX/common/src/tx_timer_expiration_process.c ****                    the end of the list.  */
+ 182:ThreadX/common/src/tx_timer_expiration_process.c ****                 _tx_timer_current_ptr =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, 1);
+ 183:ThreadX/common/src/tx_timer_expiration_process.c ****                 if (_tx_timer_current_ptr == _tx_timer_list_end)
+ 184:ThreadX/common/src/tx_timer_expiration_process.c ****                 {
+ 185:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 186:ThreadX/common/src/tx_timer_expiration_process.c ****                     _tx_timer_current_ptr =  _tx_timer_list_start;
+ 187:ThreadX/common/src/tx_timer_expiration_process.c ****                 }
+ 188:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 189:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Clear the expired flag.  */
+ 190:ThreadX/common/src/tx_timer_expiration_process.c ****                 _tx_timer_expired =  TX_FALSE;
+ 191:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 192:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Restore interrupts temporarily.  */
+ 193:ThreadX/common/src/tx_timer_expiration_process.c ****                 TX_RESTORE
+ 194:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 195:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Disable interrupts again.  */
+ 196:ThreadX/common/src/tx_timer_expiration_process.c ****                 TX_DISABLE
+ 197:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 198:ThreadX/common/src/tx_timer_expiration_process.c ****                 /* Next, process the expiration of the associated timers at this
+ 199:ThreadX/common/src/tx_timer_expiration_process.c ****                    time slot.  */
+ 200:ThreadX/common/src/tx_timer_expiration_process.c ****                 while (expired_timers != TX_NULL)
+ 201:ThreadX/common/src/tx_timer_expiration_process.c ****                 {
+ARM GAS  /tmp/cc90j151.s 			page 16
+
+
+ 202:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 203:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Something is on the list.  Remove it and process the expiration.  */
+ 204:ThreadX/common/src/tx_timer_expiration_process.c ****                     current_timer =  expired_timers;
+ 205:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 206:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Pickup the next timer.  */
+ 207:ThreadX/common/src/tx_timer_expiration_process.c ****                     next_timer =  expired_timers -> tx_timer_internal_active_next;
+ 208:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 209:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Set the reactivate timer to NULL.  */
+ 210:ThreadX/common/src/tx_timer_expiration_process.c ****                     reactivate_timer =  TX_NULL;
+ 211:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 212:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Determine if this is the only timer.  */
+ 213:ThreadX/common/src/tx_timer_expiration_process.c ****                     if (current_timer == next_timer)
+ 214:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 215:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 216:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Yes, this is the only timer in the list.  */
+ 217:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 218:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Set the head pointer to NULL.  */
+ 219:ThreadX/common/src/tx_timer_expiration_process.c ****                         expired_timers =  TX_NULL;
+ 220:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 221:ThreadX/common/src/tx_timer_expiration_process.c ****                     else
+ 222:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 223:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 224:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* No, not the only expired timer.  */
+ 225:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 226:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Remove this timer from the expired list.  */
+ 227:ThreadX/common/src/tx_timer_expiration_process.c ****                         previous_timer =                                   current_timer -> tx_time
+ 228:ThreadX/common/src/tx_timer_expiration_process.c ****                         next_timer -> tx_timer_internal_active_previous =  previous_timer;
+ 229:ThreadX/common/src/tx_timer_expiration_process.c ****                         previous_timer -> tx_timer_internal_active_next =  next_timer;
+ 230:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 231:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Modify the next timer's list head to point at the current list head.  */
+ 232:ThreadX/common/src/tx_timer_expiration_process.c ****                         next_timer -> tx_timer_internal_list_head =  &expired_timers;
+ 233:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 234:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Set the list head pointer.  */
+ 235:ThreadX/common/src/tx_timer_expiration_process.c ****                         expired_timers =  next_timer;
+ 236:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 237:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 238:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* In any case, the timer is now off of the expired list.  */
+ 239:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 240:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Determine if the timer has expired or if it is just a really
+ 241:ThreadX/common/src/tx_timer_expiration_process.c ****                        big timer that needs to be placed in the list again.  */
+ 242:ThreadX/common/src/tx_timer_expiration_process.c ****                     if (current_timer -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
+ 243:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 244:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 245:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Timer is bigger than the timer entries and must be
+ 246:ThreadX/common/src/tx_timer_expiration_process.c ****                            rescheduled.  */
+ 247:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 248:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
+ 249:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 250:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Increment the total expiration adjustments counter.  */
+ 251:ThreadX/common/src/tx_timer_expiration_process.c ****                         _tx_timer_performance__expiration_adjust_count++;
+ 252:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 253:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Determine if this is an application timer.  */
+ 254:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_time
+ 255:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 256:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 257:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Derive the application timer pointer.  */
+ 258:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ARM GAS  /tmp/cc90j151.s 			page 17
+
+
+ 259:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Pickup the application timer pointer.  */
+ 260:ThreadX/common/src/tx_timer_expiration_process.c ****                             TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
+ 261:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 262:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Increment the number of expiration adjustments on this timer.  */
+ 263:ThreadX/common/src/tx_timer_expiration_process.c ****                             if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
+ 264:ThreadX/common/src/tx_timer_expiration_process.c ****                             {
+ 265:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 266:ThreadX/common/src/tx_timer_expiration_process.c ****                                 timer_ptr -> tx_timer_performance__expiration_adjust_count++;
+ 267:ThreadX/common/src/tx_timer_expiration_process.c ****                             }
+ 268:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 269:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 270:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 271:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Decrement the remaining ticks of the timer.  */
+ 272:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_remaining_ticks =
+ 273:ThreadX/common/src/tx_timer_expiration_process.c ****                                 current_timer -> tx_timer_internal_remaining_ticks - TX_TIMER_ENTRI
+ 274:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 275:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Set the timeout function to NULL in order to bypass the
+ 276:ThreadX/common/src/tx_timer_expiration_process.c ****                            expiration.  */
+ 277:ThreadX/common/src/tx_timer_expiration_process.c ****                         timeout_function =  TX_NULL;
+ 278:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 279:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Make the timer appear that it is still active while interrupts
+ 280:ThreadX/common/src/tx_timer_expiration_process.c ****                            are enabled.  This will permit proper processing of a timer
+ 281:ThreadX/common/src/tx_timer_expiration_process.c ****                            deactivate from an ISR.  */
+ 282:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_list_head =    &reactivate_timer;
+ 283:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_active_next =  current_timer;
+ 284:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 285:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Setup the temporary timer list head pointer.  */
+ 286:ThreadX/common/src/tx_timer_expiration_process.c ****                         reactivate_timer =  current_timer;
+ 287:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 288:ThreadX/common/src/tx_timer_expiration_process.c ****                     else
+ 289:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 290:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 291:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Timer did expire.  */
+ 292:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 293:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
+ 294:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 295:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Increment the total expirations counter.  */
+ 296:ThreadX/common/src/tx_timer_expiration_process.c ****                         _tx_timer_performance_expiration_count++;
+ 297:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 298:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Determine if this is an application timer.  */
+ 299:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_time
+ 300:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 301:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 302:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Derive the application timer pointer.  */
+ 303:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 304:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Pickup the application timer pointer.  */
+ 305:ThreadX/common/src/tx_timer_expiration_process.c ****                             TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
+ 306:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 307:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Increment the number of expirations on this timer.  */
+ 308:ThreadX/common/src/tx_timer_expiration_process.c ****                             if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
+ 309:ThreadX/common/src/tx_timer_expiration_process.c ****                             {
+ 310:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 311:ThreadX/common/src/tx_timer_expiration_process.c ****                                 timer_ptr -> tx_timer_performance_expiration_count++;
+ 312:ThreadX/common/src/tx_timer_expiration_process.c ****                             }
+ 313:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 314:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 315:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ARM GAS  /tmp/cc90j151.s 			page 18
+
+
+ 316:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Copy the calling function and ID into local variables before interrupts
+ 317:ThreadX/common/src/tx_timer_expiration_process.c ****                            are re-enabled.  */
+ 318:ThreadX/common/src/tx_timer_expiration_process.c ****                         timeout_function =  current_timer -> tx_timer_internal_timeout_function;
+ 319:ThreadX/common/src/tx_timer_expiration_process.c ****                         timeout_param =     current_timer -> tx_timer_internal_timeout_param;
+ 320:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 321:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Copy the reinitialize ticks into the remaining ticks.  */
+ 322:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_remaining_ticks =  current_timer -> tx_t
+ 323:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 324:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Determine if the timer should be reactivated.  */
+ 325:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (current_timer -> tx_timer_internal_remaining_ticks != ((ULONG) 0))
+ 326:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 327:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 328:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Make the timer appear that it is still active while processing
+ 329:ThreadX/common/src/tx_timer_expiration_process.c ****                                the expiration routine and with interrupts enabled.  This will
+ 330:ThreadX/common/src/tx_timer_expiration_process.c ****                                permit proper processing of a timer deactivate from both the
+ 331:ThreadX/common/src/tx_timer_expiration_process.c ****                                expiration routine and an ISR.  */
+ 332:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_list_head =    &reactivate_timer;
+ 333:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_active_next =  current_timer;
+ 334:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 335:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Setup the temporary timer list head pointer.  */
+ 336:ThreadX/common/src/tx_timer_expiration_process.c ****                             reactivate_timer =  current_timer;
+ 337:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 338:ThreadX/common/src/tx_timer_expiration_process.c ****                         else
+ 339:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 340:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 341:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Set the list pointer of this timer to NULL.  This is used to indicat
+ 342:ThreadX/common/src/tx_timer_expiration_process.c ****                                the timer is no longer active.  */
+ 343:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_list_head =  TX_NULL;
+ 344:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 345:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 346:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 347:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Set pointer to indicate the expired timer that is currently being processed.
+ 348:ThreadX/common/src/tx_timer_expiration_process.c ****                     _tx_timer_expired_timer_ptr =  current_timer;
+ 349:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 350:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Restore interrupts for timer expiration call.  */
+ 351:ThreadX/common/src/tx_timer_expiration_process.c ****                     TX_RESTORE
+ 352:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 353:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Call the timer-expiration function, if non-NULL.  */
+ 354:ThreadX/common/src/tx_timer_expiration_process.c ****                     if (timeout_function != TX_NULL)
+ 355:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 356:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 357:ThreadX/common/src/tx_timer_expiration_process.c ****                         (timeout_function) (timeout_param);
+ 358:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 359:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 360:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Lockout interrupts again.  */
+ 361:ThreadX/common/src/tx_timer_expiration_process.c ****                     TX_DISABLE
+ 362:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 363:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Clear expired timer pointer.  */
+ 364:ThreadX/common/src/tx_timer_expiration_process.c ****                     _tx_timer_expired_timer_ptr =  TX_NULL;
+ 365:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 366:ThreadX/common/src/tx_timer_expiration_process.c ****                     /* Determine if the timer needs to be reactivated.  */
+ 367:ThreadX/common/src/tx_timer_expiration_process.c ****                     if (reactivate_timer == current_timer)
+ 368:ThreadX/common/src/tx_timer_expiration_process.c ****                     {
+ 369:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 370:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Reactivate the timer.  */
+ 371:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 372:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_TIMER_ENABLE_PERFORMANCE_INFO
+ARM GAS  /tmp/cc90j151.s 			page 19
+
+
+ 373:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 374:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Determine if this timer expired.  */
+ 375:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (timeout_function != TX_NULL)
+ 376:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 377:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 378:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Increment the total reactivations counter.  */
+ 379:ThreadX/common/src/tx_timer_expiration_process.c ****                             _tx_timer_performance_reactivate_count++;
+ 380:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 381:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Determine if this is an application timer.  */
+ 382:ThreadX/common/src/tx_timer_expiration_process.c ****                             if (current_timer -> tx_timer_internal_timeout_function != &_tx_thread_
+ 383:ThreadX/common/src/tx_timer_expiration_process.c ****                             {
+ 384:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 385:ThreadX/common/src/tx_timer_expiration_process.c ****                                 /* Derive the application timer pointer.  */
+ 386:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 387:ThreadX/common/src/tx_timer_expiration_process.c ****                                 /* Pickup the application timer pointer.  */
+ 388:ThreadX/common/src/tx_timer_expiration_process.c ****                                 TX_USER_TIMER_POINTER_GET(current_timer, timer_ptr)
+ 389:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 390:ThreadX/common/src/tx_timer_expiration_process.c ****                                 /* Increment the number of expirations on this timer.  */
+ 391:ThreadX/common/src/tx_timer_expiration_process.c ****                                 if (timer_ptr -> tx_timer_id == TX_TIMER_ID)
+ 392:ThreadX/common/src/tx_timer_expiration_process.c ****                                 {
+ 393:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 394:ThreadX/common/src/tx_timer_expiration_process.c ****                                     timer_ptr -> tx_timer_performance_reactivate_count++;
+ 395:ThreadX/common/src/tx_timer_expiration_process.c ****                                 }
+ 396:ThreadX/common/src/tx_timer_expiration_process.c ****                             }
+ 397:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 398:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 399:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 400:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 401:ThreadX/common/src/tx_timer_expiration_process.c **** #ifdef TX_REACTIVATE_INLINE
+ 402:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 403:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Calculate the amount of time remaining for the timer.  */
+ 404:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (current_timer -> tx_timer_internal_remaining_ticks > TX_TIMER_ENTRIES)
+ 405:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 406:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 407:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Set expiration time to the maximum number of entries.  */
+ 408:ThreadX/common/src/tx_timer_expiration_process.c ****                             expiration_time =  TX_TIMER_ENTRIES - ((UINT) 1);
+ 409:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 410:ThreadX/common/src/tx_timer_expiration_process.c ****                         else
+ 411:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 412:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 413:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Timer value fits in the timer entries.  */
+ 414:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 415:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Set the expiration time.  */
+ 416:ThreadX/common/src/tx_timer_expiration_process.c ****                             expiration_time =  ((UINT) current_timer -> tx_timer_internal_remaining
+ 417:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 418:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 419:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* At this point, we are ready to put the timer back on one of
+ 420:ThreadX/common/src/tx_timer_expiration_process.c ****                            the timer lists.  */
+ 421:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 422:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Calculate the proper place for the timer.  */
+ 423:ThreadX/common/src/tx_timer_expiration_process.c ****                         timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_current_ptr, expiration_time);
+ 424:ThreadX/common/src/tx_timer_expiration_process.c ****                         if (TX_TIMER_INDIRECT_TO_VOID_POINTER_CONVERT(timer_list) >= TX_TIMER_INDIR
+ 425:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 426:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 427:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Wrap from the beginning of the list.  */
+ 428:ThreadX/common/src/tx_timer_expiration_process.c ****                             delta =  TX_TIMER_POINTER_DIF(timer_list, _tx_timer_list_end);
+ 429:ThreadX/common/src/tx_timer_expiration_process.c ****                             timer_list =  TX_TIMER_POINTER_ADD(_tx_timer_list_start, delta);
+ARM GAS  /tmp/cc90j151.s 			page 20
+
+
+ 430:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 431:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 432:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Now put the timer on this list.  */
+ 433:ThreadX/common/src/tx_timer_expiration_process.c ****                         if ((*timer_list) == TX_NULL)
+ 434:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 435:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 436:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* This list is NULL, just put the new timer on it.  */
+ 437:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 438:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Setup the links in this timer.  */
+ 439:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_active_next =      current_timer;
+ 440:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_active_previous =  current_timer;
+ 441:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 442:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* Setup the list head pointer.  */
+ 443:ThreadX/common/src/tx_timer_expiration_process.c ****                             *timer_list =  current_timer;
+ 444:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 445:ThreadX/common/src/tx_timer_expiration_process.c ****                         else
+ 446:ThreadX/common/src/tx_timer_expiration_process.c ****                         {
+ 447:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 448:ThreadX/common/src/tx_timer_expiration_process.c ****                             /* This list is not NULL, add current timer to the end. */
+ 449:ThreadX/common/src/tx_timer_expiration_process.c ****                             next_timer =                                          *timer_list;
+ 450:ThreadX/common/src/tx_timer_expiration_process.c ****                             previous_timer =                                      next_timer -> tx_
+ 451:ThreadX/common/src/tx_timer_expiration_process.c ****                             previous_timer -> tx_timer_internal_active_next =     current_timer;
+ 452:ThreadX/common/src/tx_timer_expiration_process.c ****                             next_timer -> tx_timer_internal_active_previous =     current_timer;
+ 453:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_active_next =      next_timer;
+ 454:ThreadX/common/src/tx_timer_expiration_process.c ****                             current_timer -> tx_timer_internal_active_previous =  previous_timer;
+ 455:ThreadX/common/src/tx_timer_expiration_process.c ****                         }
+ 456:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 457:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Setup list head pointer.  */
+ 458:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_list_head =  timer_list;
+ 459:ThreadX/common/src/tx_timer_expiration_process.c **** #else
+ 460:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 461:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Reactivate through the timer activate function.  */
+ 462:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 463:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Clear the list head for the timer activate call.  */
+ 464:ThreadX/common/src/tx_timer_expiration_process.c ****                         current_timer -> tx_timer_internal_list_head = TX_NULL;
+ 465:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 466:ThreadX/common/src/tx_timer_expiration_process.c ****                         /* Activate the current timer.  */
+ 467:ThreadX/common/src/tx_timer_expiration_process.c ****                         _tx_timer_system_activate(current_timer);
+ 468:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 469:ThreadX/common/src/tx_timer_expiration_process.c ****                     }
+ 470:ThreadX/common/src/tx_timer_expiration_process.c ****                 }
+ 471:ThreadX/common/src/tx_timer_expiration_process.c ****             } while (_tx_timer_expired != TX_FALSE);
+ 472:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 473:ThreadX/common/src/tx_timer_expiration_process.c ****             /* Clear the timer interrupt processing active flag.  */
+ 474:ThreadX/common/src/tx_timer_expiration_process.c ****             _tx_timer_processing_active =  TX_FALSE;
+ 475:ThreadX/common/src/tx_timer_expiration_process.c ****         }
+ 476:ThreadX/common/src/tx_timer_expiration_process.c ****     }
+ 477:ThreadX/common/src/tx_timer_expiration_process.c **** 
+ 478:ThreadX/common/src/tx_timer_expiration_process.c ****     /* Restore interrupts.  */
+ 479:ThreadX/common/src/tx_timer_expiration_process.c ****     TX_RESTORE
+ 480:ThreadX/common/src/tx_timer_expiration_process.c **** #endif
+ 481:ThreadX/common/src/tx_timer_expiration_process.c **** }
+  80              		.loc 1 481 0
+  81 001a 08BD     		pop	{r3, pc}
+  82              	.L4:
+  83              		.align	2
+  84              	.L3:
+ARM GAS  /tmp/cc90j151.s 			page 21
+
+
+  85 001c 00000000 		.word	_tx_thread_preempt_disable
+  86 0020 00000000 		.word	_tx_timer_thread
+  87              		.cfi_endproc
+  88              	.LFE8:
+  90              		.text
+  91              	.Letext0:
+  92              		.file 3 "/usr/include/newlib/sys/lock.h"
+  93              		.file 4 "/usr/include/newlib/sys/_types.h"
+  94              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+  95              		.file 6 "/usr/include/newlib/sys/reent.h"
+  96              		.file 7 "/usr/include/newlib/stdlib.h"
+  97              		.file 8 "ThreadX/common/inc/tx_api.h"
+  98              		.file 9 "ThreadX/common/inc/tx_timer.h"
+  99              		.file 10 "ThreadX/common/inc/tx_thread.h"
+ARM GAS  /tmp/cc90j151.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 tx_timer_expiration_process.c
+     /tmp/cc90j151.s:18     .text._tx_timer_expiration_process:0000000000000000 $t
+     /tmp/cc90j151.s:25     .text._tx_timer_expiration_process:0000000000000000 _tx_timer_expiration_process
+     /tmp/cc90j151.s:85     .text._tx_timer_expiration_process:000000000000001c $d
+
+UNDEFINED SYMBOLS
+_tx_thread_system_resume
+_tx_thread_preempt_disable
+_tx_timer_thread

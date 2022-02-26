@@ -13,6 +13,20 @@ FreeRTOS-Plus   //第三方产品
 /*******************************************************************************
         => FreeRTOS 移植
 *******************************************************************************/
+// freertos
+//_____________________________________________________________
+FreeRTOSConfig.h        //FreeRTOS配置文件
+include/
+portable/
+list.c
+tasks.c
+queue.c
+timers.c
+croutine.c
+event_groups.c
+stream_buffer.c
+
+
 // stm32f10x_it.c
 //_____________________________________________________________
 extern void xPortSysTickHandler(void);
@@ -29,7 +43,7 @@ void SysTick_Handler(void)
         
 }
 
-
+// 注释下面文件 
 /*void SVC_Handler(void)
 {
 }*/
