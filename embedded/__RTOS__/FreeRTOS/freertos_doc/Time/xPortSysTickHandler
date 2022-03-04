@@ -19,7 +19,7 @@ void xPortSysTickHandler(void)
 {
         vPortRaiseBASEPRI();
         if (xTaskIncrementTick() != pdFALSE) {
-                //时行任务切换
+                //运行任务切换
                 portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
         }
         vPortClearBASEPRIFromISR();
@@ -41,6 +41,7 @@ BaseType_t xTaskIncrementTick( void )
                         mtCOVERAGE_TEST_MARKER();
                 }
 
+                //判断是否有任务延时完成
                 if ( xConstTickCount >= xNextTaskUnblockTime ) {
                         for ( ; ; ) {
                                 if ( listLIST_IS_EMPTY( pxDelayedTaskList ) != pdFALSE ) {

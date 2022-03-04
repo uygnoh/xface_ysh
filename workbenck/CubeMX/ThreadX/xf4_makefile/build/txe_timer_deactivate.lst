@@ -1,0 +1,212 @@
+ARM GAS  /tmp/cc4eNYPU.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"txe_timer_deactivate.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._txe_timer_deactivate,"ax",%progbits
+  18              		.align	1
+  19              		.global	_txe_timer_deactivate
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_txe_timer_deactivate:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/txe_timer_deactivate.c"
+   1:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+   2:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+   3:ThreadX/common/src/txe_timer_deactivate.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+   5:ThreadX/common/src/txe_timer_deactivate.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/txe_timer_deactivate.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/txe_timer_deactivate.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/txe_timer_deactivate.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  10:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  11:ThreadX/common/src/txe_timer_deactivate.c **** 
+  12:ThreadX/common/src/txe_timer_deactivate.c **** 
+  13:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  14:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  15:ThreadX/common/src/txe_timer_deactivate.c **** /**                                                                       */
+  16:ThreadX/common/src/txe_timer_deactivate.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/txe_timer_deactivate.c **** /**                                                                       */
+  18:ThreadX/common/src/txe_timer_deactivate.c **** /**   Timer                                                               */
+  19:ThreadX/common/src/txe_timer_deactivate.c **** /**                                                                       */
+  20:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  21:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  22:ThreadX/common/src/txe_timer_deactivate.c **** 
+  23:ThreadX/common/src/txe_timer_deactivate.c **** #define TX_SOURCE_CODE
+  24:ThreadX/common/src/txe_timer_deactivate.c **** 
+  25:ThreadX/common/src/txe_timer_deactivate.c **** 
+  26:ThreadX/common/src/txe_timer_deactivate.c **** /* Include necessary system files.  */
+  27:ThreadX/common/src/txe_timer_deactivate.c **** 
+  28:ThreadX/common/src/txe_timer_deactivate.c **** #include "tx_api.h"
+  29:ThreadX/common/src/txe_timer_deactivate.c **** #include "tx_timer.h"
+  30:ThreadX/common/src/txe_timer_deactivate.c **** 
+  31:ThreadX/common/src/txe_timer_deactivate.c **** 
+ARM GAS  /tmp/cc4eNYPU.s 			page 2
+
+
+  32:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  33:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  34:ThreadX/common/src/txe_timer_deactivate.c **** /*  FUNCTION                                               RELEASE        */
+  35:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  36:ThreadX/common/src/txe_timer_deactivate.c **** /*    _txe_timer_deactivate                               PORTABLE C      */
+  37:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                           6.1          */
+  38:ThreadX/common/src/txe_timer_deactivate.c **** /*  AUTHOR                                                                */
+  39:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  40:ThreadX/common/src/txe_timer_deactivate.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  41:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  42:ThreadX/common/src/txe_timer_deactivate.c **** /*  DESCRIPTION                                                           */
+  43:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  44:ThreadX/common/src/txe_timer_deactivate.c **** /*    This function checks for errors in the deactivate application timer */
+  45:ThreadX/common/src/txe_timer_deactivate.c **** /*    function call.                                                      */
+  46:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  47:ThreadX/common/src/txe_timer_deactivate.c **** /*  INPUT                                                                 */
+  48:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  49:ThreadX/common/src/txe_timer_deactivate.c **** /*    timer_ptr                         Pointer to timer control block    */
+  50:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  51:ThreadX/common/src/txe_timer_deactivate.c **** /*  OUTPUT                                                                */
+  52:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  53:ThreadX/common/src/txe_timer_deactivate.c **** /*    TX_TIMER_ERROR                    Invalid application timer pointer */
+  54:ThreadX/common/src/txe_timer_deactivate.c **** /*    status                            Actual completion status          */
+  55:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  56:ThreadX/common/src/txe_timer_deactivate.c **** /*  CALLS                                                                 */
+  57:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  58:ThreadX/common/src/txe_timer_deactivate.c **** /*    _tx_timer_deactivate              Actual timer deactivation function*/
+  59:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  60:ThreadX/common/src/txe_timer_deactivate.c **** /*  CALLED BY                                                             */
+  61:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  62:ThreadX/common/src/txe_timer_deactivate.c **** /*    Application Code                                                    */
+  63:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  64:ThreadX/common/src/txe_timer_deactivate.c **** /*  RELEASE HISTORY                                                       */
+  65:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  66:ThreadX/common/src/txe_timer_deactivate.c **** /*    DATE              NAME                      DESCRIPTION             */
+  67:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  68:ThreadX/common/src/txe_timer_deactivate.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  69:ThreadX/common/src/txe_timer_deactivate.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+  70:ThreadX/common/src/txe_timer_deactivate.c **** /*                                            resulting in version 6.1    */
+  71:ThreadX/common/src/txe_timer_deactivate.c **** /*                                                                        */
+  72:ThreadX/common/src/txe_timer_deactivate.c **** /**************************************************************************/
+  73:ThreadX/common/src/txe_timer_deactivate.c **** UINT  _txe_timer_deactivate(TX_TIMER *timer_ptr)
+  74:ThreadX/common/src/txe_timer_deactivate.c **** {
+  28              		.loc 1 74 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  75:ThreadX/common/src/txe_timer_deactivate.c **** 
+  76:ThreadX/common/src/txe_timer_deactivate.c **** UINT    status;
+  77:ThreadX/common/src/txe_timer_deactivate.c **** 
+  78:ThreadX/common/src/txe_timer_deactivate.c **** 
+  79:ThreadX/common/src/txe_timer_deactivate.c ****     /* Check for an invalid timer pointer.  */
+  80:ThreadX/common/src/txe_timer_deactivate.c ****     if (timer_ptr == TX_NULL)
+  33              		.loc 1 80 0
+  34 0000 48B1     		cbz	r0, .L3
+  74:ThreadX/common/src/txe_timer_deactivate.c **** 
+ARM GAS  /tmp/cc4eNYPU.s 			page 3
+
+
+  35              		.loc 1 74 0
+  36 0002 08B5     		push	{r3, lr}
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 8
+  39              		.cfi_offset 3, -8
+  40              		.cfi_offset 14, -4
+  81:ThreadX/common/src/txe_timer_deactivate.c ****     {
+  82:ThreadX/common/src/txe_timer_deactivate.c **** 
+  83:ThreadX/common/src/txe_timer_deactivate.c ****         /* Timer pointer is invalid, return appropriate error code.  */
+  84:ThreadX/common/src/txe_timer_deactivate.c ****         status =  TX_TIMER_ERROR;
+  85:ThreadX/common/src/txe_timer_deactivate.c ****     }
+  86:ThreadX/common/src/txe_timer_deactivate.c **** 
+  87:ThreadX/common/src/txe_timer_deactivate.c ****     /* Now check for invalid timer ID.  */
+  88:ThreadX/common/src/txe_timer_deactivate.c ****     else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
+  41              		.loc 1 88 0
+  42 0004 0168     		ldr	r1, [r0]
+  43 0006 054A     		ldr	r2, .L10
+  44 0008 9142     		cmp	r1, r2
+  45 000a 01D0     		beq	.L9
+  89:ThreadX/common/src/txe_timer_deactivate.c ****     {
+  90:ThreadX/common/src/txe_timer_deactivate.c **** 
+  91:ThreadX/common/src/txe_timer_deactivate.c ****         /* Timer pointer is invalid, return appropriate error code.  */
+  92:ThreadX/common/src/txe_timer_deactivate.c ****         status =  TX_TIMER_ERROR;
+  46              		.loc 1 92 0
+  47 000c 1520     		movs	r0, #21
+  48              	.LVL1:
+  49              	.L1:
+  93:ThreadX/common/src/txe_timer_deactivate.c ****     }
+  94:ThreadX/common/src/txe_timer_deactivate.c ****     else
+  95:ThreadX/common/src/txe_timer_deactivate.c ****     {
+  96:ThreadX/common/src/txe_timer_deactivate.c **** 
+  97:ThreadX/common/src/txe_timer_deactivate.c ****         /* Call actual application timer deactivate function.  */
+  98:ThreadX/common/src/txe_timer_deactivate.c ****         status =  _tx_timer_deactivate(timer_ptr);
+  99:ThreadX/common/src/txe_timer_deactivate.c ****     }
+ 100:ThreadX/common/src/txe_timer_deactivate.c **** 
+ 101:ThreadX/common/src/txe_timer_deactivate.c ****     /* Return completion status.  */
+ 102:ThreadX/common/src/txe_timer_deactivate.c ****     return(status);
+ 103:ThreadX/common/src/txe_timer_deactivate.c **** }
+  50              		.loc 1 103 0
+  51 000e 08BD     		pop	{r3, pc}
+  52              	.LVL2:
+  53              	.L9:
+  98:ThreadX/common/src/txe_timer_deactivate.c ****     }
+  54              		.loc 1 98 0
+  55 0010 FFF7FEFF 		bl	_tx_timer_deactivate
+  56              	.LVL3:
+  57 0014 FBE7     		b	.L1
+  58              	.LVL4:
+  59              	.L3:
+  60              	.LCFI1:
+  61              		.cfi_def_cfa_offset 0
+  62              		.cfi_restore 3
+  63              		.cfi_restore 14
+  84:ThreadX/common/src/txe_timer_deactivate.c ****     }
+  64              		.loc 1 84 0
+  65 0016 1520     		movs	r0, #21
+  66              	.LVL5:
+ARM GAS  /tmp/cc4eNYPU.s 			page 4
+
+
+  67              		.loc 1 103 0
+  68 0018 7047     		bx	lr
+  69              	.L11:
+  70 001a 00BF     		.align	2
+  71              	.L10:
+  72 001c 4D495441 		.word	1096042829
+  73              		.cfi_endproc
+  74              	.LFE8:
+  76              		.text
+  77              	.Letext0:
+  78              		.file 2 "/usr/include/newlib/sys/lock.h"
+  79              		.file 3 "/usr/include/newlib/sys/_types.h"
+  80              		.file 4 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+  81              		.file 5 "/usr/include/newlib/sys/reent.h"
+  82              		.file 6 "/usr/include/newlib/stdlib.h"
+  83              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+  84              		.file 8 "ThreadX/common/inc/tx_api.h"
+  85              		.file 9 "ThreadX/common/inc/tx_timer.h"
+ARM GAS  /tmp/cc4eNYPU.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 txe_timer_deactivate.c
+     /tmp/cc4eNYPU.s:18     .text._txe_timer_deactivate:0000000000000000 $t
+     /tmp/cc4eNYPU.s:25     .text._txe_timer_deactivate:0000000000000000 _txe_timer_deactivate
+     /tmp/cc4eNYPU.s:72     .text._txe_timer_deactivate:000000000000001c $d
+
+UNDEFINED SYMBOLS
+_tx_timer_deactivate

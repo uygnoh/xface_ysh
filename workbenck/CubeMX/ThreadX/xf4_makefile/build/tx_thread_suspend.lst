@@ -1,0 +1,1732 @@
+ARM GAS  /tmp/ccLRbzKC.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"tx_thread_suspend.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._tx_thread_suspend,"ax",%progbits
+  18              		.align	1
+  19              		.global	_tx_thread_suspend
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_tx_thread_suspend:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/tx_thread_suspend.c"
+   1:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+   2:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+   3:ThreadX/common/src/tx_thread_suspend.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+   5:ThreadX/common/src/tx_thread_suspend.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/tx_thread_suspend.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/tx_thread_suspend.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/tx_thread_suspend.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  10:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  11:ThreadX/common/src/tx_thread_suspend.c **** 
+  12:ThreadX/common/src/tx_thread_suspend.c **** 
+  13:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  14:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  15:ThreadX/common/src/tx_thread_suspend.c **** /**                                                                       */
+  16:ThreadX/common/src/tx_thread_suspend.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/tx_thread_suspend.c **** /**                                                                       */
+  18:ThreadX/common/src/tx_thread_suspend.c **** /**   Thread                                                              */
+  19:ThreadX/common/src/tx_thread_suspend.c **** /**                                                                       */
+  20:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  21:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  22:ThreadX/common/src/tx_thread_suspend.c **** #define TX_SOURCE_CODE
+  23:ThreadX/common/src/tx_thread_suspend.c **** 
+  24:ThreadX/common/src/tx_thread_suspend.c **** /* Include necessary system files.  */
+  25:ThreadX/common/src/tx_thread_suspend.c **** #include "tx_api.h"
+  26:ThreadX/common/src/tx_thread_suspend.c **** #include "tx_trace.h"
+  27:ThreadX/common/src/tx_thread_suspend.c **** #include "tx_thread.h"
+  28:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_INLINE_THREAD_RESUME_SUSPEND
+  29:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_NO_TIMER
+  30:ThreadX/common/src/tx_thread_suspend.c **** #include "tx_timer.h"
+  31:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ARM GAS  /tmp/ccLRbzKC.s 			page 2
+
+
+  32:ThreadX/common/src/tx_thread_suspend.c **** #endif
+  33:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  34:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  35:ThreadX/common/src/tx_thread_suspend.c **** /*  FUNCTION                                               RELEASE        */
+  36:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  37:ThreadX/common/src/tx_thread_suspend.c **** /*    _tx_thread_suspend                                  PORTABLE C      */
+  38:ThreadX/common/src/tx_thread_suspend.c **** /*                                                           6.1.1        */
+  39:ThreadX/common/src/tx_thread_suspend.c **** /*  AUTHOR                                                                */
+  40:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  41:ThreadX/common/src/tx_thread_suspend.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  42:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  43:ThreadX/common/src/tx_thread_suspend.c **** /*  DESCRIPTION                                                           */
+  44:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  45:ThreadX/common/src/tx_thread_suspend.c **** /*    This function handles application suspend requests.  If the suspend */
+  46:ThreadX/common/src/tx_thread_suspend.c **** /*    requires actual processing, this function calls the actual suspend  */
+  47:ThreadX/common/src/tx_thread_suspend.c **** /*    thread routine.                                                     */
+  48:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  49:ThreadX/common/src/tx_thread_suspend.c **** /*  INPUT                                                                 */
+  50:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  51:ThreadX/common/src/tx_thread_suspend.c **** /*    thread_ptr                            Pointer to thread to suspend  */
+  52:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  53:ThreadX/common/src/tx_thread_suspend.c **** /*  OUTPUT                                                                */
+  54:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  55:ThreadX/common/src/tx_thread_suspend.c **** /*    status                                Return completion status      */
+  56:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  57:ThreadX/common/src/tx_thread_suspend.c **** /*  CALLS                                                                 */
+  58:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  59:ThreadX/common/src/tx_thread_suspend.c **** /*    _tx_thread_system_suspend         Actual thread suspension          */
+  60:ThreadX/common/src/tx_thread_suspend.c **** /*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+  61:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  62:ThreadX/common/src/tx_thread_suspend.c **** /*  CALLED BY                                                             */
+  63:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  64:ThreadX/common/src/tx_thread_suspend.c **** /*    Application code                                                    */
+  65:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  66:ThreadX/common/src/tx_thread_suspend.c **** /*  RELEASE HISTORY                                                       */
+  67:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  68:ThreadX/common/src/tx_thread_suspend.c **** /*    DATE              NAME                      DESCRIPTION             */
+  69:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  70:ThreadX/common/src/tx_thread_suspend.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  71:ThreadX/common/src/tx_thread_suspend.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+  72:ThreadX/common/src/tx_thread_suspend.c **** /*                                            resulting in version 6.1    */
+  73:ThreadX/common/src/tx_thread_suspend.c **** /*  10-16-2020     Yuxin Zhou               Modified comment(s), and      */
+  74:ThreadX/common/src/tx_thread_suspend.c **** /*                                            added type cast to address  */
+  75:ThreadX/common/src/tx_thread_suspend.c **** /*                                            a MISRA compliance issue,   */
+  76:ThreadX/common/src/tx_thread_suspend.c **** /*                                            resulting in version 6.1.1  */
+  77:ThreadX/common/src/tx_thread_suspend.c **** /*                                                                        */
+  78:ThreadX/common/src/tx_thread_suspend.c **** /**************************************************************************/
+  79:ThreadX/common/src/tx_thread_suspend.c **** UINT  _tx_thread_suspend(TX_THREAD *thread_ptr)
+  80:ThreadX/common/src/tx_thread_suspend.c **** {
+  28              		.loc 1 80 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 38B5     		push	{r3, r4, r5, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 16
+ARM GAS  /tmp/ccLRbzKC.s 			page 3
+
+
+  36              		.cfi_offset 3, -16
+  37              		.cfi_offset 4, -12
+  38              		.cfi_offset 5, -8
+  39              		.cfi_offset 14, -4
+  40              	.LBB14:
+  41              	.LBB15:
+  42              	.LBB16:
+  43              	.LBB17:
+  44              		.file 2 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+   1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+   2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   5:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
+   9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  10:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  11:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  12:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  13:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  14:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  15:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  16:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /** ThreadX Component                                                     */
+  17:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  18:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**   Port Specific                                                       */
+  19:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  20:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  21:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  22:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  23:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  24:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  25:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  26:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+  27:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  28:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    tx_port.h                                         Cortex-M4/GNU     */
+  29:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                           6.1.10       */
+  30:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  31:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  AUTHOR                                                                */
+  32:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  33:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    Scott Larson, Microsoft Corporation                                 */
+  34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  35:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  DESCRIPTION                                                           */
+  36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
+  38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
+  39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
+  40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
+  41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
+  42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
+  43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
+  44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
+  45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
+  47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
+  48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+ARM GAS  /tmp/ccLRbzKC.s 			page 4
+
+
+  49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
+  50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
+  52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+  54:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  01-31-2022      Scott Larson            Modified comments, updated    */
+  55:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            typedef to fix misra        */
+  56:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            violation,                  */
+  57:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            fixed predefined macro,     */
+  58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
+  59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  61:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  62:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_PORT_H
+  63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
+  64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
+  67:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  68:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_INCLUDE_USER_DEFINE_FILE
+  69:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  70:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Yes, include the user defines in tx_user.h. The defines in this file may
+  71:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    alternately be defined on the command line.  */
+  72:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  73:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_user.h"
+  74:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  75:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  76:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  77:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define compiler library include files.  */
+  78:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  79:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <stdlib.h>
+  80:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <string.h>
+  81:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  82:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__
+  83:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <intrinsics.h>                     /* IAR Intrinsics */
+  84:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __asm__ __asm                       /* Define to make all inline asm look similar */
+  85:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+  86:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <yvals.h>
+  87:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  88:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif /* __ICCARM__ */
+  89:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  90:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+  91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
+  92:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_ghs.h"
+  93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+  94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
+  97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
+  98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
+  99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
+ 102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
+ 103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
+ARM GAS  /tmp/ccLRbzKC.s 			page 5
+
+
+ 106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
+ 108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
+ 109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
+ 110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
+ 111:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned int                            UINT;
+ 112:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef long                                    LONG;
+ 113:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long                           ULONG;
+ 114:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long long                      ULONG64;
+ 115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
+ 116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
+ 117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
+ 118:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 119:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the priority levels for ThreadX.  Legal values range
+ 120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
+ 121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
+ 123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
+ 124:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 125:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 126:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 127:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
+ 128:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    thread creation is less than this value, the thread create call will return an error.  */
+ 129:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 130:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MINIMUM_STACK
+ 131:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MINIMUM_STACK                        200         /* Minimum stack size for this port  */
+ 132:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 133:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 134:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 135:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the system timer thread's default stack size and priority.  These are only applicable
+ 136:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    if TX_TIMER_PROCESS_IN_ISR is not defined.  */
+ 137:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 138:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_STACK_SIZE
+ 139:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
+ 140:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 141:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 142:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_PRIORITY
+ 143:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
+ 144:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 145:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 146:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 147:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define various constants for the ThreadX Cortex-M port.  */
+ 148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 149:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_DISABLE                          1           /* Disable interrupts               */
+ 150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
+ 151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
+ 154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
+ 155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
+ 156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+ 158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
+ 159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
+ 161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ARM GAS  /tmp/ccLRbzKC.s 			page 6
+
+
+ 163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
+ 164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+ 165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
+ 168:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
+ 169:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 170:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 171:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_MASK
+ 172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
+ 173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 175:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+ 176:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define constants for Green Hills EventAnalyzer.  */
+ 177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
+ 179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
+ 180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 181:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EL_TICKS_PER_SECOND                  1000000
+ 182:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 183:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the method of how to get the upper and lower 32-bits of the time stamp. By default, simpl
+ 184:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    simulate the time-stamp source with a counter.  */
+ 185:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 186:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbu()                              _tx_el_time_base_upper
+ 187:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbl()                              ++_tx_el_time_base_lower
+ 188:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+ 189:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 190:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port specific options for the _tx_build_options variable. This variable indicates
+ 191:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    how the ThreadX library was built.  */
+ 192:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 193:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
+ 194:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 195:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 196:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the in-line initialization constant so that modules with in-line
+ 197:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    initialization capabilities can prevent their initialization from being
+ 198:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    a function call.  */
+ 199:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 200:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 201:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_DISABLE_INLINE
+ 202:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 203:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INLINE_INITIALIZATION
+ 204:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 206:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
+ 208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
+ 209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
+ 210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
+ 211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
+ 212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
+ 215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
+ 216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 7
+
+
+ 220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
+ 221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
+ 222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
+ 223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
+ 225:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_1
+ 226:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 227:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
+ 228:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ghs__)
+ 229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
+ 230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
+ 231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
+ 232:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 233:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2
+ 234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
+ 238:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 239:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 240:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 241:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port extensions of the remaining ThreadX objects.  */
+ 242:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 243:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_EXTENSION
+ 244:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_EXTENSION
+ 245:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_EXTENSION
+ 246:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_EXTENSION
+ 247:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_EXTENSION
+ 248:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_EXTENSION
+ 249:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_EXTENSION
+ 250:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 251:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 252:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the user extension field of the thread control block.  Nothing
+ 253:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    additional is needed for this port so it is defined as white space.  */
+ 254:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 255:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_USER_EXTENSION
+ 256:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_USER_EXTENSION
+ 257:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 258:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 259:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 260:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
+ 261:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    tx_thread_shell_entry, and tx_thread_terminate.  */
+ 262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 263:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
+ 266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
+ 268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
+ 269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
+ 270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
+ 272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
+ 273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
+ 274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
+ARM GAS  /tmp/ccLRbzKC.s 			page 8
+
+
+ 277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
+ 278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
+ 279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+ 282:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
+ 283:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 284:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 285:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP)
+ 286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 289:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_control_get(void);
+ 290:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_control_set(ULONG value);
+ 291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
+ 292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
+ 293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
+ 295:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 296:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define some helper functions (these are intrinsics in some compilers). */
+ 297:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __GNUC__ /* GCC and ARM Compiler 6 */
+ 298:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 299:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline ULONG __get_control_value(void)
+ 300:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 301:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 302:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 303:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,CONTROL ": "=r" (control_value) );
+ 304:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 305:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 306:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 307:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_control_value(ULONG control_value)
+ 308:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 309:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
+ 310:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 311:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 312:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ 313:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 314:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* ARM Compiler 5 */
+ 315:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 316:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) ULONG __get_control_value(void)
+ 317:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 318:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 320:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm volatile ("MRS control_value,CONTROL");
+ 321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
+ 325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
+ 327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
+ 329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
+ 330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
+ 331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
+ 333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ARM GAS  /tmp/ccLRbzKC.s 			page 9
+
+
+ 334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
+ 335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 339:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTR
+ 340:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    in order to ensure no lazy stacking will occur. */
+ 341:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 342:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 346:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  __get_control_value();    
+ 347:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
+ 349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 352:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 353:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 354:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_misra_control_get();  
+ 355:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 356:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_misra_control_set(_tx_vfp_state);      
+ 357:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 358:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 359:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 360:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 361:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A thread can be terminated by another thread, so we first check if it's self-terminating and not
+ 362:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread i
+ 363:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the F
+ 364:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    the lazy FPU save, then restore the CONTROL.FPCA state. */
+ 365:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 366:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 367:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 368:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 369:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 370:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 371:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 372:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 373:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 374:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  __get_control_value();
+ 375:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
+ 377:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
+ 382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
+ 387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ 388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
+ 389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ARM GAS  /tmp/ccLRbzKC.s 			page 10
+
+
+ 391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
+ 392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
+ 394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 396:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 397:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 398:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 399:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 403:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 404:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
+ 407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
+ 409:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 410:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 411:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 412:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 413:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_misra_fpccr_get();    
+ 414:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 415:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 416:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 417:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 418:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = _tx_misra_control_g
+ 419:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ 420:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_misra_vfp_touch();             
+ 421:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 422:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ 423:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_misra_cont
+ 424:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 425:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_misra_control_set(_tx_vfp_s
+ 426:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 427:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 428:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 429:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 430:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 431:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 432:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* No VFP in use */
+ 433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 434:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+ 435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+ 436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
+ 438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
+ 441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
+ 443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
+ 444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
+ 445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
+ 446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
+ 447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
+ARM GAS  /tmp/ccLRbzKC.s 			page 11
+
+
+ 448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
+ 449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
+ 452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 453:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
+ 454:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
+ 455:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
+ 456:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
+ 457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
+ 458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
+ 459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+ 460:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 461:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
+ 463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
+ 465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 466:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 467:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __CC_ARM /* ARM Compiler 5 */
+ 468:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 469:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** register unsigned int _ipsr __asm("ipsr");
+ 470:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _ipsr)
+ 471:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 472:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and ARM Compiler 6 */
+ 473:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 474:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_ipsr_value(void)
+ 475:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 476:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int  ipsr_value;
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,IPSR ": "=r" (ipsr_value) );
+ 478:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+ 479:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 480:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 481:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_ipsr_value())
+ 482:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 483:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)   /* IAR */
+ 484:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 485:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
+ 486:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 487:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE for different compilers */
+ 488:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 489:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE is defined, use MISRA function. */
+ 490:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_ipsr_get(VOID);
+ 491:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _tx_misra_ipsr_get())
+ 492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
+ 494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
+ 497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
+ 498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
+ 499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
+ 500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
+ 502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
+ 503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 12
+
+
+ 505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
+ 506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
+ 507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
+ 509:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 510:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 511:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 512:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 513:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_DISABLE_INLINE
+ 514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
+ 516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
+ 517:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
+ 518:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* AC5 Compiler */
+ 519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
+ 520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
+ 521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
+ 522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
+ 523:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 524:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 525:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 526:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 527:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the interrupt disable/restore macros for each compiler. */
+ 528:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 529:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__GNUC__) || defined(__ICCARM__)
+ 530:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 531:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*** GCC/AC6 and IAR ***/
+ 532:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 533:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_posture(void)
+ 534:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 535:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int posture;
+ 536:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 537:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, BASEPRI ": "=r" (posture));
+ 538:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, PRIMASK ": "=r" (posture));
+  45              		.loc 2 539 0
+  46              		.syntax unified
+  47              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  48 0002 EFF31082 		MRS  r2, PRIMASK 
+  49              	@ 0 "" 2
+  50              		.thumb
+  51              		.syntax unified
+  52              	.LBE17:
+  53              	.LBE16:
+ 540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
+ 542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
+ 546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
+ 548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
+ 551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
+ARM GAS  /tmp/ccLRbzKC.s 			page 13
+
+
+ 553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
+ 557:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 558:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 559:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(int_posture);
+ 560:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     //__asm__ volatile ("MSR  BASEPRI,%0": : "r" (int_posture): "memory");
+ 561:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
+ 563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 565:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 566:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
+ 567:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 568:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int int_posture;
+ 569:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 570:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     int_posture = __get_interrupt_posture();
+ 571:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 572:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 573:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(TX_PORT_BASEPRI);
+ 574:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 575:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSID i" : : : "memory");
+  54              		.loc 2 575 0
+  55              		.syntax unified
+  56              	@ 575 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  57 0006 72B6     		CPSID i
+  58              	@ 0 "" 2
+  59              		.thumb
+  60              		.syntax unified
+  61              	.LBE15:
+  62              	.LBE14:
+  81:ThreadX/common/src/tx_thread_suspend.c **** 
+  82:ThreadX/common/src/tx_thread_suspend.c **** TX_INTERRUPT_SAVE_AREA
+  83:ThreadX/common/src/tx_thread_suspend.c **** 
+  84:ThreadX/common/src/tx_thread_suspend.c **** TX_THREAD  *current_thread;
+  85:ThreadX/common/src/tx_thread_suspend.c **** UINT        status;
+  86:ThreadX/common/src/tx_thread_suspend.c **** 
+  87:ThreadX/common/src/tx_thread_suspend.c **** 
+  88:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_INLINE_THREAD_RESUME_SUSPEND
+  89:ThreadX/common/src/tx_thread_suspend.c **** 
+  90:ThreadX/common/src/tx_thread_suspend.c ****     /* Lockout interrupts while the thread is being suspended.  */
+  91:ThreadX/common/src/tx_thread_suspend.c ****     TX_DISABLE
+  92:ThreadX/common/src/tx_thread_suspend.c **** 
+  93:ThreadX/common/src/tx_thread_suspend.c ****     /* Pickup thread pointer.  */
+  94:ThreadX/common/src/tx_thread_suspend.c ****     TX_THREAD_GET_CURRENT(current_thread)
+  63              		.loc 1 94 0
+  64 0008 194B     		ldr	r3, .L12
+  65 000a 1B68     		ldr	r3, [r3]
+  66              	.LVL1:
+  95:ThreadX/common/src/tx_thread_suspend.c **** 
+  96:ThreadX/common/src/tx_thread_suspend.c ****     /* If trace is enabled, insert this event into the trace buffer.  */
+  97:ThreadX/common/src/tx_thread_suspend.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_SUSPEND_API, thread_ptr, thread_ptr -> tx_thread_state,
+  98:ThreadX/common/src/tx_thread_suspend.c **** 
+  99:ThreadX/common/src/tx_thread_suspend.c ****     /* Log this kernel call.  */
+ 100:ThreadX/common/src/tx_thread_suspend.c ****     TX_EL_THREAD_SUSPEND_INSERT
+ 101:ThreadX/common/src/tx_thread_suspend.c **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 14
+
+
+ 102:ThreadX/common/src/tx_thread_suspend.c ****     /* Check the specified thread's current status.  */
+ 103:ThreadX/common/src/tx_thread_suspend.c ****     if (thread_ptr -> tx_thread_state == TX_READY)
+  67              		.loc 1 103 0
+  68 000c 046B     		ldr	r4, [r0, #48]
+  69 000e E4B9     		cbnz	r4, .L2
+  70              	.LVL2:
+  71              	.LBB18:
+  72              	.LBB19:
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+  73              		.loc 2 477 0
+  74              		.syntax unified
+  75              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  76 0010 EFF30581 		 MRS  r1,IPSR 
+  77              	@ 0 "" 2
+  78              		.thumb
+  79              		.syntax unified
+  80              	.LBE19:
+  81              	.LBE18:
+ 104:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 105:ThreadX/common/src/tx_thread_suspend.c **** 
+ 106:ThreadX/common/src/tx_thread_suspend.c ****         /* Initialize status to success.  */
+ 107:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 108:ThreadX/common/src/tx_thread_suspend.c **** 
+ 109:ThreadX/common/src/tx_thread_suspend.c ****         /* Determine if we are in a thread context.  */
+ 110:ThreadX/common/src/tx_thread_suspend.c ****         if (TX_THREAD_GET_SYSTEM_STATE() == ((ULONG) 0))
+  82              		.loc 1 110 0
+  83 0014 174D     		ldr	r5, .L12+4
+  84 0016 2D68     		ldr	r5, [r5]
+  85 0018 2943     		orrs	r1, r5, r1
+  86 001a 01D1     		bne	.L3
+ 111:ThreadX/common/src/tx_thread_suspend.c ****         {
+ 112:ThreadX/common/src/tx_thread_suspend.c **** 
+ 113:ThreadX/common/src/tx_thread_suspend.c ****             /* Yes, we are in a thread context.  */
+ 114:ThreadX/common/src/tx_thread_suspend.c **** 
+ 115:ThreadX/common/src/tx_thread_suspend.c ****             /* Determine if the current thread is also the suspending thread.  */
+ 116:ThreadX/common/src/tx_thread_suspend.c ****             if (current_thread == thread_ptr)
+  87              		.loc 1 116 0
+  88 001c 8342     		cmp	r3, r0
+  89 001e 0ED0     		beq	.L11
+  90              	.LVL3:
+  91              	.L3:
+ 117:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 118:ThreadX/common/src/tx_thread_suspend.c **** 
+ 119:ThreadX/common/src/tx_thread_suspend.c ****                 /* Now determine if the preempt disable flag is non-zero.  */
+ 120:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_preempt_disable != ((UINT) 0))
+ 121:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 122:ThreadX/common/src/tx_thread_suspend.c **** 
+ 123:ThreadX/common/src/tx_thread_suspend.c ****                     /* Current thread cannot suspend when the preempt disable flag is non-zero,
+ 124:ThreadX/common/src/tx_thread_suspend.c ****                        return an error.  */
+ 125:ThreadX/common/src/tx_thread_suspend.c ****                     status =  TX_SUSPEND_ERROR;
+ 126:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 127:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 128:ThreadX/common/src/tx_thread_suspend.c ****         }
+ 129:ThreadX/common/src/tx_thread_suspend.c **** 
+ 130:ThreadX/common/src/tx_thread_suspend.c ****         /* Determine if the status is still successful.  */
+ 131:ThreadX/common/src/tx_thread_suspend.c ****         if (status == TX_SUCCESS)
+ 132:ThreadX/common/src/tx_thread_suspend.c ****         {
+ARM GAS  /tmp/ccLRbzKC.s 			page 15
+
+
+ 133:ThreadX/common/src/tx_thread_suspend.c **** 
+ 134:ThreadX/common/src/tx_thread_suspend.c ****             /* Set the state to suspended.  */
+ 135:ThreadX/common/src/tx_thread_suspend.c ****             thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+  92              		.loc 1 135 0
+  93 0020 0323     		movs	r3, #3
+  94 0022 0363     		str	r3, [r0, #48]
+ 136:ThreadX/common/src/tx_thread_suspend.c **** 
+ 137:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_NOT_INTERRUPTABLE
+ 138:ThreadX/common/src/tx_thread_suspend.c **** 
+ 139:ThreadX/common/src/tx_thread_suspend.c ****             /* Call actual non-interruptable thread suspension routine.  */
+ 140:ThreadX/common/src/tx_thread_suspend.c ****             _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
+ 141:ThreadX/common/src/tx_thread_suspend.c **** 
+ 142:ThreadX/common/src/tx_thread_suspend.c ****             /* Restore interrupts.  */
+ 143:ThreadX/common/src/tx_thread_suspend.c ****             TX_RESTORE
+ 144:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 145:ThreadX/common/src/tx_thread_suspend.c **** 
+ 146:ThreadX/common/src/tx_thread_suspend.c ****             /* Set the suspending flag. */
+ 147:ThreadX/common/src/tx_thread_suspend.c ****             thread_ptr -> tx_thread_suspending =  TX_TRUE;
+  95              		.loc 1 147 0
+  96 0024 0123     		movs	r3, #1
+  97 0026 8363     		str	r3, [r0, #56]
+ 148:ThreadX/common/src/tx_thread_suspend.c **** 
+ 149:ThreadX/common/src/tx_thread_suspend.c ****             /* Setup for no timeout period.  */
+ 150:ThreadX/common/src/tx_thread_suspend.c ****             thread_ptr -> tx_thread_timer.tx_timer_internal_remaining_ticks =  ((ULONG) 0);
+  98              		.loc 1 150 0
+  99 0028 0023     		movs	r3, #0
+ 100 002a C364     		str	r3, [r0, #76]
+ 151:ThreadX/common/src/tx_thread_suspend.c **** 
+ 152:ThreadX/common/src/tx_thread_suspend.c ****             /* Temporarily disable preemption.  */
+ 153:ThreadX/common/src/tx_thread_suspend.c ****             _tx_thread_preempt_disable++;
+ 101              		.loc 1 153 0
+ 102 002c 1249     		ldr	r1, .L12+8
+ 103 002e 0B68     		ldr	r3, [r1]
+ 104 0030 0133     		adds	r3, r3, #1
+ 105 0032 0B60     		str	r3, [r1]
+ 106              	.LVL4:
+ 107              	.LBB20:
+ 108              	.LBB21:
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 109              		.loc 2 562 0
+ 110              		.syntax unified
+ 111              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 112 0034 82F31088 		MSR  PRIMASK,r2
+ 113              	@ 0 "" 2
+ 114              	.LVL5:
+ 115              		.thumb
+ 116              		.syntax unified
+ 117              	.LBE21:
+ 118              	.LBE20:
+ 154:ThreadX/common/src/tx_thread_suspend.c **** 
+ 155:ThreadX/common/src/tx_thread_suspend.c ****             /* Restore interrupts.  */
+ 156:ThreadX/common/src/tx_thread_suspend.c ****             TX_RESTORE
+ 157:ThreadX/common/src/tx_thread_suspend.c **** 
+ 158:ThreadX/common/src/tx_thread_suspend.c ****             /* Call actual thread suspension routine.  */
+ 159:ThreadX/common/src/tx_thread_suspend.c ****             _tx_thread_system_suspend(thread_ptr);
+ 119              		.loc 1 159 0
+ 120 0038 FFF7FEFF 		bl	_tx_thread_system_suspend
+ARM GAS  /tmp/ccLRbzKC.s 			page 16
+
+
+ 121              	.LVL6:
+ 160:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 161:ThreadX/common/src/tx_thread_suspend.c **** 
+ 162:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_MISRA_ENABLE
+ 163:ThreadX/common/src/tx_thread_suspend.c **** 
+ 164:ThreadX/common/src/tx_thread_suspend.c ****             /* Disable interrupts.  */
+ 165:ThreadX/common/src/tx_thread_suspend.c ****             TX_DISABLE
+ 166:ThreadX/common/src/tx_thread_suspend.c **** 
+ 167:ThreadX/common/src/tx_thread_suspend.c ****             /* Return success.  */
+ 168:ThreadX/common/src/tx_thread_suspend.c ****             status =  TX_SUCCESS;
+ 169:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 170:ThreadX/common/src/tx_thread_suspend.c **** 
+ 171:ThreadX/common/src/tx_thread_suspend.c ****             /* If MISRA is not enabled, return directly.  */
+ 172:ThreadX/common/src/tx_thread_suspend.c ****             return(TX_SUCCESS);
+ 122              		.loc 1 172 0
+ 123 003c 12E0     		b	.L1
+ 124              	.LVL7:
+ 125              	.L11:
+ 120:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 126              		.loc 1 120 0
+ 127 003e 0E4B     		ldr	r3, .L12+8
+ 128              	.LVL8:
+ 129 0040 1B68     		ldr	r3, [r3]
+ 130 0042 002B     		cmp	r3, #0
+ 131 0044 ECD0     		beq	.L3
+ 125:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 132              		.loc 1 125 0
+ 133 0046 1424     		movs	r4, #20
+ 134 0048 0AE0     		b	.L4
+ 135              	.LVL9:
+ 136              	.L2:
+ 173:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 174:ThreadX/common/src/tx_thread_suspend.c ****         }
+ 175:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 176:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_TERMINATED)
+ 137              		.loc 1 176 0
+ 138 004a 022C     		cmp	r4, #2
+ 139 004c 07D0     		beq	.L7
+ 177:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 178:ThreadX/common/src/tx_thread_suspend.c **** 
+ 179:ThreadX/common/src/tx_thread_suspend.c ****         /* Thread is terminated.  */
+ 180:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUSPEND_ERROR;
+ 181:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 182:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_COMPLETED)
+ 140              		.loc 1 182 0
+ 141 004e 012C     		cmp	r4, #1
+ 142 0050 0AD0     		beq	.L8
+ 183:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 184:ThreadX/common/src/tx_thread_suspend.c **** 
+ 185:ThreadX/common/src/tx_thread_suspend.c ****         /* Thread is completed.  */
+ 186:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUSPEND_ERROR;
+ 187:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 188:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_SUSPENDED)
+ 143              		.loc 1 188 0
+ 144 0052 032C     		cmp	r4, #3
+ 145 0054 0AD0     		beq	.L9
+ 189:ThreadX/common/src/tx_thread_suspend.c ****     {
+ARM GAS  /tmp/ccLRbzKC.s 			page 17
+
+
+ 190:ThreadX/common/src/tx_thread_suspend.c **** 
+ 191:ThreadX/common/src/tx_thread_suspend.c ****         /* Already suspended, just set status to success.  */
+ 192:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 193:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 194:ThreadX/common/src/tx_thread_suspend.c ****     else
+ 195:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 196:ThreadX/common/src/tx_thread_suspend.c **** 
+ 197:ThreadX/common/src/tx_thread_suspend.c ****         /* Just set the delayed suspension flag.  */
+ 198:ThreadX/common/src/tx_thread_suspend.c ****         thread_ptr -> tx_thread_delayed_suspend =  TX_TRUE;
+ 146              		.loc 1 198 0
+ 147 0056 0123     		movs	r3, #1
+ 148              	.LVL10:
+ 149 0058 4363     		str	r3, [r0, #52]
+ 150              	.LVL11:
+ 199:ThreadX/common/src/tx_thread_suspend.c **** 
+ 200:ThreadX/common/src/tx_thread_suspend.c ****         /* Set status to success.  */
+ 201:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 151              		.loc 1 201 0
+ 152 005a 0024     		movs	r4, #0
+ 153 005c 00E0     		b	.L4
+ 154              	.LVL12:
+ 155              	.L7:
+ 180:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 156              		.loc 1 180 0
+ 157 005e 1424     		movs	r4, #20
+ 158              	.LVL13:
+ 159              	.L4:
+ 160              	.LBB22:
+ 161              	.LBB23:
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 162              		.loc 2 562 0
+ 163              		.syntax unified
+ 164              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 165 0060 82F31088 		MSR  PRIMASK,r2
+ 166              	@ 0 "" 2
+ 167              	.LVL14:
+ 168              		.thumb
+ 169              		.syntax unified
+ 170              	.L1:
+ 171              	.LBE23:
+ 172              	.LBE22:
+ 202:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 203:ThreadX/common/src/tx_thread_suspend.c **** 
+ 204:ThreadX/common/src/tx_thread_suspend.c ****     /* Restore interrupts.  */
+ 205:ThreadX/common/src/tx_thread_suspend.c ****     TX_RESTORE
+ 206:ThreadX/common/src/tx_thread_suspend.c **** 
+ 207:ThreadX/common/src/tx_thread_suspend.c ****     /* Always return success, since this function does not perform error
+ 208:ThreadX/common/src/tx_thread_suspend.c ****        checking.  */
+ 209:ThreadX/common/src/tx_thread_suspend.c ****     return(status);
+ 210:ThreadX/common/src/tx_thread_suspend.c **** 
+ 211:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 212:ThreadX/common/src/tx_thread_suspend.c **** 
+ 213:ThreadX/common/src/tx_thread_suspend.c ****     /* In-line thread suspension processing follows, which is effectively just taking the
+ 214:ThreadX/common/src/tx_thread_suspend.c ****        logic in tx_thread_system_suspend.c and placing it here!  */
+ 215:ThreadX/common/src/tx_thread_suspend.c **** 
+ 216:ThreadX/common/src/tx_thread_suspend.c **** UINT            priority;
+ 217:ThreadX/common/src/tx_thread_suspend.c **** UINT            base_priority;
+ARM GAS  /tmp/ccLRbzKC.s 			page 18
+
+
+ 218:ThreadX/common/src/tx_thread_suspend.c **** ULONG           priority_map;
+ 219:ThreadX/common/src/tx_thread_suspend.c **** ULONG           priority_bit;
+ 220:ThreadX/common/src/tx_thread_suspend.c **** ULONG           combined_flags;
+ 221:ThreadX/common/src/tx_thread_suspend.c **** TX_THREAD       *ready_next;
+ 222:ThreadX/common/src/tx_thread_suspend.c **** TX_THREAD       *ready_previous;
+ 223:ThreadX/common/src/tx_thread_suspend.c **** 
+ 224:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 225:ThreadX/common/src/tx_thread_suspend.c **** UINT            map_index;
+ 226:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 227:ThreadX/common/src/tx_thread_suspend.c **** 
+ 228:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 229:ThreadX/common/src/tx_thread_suspend.c **** TX_TRACE_BUFFER_ENTRY       *entry_ptr;
+ 230:ThreadX/common/src/tx_thread_suspend.c **** ULONG                       time_stamp =  ((ULONG) 0);
+ 231:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 232:ThreadX/common/src/tx_thread_suspend.c **** 
+ 233:ThreadX/common/src/tx_thread_suspend.c **** 
+ 234:ThreadX/common/src/tx_thread_suspend.c ****     /* Pickup thread pointer.  */
+ 235:ThreadX/common/src/tx_thread_suspend.c ****     TX_THREAD_GET_CURRENT(current_thread)
+ 236:ThreadX/common/src/tx_thread_suspend.c **** 
+ 237:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_STACK_CHECKING
+ 238:ThreadX/common/src/tx_thread_suspend.c **** 
+ 239:ThreadX/common/src/tx_thread_suspend.c ****     /* Check this thread's stack.  */
+ 240:ThreadX/common/src/tx_thread_suspend.c ****     TX_THREAD_STACK_CHECK(thread_ptr)
+ 241:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 242:ThreadX/common/src/tx_thread_suspend.c **** 
+ 243:ThreadX/common/src/tx_thread_suspend.c ****     /* Lockout interrupts while the thread is being suspended.  */
+ 244:ThreadX/common/src/tx_thread_suspend.c ****     TX_DISABLE
+ 245:ThreadX/common/src/tx_thread_suspend.c **** 
+ 246:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_NO_TIMER
+ 247:ThreadX/common/src/tx_thread_suspend.c **** 
+ 248:ThreadX/common/src/tx_thread_suspend.c ****     /* Determine if this is the current thread.  */
+ 249:ThreadX/common/src/tx_thread_suspend.c ****     if (thread_ptr == current_thread)
+ 250:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 251:ThreadX/common/src/tx_thread_suspend.c **** 
+ 252:ThreadX/common/src/tx_thread_suspend.c ****         /* Yes, current thread is suspending - reset time slice for current thread.  */
+ 253:ThreadX/common/src/tx_thread_suspend.c ****         _tx_timer_time_slice =  thread_ptr -> tx_thread_new_time_slice;
+ 254:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 255:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 256:ThreadX/common/src/tx_thread_suspend.c **** 
+ 257:ThreadX/common/src/tx_thread_suspend.c ****     /* If trace is enabled, insert this event into the trace buffer.  */
+ 258:ThreadX/common/src/tx_thread_suspend.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_SUSPEND_API, thread_ptr, thread_ptr -> tx_thread_state,
+ 259:ThreadX/common/src/tx_thread_suspend.c **** 
+ 260:ThreadX/common/src/tx_thread_suspend.c ****     /* Log this kernel call.  */
+ 261:ThreadX/common/src/tx_thread_suspend.c ****     TX_EL_THREAD_SUSPEND_INSERT
+ 262:ThreadX/common/src/tx_thread_suspend.c **** 
+ 263:ThreadX/common/src/tx_thread_suspend.c ****     /* Check the specified thread's current status.  */
+ 264:ThreadX/common/src/tx_thread_suspend.c ****     if (thread_ptr -> tx_thread_state == TX_READY)
+ 265:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 266:ThreadX/common/src/tx_thread_suspend.c **** 
+ 267:ThreadX/common/src/tx_thread_suspend.c ****         /* Initialize status to success.  */
+ 268:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 269:ThreadX/common/src/tx_thread_suspend.c **** 
+ 270:ThreadX/common/src/tx_thread_suspend.c ****         /* Determine if we are in a thread context.  */
+ 271:ThreadX/common/src/tx_thread_suspend.c ****         if (TX_THREAD_GET_SYSTEM_STATE() == ((ULONG) 0))
+ 272:ThreadX/common/src/tx_thread_suspend.c ****         {
+ 273:ThreadX/common/src/tx_thread_suspend.c **** 
+ 274:ThreadX/common/src/tx_thread_suspend.c ****             /* Yes, we are in a thread context.  */
+ARM GAS  /tmp/ccLRbzKC.s 			page 19
+
+
+ 275:ThreadX/common/src/tx_thread_suspend.c **** 
+ 276:ThreadX/common/src/tx_thread_suspend.c ****             /* Determine if the current thread is also the suspending thread.  */
+ 277:ThreadX/common/src/tx_thread_suspend.c ****             if (current_thread == thread_ptr)
+ 278:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 279:ThreadX/common/src/tx_thread_suspend.c **** 
+ 280:ThreadX/common/src/tx_thread_suspend.c ****                 /* Now determine if the preempt disable flag is non-zero.  */
+ 281:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_preempt_disable != ((UINT) 0))
+ 282:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 283:ThreadX/common/src/tx_thread_suspend.c **** 
+ 284:ThreadX/common/src/tx_thread_suspend.c ****                     /* Current thread cannot suspend when the preempt disable flag is non-zero,
+ 285:ThreadX/common/src/tx_thread_suspend.c ****                        return an error.  */
+ 286:ThreadX/common/src/tx_thread_suspend.c ****                     status =  TX_SUSPEND_ERROR;
+ 287:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 288:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 289:ThreadX/common/src/tx_thread_suspend.c ****         }
+ 290:ThreadX/common/src/tx_thread_suspend.c **** 
+ 291:ThreadX/common/src/tx_thread_suspend.c ****         /* Determine if the status is still successful.  */
+ 292:ThreadX/common/src/tx_thread_suspend.c ****         if (status == TX_SUCCESS)
+ 293:ThreadX/common/src/tx_thread_suspend.c ****         {
+ 294:ThreadX/common/src/tx_thread_suspend.c **** 
+ 295:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 296:ThreadX/common/src/tx_thread_suspend.c **** 
+ 297:ThreadX/common/src/tx_thread_suspend.c ****             /* Increment the thread's suspend count.  */
+ 298:ThreadX/common/src/tx_thread_suspend.c ****             thread_ptr -> tx_thread_performance_suspend_count++;
+ 299:ThreadX/common/src/tx_thread_suspend.c **** 
+ 300:ThreadX/common/src/tx_thread_suspend.c ****             /* Increment the total number of thread suspensions.  */
+ 301:ThreadX/common/src/tx_thread_suspend.c ****             _tx_thread_performance_suspend_count++;
+ 302:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 303:ThreadX/common/src/tx_thread_suspend.c **** 
+ 304:ThreadX/common/src/tx_thread_suspend.c ****             /* Set the state to suspended.  */
+ 305:ThreadX/common/src/tx_thread_suspend.c ****             thread_ptr -> tx_thread_state =    TX_SUSPENDED;
+ 306:ThreadX/common/src/tx_thread_suspend.c **** 
+ 307:ThreadX/common/src/tx_thread_suspend.c ****             /* Thread state change.  */
+ 308:ThreadX/common/src/tx_thread_suspend.c ****             TX_THREAD_STATE_CHANGE(thread_ptr, TX_SUSPENDED)
+ 309:ThreadX/common/src/tx_thread_suspend.c **** 
+ 310:ThreadX/common/src/tx_thread_suspend.c ****             /* Log the thread status change.  */
+ 311:ThreadX/common/src/tx_thread_suspend.c ****             TX_EL_THREAD_STATUS_CHANGE_INSERT(thread_ptr, thread_ptr -> tx_thread_state)
+ 312:ThreadX/common/src/tx_thread_suspend.c **** 
+ 313:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 314:ThreadX/common/src/tx_thread_suspend.c **** 
+ 315:ThreadX/common/src/tx_thread_suspend.c ****             /* If trace is enabled, save the current event pointer.  */
+ 316:ThreadX/common/src/tx_thread_suspend.c ****             entry_ptr =  _tx_trace_buffer_current_ptr;
+ 317:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 318:ThreadX/common/src/tx_thread_suspend.c **** 
+ 319:ThreadX/common/src/tx_thread_suspend.c ****             /* Log the thread status change.  */
+ 320:ThreadX/common/src/tx_thread_suspend.c ****             TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_SUSPEND, thread_ptr, ((ULONG) thread_ptr -> tx_
+ 321:ThreadX/common/src/tx_thread_suspend.c **** 
+ 322:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 323:ThreadX/common/src/tx_thread_suspend.c **** 
+ 324:ThreadX/common/src/tx_thread_suspend.c ****             /* Save the time stamp for later comparison to verify that
+ 325:ThreadX/common/src/tx_thread_suspend.c ****                the event hasn't been overwritten by the time we have
+ 326:ThreadX/common/src/tx_thread_suspend.c ****                computed the next thread to execute.  */
+ 327:ThreadX/common/src/tx_thread_suspend.c ****             if (entry_ptr != TX_NULL)
+ 328:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 329:ThreadX/common/src/tx_thread_suspend.c **** 
+ 330:ThreadX/common/src/tx_thread_suspend.c ****                 /* Save time stamp.  */
+ 331:ThreadX/common/src/tx_thread_suspend.c ****                 time_stamp =  entry_ptr -> tx_trace_buffer_entry_time_stamp;
+ARM GAS  /tmp/ccLRbzKC.s 			page 20
+
+
+ 332:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 333:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 334:ThreadX/common/src/tx_thread_suspend.c **** 
+ 335:ThreadX/common/src/tx_thread_suspend.c ****             /* Pickup priority of thread.  */
+ 336:ThreadX/common/src/tx_thread_suspend.c ****             priority =  thread_ptr -> tx_thread_priority;
+ 337:ThreadX/common/src/tx_thread_suspend.c **** 
+ 338:ThreadX/common/src/tx_thread_suspend.c ****             /* Pickup the previous and next ready thread pointers.  */
+ 339:ThreadX/common/src/tx_thread_suspend.c ****             ready_next =      thread_ptr -> tx_thread_ready_next;
+ 340:ThreadX/common/src/tx_thread_suspend.c ****             ready_previous =  thread_ptr -> tx_thread_ready_previous;
+ 341:ThreadX/common/src/tx_thread_suspend.c **** 
+ 342:ThreadX/common/src/tx_thread_suspend.c ****             /* Determine if there are other threads at this priority that are
+ 343:ThreadX/common/src/tx_thread_suspend.c ****                ready.  */
+ 344:ThreadX/common/src/tx_thread_suspend.c ****             if (ready_next != thread_ptr)
+ 345:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 346:ThreadX/common/src/tx_thread_suspend.c **** 
+ 347:ThreadX/common/src/tx_thread_suspend.c ****                 /* Yes, there are other threads at this priority ready.  */
+ 348:ThreadX/common/src/tx_thread_suspend.c **** 
+ 349:ThreadX/common/src/tx_thread_suspend.c ****                 /* Just remove this thread from the priority list.  */
+ 350:ThreadX/common/src/tx_thread_suspend.c ****                 ready_next -> tx_thread_ready_previous =    ready_previous;
+ 351:ThreadX/common/src/tx_thread_suspend.c ****                 ready_previous -> tx_thread_ready_next =    ready_next;
+ 352:ThreadX/common/src/tx_thread_suspend.c **** 
+ 353:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if this is the head of the priority list.  */
+ 354:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_priority_list[priority] == thread_ptr)
+ 355:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 356:ThreadX/common/src/tx_thread_suspend.c **** 
+ 357:ThreadX/common/src/tx_thread_suspend.c ****                     /* Update the head pointer of this priority list.  */
+ 358:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_priority_list[priority] =  ready_next;
+ 359:ThreadX/common/src/tx_thread_suspend.c **** 
+ 360:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+ 361:ThreadX/common/src/tx_thread_suspend.c **** 
+ 362:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 363:ThreadX/common/src/tx_thread_suspend.c **** 
+ 364:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the index into the bit map array.  */
+ 365:ThreadX/common/src/tx_thread_suspend.c ****                     map_index =  priority/((UINT) 32);
+ 366:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 367:ThreadX/common/src/tx_thread_suspend.c **** 
+ 368:ThreadX/common/src/tx_thread_suspend.c ****                     /* Check for a thread preempted that had preemption threshold set.  */
+ 369:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_preempted_maps[MAP_INDEX] != ((ULONG) 0))
+ 370:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 371:ThreadX/common/src/tx_thread_suspend.c **** 
+ 372:ThreadX/common/src/tx_thread_suspend.c ****                         /* Ensure that this thread's priority is clear in the preempt map.  */
+ 373:ThreadX/common/src/tx_thread_suspend.c ****                         TX_MOD32_BIT_SET(priority, priority_bit)
+ 374:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX
+ 375:ThreadX/common/src/tx_thread_suspend.c **** 
+ 376:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 377:ThreadX/common/src/tx_thread_suspend.c **** 
+ 378:ThreadX/common/src/tx_thread_suspend.c ****                         /* Determine if there are any other bits set in this preempt map.  */
+ 379:ThreadX/common/src/tx_thread_suspend.c ****                         if (_tx_thread_preempted_maps[MAP_INDEX] == ((ULONG) 0))
+ 380:ThreadX/common/src/tx_thread_suspend.c ****                         {
+ 381:ThreadX/common/src/tx_thread_suspend.c **** 
+ 382:ThreadX/common/src/tx_thread_suspend.c ****                             /* No, clear the active bit to signify this preempt map has nothing set
+ 383:ThreadX/common/src/tx_thread_suspend.c ****                             TX_DIV32_BIT_SET(priority, priority_bit)
+ 384:ThreadX/common/src/tx_thread_suspend.c ****                             _tx_thread_preempted_map_active =  _tx_thread_preempted_map_active & (~
+ 385:ThreadX/common/src/tx_thread_suspend.c ****                         }
+ 386:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 387:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 388:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ARM GAS  /tmp/ccLRbzKC.s 			page 21
+
+
+ 389:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 390:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 391:ThreadX/common/src/tx_thread_suspend.c ****             else
+ 392:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 393:ThreadX/common/src/tx_thread_suspend.c **** 
+ 394:ThreadX/common/src/tx_thread_suspend.c ****                 /* This is the only thread at this priority ready to run.  Set the head
+ 395:ThreadX/common/src/tx_thread_suspend.c ****                    pointer to NULL.  */
+ 396:ThreadX/common/src/tx_thread_suspend.c ****                 _tx_thread_priority_list[priority] =    TX_NULL;
+ 397:ThreadX/common/src/tx_thread_suspend.c **** 
+ 398:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 399:ThreadX/common/src/tx_thread_suspend.c **** 
+ 400:ThreadX/common/src/tx_thread_suspend.c ****                 /* Calculate the index into the bit map array.  */
+ 401:ThreadX/common/src/tx_thread_suspend.c ****                 map_index =  priority/((UINT) 32);
+ 402:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 403:ThreadX/common/src/tx_thread_suspend.c **** 
+ 404:ThreadX/common/src/tx_thread_suspend.c ****                 /* Clear this priority bit in the ready priority bit map.  */
+ 405:ThreadX/common/src/tx_thread_suspend.c ****                 TX_MOD32_BIT_SET(priority, priority_bit)
+ 406:ThreadX/common/src/tx_thread_suspend.c ****                 _tx_thread_priority_maps[MAP_INDEX] =  _tx_thread_priority_maps[MAP_INDEX] & (~(pri
+ 407:ThreadX/common/src/tx_thread_suspend.c **** 
+ 408:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 409:ThreadX/common/src/tx_thread_suspend.c **** 
+ 410:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if there are any other bits set in this priority map.  */
+ 411:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_priority_maps[MAP_INDEX] == ((ULONG) 0))
+ 412:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 413:ThreadX/common/src/tx_thread_suspend.c **** 
+ 414:ThreadX/common/src/tx_thread_suspend.c ****                     /* No, clear the active bit to signify this priority map has nothing set.  */
+ 415:ThreadX/common/src/tx_thread_suspend.c ****                     TX_DIV32_BIT_SET(priority, priority_bit)
+ 416:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_priority_map_active =  _tx_thread_priority_map_active & (~(priority_
+ 417:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 418:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 419:ThreadX/common/src/tx_thread_suspend.c **** 
+ 420:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+ 421:ThreadX/common/src/tx_thread_suspend.c **** 
+ 422:ThreadX/common/src/tx_thread_suspend.c ****                 /* Check for a thread preempted that had preemption-threshold set.  */
+ 423:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_preempted_maps[MAP_INDEX] != ((ULONG) 0))
+ 424:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 425:ThreadX/common/src/tx_thread_suspend.c **** 
+ 426:ThreadX/common/src/tx_thread_suspend.c ****                     /* Ensure that this thread's priority is clear in the preempt map.  */
+ 427:ThreadX/common/src/tx_thread_suspend.c ****                     TX_MOD32_BIT_SET(priority, priority_bit)
+ 428:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX] & 
+ 429:ThreadX/common/src/tx_thread_suspend.c **** 
+ 430:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 431:ThreadX/common/src/tx_thread_suspend.c **** 
+ 432:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if there are any other bits set in this preempt map.  */
+ 433:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_preempted_maps[MAP_INDEX] == ((ULONG) 0))
+ 434:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 435:ThreadX/common/src/tx_thread_suspend.c **** 
+ 436:ThreadX/common/src/tx_thread_suspend.c ****                         /* No, clear the active bit to signify this preempted map has nothing set. 
+ 437:ThreadX/common/src/tx_thread_suspend.c ****                         TX_DIV32_BIT_SET(priority, priority_bit)
+ 438:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_preempted_map_active =  _tx_thread_preempted_map_active & (~(pri
+ 439:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 440:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 441:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 442:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 443:ThreadX/common/src/tx_thread_suspend.c **** 
+ 444:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 445:ThreadX/common/src/tx_thread_suspend.c **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 22
+
+
+ 446:ThreadX/common/src/tx_thread_suspend.c ****                 /* Calculate the index to find the next highest priority thread ready for execution
+ 447:ThreadX/common/src/tx_thread_suspend.c ****                 priority_map =    _tx_thread_priority_map_active;
+ 448:ThreadX/common/src/tx_thread_suspend.c **** 
+ 449:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if there is anything.   */
+ 450:ThreadX/common/src/tx_thread_suspend.c ****                 if (priority_map != ((ULONG) 0))
+ 451:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 452:ThreadX/common/src/tx_thread_suspend.c **** 
+ 453:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the lowest bit set in the priority map. */
+ 454:ThreadX/common/src/tx_thread_suspend.c ****                     TX_LOWEST_SET_BIT_CALCULATE(priority_map, map_index)
+ 455:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 456:ThreadX/common/src/tx_thread_suspend.c **** 
+ 457:ThreadX/common/src/tx_thread_suspend.c ****                 /* Calculate the base priority as well.  */
+ 458:ThreadX/common/src/tx_thread_suspend.c ****                 base_priority =  map_index * ((UINT) 32);
+ 459:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 460:ThreadX/common/src/tx_thread_suspend.c **** 
+ 461:ThreadX/common/src/tx_thread_suspend.c ****                 /* Setup the base priority to zero.  */
+ 462:ThreadX/common/src/tx_thread_suspend.c ****                 base_priority =   ((UINT) 0);
+ 463:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 464:ThreadX/common/src/tx_thread_suspend.c **** 
+ 465:ThreadX/common/src/tx_thread_suspend.c ****                 /* Setup working variable for the priority map.  */
+ 466:ThreadX/common/src/tx_thread_suspend.c ****                 priority_map =    _tx_thread_priority_maps[MAP_INDEX];
+ 467:ThreadX/common/src/tx_thread_suspend.c **** 
+ 468:ThreadX/common/src/tx_thread_suspend.c ****                 /* Make a quick check for no other threads ready for execution.  */
+ 469:ThreadX/common/src/tx_thread_suspend.c ****                 if (priority_map == ((ULONG) 0))
+ 470:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 471:ThreadX/common/src/tx_thread_suspend.c **** 
+ 472:ThreadX/common/src/tx_thread_suspend.c ****                     /* Nothing else is ready.  Set highest priority and execute thread
+ 473:ThreadX/common/src/tx_thread_suspend.c ****                        accordingly.  */
+ 474:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_highest_priority =  ((UINT) TX_MAX_PRIORITIES);
+ 475:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_execute_ptr =       TX_NULL;
+ 476:ThreadX/common/src/tx_thread_suspend.c **** 
+ 477:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_MISRA_ENABLE
+ 478:ThreadX/common/src/tx_thread_suspend.c **** 
+ 479:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 480:ThreadX/common/src/tx_thread_suspend.c **** 
+ 481:ThreadX/common/src/tx_thread_suspend.c ****                     /* Check that the event time stamp is unchanged.  A different
+ 482:ThreadX/common/src/tx_thread_suspend.c ****                        timestamp means that a later event wrote over the thread
+ 483:ThreadX/common/src/tx_thread_suspend.c ****                        suspend event. In that case, do nothing here.  */
+ 484:ThreadX/common/src/tx_thread_suspend.c ****                     if (entry_ptr != TX_NULL)
+ 485:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 486:ThreadX/common/src/tx_thread_suspend.c **** 
+ 487:ThreadX/common/src/tx_thread_suspend.c ****                         /* Is the timestamp the same?  */
+ 488:ThreadX/common/src/tx_thread_suspend.c ****                         if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
+ 489:ThreadX/common/src/tx_thread_suspend.c ****                         {
+ 490:ThreadX/common/src/tx_thread_suspend.c **** 
+ 491:ThreadX/common/src/tx_thread_suspend.c ****                             /* Timestamp is the same, set the "next thread pointer" to the new valu
+ 492:ThreadX/common/src/tx_thread_suspend.c ****                                next thread to execute. This can be used by the trace analysis tool 
+ 493:ThreadX/common/src/tx_thread_suspend.c ****                                track of next thread execution.  */
+ 494:ThreadX/common/src/tx_thread_suspend.c ****                             entry_ptr -> tx_trace_buffer_entry_information_field_4 =  0;
+ 495:ThreadX/common/src/tx_thread_suspend.c ****                         }
+ 496:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 497:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 498:ThreadX/common/src/tx_thread_suspend.c **** 
+ 499:ThreadX/common/src/tx_thread_suspend.c ****                     /* Restore interrupts.  */
+ 500:ThreadX/common/src/tx_thread_suspend.c ****                     TX_RESTORE
+ 501:ThreadX/common/src/tx_thread_suspend.c **** 
+ 502:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if preemption should take place. This is only possible if the curr
+ARM GAS  /tmp/ccLRbzKC.s 			page 23
+
+
+ 503:ThreadX/common/src/tx_thread_suspend.c ****                        not the same as the execute thread pointer AND the system state and preempt 
+ 504:ThreadX/common/src/tx_thread_suspend.c ****                     TX_THREAD_SYSTEM_RETURN_CHECK(combined_flags)
+ 505:ThreadX/common/src/tx_thread_suspend.c ****                     if (combined_flags == ((ULONG) 0))
+ 506:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 507:ThreadX/common/src/tx_thread_suspend.c **** 
+ 508:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 509:ThreadX/common/src/tx_thread_suspend.c **** 
+ 510:ThreadX/common/src/tx_thread_suspend.c ****                         /* Yes, increment the return to idle return count.  */
+ 511:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_performance_idle_return_count++;
+ 512:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 513:ThreadX/common/src/tx_thread_suspend.c **** 
+ 514:ThreadX/common/src/tx_thread_suspend.c ****                         /* Preemption is needed - return to the system!  */
+ 515:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_system_return();
+ 516:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 517:ThreadX/common/src/tx_thread_suspend.c **** 
+ 518:ThreadX/common/src/tx_thread_suspend.c ****                     /* Return to caller.  */
+ 519:ThreadX/common/src/tx_thread_suspend.c ****                     return(TX_SUCCESS);
+ 520:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 521:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 522:ThreadX/common/src/tx_thread_suspend.c ****                 else
+ 523:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 524:ThreadX/common/src/tx_thread_suspend.c **** 
+ 525:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the lowest bit set in the priority map. */
+ 526:ThreadX/common/src/tx_thread_suspend.c ****                     TX_LOWEST_SET_BIT_CALCULATE(priority_map, priority_bit)
+ 527:ThreadX/common/src/tx_thread_suspend.c **** 
+ 528:ThreadX/common/src/tx_thread_suspend.c ****                     /* Setup the next highest priority variable.  */
+ 529:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_highest_priority =  base_priority + priority_bit;
+ 530:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 531:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 532:ThreadX/common/src/tx_thread_suspend.c **** 
+ 533:ThreadX/common/src/tx_thread_suspend.c ****             /* Determine if this thread is the thread designated to execute.  */
+ 534:ThreadX/common/src/tx_thread_suspend.c ****             if (thread_ptr == _tx_thread_execute_ptr)
+ 535:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 536:ThreadX/common/src/tx_thread_suspend.c **** 
+ 537:ThreadX/common/src/tx_thread_suspend.c ****                 /* Pickup the highest priority thread to execute.  */
+ 538:ThreadX/common/src/tx_thread_suspend.c ****                 _tx_thread_execute_ptr =  _tx_thread_priority_list[_tx_thread_highest_priority];
+ 539:ThreadX/common/src/tx_thread_suspend.c **** 
+ 540:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_DISABLE_PREEMPTION_THRESHOLD
+ 541:ThreadX/common/src/tx_thread_suspend.c **** 
+ 542:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if a previous thread with preemption-threshold was preempted.  */
+ 543:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 544:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_preempted_map_active != ((ULONG) 0))
+ 545:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 546:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_preempted_maps[MAP_INDEX] != ((ULONG) 0))
+ 547:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 548:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 549:ThreadX/common/src/tx_thread_suspend.c **** 
+ 550:ThreadX/common/src/tx_thread_suspend.c ****                     /* Yes, there was a thread preempted when it was using preemption-threshold.  *
+ 551:ThreadX/common/src/tx_thread_suspend.c **** 
+ 552:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_NOT_INTERRUPTABLE
+ 553:ThreadX/common/src/tx_thread_suspend.c **** 
+ 554:ThreadX/common/src/tx_thread_suspend.c ****                     /* Disable preemption.  */
+ 555:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_preempt_disable++;
+ 556:ThreadX/common/src/tx_thread_suspend.c **** 
+ 557:ThreadX/common/src/tx_thread_suspend.c ****                     /* Restore interrupts.  */
+ 558:ThreadX/common/src/tx_thread_suspend.c ****                     TX_RESTORE
+ 559:ThreadX/common/src/tx_thread_suspend.c **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 24
+
+
+ 560:ThreadX/common/src/tx_thread_suspend.c ****                     /* Interrupts are enabled briefly here to keep the interrupt
+ 561:ThreadX/common/src/tx_thread_suspend.c ****                        lockout time deterministic.  */
+ 562:ThreadX/common/src/tx_thread_suspend.c **** 
+ 563:ThreadX/common/src/tx_thread_suspend.c ****                     /* Disable interrupts again.  */
+ 564:ThreadX/common/src/tx_thread_suspend.c ****                     TX_DISABLE
+ 565:ThreadX/common/src/tx_thread_suspend.c **** 
+ 566:ThreadX/common/src/tx_thread_suspend.c ****                     /* Decrement the preemption disable variable.  */
+ 567:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_preempt_disable--;
+ 568:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 569:ThreadX/common/src/tx_thread_suspend.c **** 
+ 570:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the thread with preemption threshold set that
+ 571:ThreadX/common/src/tx_thread_suspend.c ****                        was interrupted by a thread above the preemption level.  */
+ 572:ThreadX/common/src/tx_thread_suspend.c **** 
+ 573:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 574:ThreadX/common/src/tx_thread_suspend.c **** 
+ 575:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the index to find the next highest priority thread ready for execu
+ 576:ThreadX/common/src/tx_thread_suspend.c ****                     priority_map =    _tx_thread_preempted_map_active;
+ 577:ThreadX/common/src/tx_thread_suspend.c **** 
+ 578:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the lowest bit set in the priority map. */
+ 579:ThreadX/common/src/tx_thread_suspend.c ****                     TX_LOWEST_SET_BIT_CALCULATE(priority_map, map_index)
+ 580:ThreadX/common/src/tx_thread_suspend.c **** 
+ 581:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the base priority as well.  */
+ 582:ThreadX/common/src/tx_thread_suspend.c ****                     base_priority =  map_index * ((UINT) 32);
+ 583:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 584:ThreadX/common/src/tx_thread_suspend.c **** 
+ 585:ThreadX/common/src/tx_thread_suspend.c ****                     /* Setup the base priority to zero.  */
+ 586:ThreadX/common/src/tx_thread_suspend.c ****                     base_priority =   ((UINT) 0);
+ 587:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 588:ThreadX/common/src/tx_thread_suspend.c **** 
+ 589:ThreadX/common/src/tx_thread_suspend.c ****                     /* Setup temporary preempted map.  */
+ 590:ThreadX/common/src/tx_thread_suspend.c ****                     priority_map =  _tx_thread_preempted_maps[MAP_INDEX];
+ 591:ThreadX/common/src/tx_thread_suspend.c **** 
+ 592:ThreadX/common/src/tx_thread_suspend.c ****                     /* Calculate the lowest bit set in the priority map. */
+ 593:ThreadX/common/src/tx_thread_suspend.c ****                     TX_LOWEST_SET_BIT_CALCULATE(priority_map, priority_bit)
+ 594:ThreadX/common/src/tx_thread_suspend.c **** 
+ 595:ThreadX/common/src/tx_thread_suspend.c ****                     /* Setup the highest priority preempted thread.  */
+ 596:ThreadX/common/src/tx_thread_suspend.c ****                     priority =  base_priority + priority_bit;
+ 597:ThreadX/common/src/tx_thread_suspend.c **** 
+ 598:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if the next highest priority thread is above the highest priority 
+ 599:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_highest_priority >= (_tx_thread_priority_list[priority] -> tx_th
+ 600:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 601:ThreadX/common/src/tx_thread_suspend.c **** 
+ 602:ThreadX/common/src/tx_thread_suspend.c ****                         /* Thread not allowed to execute until earlier preempted thread finishes or
+ 603:ThreadX/common/src/tx_thread_suspend.c ****                            preemption-threshold.  */
+ 604:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_execute_ptr =  _tx_thread_priority_list[priority];
+ 605:ThreadX/common/src/tx_thread_suspend.c **** 
+ 606:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 607:ThreadX/common/src/tx_thread_suspend.c **** 
+ 608:ThreadX/common/src/tx_thread_suspend.c ****                         /* Check that the event time stamp is unchanged.  A different
+ 609:ThreadX/common/src/tx_thread_suspend.c ****                            timestamp means that a later event wrote over the thread
+ 610:ThreadX/common/src/tx_thread_suspend.c ****                            suspend event. In that case, do nothing here.  */
+ 611:ThreadX/common/src/tx_thread_suspend.c ****                         if (entry_ptr != TX_NULL)
+ 612:ThreadX/common/src/tx_thread_suspend.c ****                         {
+ 613:ThreadX/common/src/tx_thread_suspend.c **** 
+ 614:ThreadX/common/src/tx_thread_suspend.c ****                             /* Is the timestamp the same?  */
+ 615:ThreadX/common/src/tx_thread_suspend.c ****                             if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
+ 616:ThreadX/common/src/tx_thread_suspend.c ****                             {
+ARM GAS  /tmp/ccLRbzKC.s 			page 25
+
+
+ 617:ThreadX/common/src/tx_thread_suspend.c **** 
+ 618:ThreadX/common/src/tx_thread_suspend.c ****                                 /* Timestamp is the same, set the "next thread pointer" to the new 
+ 619:ThreadX/common/src/tx_thread_suspend.c ****                                    next thread to execute. This can be used by the trace analysis t
+ 620:ThreadX/common/src/tx_thread_suspend.c ****                                    track of next thread execution.  */
+ 621:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_MISRA_ENABLE
+ 622:ThreadX/common/src/tx_thread_suspend.c ****                                 entry_ptr -> tx_trace_buffer_entry_info_4 =  TX_POINTER_TO_ULONG_CO
+ 623:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 624:ThreadX/common/src/tx_thread_suspend.c ****                                 entry_ptr -> tx_trace_buffer_entry_information_field_4 =  TX_POINTE
+ 625:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 626:ThreadX/common/src/tx_thread_suspend.c ****                             }
+ 627:ThreadX/common/src/tx_thread_suspend.c ****                         }
+ 628:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 629:ThreadX/common/src/tx_thread_suspend.c **** 
+ 630:ThreadX/common/src/tx_thread_suspend.c ****                         /* Clear the corresponding bit in the preempted map, since the preemption h
+ 631:ThreadX/common/src/tx_thread_suspend.c ****                         TX_MOD32_BIT_SET(priority, priority_bit)
+ 632:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_preempted_maps[MAP_INDEX] =  _tx_thread_preempted_maps[MAP_INDEX
+ 633:ThreadX/common/src/tx_thread_suspend.c **** 
+ 634:ThreadX/common/src/tx_thread_suspend.c **** #if TX_MAX_PRIORITIES > 32
+ 635:ThreadX/common/src/tx_thread_suspend.c **** 
+ 636:ThreadX/common/src/tx_thread_suspend.c ****                         /* Determine if there are any other bits set in this preempt map.  */
+ 637:ThreadX/common/src/tx_thread_suspend.c ****                         if (_tx_thread_preempted_maps[MAP_INDEX] == ((ULONG) 0))
+ 638:ThreadX/common/src/tx_thread_suspend.c ****                         {
+ 639:ThreadX/common/src/tx_thread_suspend.c **** 
+ 640:ThreadX/common/src/tx_thread_suspend.c ****                             /* No, clear the active bit to signify this preempt map has nothing set
+ 641:ThreadX/common/src/tx_thread_suspend.c ****                             TX_DIV32_BIT_SET(priority, priority_bit)
+ 642:ThreadX/common/src/tx_thread_suspend.c ****                             _tx_thread_preempted_map_active =  _tx_thread_preempted_map_active & (~
+ 643:ThreadX/common/src/tx_thread_suspend.c ****                         }
+ 644:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 645:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 646:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 647:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 648:ThreadX/common/src/tx_thread_suspend.c **** 
+ 649:ThreadX/common/src/tx_thread_suspend.c **** #ifndef TX_MISRA_ENABLE
+ 650:ThreadX/common/src/tx_thread_suspend.c **** 
+ 651:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 652:ThreadX/common/src/tx_thread_suspend.c **** 
+ 653:ThreadX/common/src/tx_thread_suspend.c ****                 /* Is the execute pointer different?  */
+ 654:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] !
+ 655:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 656:ThreadX/common/src/tx_thread_suspend.c **** 
+ 657:ThreadX/common/src/tx_thread_suspend.c ****                     /* Move to next entry.  */
+ 658:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_performance__execute_log_index++;
+ 659:ThreadX/common/src/tx_thread_suspend.c **** 
+ 660:ThreadX/common/src/tx_thread_suspend.c ****                     /* Check for wrap condition.  */
+ 661:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
+ 662:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 663:ThreadX/common/src/tx_thread_suspend.c **** 
+ 664:ThreadX/common/src/tx_thread_suspend.c ****                         /* Set the index to the beginning.  */
+ 665:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_performance__execute_log_index =  ((UINT) 0);
+ 666:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 667:ThreadX/common/src/tx_thread_suspend.c **** 
+ 668:ThreadX/common/src/tx_thread_suspend.c ****                     /* Log the new execute pointer.  */
+ 669:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =
+ 670:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 671:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 672:ThreadX/common/src/tx_thread_suspend.c **** 
+ 673:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ARM GAS  /tmp/ccLRbzKC.s 			page 26
+
+
+ 674:ThreadX/common/src/tx_thread_suspend.c **** 
+ 675:ThreadX/common/src/tx_thread_suspend.c ****                 /* Check that the event time stamp is unchanged.  A different
+ 676:ThreadX/common/src/tx_thread_suspend.c ****                    timestamp means that a later event wrote over the thread
+ 677:ThreadX/common/src/tx_thread_suspend.c ****                    suspend event. In that case, do nothing here.  */
+ 678:ThreadX/common/src/tx_thread_suspend.c ****                 if (entry_ptr != TX_NULL)
+ 679:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 680:ThreadX/common/src/tx_thread_suspend.c **** 
+ 681:ThreadX/common/src/tx_thread_suspend.c ****                     /* Is the timestamp the same?  */
+ 682:ThreadX/common/src/tx_thread_suspend.c ****                     if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
+ 683:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 684:ThreadX/common/src/tx_thread_suspend.c **** 
+ 685:ThreadX/common/src/tx_thread_suspend.c ****                         /* Timestamp is the same, set the "next thread pointer" to the new value of
+ 686:ThreadX/common/src/tx_thread_suspend.c ****                            next thread to execute. This can be used by the trace analysis tool to k
+ 687:ThreadX/common/src/tx_thread_suspend.c ****                            track of next thread execution.  */
+ 688:ThreadX/common/src/tx_thread_suspend.c ****                         entry_ptr -> tx_trace_buffer_entry_information_field_4 =  0;
+ 689:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 690:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 691:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 692:ThreadX/common/src/tx_thread_suspend.c **** 
+ 693:ThreadX/common/src/tx_thread_suspend.c ****                 /* Restore interrupts.  */
+ 694:ThreadX/common/src/tx_thread_suspend.c ****                 TX_RESTORE
+ 695:ThreadX/common/src/tx_thread_suspend.c **** 
+ 696:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if preemption should take place. This is only possible if the current 
+ 697:ThreadX/common/src/tx_thread_suspend.c ****                    not the same as the execute thread pointer AND the system state and preempt disa
+ 698:ThreadX/common/src/tx_thread_suspend.c ****                 TX_THREAD_SYSTEM_RETURN_CHECK(combined_flags)
+ 699:ThreadX/common/src/tx_thread_suspend.c ****                 if (combined_flags == ((ULONG) 0))
+ 700:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 701:ThreadX/common/src/tx_thread_suspend.c **** 
+ 702:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 703:ThreadX/common/src/tx_thread_suspend.c **** 
+ 704:ThreadX/common/src/tx_thread_suspend.c ****                     /* No, there is another thread ready to run and will be scheduled upon return. 
+ 705:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_performance_non_idle_return_count++;
+ 706:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 707:ThreadX/common/src/tx_thread_suspend.c **** 
+ 708:ThreadX/common/src/tx_thread_suspend.c ****                     /* Preemption is needed - return to the system!  */
+ 709:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_system_return();
+ 710:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 711:ThreadX/common/src/tx_thread_suspend.c **** 
+ 712:ThreadX/common/src/tx_thread_suspend.c ****                 /* Return to caller.  */
+ 713:ThreadX/common/src/tx_thread_suspend.c ****                 return(TX_SUCCESS);
+ 714:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 715:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 716:ThreadX/common/src/tx_thread_suspend.c **** 
+ 717:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 718:ThreadX/common/src/tx_thread_suspend.c **** 
+ 719:ThreadX/common/src/tx_thread_suspend.c ****             /* Is the execute pointer different?  */
+ 720:ThreadX/common/src/tx_thread_suspend.c ****             if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _t
+ 721:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 722:ThreadX/common/src/tx_thread_suspend.c **** 
+ 723:ThreadX/common/src/tx_thread_suspend.c ****                 /* Move to next entry.  */
+ 724:ThreadX/common/src/tx_thread_suspend.c ****                 _tx_thread_performance__execute_log_index++;
+ 725:ThreadX/common/src/tx_thread_suspend.c **** 
+ 726:ThreadX/common/src/tx_thread_suspend.c ****                 /* Check for wrap condition.  */
+ 727:ThreadX/common/src/tx_thread_suspend.c ****                 if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
+ 728:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 729:ThreadX/common/src/tx_thread_suspend.c **** 
+ 730:ThreadX/common/src/tx_thread_suspend.c ****                     /* Set the index to the beginning.  */
+ARM GAS  /tmp/ccLRbzKC.s 			page 27
+
+
+ 731:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_performance__execute_log_index =  ((UINT) 0);
+ 732:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 733:ThreadX/common/src/tx_thread_suspend.c **** 
+ 734:ThreadX/common/src/tx_thread_suspend.c ****                 /* Log the new execute pointer.  */
+ 735:ThreadX/common/src/tx_thread_suspend.c ****                 _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _t
+ 736:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 737:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 738:ThreadX/common/src/tx_thread_suspend.c **** 
+ 739:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_EVENT_TRACE
+ 740:ThreadX/common/src/tx_thread_suspend.c **** 
+ 741:ThreadX/common/src/tx_thread_suspend.c ****             /* Check that the event time stamp is unchanged.  A different
+ 742:ThreadX/common/src/tx_thread_suspend.c ****                timestamp means that a later event wrote over the thread
+ 743:ThreadX/common/src/tx_thread_suspend.c ****                suspend event. In that case, do nothing here.  */
+ 744:ThreadX/common/src/tx_thread_suspend.c ****             if (entry_ptr != TX_NULL)
+ 745:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 746:ThreadX/common/src/tx_thread_suspend.c **** 
+ 747:ThreadX/common/src/tx_thread_suspend.c ****                 /* Is the timestamp the same?  */
+ 748:ThreadX/common/src/tx_thread_suspend.c ****                 if (time_stamp == entry_ptr -> tx_trace_buffer_entry_time_stamp)
+ 749:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 750:ThreadX/common/src/tx_thread_suspend.c **** 
+ 751:ThreadX/common/src/tx_thread_suspend.c ****                     /* Timestamp is the same, set the "next thread pointer" to the new value of the
+ 752:ThreadX/common/src/tx_thread_suspend.c ****                        next thread to execute. This can be used by the trace analysis tool to keep
+ 753:ThreadX/common/src/tx_thread_suspend.c ****                        track of next thread execution.  */
+ 754:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_MISRA_ENABLE
+ 755:ThreadX/common/src/tx_thread_suspend.c ****                     entry_ptr -> tx_trace_buffer_entry_info_4 =  TX_POINTER_TO_ULONG_CONVERT(_tx_th
+ 756:ThreadX/common/src/tx_thread_suspend.c **** #else
+ 757:ThreadX/common/src/tx_thread_suspend.c ****                     entry_ptr -> tx_trace_buffer_entry_information_field_4 =  TX_POINTER_TO_ULONG_C
+ 758:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 759:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 760:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 761:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 762:ThreadX/common/src/tx_thread_suspend.c **** 
+ 763:ThreadX/common/src/tx_thread_suspend.c ****             /* Restore interrupts.  */
+ 764:ThreadX/common/src/tx_thread_suspend.c ****             TX_RESTORE
+ 765:ThreadX/common/src/tx_thread_suspend.c **** 
+ 766:ThreadX/common/src/tx_thread_suspend.c ****             /* Determine if a preemption condition is present.  */
+ 767:ThreadX/common/src/tx_thread_suspend.c ****             if (current_thread != _tx_thread_execute_ptr)
+ 768:ThreadX/common/src/tx_thread_suspend.c ****             {
+ 769:ThreadX/common/src/tx_thread_suspend.c **** 
+ 770:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_ENABLE_STACK_CHECKING
+ 771:ThreadX/common/src/tx_thread_suspend.c **** 
+ 772:ThreadX/common/src/tx_thread_suspend.c ****                 /* Pickup the next execute pointer.  */
+ 773:ThreadX/common/src/tx_thread_suspend.c ****                 thread_ptr =  _tx_thread_execute_ptr;
+ 774:ThreadX/common/src/tx_thread_suspend.c **** 
+ 775:ThreadX/common/src/tx_thread_suspend.c ****                 /* Check this thread's stack.  */
+ 776:ThreadX/common/src/tx_thread_suspend.c ****                 TX_THREAD_STACK_CHECK(thread_ptr)
+ 777:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 778:ThreadX/common/src/tx_thread_suspend.c **** 
+ 779:ThreadX/common/src/tx_thread_suspend.c ****                 /* Determine if preemption should take place. This is only possible if the current 
+ 780:ThreadX/common/src/tx_thread_suspend.c ****                    not the same as the execute thread pointer AND the system state and preempt disa
+ 781:ThreadX/common/src/tx_thread_suspend.c ****                 TX_THREAD_SYSTEM_RETURN_CHECK(combined_flags)
+ 782:ThreadX/common/src/tx_thread_suspend.c ****                 if (combined_flags == ((ULONG) 0))
+ 783:ThreadX/common/src/tx_thread_suspend.c ****                 {
+ 784:ThreadX/common/src/tx_thread_suspend.c **** 
+ 785:ThreadX/common/src/tx_thread_suspend.c **** #ifdef TX_THREAD_ENABLE_PERFORMANCE_INFO
+ 786:ThreadX/common/src/tx_thread_suspend.c **** 
+ 787:ThreadX/common/src/tx_thread_suspend.c ****                     /* Determine if an idle system return is present.  */
+ARM GAS  /tmp/ccLRbzKC.s 			page 28
+
+
+ 788:ThreadX/common/src/tx_thread_suspend.c ****                     if (_tx_thread_execute_ptr == TX_NULL)
+ 789:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 790:ThreadX/common/src/tx_thread_suspend.c **** 
+ 791:ThreadX/common/src/tx_thread_suspend.c ****                         /* Yes, increment the return to idle return count.  */
+ 792:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_performance_idle_return_count++;
+ 793:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 794:ThreadX/common/src/tx_thread_suspend.c ****                     else
+ 795:ThreadX/common/src/tx_thread_suspend.c ****                     {
+ 796:ThreadX/common/src/tx_thread_suspend.c **** 
+ 797:ThreadX/common/src/tx_thread_suspend.c ****                         /* No, there is another thread ready to run and will be scheduled upon retu
+ 798:ThreadX/common/src/tx_thread_suspend.c ****                         _tx_thread_performance_non_idle_return_count++;
+ 799:ThreadX/common/src/tx_thread_suspend.c ****                     }
+ 800:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 801:ThreadX/common/src/tx_thread_suspend.c **** 
+ 802:ThreadX/common/src/tx_thread_suspend.c ****                     /* Preemption is needed - return to the system!  */
+ 803:ThreadX/common/src/tx_thread_suspend.c ****                     _tx_thread_system_return();
+ 804:ThreadX/common/src/tx_thread_suspend.c ****                 }
+ 805:ThreadX/common/src/tx_thread_suspend.c ****             }
+ 806:ThreadX/common/src/tx_thread_suspend.c **** 
+ 807:ThreadX/common/src/tx_thread_suspend.c ****             /* Disable interrupts.  */
+ 808:ThreadX/common/src/tx_thread_suspend.c ****             TX_DISABLE
+ 809:ThreadX/common/src/tx_thread_suspend.c **** 
+ 810:ThreadX/common/src/tx_thread_suspend.c ****             /* Return success.  */
+ 811:ThreadX/common/src/tx_thread_suspend.c ****             status =  TX_SUCCESS;
+ 812:ThreadX/common/src/tx_thread_suspend.c ****         }
+ 813:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 814:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_TERMINATED)
+ 815:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 816:ThreadX/common/src/tx_thread_suspend.c **** 
+ 817:ThreadX/common/src/tx_thread_suspend.c ****         /* Thread is terminated.  */
+ 818:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUSPEND_ERROR;
+ 819:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 820:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_COMPLETED)
+ 821:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 822:ThreadX/common/src/tx_thread_suspend.c **** 
+ 823:ThreadX/common/src/tx_thread_suspend.c ****         /* Thread is completed.  */
+ 824:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUSPEND_ERROR;
+ 825:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 826:ThreadX/common/src/tx_thread_suspend.c ****     else if (thread_ptr -> tx_thread_state == TX_SUSPENDED)
+ 827:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 828:ThreadX/common/src/tx_thread_suspend.c **** 
+ 829:ThreadX/common/src/tx_thread_suspend.c ****         /* Already suspended, just set status to success.  */
+ 830:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 831:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 832:ThreadX/common/src/tx_thread_suspend.c ****     else
+ 833:ThreadX/common/src/tx_thread_suspend.c ****     {
+ 834:ThreadX/common/src/tx_thread_suspend.c **** 
+ 835:ThreadX/common/src/tx_thread_suspend.c ****         /* Just set the delayed suspension flag.  */
+ 836:ThreadX/common/src/tx_thread_suspend.c ****         thread_ptr -> tx_thread_delayed_suspend =  TX_TRUE;
+ 837:ThreadX/common/src/tx_thread_suspend.c **** 
+ 838:ThreadX/common/src/tx_thread_suspend.c ****         /* Set status to success.  */
+ 839:ThreadX/common/src/tx_thread_suspend.c ****         status =  TX_SUCCESS;
+ 840:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 841:ThreadX/common/src/tx_thread_suspend.c **** 
+ 842:ThreadX/common/src/tx_thread_suspend.c ****     /* Restore interrupts.  */
+ 843:ThreadX/common/src/tx_thread_suspend.c ****     TX_RESTORE
+ 844:ThreadX/common/src/tx_thread_suspend.c **** 
+ARM GAS  /tmp/ccLRbzKC.s 			page 29
+
+
+ 845:ThreadX/common/src/tx_thread_suspend.c ****     /* Return completion status.  */
+ 846:ThreadX/common/src/tx_thread_suspend.c ****     return(status);
+ 847:ThreadX/common/src/tx_thread_suspend.c **** #endif
+ 848:ThreadX/common/src/tx_thread_suspend.c **** }
+ 173              		.loc 1 848 0
+ 174 0064 2046     		mov	r0, r4
+ 175 0066 38BD     		pop	{r3, r4, r5, pc}
+ 176              	.LVL15:
+ 177              	.L8:
+ 186:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 178              		.loc 1 186 0
+ 179 0068 1424     		movs	r4, #20
+ 180 006a F9E7     		b	.L4
+ 181              	.L9:
+ 192:ThreadX/common/src/tx_thread_suspend.c ****     }
+ 182              		.loc 1 192 0
+ 183 006c 0024     		movs	r4, #0
+ 184 006e F7E7     		b	.L4
+ 185              	.L13:
+ 186              		.align	2
+ 187              	.L12:
+ 188 0070 00000000 		.word	_tx_thread_current_ptr
+ 189 0074 00000000 		.word	_tx_thread_system_state
+ 190 0078 00000000 		.word	_tx_thread_preempt_disable
+ 191              		.cfi_endproc
+ 192              	.LFE8:
+ 194              		.text
+ 195              	.Letext0:
+ 196              		.file 3 "/usr/include/newlib/sys/lock.h"
+ 197              		.file 4 "/usr/include/newlib/sys/_types.h"
+ 198              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+ 199              		.file 6 "/usr/include/newlib/sys/reent.h"
+ 200              		.file 7 "/usr/include/newlib/stdlib.h"
+ 201              		.file 8 "ThreadX/common/inc/tx_api.h"
+ 202              		.file 9 "ThreadX/common/inc/tx_thread.h"
+ARM GAS  /tmp/ccLRbzKC.s 			page 30
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 tx_thread_suspend.c
+     /tmp/ccLRbzKC.s:18     .text._tx_thread_suspend:0000000000000000 $t
+     /tmp/ccLRbzKC.s:25     .text._tx_thread_suspend:0000000000000000 _tx_thread_suspend
+     /tmp/ccLRbzKC.s:188    .text._tx_thread_suspend:0000000000000070 $d
+
+UNDEFINED SYMBOLS
+_tx_thread_system_suspend
+_tx_thread_current_ptr
+_tx_thread_system_state
+_tx_thread_preempt_disable

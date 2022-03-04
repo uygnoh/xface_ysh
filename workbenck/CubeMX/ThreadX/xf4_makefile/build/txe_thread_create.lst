@@ -1,0 +1,1392 @@
+ARM GAS  /tmp/ccJARZ81.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"txe_thread_create.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._txe_thread_create,"ax",%progbits
+  18              		.align	1
+  19              		.global	_txe_thread_create
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_txe_thread_create:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/txe_thread_create.c"
+   1:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+   2:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+   3:ThreadX/common/src/txe_thread_create.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+   5:ThreadX/common/src/txe_thread_create.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/txe_thread_create.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/txe_thread_create.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/txe_thread_create.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  10:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  11:ThreadX/common/src/txe_thread_create.c **** 
+  12:ThreadX/common/src/txe_thread_create.c **** 
+  13:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  14:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  15:ThreadX/common/src/txe_thread_create.c **** /**                                                                       */
+  16:ThreadX/common/src/txe_thread_create.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/txe_thread_create.c **** /**                                                                       */
+  18:ThreadX/common/src/txe_thread_create.c **** /**   Thread                                                              */
+  19:ThreadX/common/src/txe_thread_create.c **** /**                                                                       */
+  20:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  21:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  22:ThreadX/common/src/txe_thread_create.c **** 
+  23:ThreadX/common/src/txe_thread_create.c **** #define TX_SOURCE_CODE
+  24:ThreadX/common/src/txe_thread_create.c **** 
+  25:ThreadX/common/src/txe_thread_create.c **** 
+  26:ThreadX/common/src/txe_thread_create.c **** /* Include necessary system files.  */
+  27:ThreadX/common/src/txe_thread_create.c **** 
+  28:ThreadX/common/src/txe_thread_create.c **** #include "tx_api.h"
+  29:ThreadX/common/src/txe_thread_create.c **** #include "tx_initialize.h"
+  30:ThreadX/common/src/txe_thread_create.c **** #include "tx_thread.h"
+  31:ThreadX/common/src/txe_thread_create.c **** #include "tx_timer.h"
+ARM GAS  /tmp/ccJARZ81.s 			page 2
+
+
+  32:ThreadX/common/src/txe_thread_create.c **** 
+  33:ThreadX/common/src/txe_thread_create.c **** 
+  34:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  35:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  36:ThreadX/common/src/txe_thread_create.c **** /*  FUNCTION                                               RELEASE        */
+  37:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  38:ThreadX/common/src/txe_thread_create.c **** /*    _txe_thread_create                                  PORTABLE C      */
+  39:ThreadX/common/src/txe_thread_create.c **** /*                                                           6.1          */
+  40:ThreadX/common/src/txe_thread_create.c **** /*  AUTHOR                                                                */
+  41:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  42:ThreadX/common/src/txe_thread_create.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  43:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  44:ThreadX/common/src/txe_thread_create.c **** /*  DESCRIPTION                                                           */
+  45:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  46:ThreadX/common/src/txe_thread_create.c **** /*    This function checks for errors in the thread create function call. */
+  47:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  48:ThreadX/common/src/txe_thread_create.c **** /*  INPUT                                                                 */
+  49:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  50:ThreadX/common/src/txe_thread_create.c **** /*    thread_ptr                            Thread control block pointer  */
+  51:ThreadX/common/src/txe_thread_create.c **** /*    name                                  Pointer to thread name string */
+  52:ThreadX/common/src/txe_thread_create.c **** /*    entry_function                        Entry function of the thread  */
+  53:ThreadX/common/src/txe_thread_create.c **** /*    entry_input                           32-bit input value to thread  */
+  54:ThreadX/common/src/txe_thread_create.c **** /*    stack_start                           Pointer to start of stack     */
+  55:ThreadX/common/src/txe_thread_create.c **** /*    stack_size                            Stack size in bytes           */
+  56:ThreadX/common/src/txe_thread_create.c **** /*    priority                              Priority of thread (0-31)     */
+  57:ThreadX/common/src/txe_thread_create.c **** /*    preempt_threshold                     Preemption threshold          */
+  58:ThreadX/common/src/txe_thread_create.c **** /*    time_slice                            Thread time-slice value       */
+  59:ThreadX/common/src/txe_thread_create.c **** /*    auto_start                            Automatic start selection     */
+  60:ThreadX/common/src/txe_thread_create.c **** /*    thread_control_block_size             Size of thread control block  */
+  61:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  62:ThreadX/common/src/txe_thread_create.c **** /*  OUTPUT                                                                */
+  63:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  64:ThreadX/common/src/txe_thread_create.c **** /*    TX_THREAD_ERROR                       Invalid thread pointer        */
+  65:ThreadX/common/src/txe_thread_create.c **** /*    TX_PTR_ERROR                          Invalid entry point or stack  */
+  66:ThreadX/common/src/txe_thread_create.c **** /*                                            address                     */
+  67:ThreadX/common/src/txe_thread_create.c **** /*    TX_SIZE_ERROR                         Invalid stack size -too small */
+  68:ThreadX/common/src/txe_thread_create.c **** /*    TX_PRIORITY_ERROR                     Invalid thread priority       */
+  69:ThreadX/common/src/txe_thread_create.c **** /*    TX_THRESH_ERROR                       Invalid preemption threshold  */
+  70:ThreadX/common/src/txe_thread_create.c **** /*    status                                Actual completion status      */
+  71:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  72:ThreadX/common/src/txe_thread_create.c **** /*  CALLS                                                                 */
+  73:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  74:ThreadX/common/src/txe_thread_create.c **** /*    _tx_thread_create                     Actual thread create function */
+  75:ThreadX/common/src/txe_thread_create.c **** /*    _tx_thread_system_preempt_check       Check for preemption          */
+  76:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  77:ThreadX/common/src/txe_thread_create.c **** /*  CALLED BY                                                             */
+  78:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  79:ThreadX/common/src/txe_thread_create.c **** /*    Application Code                                                    */
+  80:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  81:ThreadX/common/src/txe_thread_create.c **** /*  RELEASE HISTORY                                                       */
+  82:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  83:ThreadX/common/src/txe_thread_create.c **** /*    DATE              NAME                      DESCRIPTION             */
+  84:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+  85:ThreadX/common/src/txe_thread_create.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  86:ThreadX/common/src/txe_thread_create.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+  87:ThreadX/common/src/txe_thread_create.c **** /*                                            resulting in version 6.1    */
+  88:ThreadX/common/src/txe_thread_create.c **** /*                                                                        */
+ARM GAS  /tmp/ccJARZ81.s 			page 3
+
+
+  89:ThreadX/common/src/txe_thread_create.c **** /**************************************************************************/
+  90:ThreadX/common/src/txe_thread_create.c **** UINT    _txe_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
+  91:ThreadX/common/src/txe_thread_create.c ****                 VOID (*entry_function)(ULONG id), ULONG entry_input,
+  92:ThreadX/common/src/txe_thread_create.c ****                 VOID *stack_start, ULONG stack_size,
+  93:ThreadX/common/src/txe_thread_create.c ****                 UINT priority, UINT preempt_threshold,
+  94:ThreadX/common/src/txe_thread_create.c ****                 ULONG time_slice, UINT auto_start, UINT thread_control_block_size)
+  95:ThreadX/common/src/txe_thread_create.c **** {
+  28              		.loc 1 95 0
+  29              		.cfi_startproc
+  30              		@ args = 28, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 28
+  36              		.cfi_offset 4, -28
+  37              		.cfi_offset 5, -24
+  38              		.cfi_offset 6, -20
+  39              		.cfi_offset 7, -16
+  40              		.cfi_offset 8, -12
+  41              		.cfi_offset 9, -8
+  42              		.cfi_offset 14, -4
+  43 0004 87B0     		sub	sp, sp, #28
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 56
+  46 0006 0E9F     		ldr	r7, [sp, #56]
+  47              	.LVL1:
+  96:ThreadX/common/src/txe_thread_create.c **** 
+  97:ThreadX/common/src/txe_thread_create.c **** TX_INTERRUPT_SAVE_AREA
+  98:ThreadX/common/src/txe_thread_create.c **** 
+  99:ThreadX/common/src/txe_thread_create.c **** UINT            status;
+ 100:ThreadX/common/src/txe_thread_create.c **** UINT            break_flag;
+ 101:ThreadX/common/src/txe_thread_create.c **** ULONG           i;
+ 102:ThreadX/common/src/txe_thread_create.c **** TX_THREAD       *next_thread;
+ 103:ThreadX/common/src/txe_thread_create.c **** VOID            *stack_end;
+ 104:ThreadX/common/src/txe_thread_create.c **** UCHAR           *work_ptr;
+ 105:ThreadX/common/src/txe_thread_create.c **** #ifndef TX_TIMER_PROCESS_IN_ISR
+ 106:ThreadX/common/src/txe_thread_create.c **** TX_THREAD       *current_thread;
+ 107:ThreadX/common/src/txe_thread_create.c **** #endif
+ 108:ThreadX/common/src/txe_thread_create.c **** 
+ 109:ThreadX/common/src/txe_thread_create.c **** 
+ 110:ThreadX/common/src/txe_thread_create.c ****     /* Default status to success.  */
+ 111:ThreadX/common/src/txe_thread_create.c ****     status =  TX_SUCCESS;
+ 112:ThreadX/common/src/txe_thread_create.c **** 
+ 113:ThreadX/common/src/txe_thread_create.c ****     /* Check for an invalid thread pointer.  */
+ 114:ThreadX/common/src/txe_thread_create.c ****     if (thread_ptr == TX_NULL)
+  48              		.loc 1 114 0
+  49 0008 0028     		cmp	r0, #0
+  50 000a 79D0     		beq	.L10
+  51 000c 9846     		mov	r8, r3
+  52 000e 8646     		mov	lr, r0
+ 115:ThreadX/common/src/txe_thread_create.c ****     {
+ 116:ThreadX/common/src/txe_thread_create.c **** 
+ 117:ThreadX/common/src/txe_thread_create.c ****         /* Thread pointer is invalid, return appropriate error code.  */
+ 118:ThreadX/common/src/txe_thread_create.c ****         status =  TX_THREAD_ERROR;
+ 119:ThreadX/common/src/txe_thread_create.c ****     }
+ 120:ThreadX/common/src/txe_thread_create.c **** 
+ARM GAS  /tmp/ccJARZ81.s 			page 4
+
+
+ 121:ThreadX/common/src/txe_thread_create.c ****     /* Now check for invalid thread control block size.  */
+ 122:ThreadX/common/src/txe_thread_create.c ****     else if (thread_control_block_size != (sizeof(TX_THREAD)))
+  53              		.loc 1 122 0
+  54 0010 1498     		ldr	r0, [sp, #80]
+  55              	.LVL2:
+  56 0012 B428     		cmp	r0, #180
+  57 0014 76D1     		bne	.L11
+  58              	.LBB20:
+  59              	.LBB21:
+  60              	.LBB22:
+  61              	.LBB23:
+  62              		.file 2 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+   1:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+   2:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   3:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+   5:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*       and in the root directory of this software.                      */
+   9:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  10:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  11:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  12:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  13:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  14:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  15:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  16:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /** ThreadX Component                                                     */
+  17:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  18:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**   Port Specific                                                       */
+  19:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**                                                                       */
+  20:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  21:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  22:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  23:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  24:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  25:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  26:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+  27:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  28:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    tx_port.h                                         Cortex-M4/GNU     */
+  29:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                           6.1.10       */
+  30:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  31:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  AUTHOR                                                                */
+  32:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  33:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    Scott Larson, Microsoft Corporation                                 */
+  34:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  35:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  DESCRIPTION                                                           */
+  36:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  37:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file contains data type definitions that make the ThreadX      */
+  38:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    real-time kernel function identically on a variety of different     */
+  39:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    processor architectures.  For example, the size or number of bits   */
+  40:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    in an "int" data type vary between microprocessor architectures and */
+  41:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    even C compilers for the same microprocessor.  ThreadX does not     */
+  42:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    directly use native C data types.  Instead, ThreadX creates its     */
+  43:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    own special types that can be mapped to actual data types by this   */
+  44:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    file to guarantee consistency in the interface and functionality.   */
+  45:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+ARM GAS  /tmp/ccJARZ81.s 			page 5
+
+
+  46:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    This file replaces the previous Cortex-M3/M4/M7 files. It unifies   */
+  47:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    the ARMv7-M architecture and compilers into one common file.        */
+  48:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  49:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  RELEASE HISTORY                                                       */
+  50:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  51:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*    DATE              NAME                      DESCRIPTION             */
+  52:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  53:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  06-02-2021      Scott Larson            Initial Version 6.1.7         */
+  54:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*  01-31-2022      Scott Larson            Modified comments, updated    */
+  55:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            typedef to fix misra        */
+  56:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            violation,                  */
+  57:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            fixed predefined macro,     */
+  58:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                            resulting in version 6.1.10 */
+  59:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*                                                                        */
+  60:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /**************************************************************************/
+  61:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  62:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_PORT_H
+  63:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_H
+  64:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  65:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  66:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine if the optional ThreadX user define file should be used.  */
+  67:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  68:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_INCLUDE_USER_DEFINE_FILE
+  69:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  70:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Yes, include the user defines in tx_user.h. The defines in this file may
+  71:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    alternately be defined on the command line.  */
+  72:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  73:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_user.h"
+  74:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  75:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  76:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  77:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define compiler library include files.  */
+  78:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  79:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <stdlib.h>
+  80:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <string.h>
+  81:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  82:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__
+  83:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <intrinsics.h>                     /* IAR Intrinsics */
+  84:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __asm__ __asm                       /* Define to make all inline asm look similar */
+  85:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+  86:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <yvals.h>
+  87:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  88:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif /* __ICCARM__ */
+  89:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  90:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+  91:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include <arm_ghs.h>
+  92:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #include "tx_ghs.h"
+  93:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+  94:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  95:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+  96:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if !defined(__GNUC__) && !defined(__CC_ARM)
+  97:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_control_value __get_CONTROL
+  98:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __set_control_value __set_CONTROL
+  99:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 100:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 101:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef __GNUC__
+ 102:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define __get_ipsr_value __get_IPSR
+ARM GAS  /tmp/ccJARZ81.s 			page 6
+
+
+ 103:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 104:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 105:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define ThreadX basic types for this port.  */
+ 106:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 107:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define VOID                                    void
+ 108:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef char                                    CHAR;
+ 109:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned char                           UCHAR;
+ 110:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef int                                     INT;
+ 111:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned int                            UINT;
+ 112:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef long                                    LONG;
+ 113:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long                           ULONG;
+ 114:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned long long                      ULONG64;
+ 115:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef short                                   SHORT;
+ 116:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** typedef unsigned short                          USHORT;
+ 117:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define ULONG64_DEFINED
+ 118:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 119:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the priority levels for ThreadX.  Legal values range
+ 120:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    from 32 to 1024 and MUST be evenly divisible by 32.  */
+ 121:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 122:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MAX_PRIORITIES
+ 123:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MAX_PRIORITIES                       32
+ 124:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 125:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 126:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 127:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the minimum stack for a ThreadX thread on this processor. If the size supplied during
+ 128:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    thread creation is less than this value, the thread create call will return an error.  */
+ 129:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 130:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MINIMUM_STACK
+ 131:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MINIMUM_STACK                        200         /* Minimum stack size for this port  */
+ 132:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 133:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 134:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 135:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the system timer thread's default stack size and priority.  These are only applicable
+ 136:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    if TX_TIMER_PROCESS_IN_ISR is not defined.  */
+ 137:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 138:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_STACK_SIZE
+ 139:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_STACK_SIZE              1024        /* Default timer thread stack size  */
+ 140:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 141:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 142:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TIMER_THREAD_PRIORITY
+ 143:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_THREAD_PRIORITY                0           /* Default timer thread priority    */
+ 144:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 145:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 146:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 147:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define various constants for the ThreadX Cortex-M port.  */
+ 148:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 149:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_DISABLE                          1           /* Disable interrupts               */
+ 150:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INT_ENABLE                           0           /* Enable interrupts                */
+ 151:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 152:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 153:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the clock source for trace event entry time stamp. The following two item are port specif
+ 154:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    For example, if the time source is at the address 0x0a800024 and is 16-bits in size, the clock
+ 155:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    source constants would be:
+ 156:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 157:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0x0a800024)
+ 158:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0x0000FFFFUL
+ 159:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ARM GAS  /tmp/ccJARZ81.s 			page 7
+
+
+ 160:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** */
+ 161:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 162:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 163:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_SOURCE
+ 164:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    *((ULONG *) 0xE0001004)
+ 165:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 166:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 167:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_time_stamp_get(VOID);
+ 168:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_SOURCE                    _tx_misra_time_stamp_get()
+ 169:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 170:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 171:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_TRACE_TIME_MASK
+ 172:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TRACE_TIME_MASK                      0xFFFFFFFFUL
+ 173:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 174:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 175:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ghs__
+ 176:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define constants for Green Hills EventAnalyzer.  */
+ 177:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 178:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the number of ticks per second. This informs the EventAnalyzer what the timestamps
+ 179:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    represent.  By default, this is set to 1,000,000 i.e., one tick every microsecond. */
+ 180:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 181:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EL_TICKS_PER_SECOND                  1000000
+ 182:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 183:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the method of how to get the upper and lower 32-bits of the time stamp. By default, simpl
+ 184:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    simulate the time-stamp source with a counter.  */
+ 185:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 186:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbu()                              _tx_el_time_base_upper
+ 187:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define read_tbl()                              ++_tx_el_time_base_lower
+ 188:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* __ghs__ */
+ 189:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 190:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port specific options for the _tx_build_options variable. This variable indicates
+ 191:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    how the ThreadX library was built.  */
+ 192:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 193:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_BUILD_OPTIONS          (0)
+ 194:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 195:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 196:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the in-line initialization constant so that modules with in-line
+ 197:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    initialization capabilities can prevent their initialization from being
+ 198:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    a function call.  */
+ 199:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 200:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 201:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_DISABLE_INLINE
+ 202:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 203:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_INLINE_INITIALIZATION
+ 204:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 205:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 206:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 207:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Determine whether or not stack checking is enabled. By default, ThreadX stack checking is
+ 208:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    disabled. When the following is defined, ThreadX thread stack checking is enabled.  If stack
+ 209:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    checking is enabled (TX_ENABLE_STACK_CHECKING is defined), the TX_DISABLE_STACK_FILLING
+ 210:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    define is negated, thereby forcing the stack fill which is necessary for the stack checking
+ 211:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    logic.  */
+ 212:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 213:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 214:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_ENABLE_STACK_CHECKING
+ 215:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #undef TX_DISABLE_STACK_FILLING
+ 216:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ARM GAS  /tmp/ccJARZ81.s 			page 8
+
+
+ 217:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 218:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 219:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 220:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_THREAD control block extensions for this port. The main reason
+ 221:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for the multiple macros is so that backward compatibility can be maintained with
+ 222:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    existing ThreadX kernel awareness modules.  */
+ 223:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 224:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_0
+ 225:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_1
+ 226:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 227:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID    *tx_thread_iar_tls_pointer;
+ 228:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ghs__)
+ 229:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2           VOID *  tx_thread_eh_globals;                           \
+ 230:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         int     Errno;             /* errno.  */                \
+ 231:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                         char *  strtok_saved_pos;  /* strtok() position.  */
+ 232:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 233:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_2
+ 234:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 235:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 236:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 237:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_EXTENSION_3
+ 238:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 239:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 240:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 241:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the port extensions of the remaining ThreadX objects.  */
+ 242:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 243:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_EXTENSION
+ 244:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_EXTENSION
+ 245:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_EXTENSION
+ 246:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_EXTENSION
+ 247:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_EXTENSION
+ 248:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_EXTENSION
+ 249:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_EXTENSION
+ 250:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 251:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 252:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the user extension field of the thread control block.  Nothing
+ 253:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    additional is needed for this port so it is defined as white space.  */
+ 254:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 255:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_USER_EXTENSION
+ 256:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_USER_EXTENSION
+ 257:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 258:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 259:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 260:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macros for processing extensions in tx_thread_create, tx_thread_delete,
+ 261:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    tx_thread_shell_entry, and tx_thread_terminate.  */
+ 262:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 263:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 264:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef  TX_ENABLE_IAR_LIBRARY_SUPPORT
+ 265:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if (__VER__ < 8000000)
+ 266:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 267:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      __iar_dlib_perthread_deallocate
+ 268:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     thread_ptr -> tx_thread_iar_tls
+ 269:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               __iar_dlib_perthread_access(0);
+ 270:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 271:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    *_tx_iar_create_per_thread_tls_area(void);
+ 272:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    _tx_iar_destroy_per_thread_tls_area(void *tls_ptr);
+ 273:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void    __iar_Initlocks(void);
+ARM GAS  /tmp/ccJARZ81.s 			page 9
+
+
+ 274:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 275:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)                      thread_ptr -> tx_thread_iar_tls
+ 276:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)                      do {_tx_iar_destroy_per_thread_
+ 277:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                         thread_ptr -> tx_thread_iar
+ 278:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_PRE_SCHEDULER_INITIALIZATION               do {__iar_Initlocks();} while(0
+ 279:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 280:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 281:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_CREATE_EXTENSION(thread_ptr)
+ 282:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_DELETE_EXTENSION(thread_ptr)
+ 283:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 284:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 285:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_FPU_VFP)
+ 286:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 287:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_MISRA_ENABLE
+ 288:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 289:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_control_get(void);
+ 290:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_control_set(ULONG value);
+ 291:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  _tx_misra_fpccr_get(void);
+ 292:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void   _tx_misra_vfp_touch(void);
+ 293:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 294:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE not defined */
+ 295:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 296:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define some helper functions (these are intrinsics in some compilers). */
+ 297:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __GNUC__ /* GCC and ARM Compiler 6 */
+ 298:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 299:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline ULONG __get_control_value(void)
+ 300:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 301:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 302:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 303:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,CONTROL ": "=r" (control_value) );
+ 304:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 305:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 306:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 307:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_control_value(ULONG control_value)
+ 308:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 309:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MSR  CONTROL,%0": : "r" (control_value): "memory" );
+ 310:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 311:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 312:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ 313:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 314:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* ARM Compiler 5 */
+ 315:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 316:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) ULONG __get_control_value(void)
+ 317:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 318:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG  control_value;
+ 319:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 320:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm volatile ("MRS control_value,CONTROL");
+ 321:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(control_value);
+ 322:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 323:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 324:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) void __set_control_value(ULONG control_value)
+ 325:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 326:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR CONTROL,control_value");
+ 327:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 328:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Can't access VFP registers with inline asm, so define this in tx_thread_schedule.  */
+ 329:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** void _tx_vfp_access(void);
+ 330:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  _tx_vfp_access();
+ARM GAS  /tmp/ccJARZ81.s 			page 10
+
+
+ 331:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 332:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)  /* IAR */
+ 333:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_VFP_TOUCH()  __asm__ volatile ("VMOV.F32 s0, s0");
+ 334:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* Helper functions for different compilers */
+ 335:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 336:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 337:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 338:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 339:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A completed thread falls into _thread_shell_entry and we can simply deactivate the FPU via CONTR
+ 340:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    in order to ensure no lazy stacking will occur. */
+ 341:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 342:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 343:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 344:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 345:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 346:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  __get_control_value();    
+ 347:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 348:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         __set_control_value(_tx_vfp_state);        
+ 349:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 350:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 351:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 352:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)   {                                              
+ 353:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_vfp_state;                          
+ 354:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_misra_control_get();  
+ 355:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_vfp_state =  _tx_vfp_state & ~((ULONG) 
+ 356:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_misra_control_set(_tx_vfp_state);      
+ 357:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 358:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 359:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 360:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 361:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* A thread can be terminated by another thread, so we first check if it's self-terminating and not
+ 362:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    If so, deactivate the FPU via CONTROL.FPCA. Otherwise we are in an interrupt or another thread i
+ 363:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    this one, so if the FPCCR.LSPACT bit is set, we need to save the CONTROL.FPCA state, touch the F
+ 364:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    the lazy FPU save, then restore the CONTROL.FPCA state. */
+ 365:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 366:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 367:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 368:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 369:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 370:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 371:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 372:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 373:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 374:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  __get_control_value();
+ 375:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 376:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             __set_control_value(_tx_vfp_state);    
+ 377:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 378:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 379:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 380:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 381:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  *((ULONG *) 0xE000EF34);  
+ 382:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 383:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 384:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 385:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 386:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = __get_control_value
+ 387:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ARM GAS  /tmp/ccJARZ81.s 			page 11
+
+
+ 388:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 TX_VFP_TOUCH();                    
+ 389:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 390:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ 391:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  __get_control_
+ 392:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 393:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     __set_control_value(_tx_vfp_sta
+ 394:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 395:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 396:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 397:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 398:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 399:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 400:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)  {                                              
+ 401:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     ULONG  _tx_system_state;                       
+ 402:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         _tx_system_state =  TX_THREAD_GET_SYSTEM_ST
+ 403:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         if ((_tx_system_state == ((ULONG) 0)) && ((
+ 404:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 405:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_vfp_state;                      
+ 406:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_misra_control_get(
+ 407:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_vfp_state =  _tx_vfp_state & ~((ULO
+ 408:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_misra_control_set(_tx_vfp_state);  
+ 409:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 410:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         else                                       
+ 411:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         {                                          
+ 412:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         ULONG  _tx_fpccr;                          
+ 413:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_misra_fpccr_get();    
+ 414:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             _tx_fpccr =  _tx_fpccr & ((ULONG) 0x01)
+ 415:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             if (_tx_fpccr == ((ULONG) 0x01))       
+ 416:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             {                                      
+ 417:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             ULONG _tx_vfp_state;                   
+ 418:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state = _tx_misra_control_g
+ 419:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_vfp_state =  _tx_vfp_state & ((
+ 420:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 _tx_misra_vfp_touch();             
+ 421:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 if (_tx_vfp_state == ((ULONG) 0))  
+ 422:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 {                                  
+ 423:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_misra_cont
+ 424:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_vfp_state =  _tx_vfp_state 
+ 425:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                     _tx_misra_control_set(_tx_vfp_s
+ 426:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                                 }                                  
+ 427:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                             }                                      
+ 428:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                         }                                          
+ 429:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                     }
+ 430:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 431:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 432:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* No VFP in use */
+ 433:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 434:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+ 435:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+ 436:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 437:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* defined(__ARMVFP__) || defined(__ARM_PCS_VFP) || defined(__ARM_FP) || defined(__TARGET_F
+ 438:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 439:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 440:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object creation extensions for the remaining objects.  */
+ 441:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 442:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_CREATE_EXTENSION(pool_ptr)
+ 443:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_CREATE_EXTENSION(pool_ptr)
+ 444:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
+ARM GAS  /tmp/ccJARZ81.s 			page 12
+
+
+ 445:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
+ 446:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_CREATE_EXTENSION(queue_ptr)
+ 447:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_CREATE_EXTENSION(semaphore_ptr)
+ 448:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_CREATE_EXTENSION(timer_ptr)
+ 449:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 450:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 451:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the ThreadX object deletion extensions for the remaining objects.  */
+ 452:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 453:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BLOCK_POOL_DELETE_EXTENSION(pool_ptr)
+ 454:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_BYTE_POOL_DELETE_EXTENSION(pool_ptr)
+ 455:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_EVENT_FLAGS_GROUP_DELETE_EXTENSION(group_ptr)
+ 456:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_MUTEX_DELETE_EXTENSION(mutex_ptr)
+ 457:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_QUEUE_DELETE_EXTENSION(queue_ptr)
+ 458:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_SEMAPHORE_DELETE_EXTENSION(semaphore_ptr)
+ 459:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_TIMER_DELETE_EXTENSION(timer_ptr)
+ 460:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 461:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 462:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the get system state macro.  */
+ 463:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 464:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_GET_SYSTEM_STATE
+ 465:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_MISRA_ENABLE
+ 466:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 467:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __CC_ARM /* ARM Compiler 5 */
+ 468:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 469:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** register unsigned int _ipsr __asm("ipsr");
+ 470:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _ipsr)
+ 471:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 472:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and ARM Compiler 6 */
+ 473:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 474:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_ipsr_value(void)
+ 475:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 476:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int  ipsr_value;
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile (" MRS  %0,IPSR ": "=r" (ipsr_value) );
+ 478:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+ 479:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 480:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 481:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_ipsr_value())
+ 482:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 483:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__ICCARM__)   /* IAR */
+ 484:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 485:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | __get_IPSR())
+ 486:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 487:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE for different compilers */
+ 488:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 489:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else   /* TX_MISRA_ENABLE is defined, use MISRA function. */
+ 490:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** ULONG   _tx_misra_ipsr_get(VOID);
+ 491:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_GET_SYSTEM_STATE()        (_tx_thread_system_state | _tx_misra_ipsr_get())
+ 492:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_MISRA_ENABLE */
+ 493:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif  /* TX_THREAD_GET_SYSTEM_STATE */
+ 494:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 495:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 496:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the check for whether or not to call the _tx_thread_system_return function.  A non-zero v
+ 497:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    indicates that _tx_thread_system_return should not be called. This overrides the definition in t
+ 498:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    for Cortex-M since so we don't waste time checking the _tx_thread_system_state variable that is 
+ 499:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    zero after initialization for Cortex-M ports. */
+ 500:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 501:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_THREAD_SYSTEM_RETURN_CHECK
+ARM GAS  /tmp/ccJARZ81.s 			page 13
+
+
+ 502:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_THREAD_SYSTEM_RETURN_CHECK(c)    (c) = ((ULONG) _tx_thread_preempt_disable);
+ 503:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 504:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 505:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the macro to ensure _tx_thread_preempt_disable is set early in initialization in order to
+ 506:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****    prevent early scheduling on Cortex-M parts.  */
+ 507:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 508:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_PORT_SPECIFIC_POST_INITIALIZATION    _tx_thread_preempt_disable++;
+ 509:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 510:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 511:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 512:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 513:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifndef TX_DISABLE_INLINE
+ 514:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 515:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the TX_LOWEST_SET_BIT_CALCULATE macro for each compiler. */
+ 516:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef __ICCARM__       /* IAR Compiler */
+ 517:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __CLZ(__RBIT((m)));
+ 518:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__CC_ARM) /* AC5 Compiler */
+ 519:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       (b) = (UINT) __clz(__rbit((m)));
+ 520:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #elif defined(__GNUC__) /* GCC and AC6 Compiler */
+ 521:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #define TX_LOWEST_SET_BIT_CALCULATE(m, b)       __asm__ volatile (" RBIT %0,%1 ": "=r" (m) : "r" (m
+ 522:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****                                                 __asm__ volatile (" CLZ  %0,%1 ": "=r" (b) : "r" (m
+ 523:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 524:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 525:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 526:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 527:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /* Define the interrupt disable/restore macros for each compiler. */
+ 528:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 529:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #if defined(__GNUC__) || defined(__ICCARM__)
+ 530:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 531:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** /*** GCC/AC6 and IAR ***/
+ 532:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 533:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __get_interrupt_posture(void)
+ 534:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 535:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int posture;
+ 536:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 537:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, BASEPRI ": "=r" (posture));
+ 538:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MRS  %0, PRIMASK ": "=r" (posture));
+  63              		.loc 2 539 0
+  64              		.syntax unified
+  65              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  66 0016 EFF31085 		MRS  r5, PRIMASK 
+  67              	@ 0 "" 2
+  68              		.thumb
+  69              		.syntax unified
+  70              	.LBE23:
+  71              	.LBE22:
+ 540:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 541:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(posture);
+ 542:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 543:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 544:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 545:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __set_basepri_value(unsigned int basepri_valu
+ 546:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 547:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  BASEPRI,%0 ": : "r" (basepri_value));
+ 548:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 549:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ARM GAS  /tmp/ccJARZ81.s 			page 14
+
+
+ 550:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __enable_interrupts(void)
+ 551:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 552:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSIE  i": : : "memory");
+ 553:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 554:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 555:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 556:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline void __restore_interrupt(unsigned int int_posture)
+ 557:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 558:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 559:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(int_posture);
+ 560:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     //__asm__ volatile ("MSR  BASEPRI,%0": : "r" (int_posture): "memory");
+ 561:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("MSR  PRIMASK,%0": : "r" (int_posture): "memory");
+ 563:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 564:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** }
+ 565:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 566:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** __attribute__( ( always_inline ) ) static inline unsigned int __disable_interrupts(void)
+ 567:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** {
+ 568:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** unsigned int int_posture;
+ 569:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 570:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     int_posture = __get_interrupt_posture();
+ 571:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** 
+ 572:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #ifdef TX_PORT_USE_BASEPRI
+ 573:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __set_basepri_value(TX_PORT_BASEPRI);
+ 574:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #else
+ 575:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     __asm__ volatile ("CPSID i" : : : "memory");
+  72              		.loc 2 575 0
+  73              		.syntax unified
+  74              	@ 575 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  75 001a 72B6     		CPSID i
+  76              	@ 0 "" 2
+  77              		.thumb
+  78              		.syntax unified
+  79              	.LBE21:
+  80              	.LBE20:
+ 123:ThreadX/common/src/txe_thread_create.c ****     {
+ 124:ThreadX/common/src/txe_thread_create.c **** 
+ 125:ThreadX/common/src/txe_thread_create.c ****         /* Thread pointer is invalid, return appropriate error code.  */
+ 126:ThreadX/common/src/txe_thread_create.c ****         status =  TX_THREAD_ERROR;
+ 127:ThreadX/common/src/txe_thread_create.c ****     }
+ 128:ThreadX/common/src/txe_thread_create.c ****     else
+ 129:ThreadX/common/src/txe_thread_create.c ****     {
+ 130:ThreadX/common/src/txe_thread_create.c **** 
+ 131:ThreadX/common/src/txe_thread_create.c ****         /* Disable interrupts.  */
+ 132:ThreadX/common/src/txe_thread_create.c ****         TX_DISABLE
+ 133:ThreadX/common/src/txe_thread_create.c **** 
+ 134:ThreadX/common/src/txe_thread_create.c ****         /* Increment the preempt disable flag.  */
+ 135:ThreadX/common/src/txe_thread_create.c ****         _tx_thread_preempt_disable++;
+  81              		.loc 1 135 0
+  82 001c 434C     		ldr	r4, .L24
+  83 001e 2068     		ldr	r0, [r4]
+  84 0020 0130     		adds	r0, r0, #1
+  85 0022 2060     		str	r0, [r4]
+  86              	.LBB24:
+  87              	.LBB25:
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+  88              		.loc 2 562 0
+ARM GAS  /tmp/ccJARZ81.s 			page 15
+
+
+  89              		.syntax unified
+  90              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+  91 0024 85F31088 		MSR  PRIMASK,r5
+  92              	@ 0 "" 2
+  93              	.LVL3:
+  94              		.thumb
+  95              		.syntax unified
+  96              	.LBE25:
+  97              	.LBE24:
+ 136:ThreadX/common/src/txe_thread_create.c **** 
+ 137:ThreadX/common/src/txe_thread_create.c ****         /* Restore interrupts.  */
+ 138:ThreadX/common/src/txe_thread_create.c ****         TX_RESTORE
+ 139:ThreadX/common/src/txe_thread_create.c **** 
+ 140:ThreadX/common/src/txe_thread_create.c ****         /* Next see if it is already in the created list.  */
+ 141:ThreadX/common/src/txe_thread_create.c ****         break_flag =   TX_FALSE;
+ 142:ThreadX/common/src/txe_thread_create.c ****         next_thread =  _tx_thread_created_ptr;
+  98              		.loc 1 142 0
+  99 0028 4148     		ldr	r0, .L24+4
+ 100 002a 0468     		ldr	r4, [r0]
+ 101              	.LVL4:
+ 143:ThreadX/common/src/txe_thread_create.c ****         work_ptr =     TX_VOID_TO_UCHAR_POINTER_CONVERT(stack_start);
+ 144:ThreadX/common/src/txe_thread_create.c ****         work_ptr =     TX_UCHAR_POINTER_ADD(work_ptr, (stack_size - ((ULONG) 1)));
+ 102              		.loc 1 144 0
+ 103 002c 0F9B     		ldr	r3, [sp, #60]
+ 104              	.LVL5:
+ 105 002e 03F1FF3C 		add	ip, r3, #-1
+ 106 0032 BC44     		add	ip, ip, r7
+ 107              	.LVL6:
+ 145:ThreadX/common/src/txe_thread_create.c ****         stack_end =    TX_UCHAR_TO_VOID_POINTER_CONVERT(work_ptr);
+ 146:ThreadX/common/src/txe_thread_create.c ****         for (i = ((ULONG) 0); i < _tx_thread_created_count; i++)
+ 108              		.loc 1 146 0
+ 109 0034 0025     		movs	r5, #0
+ 141:ThreadX/common/src/txe_thread_create.c ****         next_thread =  _tx_thread_created_ptr;
+ 110              		.loc 1 141 0
+ 111 0036 2846     		mov	r0, r5
+ 112              		.loc 1 146 0
+ 113 0038 02E0     		b	.L3
+ 114              	.LVL7:
+ 115              	.L6:
+ 147:ThreadX/common/src/txe_thread_create.c ****         {
+ 148:ThreadX/common/src/txe_thread_create.c **** 
+ 149:ThreadX/common/src/txe_thread_create.c ****             /* Determine if this thread matches the thread in the list.  */
+ 150:ThreadX/common/src/txe_thread_create.c ****             if (thread_ptr == next_thread)
+ 151:ThreadX/common/src/txe_thread_create.c ****             {
+ 152:ThreadX/common/src/txe_thread_create.c **** 
+ 153:ThreadX/common/src/txe_thread_create.c ****                 /* Set the break flag.  */
+ 154:ThreadX/common/src/txe_thread_create.c ****                 break_flag =  TX_TRUE;
+ 155:ThreadX/common/src/txe_thread_create.c ****             }
+ 156:ThreadX/common/src/txe_thread_create.c **** 
+ 157:ThreadX/common/src/txe_thread_create.c ****             /* Determine if we need to break the loop.  */
+ 158:ThreadX/common/src/txe_thread_create.c ****             if (break_flag == TX_TRUE)
+ 159:ThreadX/common/src/txe_thread_create.c ****             {
+ 160:ThreadX/common/src/txe_thread_create.c **** 
+ 161:ThreadX/common/src/txe_thread_create.c ****                 /* Yes, break out of the loop.  */
+ 162:ThreadX/common/src/txe_thread_create.c ****                 break;
+ 163:ThreadX/common/src/txe_thread_create.c ****             }
+ 164:ThreadX/common/src/txe_thread_create.c **** 
+ARM GAS  /tmp/ccJARZ81.s 			page 16
+
+
+ 165:ThreadX/common/src/txe_thread_create.c ****             /* Check the stack pointer to see if it overlaps with this thread's stack.  */
+ 166:ThreadX/common/src/txe_thread_create.c ****             if (stack_start >= next_thread -> tx_thread_stack_start)
+ 167:ThreadX/common/src/txe_thread_create.c ****             {
+ 168:ThreadX/common/src/txe_thread_create.c **** 
+ 169:ThreadX/common/src/txe_thread_create.c ****                 if (stack_start < next_thread -> tx_thread_stack_end)
+ 170:ThreadX/common/src/txe_thread_create.c ****                 {
+ 171:ThreadX/common/src/txe_thread_create.c **** 
+ 172:ThreadX/common/src/txe_thread_create.c ****                     /* This stack overlaps with an existing thread, clear the stack pointer to
+ 173:ThreadX/common/src/txe_thread_create.c ****                        force a stack error below.  */
+ 174:ThreadX/common/src/txe_thread_create.c ****                     stack_start =  TX_NULL;
+ 175:ThreadX/common/src/txe_thread_create.c **** 
+ 176:ThreadX/common/src/txe_thread_create.c ****                     /* Set the break flag.  */
+ 177:ThreadX/common/src/txe_thread_create.c ****                     break_flag =  TX_TRUE;
+ 178:ThreadX/common/src/txe_thread_create.c ****                 }
+ 179:ThreadX/common/src/txe_thread_create.c ****             }
+ 180:ThreadX/common/src/txe_thread_create.c **** 
+ 181:ThreadX/common/src/txe_thread_create.c ****             /* Check the end of the stack to see if it is inside this thread's stack area as well. 
+ 182:ThreadX/common/src/txe_thread_create.c ****             if (stack_end >= next_thread -> tx_thread_stack_start)
+ 183:ThreadX/common/src/txe_thread_create.c ****             {
+ 184:ThreadX/common/src/txe_thread_create.c **** 
+ 185:ThreadX/common/src/txe_thread_create.c ****                 if (stack_end < next_thread -> tx_thread_stack_end)
+ 186:ThreadX/common/src/txe_thread_create.c ****                 {
+ 187:ThreadX/common/src/txe_thread_create.c **** 
+ 188:ThreadX/common/src/txe_thread_create.c ****                     /* This stack overlaps with an existing thread, clear the stack pointer to
+ 189:ThreadX/common/src/txe_thread_create.c ****                        force a stack error below.  */
+ 190:ThreadX/common/src/txe_thread_create.c ****                     stack_start =  TX_NULL;
+ 191:ThreadX/common/src/txe_thread_create.c **** 
+ 192:ThreadX/common/src/txe_thread_create.c ****                     /* Set the break flag.  */
+ 193:ThreadX/common/src/txe_thread_create.c ****                     break_flag =  TX_TRUE;
+ 194:ThreadX/common/src/txe_thread_create.c ****                 }
+ 195:ThreadX/common/src/txe_thread_create.c ****             }
+ 196:ThreadX/common/src/txe_thread_create.c **** 
+ 197:ThreadX/common/src/txe_thread_create.c ****             /* Move to the next thread.  */
+ 198:ThreadX/common/src/txe_thread_create.c ****             next_thread =  next_thread -> tx_thread_created_next;
+ 116              		.loc 1 198 0 discriminator 2
+ 117 003a D4F88840 		ldr	r4, [r4, #136]
+ 118              	.LVL8:
+ 146:ThreadX/common/src/txe_thread_create.c ****         {
+ 119              		.loc 1 146 0 discriminator 2
+ 120 003e 0135     		adds	r5, r5, #1
+ 121              	.LVL9:
+ 122              	.L3:
+ 146:ThreadX/common/src/txe_thread_create.c ****         {
+ 123              		.loc 1 146 0 is_stmt 0 discriminator 1
+ 124 0040 3C4E     		ldr	r6, .L24+8
+ 125 0042 3668     		ldr	r6, [r6]
+ 126 0044 AE42     		cmp	r6, r5
+ 127 0046 12D9     		bls	.L4
+ 150:ThreadX/common/src/txe_thread_create.c ****             {
+ 128              		.loc 1 150 0 is_stmt 1
+ 129 0048 7445     		cmp	r4, lr
+ 130 004a 10D0     		beq	.L4
+ 158:ThreadX/common/src/txe_thread_create.c ****             {
+ 131              		.loc 1 158 0
+ 132 004c 78B9     		cbnz	r0, .L4
+ 166:ThreadX/common/src/txe_thread_create.c ****             {
+ 133              		.loc 1 166 0
+ARM GAS  /tmp/ccJARZ81.s 			page 17
+
+
+ 134 004e E668     		ldr	r6, [r4, #12]
+ 135 0050 BE42     		cmp	r6, r7
+ 136 0052 04D8     		bhi	.L5
+ 169:ThreadX/common/src/txe_thread_create.c ****                 {
+ 137              		.loc 1 169 0
+ 138 0054 2369     		ldr	r3, [r4, #16]
+ 139 0056 BB42     		cmp	r3, r7
+ 140 0058 01D9     		bls	.L5
+ 177:ThreadX/common/src/txe_thread_create.c ****                 }
+ 141              		.loc 1 177 0
+ 142 005a 0120     		movs	r0, #1
+ 143              	.LVL10:
+ 174:ThreadX/common/src/txe_thread_create.c **** 
+ 144              		.loc 1 174 0
+ 145 005c 0027     		movs	r7, #0
+ 146              	.LVL11:
+ 147              	.L5:
+ 182:ThreadX/common/src/txe_thread_create.c ****             {
+ 148              		.loc 1 182 0
+ 149 005e 6645     		cmp	r6, ip
+ 150 0060 EBD8     		bhi	.L6
+ 185:ThreadX/common/src/txe_thread_create.c ****                 {
+ 151              		.loc 1 185 0
+ 152 0062 2669     		ldr	r6, [r4, #16]
+ 153 0064 6645     		cmp	r6, ip
+ 154 0066 E8D9     		bls	.L6
+ 193:ThreadX/common/src/txe_thread_create.c ****                 }
+ 155              		.loc 1 193 0
+ 156 0068 0120     		movs	r0, #1
+ 157              	.LVL12:
+ 190:ThreadX/common/src/txe_thread_create.c **** 
+ 158              		.loc 1 190 0
+ 159 006a 0027     		movs	r7, #0
+ 160              	.LVL13:
+ 161 006c E5E7     		b	.L6
+ 162              	.LVL14:
+ 163              	.L4:
+ 164 006e 7546     		mov	r5, lr
+ 165              	.LVL15:
+ 166 0070 1646     		mov	r6, r2
+ 167 0072 8946     		mov	r9, r1
+ 168              	.LBB26:
+ 169              	.LBB27:
+ 170              	.LBB28:
+ 171              	.LBB29:
+ 539:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 172              		.loc 2 539 0
+ 173              		.syntax unified
+ 174              	@ 539 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 175 0074 EFF31081 		MRS  r1, PRIMASK 
+ 176              	@ 0 "" 2
+ 177              	.LVL16:
+ 178              		.thumb
+ 179              		.syntax unified
+ 180              	.LBE29:
+ 181              	.LBE28:
+ 182              		.loc 2 575 0
+ARM GAS  /tmp/ccJARZ81.s 			page 18
+
+
+ 183              		.syntax unified
+ 184              	@ 575 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 185 0078 72B6     		CPSID i
+ 186              	@ 0 "" 2
+ 187              		.thumb
+ 188              		.syntax unified
+ 189              	.LBE27:
+ 190              	.LBE26:
+ 199:ThreadX/common/src/txe_thread_create.c ****         }
+ 200:ThreadX/common/src/txe_thread_create.c **** 
+ 201:ThreadX/common/src/txe_thread_create.c ****         /* Disable interrupts.  */
+ 202:ThreadX/common/src/txe_thread_create.c ****         TX_DISABLE
+ 203:ThreadX/common/src/txe_thread_create.c **** 
+ 204:ThreadX/common/src/txe_thread_create.c ****         /* Decrement the preempt disable flag.  */
+ 205:ThreadX/common/src/txe_thread_create.c ****         _tx_thread_preempt_disable--;
+ 191              		.loc 1 205 0
+ 192 007a 2C4A     		ldr	r2, .L24
+ 193              	.LVL17:
+ 194 007c 1368     		ldr	r3, [r2]
+ 195 007e 013B     		subs	r3, r3, #1
+ 196 0080 1360     		str	r3, [r2]
+ 197              	.LBB30:
+ 198              	.LBB31:
+ 562:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h **** #endif
+ 199              		.loc 2 562 0
+ 200              		.syntax unified
+ 201              	@ 562 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 202 0082 81F31088 		MSR  PRIMASK,r1
+ 203              	@ 0 "" 2
+ 204              		.thumb
+ 205              		.syntax unified
+ 206              	.LBE31:
+ 207              	.LBE30:
+ 206:ThreadX/common/src/txe_thread_create.c **** 
+ 207:ThreadX/common/src/txe_thread_create.c ****         /* Restore interrupts.  */
+ 208:ThreadX/common/src/txe_thread_create.c ****         TX_RESTORE
+ 209:ThreadX/common/src/txe_thread_create.c **** 
+ 210:ThreadX/common/src/txe_thread_create.c ****         /* Check for preemption.  */
+ 211:ThreadX/common/src/txe_thread_create.c ****         _tx_thread_system_preempt_check();
+ 208              		.loc 1 211 0
+ 209 0086 FFF7FEFF 		bl	_tx_thread_system_preempt_check
+ 210              	.LVL18:
+ 212:ThreadX/common/src/txe_thread_create.c **** 
+ 213:ThreadX/common/src/txe_thread_create.c ****         /* At this point, check to see if there is a duplicate thread.  */
+ 214:ThreadX/common/src/txe_thread_create.c ****         if (thread_ptr == next_thread)
+ 211              		.loc 1 214 0
+ 212 008a AC42     		cmp	r4, r5
+ 213 008c 3ED0     		beq	.L14
+ 215:ThreadX/common/src/txe_thread_create.c ****         {
+ 216:ThreadX/common/src/txe_thread_create.c **** 
+ 217:ThreadX/common/src/txe_thread_create.c ****             /* Thread is already created, return appropriate error code.  */
+ 218:ThreadX/common/src/txe_thread_create.c ****             status =  TX_THREAD_ERROR;
+ 219:ThreadX/common/src/txe_thread_create.c ****         }
+ 220:ThreadX/common/src/txe_thread_create.c **** 
+ 221:ThreadX/common/src/txe_thread_create.c ****         /* Check for invalid starting address of stack.  */
+ 222:ThreadX/common/src/txe_thread_create.c ****         else if (stack_start == TX_NULL)
+ 214              		.loc 1 222 0
+ARM GAS  /tmp/ccJARZ81.s 			page 19
+
+
+ 215 008e 002F     		cmp	r7, #0
+ 216 0090 3ED0     		beq	.L15
+ 223:ThreadX/common/src/txe_thread_create.c ****         {
+ 224:ThreadX/common/src/txe_thread_create.c **** 
+ 225:ThreadX/common/src/txe_thread_create.c ****             /* Invalid stack or entry point, return appropriate error code.  */
+ 226:ThreadX/common/src/txe_thread_create.c ****             status =  TX_PTR_ERROR;
+ 227:ThreadX/common/src/txe_thread_create.c ****         }
+ 228:ThreadX/common/src/txe_thread_create.c **** 
+ 229:ThreadX/common/src/txe_thread_create.c ****         /* Check for invalid thread entry point.  */
+ 230:ThreadX/common/src/txe_thread_create.c ****         else if (entry_function == TX_NULL)
+ 217              		.loc 1 230 0
+ 218 0092 002E     		cmp	r6, #0
+ 219 0094 3ED0     		beq	.L16
+ 231:ThreadX/common/src/txe_thread_create.c ****         {
+ 232:ThreadX/common/src/txe_thread_create.c **** 
+ 233:ThreadX/common/src/txe_thread_create.c ****             /* Invalid stack or entry point, return appropriate error code.  */
+ 234:ThreadX/common/src/txe_thread_create.c ****             status =  TX_PTR_ERROR;
+ 235:ThreadX/common/src/txe_thread_create.c ****         }
+ 236:ThreadX/common/src/txe_thread_create.c **** 
+ 237:ThreadX/common/src/txe_thread_create.c ****         /* Check the stack size.  */
+ 238:ThreadX/common/src/txe_thread_create.c ****         else if (stack_size < ((ULONG) TX_MINIMUM_STACK))
+ 220              		.loc 1 238 0
+ 221 0096 0F9B     		ldr	r3, [sp, #60]
+ 222 0098 C72B     		cmp	r3, #199
+ 223 009a 3DD9     		bls	.L17
+ 239:ThreadX/common/src/txe_thread_create.c ****         {
+ 240:ThreadX/common/src/txe_thread_create.c **** 
+ 241:ThreadX/common/src/txe_thread_create.c ****             /* Stack is not big enough, return appropriate error code.  */
+ 242:ThreadX/common/src/txe_thread_create.c ****             status =  TX_SIZE_ERROR;
+ 243:ThreadX/common/src/txe_thread_create.c ****         }
+ 244:ThreadX/common/src/txe_thread_create.c **** 
+ 245:ThreadX/common/src/txe_thread_create.c ****         /* Check the priority specified.  */
+ 246:ThreadX/common/src/txe_thread_create.c ****         else if (priority >= ((UINT) TX_MAX_PRIORITIES))
+ 224              		.loc 1 246 0
+ 225 009c 109B     		ldr	r3, [sp, #64]
+ 226 009e 1F2B     		cmp	r3, #31
+ 227 00a0 3CD8     		bhi	.L18
+ 247:ThreadX/common/src/txe_thread_create.c ****         {
+ 248:ThreadX/common/src/txe_thread_create.c **** 
+ 249:ThreadX/common/src/txe_thread_create.c ****             /* Invalid priority selected, return appropriate error code.  */
+ 250:ThreadX/common/src/txe_thread_create.c ****             status =  TX_PRIORITY_ERROR;
+ 251:ThreadX/common/src/txe_thread_create.c ****         }
+ 252:ThreadX/common/src/txe_thread_create.c **** 
+ 253:ThreadX/common/src/txe_thread_create.c ****         /* Check preemption threshold. */
+ 254:ThreadX/common/src/txe_thread_create.c ****         else if (preempt_threshold > priority)
+ 228              		.loc 1 254 0
+ 229 00a2 119A     		ldr	r2, [sp, #68]
+ 230 00a4 9342     		cmp	r3, r2
+ 231 00a6 3BD3     		bcc	.L19
+ 255:ThreadX/common/src/txe_thread_create.c ****         {
+ 256:ThreadX/common/src/txe_thread_create.c **** 
+ 257:ThreadX/common/src/txe_thread_create.c ****             /* Invalid preempt threshold, return appropriate error code.  */
+ 258:ThreadX/common/src/txe_thread_create.c ****             status =  TX_THRESH_ERROR;
+ 259:ThreadX/common/src/txe_thread_create.c ****         }
+ 260:ThreadX/common/src/txe_thread_create.c **** 
+ 261:ThreadX/common/src/txe_thread_create.c ****         /* Check the start selection.  */
+ 262:ThreadX/common/src/txe_thread_create.c ****         else if (auto_start > TX_AUTO_START)
+ARM GAS  /tmp/ccJARZ81.s 			page 20
+
+
+ 232              		.loc 1 262 0
+ 233 00a8 139B     		ldr	r3, [sp, #76]
+ 234 00aa 012B     		cmp	r3, #1
+ 235 00ac 3AD8     		bhi	.L20
+ 263:ThreadX/common/src/txe_thread_create.c ****         {
+ 264:ThreadX/common/src/txe_thread_create.c **** 
+ 265:ThreadX/common/src/txe_thread_create.c ****             /* Invalid auto start selection, return appropriate error code.  */
+ 266:ThreadX/common/src/txe_thread_create.c ****             status =  TX_START_ERROR;
+ 267:ThreadX/common/src/txe_thread_create.c ****         }
+ 268:ThreadX/common/src/txe_thread_create.c ****         else
+ 269:ThreadX/common/src/txe_thread_create.c ****         {
+ 270:ThreadX/common/src/txe_thread_create.c **** 
+ 271:ThreadX/common/src/txe_thread_create.c **** #ifndef TX_TIMER_PROCESS_IN_ISR
+ 272:ThreadX/common/src/txe_thread_create.c **** 
+ 273:ThreadX/common/src/txe_thread_create.c ****             /* Pickup thread pointer.  */
+ 274:ThreadX/common/src/txe_thread_create.c ****             TX_THREAD_GET_CURRENT(current_thread)
+ 236              		.loc 1 274 0
+ 237 00ae 224B     		ldr	r3, .L24+12
+ 238 00b0 1A68     		ldr	r2, [r3]
+ 239              	.LVL19:
+ 275:ThreadX/common/src/txe_thread_create.c **** 
+ 276:ThreadX/common/src/txe_thread_create.c ****             /* Check for invalid caller of this function.  First check for a calling thread.  */
+ 277:ThreadX/common/src/txe_thread_create.c ****             if (current_thread == &_tx_timer_thread)
+ 240              		.loc 1 277 0
+ 241 00b2 224B     		ldr	r3, .L24+16
+ 242 00b4 9A42     		cmp	r2, r3
+ 243 00b6 21D0     		beq	.L21
+ 111:ThreadX/common/src/txe_thread_create.c **** 
+ 244              		.loc 1 111 0
+ 245 00b8 0020     		movs	r0, #0
+ 246              	.L8:
+ 247              	.LVL20:
+ 248              	.LBB32:
+ 249              	.LBB33:
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+ 250              		.loc 2 477 0
+ 251              		.syntax unified
+ 252              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 253 00ba EFF30583 		 MRS  r3,IPSR 
+ 254              	@ 0 "" 2
+ 255              		.thumb
+ 256              		.syntax unified
+ 257              	.LBE33:
+ 258              	.LBE32:
+ 278:ThreadX/common/src/txe_thread_create.c ****             {
+ 279:ThreadX/common/src/txe_thread_create.c **** 
+ 280:ThreadX/common/src/txe_thread_create.c ****                 /* Invalid caller of this function, return appropriate error code.  */
+ 281:ThreadX/common/src/txe_thread_create.c ****                 status =  TX_CALLER_ERROR;
+ 282:ThreadX/common/src/txe_thread_create.c ****             }
+ 283:ThreadX/common/src/txe_thread_create.c **** #endif
+ 284:ThreadX/common/src/txe_thread_create.c **** 
+ 285:ThreadX/common/src/txe_thread_create.c ****             /* Check for interrupt call.  */
+ 286:ThreadX/common/src/txe_thread_create.c ****             if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
+ 259              		.loc 1 286 0
+ 260 00be 204A     		ldr	r2, .L24+20
+ 261              	.LVL21:
+ 262 00c0 1268     		ldr	r2, [r2]
+ARM GAS  /tmp/ccJARZ81.s 			page 21
+
+
+ 263 00c2 1343     		orrs	r3, r2, r3
+ 264 00c4 07D0     		beq	.L9
+ 265              	.LBB34:
+ 266              	.LBB35:
+ 477:ThreadX/ports/cortex_m4/gnu/inc/tx_port.h ****     return(ipsr_value);
+ 267              		.loc 2 477 0
+ 268              		.syntax unified
+ 269              	@ 477 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h" 1
+ 270 00c6 EFF30582 		 MRS  r2,IPSR 
+ 271              	@ 0 "" 2
+ 272              		.thumb
+ 273              		.syntax unified
+ 274              	.LBE35:
+ 275              	.LBE34:
+ 287:ThreadX/common/src/txe_thread_create.c ****             {
+ 288:ThreadX/common/src/txe_thread_create.c **** 
+ 289:ThreadX/common/src/txe_thread_create.c ****                 /* Now, make sure the call is from an interrupt and not initialization.  */
+ 290:ThreadX/common/src/txe_thread_create.c ****                 if (TX_THREAD_GET_SYSTEM_STATE() < TX_INITIALIZE_IN_PROGRESS)
+ 276              		.loc 1 290 0
+ 277 00ca 1D4B     		ldr	r3, .L24+20
+ 278 00cc 1B68     		ldr	r3, [r3]
+ 279 00ce 1343     		orrs	r3, r3, r2
+ 280 00d0 B3F1F03F 		cmp	r3, #-252645136
+ 281 00d4 28D3     		bcc	.L22
+ 282              	.L9:
+ 291:ThreadX/common/src/txe_thread_create.c ****                 {
+ 292:ThreadX/common/src/txe_thread_create.c **** 
+ 293:ThreadX/common/src/txe_thread_create.c ****                     /* Invalid caller of this function, return appropriate error code.  */
+ 294:ThreadX/common/src/txe_thread_create.c ****                     status =  TX_CALLER_ERROR;
+ 295:ThreadX/common/src/txe_thread_create.c ****                 }
+ 296:ThreadX/common/src/txe_thread_create.c ****             }
+ 297:ThreadX/common/src/txe_thread_create.c ****         }
+ 298:ThreadX/common/src/txe_thread_create.c ****     }
+ 299:ThreadX/common/src/txe_thread_create.c **** 
+ 300:ThreadX/common/src/txe_thread_create.c ****     /* Determine if everything is okay.  */
+ 301:ThreadX/common/src/txe_thread_create.c ****     if (status == TX_SUCCESS)
+ 283              		.loc 1 301 0
+ 284 00d6 B0B9     		cbnz	r0, .L1
+ 302:ThreadX/common/src/txe_thread_create.c ****     {
+ 303:ThreadX/common/src/txe_thread_create.c **** 
+ 304:ThreadX/common/src/txe_thread_create.c ****         /* Call actual thread create function.  */
+ 305:ThreadX/common/src/txe_thread_create.c ****         status =  _tx_thread_create(thread_ptr, name_ptr, entry_function, entry_input,
+ 285              		.loc 1 305 0
+ 286 00d8 139B     		ldr	r3, [sp, #76]
+ 287 00da 0593     		str	r3, [sp, #20]
+ 288 00dc 129B     		ldr	r3, [sp, #72]
+ 289 00de 0493     		str	r3, [sp, #16]
+ 290 00e0 119B     		ldr	r3, [sp, #68]
+ 291 00e2 0393     		str	r3, [sp, #12]
+ 292 00e4 109B     		ldr	r3, [sp, #64]
+ 293 00e6 0293     		str	r3, [sp, #8]
+ 294 00e8 0F9B     		ldr	r3, [sp, #60]
+ 295 00ea 0193     		str	r3, [sp, #4]
+ 296 00ec 0097     		str	r7, [sp]
+ 297 00ee 4346     		mov	r3, r8
+ 298 00f0 3246     		mov	r2, r6
+ 299 00f2 4946     		mov	r1, r9
+ARM GAS  /tmp/ccJARZ81.s 			page 22
+
+
+ 300 00f4 2846     		mov	r0, r5
+ 301              	.LVL22:
+ 302 00f6 FFF7FEFF 		bl	_tx_thread_create
+ 303              	.LVL23:
+ 304 00fa 04E0     		b	.L1
+ 305              	.LVL24:
+ 306              	.L21:
+ 281:ThreadX/common/src/txe_thread_create.c ****             }
+ 307              		.loc 1 281 0
+ 308 00fc 1320     		movs	r0, #19
+ 309 00fe DCE7     		b	.L8
+ 310              	.LVL25:
+ 311              	.L10:
+ 118:ThreadX/common/src/txe_thread_create.c ****     }
+ 312              		.loc 1 118 0
+ 313 0100 0E20     		movs	r0, #14
+ 314              	.LVL26:
+ 315 0102 00E0     		b	.L1
+ 316              	.LVL27:
+ 317              	.L11:
+ 126:ThreadX/common/src/txe_thread_create.c ****     }
+ 318              		.loc 1 126 0
+ 319 0104 0E20     		movs	r0, #14
+ 320              	.LVL28:
+ 321              	.L1:
+ 306:ThreadX/common/src/txe_thread_create.c ****                         stack_start, stack_size, priority, preempt_threshold,
+ 307:ThreadX/common/src/txe_thread_create.c ****                         time_slice, auto_start);
+ 308:ThreadX/common/src/txe_thread_create.c ****     }
+ 309:ThreadX/common/src/txe_thread_create.c **** 
+ 310:ThreadX/common/src/txe_thread_create.c ****     /* Return completion status.  */
+ 311:ThreadX/common/src/txe_thread_create.c ****     return(status);
+ 312:ThreadX/common/src/txe_thread_create.c **** }
+ 322              		.loc 1 312 0
+ 323 0106 07B0     		add	sp, sp, #28
+ 324              	.LCFI2:
+ 325              		.cfi_remember_state
+ 326              		.cfi_def_cfa_offset 28
+ 327              		@ sp needed
+ 328 0108 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 329              	.LVL29:
+ 330              	.L14:
+ 331              	.LCFI3:
+ 332              		.cfi_restore_state
+ 218:ThreadX/common/src/txe_thread_create.c ****         }
+ 333              		.loc 1 218 0
+ 334 010c 0E20     		movs	r0, #14
+ 335 010e FAE7     		b	.L1
+ 336              	.L15:
+ 226:ThreadX/common/src/txe_thread_create.c ****         }
+ 337              		.loc 1 226 0
+ 338 0110 0320     		movs	r0, #3
+ 339 0112 F8E7     		b	.L1
+ 340              	.L16:
+ 234:ThreadX/common/src/txe_thread_create.c ****         }
+ 341              		.loc 1 234 0
+ 342 0114 0320     		movs	r0, #3
+ 343 0116 F6E7     		b	.L1
+ARM GAS  /tmp/ccJARZ81.s 			page 23
+
+
+ 344              	.L17:
+ 242:ThreadX/common/src/txe_thread_create.c ****         }
+ 345              		.loc 1 242 0
+ 346 0118 0520     		movs	r0, #5
+ 347 011a F4E7     		b	.L1
+ 348              	.L18:
+ 250:ThreadX/common/src/txe_thread_create.c ****         }
+ 349              		.loc 1 250 0
+ 350 011c 0F20     		movs	r0, #15
+ 351 011e F2E7     		b	.L1
+ 352              	.L19:
+ 258:ThreadX/common/src/txe_thread_create.c ****         }
+ 353              		.loc 1 258 0
+ 354 0120 1820     		movs	r0, #24
+ 355 0122 F0E7     		b	.L1
+ 356              	.L20:
+ 266:ThreadX/common/src/txe_thread_create.c ****         }
+ 357              		.loc 1 266 0
+ 358 0124 1020     		movs	r0, #16
+ 359 0126 EEE7     		b	.L1
+ 360              	.LVL30:
+ 361              	.L22:
+ 294:ThreadX/common/src/txe_thread_create.c ****                 }
+ 362              		.loc 1 294 0
+ 363 0128 1320     		movs	r0, #19
+ 364              	.LVL31:
+ 311:ThreadX/common/src/txe_thread_create.c **** }
+ 365              		.loc 1 311 0
+ 366 012a ECE7     		b	.L1
+ 367              	.L25:
+ 368              		.align	2
+ 369              	.L24:
+ 370 012c 00000000 		.word	_tx_thread_preempt_disable
+ 371 0130 00000000 		.word	_tx_thread_created_ptr
+ 372 0134 00000000 		.word	_tx_thread_created_count
+ 373 0138 00000000 		.word	_tx_thread_current_ptr
+ 374 013c 00000000 		.word	_tx_timer_thread
+ 375 0140 00000000 		.word	_tx_thread_system_state
+ 376              		.cfi_endproc
+ 377              	.LFE8:
+ 379              		.text
+ 380              	.Letext0:
+ 381              		.file 3 "/usr/include/newlib/sys/lock.h"
+ 382              		.file 4 "/usr/include/newlib/sys/_types.h"
+ 383              		.file 5 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+ 384              		.file 6 "/usr/include/newlib/sys/reent.h"
+ 385              		.file 7 "/usr/include/newlib/stdlib.h"
+ 386              		.file 8 "ThreadX/common/inc/tx_api.h"
+ 387              		.file 9 "ThreadX/common/inc/tx_initialize.h"
+ 388              		.file 10 "ThreadX/common/inc/tx_thread.h"
+ 389              		.file 11 "ThreadX/common/inc/tx_timer.h"
+ARM GAS  /tmp/ccJARZ81.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 txe_thread_create.c
+     /tmp/ccJARZ81.s:18     .text._txe_thread_create:0000000000000000 $t
+     /tmp/ccJARZ81.s:25     .text._txe_thread_create:0000000000000000 _txe_thread_create
+     /tmp/ccJARZ81.s:370    .text._txe_thread_create:000000000000012c $d
+
+UNDEFINED SYMBOLS
+_tx_thread_system_preempt_check
+_tx_thread_create
+_tx_thread_preempt_disable
+_tx_thread_created_ptr
+_tx_thread_created_count
+_tx_thread_current_ptr
+_tx_timer_thread
+_tx_thread_system_state
