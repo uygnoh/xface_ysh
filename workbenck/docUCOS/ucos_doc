@@ -1,0 +1,104 @@
+/*******************************************************************************
+        => ucos_ii 移植
+*******************************************************************************/
+        => os_cpu_a.S
+//_____________________________________________________________
+//汇编文件中主要修改两处，将异常处理函数名由
+//os_cpu_PendSV_Handler改为( PendSV_Handler )在移植过程中，需要将工程中
+//stm32f4xx_it.c文件中的PendSVHandler()函数注释掉，防止与ucos中的PendSV_Handler冲突。
+
+
+        => os_cpu_c.c
+//_____________________________________________________________
+//将OS_SysTickHandler()函数注释掉
+//时钟的配置会在工程的 stm32f4xx_it.c 文件中通过滴答定时器中断配置
+#include "os.h"
+void  SysTickHandler(void)
+{
+#if OS_CRITICAL_METHOD == 3u
+        OS_CPU_SR  cpu_sr;
+#endif
+
+        OS_ENTER_CRITICAL();
+        OSIntEnter();
+        OS_EXIT_CRITICAL();
+
+        OSTimeTick();
+
+        OSIntExit();
+}
+
+
+        => app_cfg.h 添加文件
+//_____________________________________________________________
+//添加两句宏定义
+//不受内核管理的中断等级，使用 BOUNDARY寄存器设置任务切换时的中断屏蔽
+#define CPU_CFG_KA_IPL_BOUNDARY         4u
+//中断优先级寄存器可用位数， ARM官方为 8bit 由厂家裁减
+#define CPU_CFG_NVIC_PRIO_BITS          4u
+
+
+        => os_cfg.h 修改文件
+//_____________________________________________________________
+//1 处是将钩子函数失能，可以不用钩子函数；
+#define OS_APP_HOOKS_EN                 0u
+//2 处是将Debug是失能；
+#define OS_DEBUG_EN                     0u
+//3 处是用于修改时间频率，结合滴答定时器确定ucos的时基。
+#define OS_TICKS_PER_SEC                1000u
+
+
+        => 删除文件
+//_____________________________________________________________
+删除（os_dbg_r.c）
+删除（ucos_ii.c）
+
+
+
+/*******************************************************************************
+        => ucos_ii 
+*******************************************************************************/
+#include "os.h"
+//      => 任务 00
+//_____________________________________________________________
+#define TASK00_PRIO                             3
+#define TASK00_STACK_SIZE                       512
+OS_STK  task00_stack[TASK00_STACK_SIZE];
+void task00(void *pdata);
+
+
+void task00(void *pdata)
+{
+        //进入任务前，设置系统时钟参数
+        OS_CPU_SysTickInitFreq(100*1000*1000);
+        pdata = pdata;
+        for (;;) {
+                //HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+                HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+                OSTimeDly(100);
+                HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+                OSTimeDly(100);
+        }
+}
+int main(void)
+{
+        OSInit();
+        OSTaskCreate(
+                task00,                                 //任务入口
+                (void *)0,                              //任务参数
+                &task00_stack[TASK00_STACK_SIZE - 1],   //任务栈顶
+                TASK00_PRIO	);                      //任务优先级别
+        OSStart();
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,6 @@
+
+//https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/htm1_mono/ld.html#SEC16
+
 // MEMORY命令的语法是：
 //_____________________________________________________________
 MEMORY

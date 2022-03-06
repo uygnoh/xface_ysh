@@ -1,0 +1,13 @@
+os_cpu_c.c:115:7:OSInitHookBegin	24	static
+os_cpu_c.c:166:7:OSInitHookEnd	4	static
+os_cpu_c.c:185:7:OSTaskCreateHook	16	static
+os_cpu_c.c:208:7:OSTaskDelHook	16	static
+os_cpu_c.c:232:7:OSTaskIdleHook	4	static
+os_cpu_c.c:255:7:OSTaskReturnHook	16	static
+os_cpu_c.c:278:7:OSTaskStatHook	4	static
+os_cpu_c.c:467:10:OSTaskStkInit	32	static
+os_cpu_c.c:565:7:OSTaskSwHook	8	static
+os_cpu_c.c:597:7:OSTCBInitHook	16	static
+os_cpu_c.c:620:7:OSTimeTickHook	8	static
+os_cpu_c.c:681:7:OS_CPU_SysTickInitFreq	24	static
+os_cpu_c.c:706:7:OS_CPU_SysTickInit	24	static
