@@ -1,7 +1,7 @@
 /*******************************************************************************
         => esp32-c3（向队列中发送数据）
 *******************************************************************************/
-//_____________________________________________________________
+
 // 向队列中发送数据
 //_____________________________________________________________
 void tx_task(void *pvParam)
@@ -24,7 +24,7 @@ void tx_task(void *pvParam)
                 vTaskDelay(1000 / protTICK_PERIOD_MS);
         }
 }
-//_____________________________________________________________
+
 // 从队列中接收数据
 //_____________________________________________________________
 void rx_task(void *pvParam)
@@ -49,6 +49,8 @@ void rx_task(void *pvParam)
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 }
+
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t q_handle;
@@ -73,6 +75,7 @@ typedef struct A_STRUCT {
 } q_struct;
 
 
+//_____________________________________________________________
 void tx_task(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -95,7 +98,7 @@ void tx_task(void *pvParam)
         }
 }
 
-
+//_____________________________________________________________
 void rx(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -119,7 +122,7 @@ void rx(void *pvParam)
         }
 }
 
-
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t q_handle;
@@ -145,7 +148,7 @@ typedef struct A_STRUCT {
         char data;
 } q_struct;
 
-
+//_____________________________________________________________
 void tx_task(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -170,7 +173,7 @@ void tx_task(void *pvParam)
         }
 }
 
-
+//_____________________________________________________________
 void rx(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -194,7 +197,7 @@ void rx(void *pvParam)
         }
 }
 
-
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t q_handle;
@@ -214,8 +217,11 @@ void app_main(void)
 
 
 /*******************************************************************************
-        => esp32-c3（向队列中发送数据）__多个Task的输入，只有一个输出__
+        => esp32-c3（向队列中发送数据）
+        => 队列多进，单出
 *******************************************************************************/
+
+//_____________________________________________________________
 void send_task_00(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -232,6 +238,8 @@ void send_task_00(void *pvParam)
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 }
+
+//_____________________________________________________________
 void send_task_11(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -249,6 +257,7 @@ void send_task_11(void *pvParam)
         }
 }
 
+//_____________________________________________________________
 void rx_task(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -256,21 +265,18 @@ void rx_task(void *pvParam)
         BaseType_t status;
         int i;
         while (1) {
-                if (uxQueueMessageWaiting(q_handle) != 0) {
-                        //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
-                        status = xQueueReceive(q_handle, &i, portMAX_DELAY);
-                        if (status != pdPASS) {
-                                printf("rec fail!\n");
-                        } else {
-                                printf("rec: %d!\n", i);
-                        }
+                //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
+                //接收任务的优先级别要 > 发送任务的优先级
+                status = xQueueReceive(q_handle, &i, portMAX_DELAY);
+                if (status != pdPASS) {
+                        printf("rec fail!\n");
                 } else {
-                        printf("no data!\n");
+                        printf("rec: %d!\n", i);
                 }
-                //vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 }
 
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t q_handle;
@@ -279,7 +285,7 @@ void app_main(void)
                 printf("Create queue successfully!\n");
                 xTaskCreate(send_task_00, "SEND_TASK_00", 1024*5, (void *)q_handle, 1, NULL);
                 xTaskCreate(send_task_11, "SEND_TASK_00", 1024*5, (void *)q_handle, 1, NULL);
-                xTaskCreate(rx_task_11, "RX_TASK_00", 1024*5, (void *)q_handle, 2, NULL);
+                xTaskCreate(rx_task_11,   "RX_TASK_00",   1024*5, (void *)q_handle, 2, NULL);
         } else {
                 printf("Can't create queue!\n");
         }
@@ -289,7 +295,11 @@ void app_main(void)
 
 /*******************************************************************************
         => esp32-c3 队列集合
+        => TASK_00 => Queue_00  //任务00的内容写入队列1中
+        => TASK_00 => Queue_11  //任务11的内容写入队列2中
 *******************************************************************************/
+
+//_____________________________________________________________
 void send_task_00(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -307,6 +317,7 @@ void send_task_00(void *pvParam)
         }
 }
 
+//_____________________________________________________________
 void send_task_11(void *pvParam)
 {
         QueueHandle_t q_handle;
@@ -324,12 +335,13 @@ void send_task_11(void *pvParam)
         }
 }
 
+//_____________________________________________________________
 void rx_task(void *pvParam)
 {
         QueueSetHandle_t q_set_handle;
         q_set_handle = (QueueSetHandle_t)pvParam;
-        QueueMemberHandle_t q_data;
-        BaseType_t status;
+        QueueMemberHandle_t q_data;             //表示有数据的Queue
+        BaseType_t status;                      //返回状态
         int i;
         while (1) {
                 //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
@@ -344,21 +356,22 @@ void rx_task(void *pvParam)
         }
 }
 
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t q_handle_00;
         QueueHandle_t q_handle_01;
-        q_handle_00 = xQueueCreate(5, sizeof(int));     //长度为5
-        q_handle_01 = xQueueCreate(5, sizeof(int));     //长度为5
+        q_handle_00 = xQueueCreate(5, sizeof(int));     //队列00长度为5
+        q_handle_01 = xQueueCreate(5, sizeof(int));     //队列01长度为5
         QueueSetHandle_t q_set_handle;                  //队列集合
         q_set_handle = xQueueCreateSet(10);             //长度为5+5
-        xQueueAddToSet(q_handle_00, q_set_handle);      //添加队列集合
-        xQueueAddToSet(q_handle_01, q_set_handle);      //添加队列集合
+        xQueueAddToSet(q_handle_00, q_set_handle);      //添加q_handle_00到队列集合
+        xQueueAddToSet(q_handle_01, q_set_handle);      //添加q_handle_01到队列集合
         if ((q_handle_00 != NULL) && (q_handle_01 != NULL) && (q_set_handle != NULL)) {
                 printf("Create queue successfully!\n");
                 xTaskCreate(send_task_00, "SEND_TASK_00", 1024*5, (void *)q_handle_00, 1, NULL);
                 xTaskCreate(send_task_11, "SEND_TASK_00", 1024*5, (void *)q_handle_01, 1, NULL);
-                xTaskCreate(rx_task_11, "RX_TASK_00", 1024*5, (void *)q_set_handle, 2, NULL);
+                xTaskCreate(rx_task_11,    "RX_TASK_00", 1024*5, (void *)q_set_handle, 2, NULL);
         } else {
                 printf("Can't create queue!\n");
         }
@@ -369,8 +382,11 @@ void app_main(void)
 /*******************************************************************************
         => esp32-c3 队列邮箱
 *******************************************************************************/
+
+//_____________________________________________________________
 void write_task(void *pvParam)
 {
+        //队列邮箱的写入数据为（1）
         QueueHandle_t mailbox;
         mailbox = (QueueHandle_t)pvParam;
         BaseType_t status;
@@ -387,7 +403,7 @@ void write_task(void *pvParam)
         }
 }
 
-
+//_____________________________________________________________
 void read_task_00(void *pvParam)
 {
         QueueHandle_t mailbox;
@@ -395,16 +411,18 @@ void read_task_00(void *pvParam)
         BaseType_t status;
         int i;
         while (1) {
+                //等待时间为（0）
                 status = xQueuePeek(mailbox, &i, 0);
                 if (status != pdPASS) {
                         printf("read fail\n");
                 } else {
-                        printf("read i = %d\n");
+                        printf("TASK_00 read i = %d\n");
                 }
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 }
 
+//_____________________________________________________________
 void read_task_01(void *pvParam)
 {
         QueueHandle_t mailbox;
@@ -412,18 +430,22 @@ void read_task_01(void *pvParam)
         BaseType_t status;
         int i;
         while (1) {
-                status = xQueuePeek(mailbox, &i, 0);
+                //等待时间为（portMAX_DELAY）
+                status = xQueuePeek(mailbox, &i, portMAX_DELAY);
                 if (status != pdPASS) {
                         printf("read fail\n");
                 } else {
-                        printf("read i = %d\n");
+                        printf("TASK_01 read i = %d\n");
                 }
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
 }
+
+//_____________________________________________________________
 void app_main(void)
 {
         QueueHandle_t m_handle;
+        //创建队列邮箱，它只有一个数据，数据的宽度为（int）
         m_handle = xQueueCreate(1, sizeof(int));
         if (m_handle != NULL) {
                 printf("create Mailbox successfully!\n");
@@ -434,13 +456,4 @@ void app_main(void)
                 printf("Error\n");
         }
 }
-
-
-
-
-
-
-
-
-
 
