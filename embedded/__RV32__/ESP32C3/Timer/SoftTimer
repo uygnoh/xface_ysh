@@ -1,0 +1,50 @@
+/*******************************************************************************
+        => SOFT_TIMER
+*******************************************************************************/
+void timer00_callback(TimerHandle_t xTimer)
+{
+        uint32_t id;
+        const char *name;
+        name = pcTimerGetName(xTimer);
+        id   = (uint32_t)pvTimerGetTimerID(xTimer);
+        printf("TIME NAME = %s\n");
+        printf("TIME ID   = %d\n");
+        printf("one shot timer!\n");
+}
+
+
+void app_main(void)
+{
+        TimerHandle_t timer00_handle;
+        timer00_handle = xTimerCreate(
+                                        "TIMER00",              //软件定时器名字
+                                        pdMS_TO_TICKS(2000),    //定时周期为1秒
+                                        pdFALSE,                //只运行一次
+                                        (void *)0,              //timerID
+                                        timer00_callback);      //TIMER函数入口
+        timer11_handle = xTimerCreate(
+                                        "TIMER11",              //软件定时器名字
+                                        pdMS_TO_TICKS(2000),    //定时周期为1秒
+                                        pdTRUE,                 //周期执行
+                                        (void *)1,              //timerID
+                                        timer00_callback);      //TIMER函数入口
+        //软件定时器启动
+        xTimerStart(timer00_handle, 0);
+        xTimerStart(timer11_handle, 0);
+        
+        vTaskDelay(pdMS_TO_TICKS(6000));
+        
+        //停止软件定时器
+        xTimerStop(timer00_handle, 0);
+        
+        while (1) {
+                //它可以模拟一个看门狗功能
+                //Timer00和Timer11它们是（2秒钟执行）
+                //所以Timer00和Timer11都不会运行
+                xTimerReset(timer00_handle, pdMS_TO_TICKS(1000));
+                xTimerReset(timer11_handle, pdMS_TO_TICKS(1000));
+        }
+        
+        //改变软件定时器的运行周期
+        xTimerChangePeriod(timer11_handle, pdMS_TO_TICKS(6000), 0);                        
+}
