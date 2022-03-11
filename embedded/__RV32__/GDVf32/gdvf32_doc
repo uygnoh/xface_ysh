@@ -1,0 +1,263 @@
+/*******************************************************************************
+        => gdvf32 for RV32IMAC
+*******************************************************************************/
+
+
+
+
+
+/*******************************************************************************
+        => gdvf32 计时器中断和软件配置
+*******************************************************************************/
+0xD100_0000     mtime_lo        //计时器的低32位
+0xD100_0004     mtime_hi        //计时器的高32位
+0xD100_0008     mtimecmp_lo     //计时器比较值的低32位
+0xD100_000C     mtimecmp_hi     //计时器比较值的高32位
+0xD100_0FF8     mstop           //控制计时器暂停
+0xD100_0FFC     msip            //生成软件中断
+
+
+// 计时器中断
+//_____________________________________________________________
+mtime     >= mtimecmp           //则产生计时器中断
+mtimecpme >  mtime              //则清除计时器中断
+
+
+// 软件中断
+//msip寄存器的最低位，软件写“1”产生软件中断，写“0”清除该中断
+//_____________________________________________________________
+msip    |=  (0x01);             //设置软件中断
+msip    &= ~(0x01);             //清除软件中断
+
+
+
+//中断注册函数
+//_____________________________________________________________
+int32_t ECLIC_Register_IRQ(
+        IRQn_Type IRQn,                 //中断号码
+        uint8_t shv,                    //向量中断或是非向量中断
+        ECLIC_TRIGGER_Type trig_mode,   //触发模式
+        uint8_t lvl,                   //中断级别
+        priority,                       //中断优先级
+        handler)                        //中断处理程序
+
+
+
+
+/*******************************************************************************
+        => gdvf32 计时器中断和软件中断例程
+*******************************************************************************/
+#define mtimer_irq_handler              eclic_mtip_handler
+static uint32_t int0_cnt = 0;           //计时器中断标志位
+static uint32_t int1_cnt = 0;           //软件中断标志位
+static uint32_t msip_trig_flag = 1;
+
+//延时1秒
+//_____________________________________________________
+void wait_seconds(size_t n)
+{
+        uint64_t start_mtime, delta_mtime;
+        uint64_t tmp = SysTimer_GetLoadValue();
+        do {
+                start_mtime = SysTimer_GetLoadValue() - start_mtime;
+        } while (start_mtime == tmp);
+        
+        do {
+                delta_time = SysTimer_GetLoadValue() - start_mtime;
+        } while (delta_time < (n * SOC_TIMER_FREQ);
+}
+
+// RISCV32 内核计时器
+//_____________________________________________________
+void setup_timer(void)
+{
+        uint64_t now  = SysTimer_GetLoadValue();
+        uint64_t then = now + 0.5 * SOC_TIMER_FREQ;
+        SysTimer_SetCompareValue(then);
+}
+
+// RISCV32 内核计时器中断
+//_____________________________________________________
+void mtimer_irq_handler(void)
+{
+        int0_cnt++;
+        wait_seconds(1);
+        printf("MTimer IRQ handler %d\n", int0_cnt);
+        uint64_t now = SysTimer_GetLoadValue();
+        SysTimer_SetCompareValue(now + 0.5 * SOC_TIMER_FREQ);
+}
+
+// RISCV32 内核软件中断
+//_____________________________________________________
+void mtimer_sw_irq_handler(void)
+{
+        SysTimer_ClearSWIRQ();
+        int1_cnt++;
+        printf("MTimer Soft IRQ handler %d\n", int1_cnt);
+        msip_trig_flag = 1;
+}
+
+int main(void)
+{
+        //第一个例程（计时器中断）
+        //_____________________________________________________
+        uint32_t returnCode;
+        returnCode = ECLIC_Register_IRQ(
+                SysTimer_IRQn, ECLIC_NON_VECTOR_INTERRUPT,
+                ECLIC_LEVEL_TRIGGER,
+                1, 0,
+                mtimer_irq_handler);    //注册计时器中断
+        __enable_irq();                 //打开全局中断
+        
+        setup_timer();
+        
+        while (int0_cnt < 0) {
+                //关闭计时器中断
+                ECLIC_DisableIRQ(SysTimer_IRQn);
+        }
+        
+        
+        //第二个例程（软件中断）
+        //_____________________________________________________
+        returnCode = ECLIC_Register_IRQ(
+        SysTimer_IRQn, ECLIC_NON_VECTOR_INTERRUPT,
+        ECLIC_LEVEL_TRIGGER,
+        2, 0,
+        mtimer_sw_irq_handler); //注册软件中断
+        do {
+                if (msip_trig_flag == 1) {
+                        msip_trig_flag = 0;
+                        //设置软件中断
+                        SysTimer_SetSWIRQ();
+                        wait_seconds(1);
+                }
+        } while (int_cnt < 10);
+}
+
+
+
+/*******************************************************************************
+        => gdvf32 外部中断
+*******************************************************************************/
+void key_exti_init(void)
+{
+        //enable the AF clock
+        rcu_periph_clock_enable(RCU_AF);  
+        //connect kdy EXTI line to key GPIO pin      
+        gpio_exti_source_select(WAKEUP_KEY_EXTI_PORT_SOURCE, WAKEUP_KEY_EXTI_PIN_SOURCE);
+        
+        //configure key EXTI line
+        exti_init(EXTI_0, EXTI_INTERRUPT, EXTI_TRIG_FALLING);
+        exti_interrupt_flag_clear(EXTI_0);
+}
+
+void EXTI0_IRQHandler(void)
+{
+        if (RESET != exti_interrupt_flag_get(WAKEUP_KEY_PIN) {
+                if (RESET == gd_rvstart_key_state_get(KEY_WAKEUP) {
+                        gd_rvstart_led_toggle(LED3);
+                }
+        }
+        //clear EXTI lines pending flag
+        exti_interrupt_flag_clear(WAKEUP_KEY_PIN);
+}
+
+
+int main(void)
+{
+        int32_t returnCode;
+        gd_rvstart_led_init(LED3);
+        gd_rvstart_key_init(WAKEUP_KEY_GPIO_PORT, KEY_MODE_EXTI);
+        key_exti_init();
+        returnCode = ECLIC_Register_IRQ(
+                EXTI0_IRQn,
+                ECLIC_NON_VECTOR_INTERRUPT,
+                ECLIC_LEVEL_TRIGGER, 
+                1,
+                0,
+                NULL);
+        __enable_irq();
+}
+
+
+
+/*******************************************************************************
+        => gdvf32 向量中断
+*******************************************************************************/
+retcode = ECLIC_Register_IRQ(   EXTI0_IRQn, ECLIC_NON_VECTOR_INTERRUPT, //非向量中断
+                                ECLIC_LEVEL_TRIGGER, 3, 0, NULL );
+retcode = ECLIC_Register_IRQ(   TIMER2_IRQn, ECLIC_VECTOR_INTERRUPT,    //向量中断
+                                ECLIC_LEVEL_TRIGGER, 2, 0, NULL );
+retcode = ECLIC_Register_IRQ(   TIMER1_IRQn, ECLIC_VECTOR_INTERRUPT,    //向量中断
+                                ECLIC_LEVEL_TRIGGER, 1, 0, NULL );
+
+#define SAVE_IRQ_CSR_CONTEXT()                          \
+        rv_csr_t __mcause = __RV_CSR_READ(CSR_MCAUSE);  \
+        rv_csr_t __mepc   = __RV_CSR_READ(CSR_MEPC);    \
+        rv_csr_t __msubm  = __RV_CSR_READ(CSR_MSUBM);   \
+        __enable_irq();
+#define RESTORE_IRQ_CONTEXT()                           \
+        __disable_irq();                                \
+        __RV_CSR_WRITE(CSR_MSUBM, __msubm);             \
+        __RV_CSR_WRITE(CSR_MEPC,  __mepc);              \
+        __RV_CSR_WRITE(CSR_MCAUSE,__mcause);
+        
+//第一种向量中断
+//_____________________________________________________________     
+__INTERRUPT void TIMER1_IRQHandler(void)
+{
+        //Save CSR context
+        SAVE_IRQ_CSR_CONTEXT();
+        
+        //中断处理程序
+        
+        //Restore CSR context
+        RESTORE_IRQ_CSR_CONTEXT();
+}
+
+
+//第二种向量中断
+//_____________________________________________________________    
+__INTERRUPT void TIMER2_IRQHandler(void)
+{
+        //进入中断时间较快
+}
+
+
+
+/*******************************************************************************
+        => gdvf32 for FreeRTOS
+*******************************************************************************/
+__attribute__(( weak )) void vPortSetupTimerInterrupt(void)
+{
+        TickType_t ticks = SYSTICK_TICK_CONST;
+        
+        //配置System_Timer作为OS计时器中断，
+        //并且使能计时器中断（非向量中断）
+        SysTick_Config(ticks);
+        ECLIC_DisableIRQ(SysTimer_IRQ);
+        ECLIC_SetLevelIRQ(SysTimer_IRQn, configKERNEL_INTERRUPT_PRIORITY);
+        ECLIC_SetShvIRQ(SysTimer_IRQn, ECLIC_NON_VECTOR_INTERRUPT);
+        ECLIC_EnableIRQ(Systimer_IRQn);
+        
+        //使能软件中断（向量中断）
+        ECLIC_SetShvIRQ(SysTimerSW_IRQn, ECLIC_VECTOR_INTERRUPT);
+        ECLIC_SetLevelIRQ(SysTimerSW_IRQn, configKERNEL_INTERRUPT_PRIORITY);
+        ECLIC_EnableIRQ(SysTimerSW_IRQn);
+        
+}
+
+
+//计时器中断处理函数
+void xPortSysTickHandler(void)
+{
+        portDISABLE_INTERRUPTS();
+        //重置System_Timer
+        SysTick_Reload(SYSTICK_TICK_CONST);
+        if (xTaskIncrementTick() != pdFALSE) {
+                //发起软件中断
+                portYIELD();
+        }
+}
+
+

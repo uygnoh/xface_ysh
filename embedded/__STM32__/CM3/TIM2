@@ -1,0 +1,46 @@
+/*******************************************************************************
+        => STM32F10x_TIM2
+        => 它是一个基本定时器
+*******************************************************************************/
+void nvic_init(void)
+{
+}
+
+
+void timer2_init(void)
+{       
+
+        //CKD[1:0]: 时钟分频因子 (Clock division)
+        //00:t_DTS = t_CK_INT
+        TIM2->CR1       &= ~(BIT_08 + BIT_09);
+        //TIMx_ARR寄存器具有缓冲(ARPE)
+        TIM2->CR1       |=  BIT_07;
+        //（00）边沿对齐模式。计数器依据方向位(DIR)向上或向下计数
+        TIM2->CR1       &= ~(BIT_06 + BIT_05);
+        
+        TIM2->CR1       &= ~(BIT_04);   //计数器向上计数
+        TIM2->CR1       &= ~BIT_03;     //在发生更新事件时,计数器不停止(OPM)
+        TIM2->CR1       &= ~BIT_02;     //更新请求源 (Update request source)
+        TIM2->CR1       &= ~BIT_01;     //使能更新 (Update enable)
+        TIM2->CR2       &= ~BIT_07;     //0:TIMx_CH1引脚连到TI1输入
+        
+        //（000）主模式选择 (Master mode selection)
+        TIM2->CR2       &= ~(BIT_06 + BIT_05 + BIT_04);
+        //（000）关闭从模式 – 如果CEN=1,则预分频器直接由内部时钟驱动
+        TIM2->SMCR      &= ~(BIT_02 + BIT_01 + BIT_00);
+        //更新中断使能 (Update interrupt enable)
+        TIM2->DIER      |=  BIT_00;
+        
+        TIM2->CNT        = 0x00;        //清零计数器
+        TIM2->PSC        = (7200-1);    //设置预分频的数值
+        TIM2->ARR        = (10000-1);   //设置自动重装载值
+        TIM2->SR        &= ~BIT_00;     //清除更新中断
+        TIM2->CR1       |=  BIT_00;     //便能计数器
+}
+
+
+
+void TIM2_IRQHandler(void)
+{
+        TIM2->SR        &= ~BIT_00;     //清除更新中断
+}
