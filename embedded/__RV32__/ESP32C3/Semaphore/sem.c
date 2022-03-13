@@ -109,7 +109,7 @@ void app_main(void)
 //区别在于优先级继承
 
 SemaphoreHandle_t mutex_handle;
-
+//_____________________________________________________________
 void task11(void *pvParam)
 {
         for (;;) {
@@ -130,6 +130,8 @@ void task11(void *pvParam)
         }
 }
 
+// 任务22不需要互斥信号量
+//_____________________________________________________________
 void task22(void *pvParam)
 {
         BaseType_t iRet;
@@ -140,6 +142,7 @@ void task22(void *pvParam)
         }
 }
 
+//_____________________________________________________________
 void task33(void *pvParam)
 {
         BaseType_t iRet;
@@ -182,9 +185,77 @@ void app_main(void)
 
 
 /*******************************************************************************
-        =>  
+        =>  Recursive Mutex 递归互斥量
 *******************************************************************************/
 
+SemaphoreHandle_t mutex_handle;
+
+//任务11进行了（加2次锁和减2次锁）
+//_____________________________________________________________
+void task11(void *pvParam)
+{
+        for (;;) {
+                printf("_____________________________\n");
+                printf("TASK11 begin!\n");
+                //获取资源A锁__A
+                xSempahoreTakeRecuresive(mutex_handle, portMAX_DELAY);
+                printf("TASK11 take A!\n");
+                for (int i = 0; i < 10; i++) {
+                        printf("TASK11 i=%d for A!\n");
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                }
+                
+                //获取资源B锁__B（再对这个变量加一次锁）
+                xSempahoreTakeRecuresive(mutex_handle, portMAX_DELAY);
+                printf("TASK11 take B!\n");
+                for (int i = 0; i < 10; i++) {
+                        printf("TASK11 i=%d for B!\n");
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                }
+                
+                printf("TASK11 give B!\n");
+                //释放资源B的互斥量的递归锁
+                xSemaphoreGiveRecursive(mutex_handle);
+                vTaskDelay(pdMS_TO_TICKS(3000));
+                
+                printf("TASK11 give A!\n");
+                //释放资源A的互斥量的锁
+                xSemaphoreGiveRecursive(mutex_handle);
+                vTaskDelay(pdMS_TO_TICKS(3000));
+        }
+}
+
+
+//任务22没有多次加锁减锁的操作
+//_____________________________________________________________
+void task22(void *pvParam)
+{
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        for (;;) {
+                //获取递归锁
+                xSempahoreTakeRecuresive(mutex_handle, portMAX_DELAY);
+                printf("TASK22 take!\n");
+                for (int i = 0; i < 10; i++) {
+                        printf("TASK22 i=%d\n");
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                }
+                
+                printf("TASK22 give B!\n");
+                //释放递归锁
+                xSemaphoreGiveRecursive(mutex_handle);
+        }
+}
+
+
+void app_main(void)
+{
+        //创建递归互斥信号量
+        mutex_handle = xSemaphoreCreateRecursiveMutex();
+        vTaskSuspendAll();
+        xTaskCreate(task11, "TASK11", 1024*5, NULL, 1, NULL); //优先级相同
+        xTaskCreate(task22, "TASK22", 1024*5, NULL, 1, NULL); //优先级相同
+        vTaskResumeAll();
+}
 
 
 
