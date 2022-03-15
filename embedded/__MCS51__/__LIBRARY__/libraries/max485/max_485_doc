@@ -1,0 +1,87 @@
+/*******************************************************************************
+        => MAX485 MODBUS
+*******************************************************************************/
+// MODBUS 通信协议
+//_____________________________________________________________
+
+
+
+// 常用功能码
+//_____________________________________________________________
+0x01    //读单个或多个位状态（00001-09999）
+0x05    //写单个位状态（00001-09999）
+0x0F    //写多个位状态（00001-09999）
+0x03    //读单个或多个寄存器（40001-49999）
+0x06    //写单个寄存器（40001-49999）
+0x10    //写多个寄存器（40001-49999）
+
+
+
+/*******************************************************************************
+        => 单片机作为主机读取RS485的MODBUS协议的温湿度传感器的数据测试
+*******************************************************************************/
+MODBUS是靠（时间间隔来实现报文和报文之间或数据包和数据包之间的一个区别的）
+
+#define MAX_RX_TIMEOUT          10
+#define MAX_RX_LEN              10
+
+unsigned char start_timer1  = 0;        //串口接收定时器（启动标志）
+unsigned char rx_flag       = 0;        //接收帧标志位
+unsigned char rx_time_count = 0;        //接收字节计数器
+unsigned char rx_index      = 0;        //接收字节索引
+unsigned char rx_buf[MAX_RX_LEN];       //接收缓冲区
+//9600@11.0592MHz 8N1
+void uart1_init(void)
+{
+}
+
+void uart_send_byte(unsigned char data)
+{
+        SBUF = data;
+        while (!TI);
+        TI = 0;
+}
+
+void uart_send_buffer(unsigned char *buf, unsigned char len)
+{
+        unsigned char i;
+        for (i = 0; i < len; i++) {
+                uart_send_byte(buf[i]);
+        }
+}
+void TIMER0_ISR(void) interrupt 1
+{
+        TR0 = 0;
+        if (start_timer1 == 1) {        
+                rx_timer_count++;               //1 累加定时时间计数器
+                if (rx_timer_count > MAX_RX_TIMEOUT) { //2 判断定时时间是否超过了设定的最大值
+                        rx_timer_count = 0;     //3 清除定时计数器
+                        rx_flag = 1;            //4 如果一包数据接收完成，这个标志位置位
+                        start_timer1 = 0;
+                }
+        }
+        TL0 = 0xCD;     //设置定时器初值
+}
+
+void UART_ISR(void) interrupt 4
+{
+        if (RI == 1) {
+                RI = 0;
+                start_timer1 = 1;       //每接收一帧数据的时候，打开软件定时器，去计数
+                if (rx_index < MAX_RX_LEN) { //接收缓冲区尚未用完时
+                        rx_buf[rx_index) = SBUF;
+                        rx_index++;     
+                } else {
+                        rx_index = 0;
+                }
+                rx_timer_count = 0;     //如果这一包数据没有接收完成，这个数据是清零的
+        }
+}
+
+char putchar(char c)
+{
+        SBUF = c;
+        while (!TI);
+        TI = 0;
+        return (c);
+}
