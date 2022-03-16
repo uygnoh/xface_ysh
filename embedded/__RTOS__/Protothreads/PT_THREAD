@@ -1,0 +1,290 @@
+/*******************************************************************************
+        => pt.h
+*******************************************************************************/
+#ifndef __PT_H__
+#define __PT_H__
+
+#include "lc.h"
+
+struct pt {
+        lc_t lc;
+};
+
+#define PT_WAITING              0
+#define PT_YIELDED              1
+#define PT_EXITED               2
+#define PT_ENDED                3
+
+
+
+
+#define PT_INIT(pt)             LC_INIT((pt)->lc)
+
+
+#define PT_THREAD(name_args)    char name_args
+
+
+// 线程开始和结束
+//_____________________________________________________________
+#define PT_BEGIN(pt)            { char PT_YIELD_FLAG = 1; LC_RESUME((pt)->lc)
+#define PT_END(pt)              LC_END((pt)->lc); PT_YIELD_FLAG = 0; \
+                                        PT_INIT(pt); return PT_ENDED; }
+
+//  
+//_____________________________________________________________
+#define PT_WAIT_UNTIL(pt, condition)            \
+        do {                                    \
+                LC_SET((pt)->lc);               \
+                if (!(condition)) {             \
+                        return PT_WAITING;      \
+                }                               \
+        } while (0)
+
+
+#define PT_WAIT_WHILE(pt, cond)         PT_WAIT_UNTIL((pt), !(cond))
+
+
+#define PT_WAIT_THREAD(pt, thread)      PT_WAIT_WHILE((pt), PT_SCHEDULE(thread))
+
+
+#define PT_SPAWN(pt, child, thread)             \
+        do {                                    \
+                PT_INIT((child));               \
+                PT_WAIT_THREAD((pt), (thread)); \
+        } while(0)
+
+
+#define PT_RESTART(pt)                          \
+        do {                                    \
+                PT_INIT(pt);                    \
+                return PT_WAITING;              \
+        } while(0)
+
+
+#define PT_EXIT(pt)                             \
+        do {                                    \
+                PT_INIT(pt);                    \
+                return PT_EXITED;               \
+        } while(0)
+
+
+#define PT_SCHEDULE(f) ((f) < PT_EXITED)
+
+
+#define PT_YIELD(pt)                            \
+        do {                                    \
+                PT_YIELD_FLAG = 0;              \
+                LC_SET((pt)->lc);               \
+                if (PT_YIELD_FLAG == 0) {       \
+                        return PT_YIELDED;      \
+                }                               \
+        } while(0)
+
+
+#define PT_YIELD_UNTIL(pt, cond)                                \
+        do {                                                    \
+                PT_YIELD_FLAG = 0;                              \
+                LC_SET((pt)->lc);                               \
+                if ((PT_YIELD_FLAG == 0) || !(cond)) {          \
+                        return PT_YIELDED;                      \
+                }                                               \
+        } while(0)
+
+
+
+#endif
+
+
+
+
+/*******************************************************************************
+        => lc.h
+*******************************************************************************/
+
+#ifdef DOXYGEN
+        #define LC_INIT(lc)
+        #define LC_SET(lc)
+        #define LC_RESUME(lc)
+        #define LC_END(lc)
+#endif
+
+#ifndef __LC_H__
+#define __LC_H__
+
+        #ifdef LC_INCLUDE
+                #include LC_INCLUDE
+        #else
+                #include "lc-switch.h"
+        #endif
+
+#endif
+
+
+/*******************************************************************************
+        => lc.h
+*******************************************************************************/
+#ifndef __LC_SWITCH_H__
+#define __LC_SWITCH_H__
+
+typedef unsigned short lc_t;
+
+#define LC_INIT(s) s = 0;
+
+#define LC_RESUME(s) switch(s) { case 0:
+
+#define LC_SET(s) s = __LINE__; case __LINE__:
+
+#define LC_END(s) }
+
+#endif
+
+
+
+/*******************************************************************************
+        => lc-addrlables.h
+*******************************************************************************/
+#ifndef __LC_ADDRLABELS_H__
+#define __LC_ADDRLABELS_H__
+
+typedef void * lc_t;
+
+#define LC_INIT(s) s = NULL
+
+#define LC_RESUME(s)                            \
+        do {                                    \
+                if (s != NULL) {                \
+                        goto *s;                \
+                }                               \
+        } while(0)
+
+#define LC_CONCAT2(s1, s2)              s1##s2
+#define LC_CONCAT(s1, s2)               LC_CONCAT2(s1, s2)
+
+#define LC_SET(s)                                       \
+        do {                                            \
+                LC_CONCAT(LC_LABEL, __LINE__):          \
+                (s) = &&LC_CONCAT(LC_LABEL, __LINE__);  \
+        } while(0)
+
+#define LC_END(s)
+
+#endif
+
+
+
+/*******************************************************************************
+        => lc-switch.h
+*******************************************************************************/
+#ifndef __LC_SWITCH_H__
+#define __LC_SWITCH_H__
+
+typedef unsigned short lc_t;
+
+#define LC_INIT(s) s = 0;
+
+#define LC_RESUME(s) switch(s) { case 0:
+
+#define LC_SET(s) s = __LINE__; case __LINE__:
+
+#define LC_END(s) }
+
+#endif
+
+
+/*******************************************************************************
+        => lc-sem.h
+*******************************************************************************/
+/*
+
+#include "pt-sem.h"
+
+#define NUM_ITEMS 32
+#define BUFSIZE 8
+
+static struct pt_sem mutex, full, empty;
+
+PT_THREAD(producer(struct pt *pt))
+{
+        static int produced;
+
+        PT_BEGIN(pt);
+
+        for (produced = 0; produced < NUM_ITEMS; ++produced) {
+
+                PT_SEM_WAIT(pt, &full);
+
+                PT_SEM_WAIT(pt, &mutex);
+                add_to_buffer(produce_item());    
+                PT_SEM_SIGNAL(pt, &mutex);
+
+                PT_SEM_SIGNAL(pt, &empty);
+        }
+
+        PT_END(pt);
+}
+
+PT_THREAD(consumer(struct pt *pt))
+{
+        static int consumed;
+
+        PT_BEGIN(pt);
+
+        for (consumed = 0; consumed < NUM_ITEMS; ++consumed) {
+
+                PT_SEM_WAIT(pt, &empty);
+
+                PT_SEM_WAIT(pt, &mutex);    
+                consume_item(get_from_buffer());    
+                PT_SEM_SIGNAL(pt, &mutex);
+
+                PT_SEM_SIGNAL(pt, &full);
+        }
+
+        PT_END(pt);
+}
+
+PT_THREAD(driver_thread(struct pt *pt))
+{
+        static struct pt pt_producer, pt_consumer;
+
+        PT_BEGIN(pt);
+
+        PT_SEM_INIT(&empty, 0);
+        PT_SEM_INIT(&full, BUFSIZE);
+        PT_SEM_INIT(&mutex, 1);
+
+        PT_INIT(&pt_producer);
+        PT_INIT(&pt_consumer);
+
+        PT_WAIT_THREAD(pt, producer(&pt_producer) &
+                        consumer(&pt_consumer));
+
+        PT_END(pt);
+}
+ 
+ */
+   
+
+#ifndef __PT_SEM_H__
+#define __PT_SEM_H__
+
+#include "pt.h"
+
+struct pt_sem {
+        unsigned int count;
+};
+
+#define PT_SEM_INIT(s, c)               (s)->count = c
+
+
+#define PT_SEM_WAIT(pt, s)                              \
+        do {                                            \
+                PT_WAIT_UNTIL(pt, (s)->count > 0);      \
+                --(s)->count;                           \
+        } while(0)
+
+
+#define PT_SEM_SIGNAL(pt, s)            ++(s)->count
+
+#endif
+   
