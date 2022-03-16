@@ -75,3 +75,43 @@ void main()
                 f1(&p2);        
         }
 }
+
+
+
+/*******************************************************************************
+        => protothread
+*******************************************************************************/
+// http://dunkels.com/adam/pt/index.html
+
+#include "pt.h"
+ 
+struct pt pt;
+struct timer timer;
+ 
+PT_THREAD(example(struct pt *pt))
+{
+        PT_BEGIN(pt);
+ 
+        while(1) {
+                if(initiate_io()) {
+                timer_start(&timer);
+                PT_WAIT_UNTIL(pt, io_completed() || timer_expired(&timer));
+                read_data();
+                }
+        }
+        
+        PT_END(pt);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
