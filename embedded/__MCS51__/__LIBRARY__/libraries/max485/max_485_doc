@@ -3,7 +3,11 @@
 *******************************************************************************/
 // MODBUS 通信协议
 //_____________________________________________________________
-
+//9600@8N1 (数据位为（8），起始位为（1），停止位为（1），无奇偶校验位)
+数据包与数据包之间最大的一个时间间隔：一般是（3.5）个字符时间
+则一个字符为（10）bit
+3.5 * 10 * 1 / 9600 = 0.0036458333333333334(秒)
+                    = 3.64(ms)
 
 
 // 常用功能码
@@ -25,16 +29,51 @@ MODBUS是靠（时间间隔来实现报文和报文之间或数据包和数据�
 #define MAX_RX_TIMEOUT          10
 #define MAX_RX_LEN              10
 
+sbit RS485_DIR                  P3^7;   //485发送和接收状态控制引脚
+
 unsigned char start_timer1  = 0;        //串口接收定时器（启动标志）
 unsigned char rx_flag       = 0;        //接收帧标志位
+unsigned char second_flag   = 0;        //秒标志位
 unsigned char rx_time_count = 0;        //接收字节计数器
 unsigned char rx_index      = 0;        //接收字节索引
 unsigned char rx_buf[MAX_RX_LEN];       //接收缓冲区
-//9600@11.0592MHz 8N1
-void uart1_init(void)
+
+unsigned char code read_temp_hum_cmd[] = {0x03, 0x03, 0x00, 0x00, 0x00, 0x02, 0xc5, 0xe9};
+
+
+// 11.0592MHz@9600bps
+// 1位起始位， 1位停止位， 8位数据位， 共10位数据
+// 使用定时器1，做为串行口的波特率发生器
+//_____________________________________________________________
+void uart_init(void)
 {
+        PCON &= 0x7F;   //波特率不倍速
+        SCON  = 0x50;   //8位数据，可变波特率
+        TMOD &= 0x0F;   //清除定时器“1”模式位
+        TMOD |= 0x20;   //设定定时器1为8位自动重装方式
+        TL1   = 0xFD;   //设定定时初值
+        TH1   = 0xFD;   //设定定时器重装值
+        ET1   = 0;      //禁止定时器1中断
+        ES    = 1;      //串行口中断打开
+        TR1   = 1;      //启动定时器1
 }
 
+// 定时器0，16位的定时方式
+// 11.05926MHz@1ms
+//_____________________________________________________________
+void timer0_init(void)
+{
+    TMOD &= 0xF0;   //设置定时器模式
+    TMOD |= 0x01;   //设置定时器模式
+    TL0   = 0x66;   //设置定时初值
+    TH0   = 0xFC;   //设置定时初值
+    TF0   = 0;      //清除TF0标志
+    ET0   = 1;      //打开定时器0中断
+    TR0   = 1;      //定时器0开始计时
+}
+
+// 发送一个字节数据
+//_____________________________________________________________
 void uart_send_byte(unsigned char data)
 {
         SBUF = data;
@@ -42,15 +81,24 @@ void uart_send_byte(unsigned char data)
         TI = 0;
 }
 
+// 发送N个字节数据
+//_____________________________________________________________
 void uart_send_buffer(unsigned char *buf, unsigned char len)
 {
         unsigned char i;
+        RS485_DIR = 1;          //切换成发送状态
         for (i = 0; i < len; i++) {
                 uart_send_byte(buf[i]);
         }
+        RS485_DIR = 0;          //切换成接收状态
 }
+
+// 定时器0中断服务程序
+//_____________________________________________________________
 void TIMER0_ISR(void) interrupt 1
 {
+
+        static unsigned int time = 0;
         TR0 = 0;
         if (start_timer1 == 1) {        
                 rx_timer_count++;               //1 累加定时时间计数器
@@ -60,7 +108,16 @@ void TIMER0_ISR(void) interrupt 1
                         start_timer1 = 0;
                 }
         }
-        TL0 = 0xCD;     //设置定时器初值
+        
+        time++;
+        if (time >= 2000) {
+                time = 0;
+                second_flag = 1;        // 2秒标志位
+        }
+        
+        TL0   = 0x66;   //设置定时器0初值
+        TH0   = 0xFC;   //设置定时器0初值
+        TR0   = 1;      //打开定时器0
 }
 
 void UART_ISR(void) interrupt 4
@@ -69,7 +126,7 @@ void UART_ISR(void) interrupt 4
                 RI = 0;
                 start_timer1 = 1;       //每接收一帧数据的时候，打开软件定时器，去计数
                 if (rx_index < MAX_RX_LEN) { //接收缓冲区尚未用完时
-                        rx_buf[rx_index) = SBUF;
+                        rx_buf[rx_index] = SBUF;
                         rx_index++;     
                 } else {
                         rx_index = 0;
@@ -84,4 +141,42 @@ char putchar(char c)
         while (!TI);
         TI = 0;
         return (c);
+}
+
+int main(void)
+{
+        if (second_flag) {
+                second_flag = 0;
+                //主机发送
+                uart_send_buffer(read_temp_hum_cmd, 8);
+        }
+        
+        if (rx_flag) {
+                rx_flag = 0;
+                rx_index = 0;
+                //从机应答，并返回数据
+                uart_send_buffer(rx_buf, rx_index);
+                modbus_handle(rx_buf, rx_index);
+        }
+}
+
+
+#define TEMP_HUM_ADDR   0x03    //设备地址
+void modbus_handle(unsigned char *buf, unsigned char len)
+{
+        unsigned int crc;
+        unsigned crch, crcl;
+        
+        if (buf[0] != TEMP_HUM_ADDR) {
+                return;
+        } else {
+                crc = GetCRC16(buf, len-2);     //CRC16校验
+                crch = crc >> 8;
+                crcl = crc & 0xFF;
+                if ((buf[len-2] != crch) || (buf[len-1] != crcl)) {
+                        return;
+                }
+                temp     = ((int)buf[3] << 8) + buf[4];   //温度数据
+                humidity = ((int)buf[5] << 8) + buf[6];   //湿度数据
+        }
 }

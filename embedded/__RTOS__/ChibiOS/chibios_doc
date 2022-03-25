@@ -50,7 +50,7 @@ HAL(hardware abstraction layer) //包含許多抽象的device drivers，
                                 //提供普遍的I/O API給不同平台的應用程式
 
 
-        => 系統狀態(System States)
+        => 系统状态(System States)
 //_____________________________________________________________
 //Init
         1 ChibiOS/RT進行OS初始化之前的狀態， 進行所謂的物理重置

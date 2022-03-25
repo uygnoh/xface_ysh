@@ -4,9 +4,9 @@ IPM功率芯片的参数：（infineon）
 3. AN2016-12 Application Note
 
 
+#include "math.h"
 
-
-#define PWM_Period      100
+#define PWM_Period      100             //定时周期
 #define _PI             3.14159265359
 #define _PI_2           1.57079632679
 #define _PI_3           1.0471975512
@@ -15,7 +15,7 @@ IPM功率芯片的参数：（infineon）
 #define _PI_6           0.52359877559
 #define _SQRT3          1.73205080757
 
-float volatage_power_supply;    //直流母线电压值
+float volatage_power_supply = 24;            //直流母线电压: 24V
 
 //将角度值控制在（0 ~ 2pi）之间
 //fmod（对浮点数取模）
@@ -34,10 +34,10 @@ float _normalizeAngle(float angle)
 */
 //FOC核心函数， （输入Ud, Uq，电角度）
 //Park（逆变换）， 将（Ud, Uq）变换成（U_alpha, U_beta）
-void setPhaseVoltage(float Uq, float Ud, float angle_el)
+void setPhaseVoltage(float Ud, float Uq, float angle_el)
 {
         float Uref;             //参考电压
-        uint32_t sector;        //
+        int sector;        //扇区
         float T0, T1, T2;
         float Ta, Tb, Tc;
         float U_alpha, U_beta;
@@ -51,10 +51,11 @@ void setPhaseVoltage(float Uq, float Ud, float angle_el)
         U_alpha = Ud*cos(angle_el) - Uq*sin(angle_el);  //反Park变换
         U_beta  = Ud*sin(angle_el) + Uq*cos(angle_el);  //反Park变换
         
+        //参考电压
         U_ref   = _sqrt(U_alpha*U_alpha + U_beta*U_beta) / volatage_power_supply;
         
         //限幅（0.577 == ）
-        //svpwm的最大不失真旋转电压矢量幅值（根号3 /3）
+        //svpwm的最大不失真旋转电压矢量幅值（根号3 /3）Udc
         if (Uref > 0.577) {
                 Uref = 0.577;
         }
@@ -67,12 +68,12 @@ void setPhaseVoltage(float Uq, float Ud, float angle_el)
         sector = (angle_el / _PI_3) + 1;
         
         
-        //计算各相邻桥臂功率器件的开关时间
+        //计算两个相邻电压矢量作用时间
         T1 = _SQRT3 * sin(sector*_PI_3 - anagle_el) * Uref;
         T2 = _SQRT3 * sin(angle_el -(sector - 1.0)*_PI_3) * Uref;
         T0 = 1 - T1 - T2;       //零矢量电压作用的时间
         
-        //
+        //计算各相邻桥臂功率器件的开关时间
         switch (sector) {
         case 1:
                 Ta = T1 + T2 + T0/2;
@@ -95,7 +96,7 @@ void setPhaseVoltage(float Uq, float Ud, float angle_el)
                 Tc = T1 + T2 + T0/2;
                 break;
         case 5:
-                Ta = T2 + T0;
+                Ta = T2 + T0/2;
                 Tb = T0/2;
                 Tc = T1 + T2 + T0/2;
         case 6:

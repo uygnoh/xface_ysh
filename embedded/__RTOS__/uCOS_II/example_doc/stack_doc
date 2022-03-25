@@ -1,0 +1,13 @@
+//定义任务堆栈
+#define TASK_STK_SIZE           512             //定义堆栈长度
+OS_STK  TaskStk[TASK_STK_SIZE];                 //数组作为任务堆栈
+
+
+//关联
+ptos = TaskStk[0];                              //向上增长
+ptos = TaskStk[TASK_STK_SIZE-1];                //向下增长
+
+
+
+OSTimeTick()
+就是在每个任务的延时状态，使其中已经到了延时时限的非挂起任务进入就绪态
