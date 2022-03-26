@@ -7,12 +7,12 @@
 
 void main() 
 {
-    port_init();
-    clk_init();
+        port_init();
+        clk_init();
 
-    while (1) {
-            PB_ODR ^= 0x20;
-            __delay();
-    }
+        while (1) {
+                PB_ODR ^= 0x20;
+                __delay();
+        }
 
 }
