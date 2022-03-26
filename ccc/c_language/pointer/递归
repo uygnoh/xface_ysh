@@ -11,12 +11,13 @@
 #include <stdio.h>
 long fact(int n)
 {
-        if (n < 0)              //如果N小于0，返回-1
+        if (n < 0) {                    //如果N小于0，返回-1
                 return -1;
-        else if (n==0 || n==1)  //如果N=0或N=1，返回1
+        } else if (n==0 || n==1) {      //如果N=0或N=1，返回1
                 return 1;
-        else                   //否则递归处理
-                return n * fact(n-1);
+        } else {                        //否则递归处理
+                return (n * fact(n-1));
+        }
 }
 int main(void)
 {
@@ -34,17 +35,18 @@ int main(void)
 #include <stdio.h>
 int fibo(int n)
 {
-	if (n <= 0)
-		return -1;
-	else if (n == 1 || n == 2)
-		return 1;
-	else
-		return (fibo(n-1) + fibo(n-2));
+        if (n <= 0) {
+                return -1;
+        } else if (n == 1 || n == 2) {
+                return 1;
+        } else {
+                return (fibo(n-1) + fibo(n-2));
+        }
 }
 int main(void)
 {
-	printf("%d\n", fibo(5));
-	return 0;
+        printf("%d\n", fibo(5));
+        return 0;
 }
 
 
@@ -78,28 +80,27 @@ void hanoi(int n, char a, char b, char c);
 //将 “N个圆盘”借助于C从A移动到B
 void hanoi(int n, char a, char b, char c)
 {
-	if (n == 1)
-		move(n, a, b);
-	else
-	{
-		hanoi(n-1, a, c, b);
-		move(n, a, b);
-		hanoi(n-1, c, b, a);
-	}
+        if (n == 1) {
+                move(n, a, b);
+        } else {
+                hanoi(n-1, a, c, b);
+                move(n, a, b);
+                hanoi(n-1, c, b, a);
+        }
 }
 
 void move(int n, char a, char b)
 {
-	printf("move %d: from %c to from %c\n", n, a, b);
+        printf("move %d: from %c to from %c\n", n, a, b);
 }
 
 int main(void)
 {
-	int n;
-	printf("Input the number of disks:");
-	scanf("%d", &n);
-	printf("Steps of moving %d disks form A to B by means of C:\n", n);
-	hanoi(n, 'A', 'B', 'C');
+        int n;
+        printf("Input the number of disks:");
+        scanf("%d", &n);
+        printf("Steps of moving %d disks form A to B by means of C:\n", n);
+        hanoi(n, 'A', 'B', 'C');
 }
 
 
@@ -123,10 +124,11 @@ int main(void)
 */
 unsigned long Fact(unsigned int n)
 {
-	if (n==0 || n==1)
-		return 1;
-	else
-		return n * Fact(n-1);
+        if (n==0 || n==1) {
+                return 1;
+        } else {
+                return (n * Fact(n-1));
+        }
 }
 
 
@@ -146,8 +148,9 @@ unsigned long Fact(unsigned int n)
 */
 unsigned long Fact(unsigned int n, unsigned int a)
 {
-	if (n==0 || n==1)
-		return 1;
-	else
-		return Fact(n-1, n*a);
+        if (n==0 || n==1) {
+                return 1;
+        } else {
+                return Fact(n-1, n*a);
+        }
 }
