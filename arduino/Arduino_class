@@ -1,0 +1,118 @@
+// 类的声明
+// private      //无论有没有private关键字，默认都是（private）开始
+// public       //公有数据成员
+//_____________________________________________________________
+class LedFlash {
+        private:
+                byte const led_buildin = 13;
+                byte pin = led_buildin;         //Pin
+                int duration = 0;               //闪烁时间（0）
+                bool status = false;            //状态
+                byte blink_time = 10;           //闪烁次数
+        public:
+                LedFlash(byte pin_param, int duration_param);   //构造函数
+                //~LedFlash();                                  //析构函数，默认自动生成
+                
+                void set_pin(byte);
+                void set_duration(int);
+                
+                //最优作法：getter 函数全部是指为（只读）
+                byte get_pin() const;
+                int get_duration() const;
+                String get_status() const;
+                
+                void on();
+                void off();
+                void flash();
+};
+
+
+// this 指向这个类内部的成员
+// ::   表示set_pin()这个函数所在的位置位于（LedFlash）这个类中
+//_____________________________________________________________
+void LedFlash::set_pin(byte pin_param) {
+        if (pin_param > 1 && pin_param < 13) {
+                this->pin = pin_param;
+                pinMode(this->pin, OUTPUT);
+        } else {
+                //led_buildin 只能自己访问自己
+                this->pin = this->led_buildin;
+        }
+}
+
+
+//_____________________________________________________________
+void LedFlash::set_duration(int duration_param) {
+        this->duration = duration_param;
+}
+
+
+//_____________________________________________________________
+byte LedFlash::get_pin() const {
+        return (this->pin);
+}
+
+
+//_____________________________________________________________
+int LedFlash::get_duration() const {
+        return (this->duration);
+}
+
+//_____________________________________________________________
+String LedFlash::get_stauts() const {
+        if (digital(this->pin)) {
+                return ("打开 LED_00");
+        }
+        return ("关闭 LED_00");
+}
+
+//_____________________________________________________________
+void LedFlash::on() {
+        digitalWrite(this->pin, HIGH);
+}
+
+
+//_____________________________________________________________
+void LedFlash::of() {
+        digitalWrite(this->pin, LOW);
+}
+
+
+//_____________________________________________________________
+void LedFlash::flash() {
+        for (byte i = 0; i < this->blink_time; i++) {
+                digitalWrite(this->pin, HIGH);
+                delay(this->duration);
+                digitalWrite(this->pin, LOW);
+                delay(this->duration);
+        }
+}
+
+
+
+void setup() {
+        Serial.begin(9600);
+        while (!Serial);
+        
+        // LedFlash led = LedFlash();   //无参数（使用默认值）
+        LedFlash led = LedFlash(5, 300);
+        
+        //切换为（6）号灯， 600ms
+        led.set_pin(6);
+        led.set_duration(600);
+        
+        Serial.println("\nLED PIN - " + String(led.get_pin()));
+        Serial.println("LED 闪烁时间 - " + String(led.get_duration()) + " ms");
+        Serial.println("LED 占用内存空间 - " + String(sizeof(led) + "字节");
+        delay(3000);
+        
+        led.on();
+        Serial.println("\nLED状态 - " + led.get_status());
+        delay(3000);
+        
+        led.off();
+        Serial.println("\nLED状态 - " + led.get_status());
+        delay(3000);
+        
+        led.flash();
+}
