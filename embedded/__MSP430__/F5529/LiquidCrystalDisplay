@@ -1,0 +1,48 @@
+利用MSP430F636单片机的LCD_C模块，采用（4MUX）动态驱动模式，
+使段码液晶循环显示（0123456789），在实例中采用的驱动段为
+（SEG32）和（SEG33），显示缓冲寄存器为LCDM17.
+
+#include "msp430f6736.h"
+#define f       0x01
+#define g       0x02
+#define e       0x04
+#define d       0x08
+#define a       0x10
+#define b       0x20
+#define c       0x40
+#define dp      0x80
+
+const char lcd_table[] = {
+        a+b+c+d+e+f,            //0
+        b+c,                    //1
+        a+b+d+e+g,              //2
+        a+b+c+d+g,              //3
+        b+c+f+g,                //4
+        a+c+d+f+g,              //5
+        a+c+d+e+f+g,            //6
+        a+b+c,                  //7
+        a+b+c+d+e+f+g,          //8
+        a+b+c+d+f+g,            //9
+};
+
+
+int main(void)
+{
+        char i;
+        WDTCTL          = WDTPW + WDTHOLD;      // Stop WDT
+                                                // 打开LCD并配置LCD频率
+        LCDCCTL0        = LCDDIV_13 + LCDPRE_3 + LCD4MUX + LCDON;
+        LCDCPCTL2       = 0x0003;               // 使能SEG32和SEG33，LCD段功能
+        LCDM17          = 0x00;                 // 清除LCD显示
+        delay_ms(10);
+        while (1) {
+                for (i = 0; i < 10; i++) {
+                        LCDM17 = lcd_table[i];
+                        delay_ms(10);
+                }
+        }
+}
+
+
+
+
