@@ -1,0 +1,156 @@
+/*******************************************************************************
+        => MSP430F5529-FLASH
+*******************************************************************************/
+//  信息存储器 ( 1KByte ) EEPROM
+//_____________________________________________________________
+|_________________________________________|
+| 128 Byte Segment A | 128 Byte Segment B |
+|____________________|____________________|
+| 128 Byte Segment C | 128 Byte Segment D |
+|____________________|____________________|
+
+
+//  引导加载存储器 ( 2KByte )
+//_____________________________________________________________
+|_________________________________________|
+| 512 Byte BSL A     | 512 Byte BSL B     |
+|____________________|____________________|
+| 512 Byte BSL C     | 512 Byte BSL D     |
+|____________________|____________________|
+
+
+//  FLASH 主存储器( 128KByte )
+//_____________________________________________________________
+|_________________________________________|
+| 32 KB Flash  A     | 32 KB Flash  B     |
+|____________________|____________________|
+| 32 KB Flash  C     | 32 KB Flash  D     |
+|____________________|____________________|
+
+
+
+// Flash 擦除模式设置
+//_____________________________________________________________
+        MERAS   ERASE           擦除模式
+          0       1             //段擦除
+          1       0             //扇区擦除
+          1       1             //块擦除（所有主存储器的4个扇区都被擦除）
+                                信息存储器A~D及BSL引导装载程序字段A~D不被擦除
+
+
+
+// Flash 擦除单段数据函数
+//_____________________________________________________________
+void FlashErase(unsigned int addr)
+{       //定义字节型指针指向目标段
+        unsigned char *ptr = (unsigned char *)addr;
+        while (FCTL3 & BUSY);   //如果处于忙，则等待
+        FCTL3 = FWKEY;          //清除FLASH锁定位
+        FCTL1 = FWKEY + ERASE;  //使能单段擦除操作
+        _DINT();                //FLASH擦除期间不允许中断
+        *ptr = 0;               //向段内地址写入（0）
+        while (FCTL3 & BUSY);   //等待擦除完成
+        _EINT();                //启动全局中断
+        FCTL1 = FWKEY;          //FLASH退出擦除模式
+        FCTL3 = FWKEY + LOCK;   //恢复Flash锁定位，保护数据
+}
+
+
+
+
+// Flash 写操作
+//_____________________________________________________________
+        BLKWRT          WRT             写模式
+          0              1              //字节、字写入
+          1              0              //长字写入
+          1              1              //长字块写入
+
+
+
+// Flash 向目的地址写入（1）字节
+// 写入的目标地址，写入的数据
+//_____________________________________________________________
+void FlashWB(unsigned int addr, unsigned char DataB)
+{
+        FCTL3 = FWKEY;
+        FCTL1 = FWKEY + ERASE;                  //设置擦除控制位
+        _DINT();                                //关中断
+        *((unsigned char *)addr) = 0;          //向段内地址写入（0）
+        while (FCTL3 & BUSY);                   //等待擦除完成
+        FCTL1 = FWKEY + WRT;                    //设置字节/字写控制位
+        *((unsigned char *)addr) = DataB;      //向目的地址写入数据
+        while (FCTL3 & BUSY);                   //等待写入完成
+        _EINT;                                  //开中断
+        FCTL1 = FWKEY;                          //退出Flash写模式
+        FCTL3 = FWKEY + LOCK;                   //恢复Flash的锁定位，保护数据
+}
+
+
+
+/*******************************************************************************
+        => MSP430F5529-FLASH
+*******************************************************************************/
+        FCTL1           //Flash控制寄存器1
+        FCTL3           //Flash控制寄存器3
+        FCTL4           //Flash控制寄存器4
+
+
+
+// 信息段（C，D）的擦除和写入操作
+// 将信息段C的内容复制到信息段D中
+//_____________________________________________________________
+char value;
+void write_SegC(char value);
+void copy_C2D(void);
+int main(void)
+{
+        WDTCTL = WDTPW +WDTHOLD;
+        value  = 0;
+        while (1) {
+                write_SegC(value++);    // Write segment C, increment value
+                copy_C2D();             // Copy Segment C to D
+                __no_operation();       // Loop forever, SET BREAKPOINT HERE
+        }
+}
+
+// Input = value, holds value to write to Seg C
+void write_SegC(char value)
+{
+        unsigned int i;
+        char *Flash_ptr;                        // Initialize Flash pointer
+        Flash_ptr  = (char *)0x1880;             
+        FCTL3      = FWKEY;                     // Clear Lock bit
+        FCTL1      = FWKEY + ERASE;             // Set Erase bit
+        *Flash_ptr = 0;                         // Dummy write to erase Flash seg
+        FCTL1      = FWKEY + WRT;               // Set WRT bit for write operation
+        for (i = 0; i < 128; i++) {
+                *Flash_ptr++ = value;           // Write value to flash
+        }
+        FCTL1 = FWKEY;                          // Clear WRT bit
+        FCTL3 = FWKEY + LOCK;                   // Set LOCK bit
+}
+
+// Copy Seg C to Seg D
+void copy_C2D(void)
+{
+        unsigned int i;
+        char *Flash_ptrC;
+        char *Flash_ptrD;
+        
+        Flash_ptrC = (char *)0x1880;    // Initialize Flash Segment C ptr
+        Flash_prtD = (char *)0x1800;    // Initialize Flash Segment D ptr
+        
+        __disable_interrupt();          //Disable global
+        
+        FCTL3 = FWKEY;                  // Clear Lock bit
+        FCTL1 = FWKEY + ERASE;          // Set Erase bit
+        *Flash_ptrD = 0;                // Dummy write erase Flash Seg D
+        FCTL1 = FWkEY + WRT;            // Set WRT bit for write operation
+        
+        for (i = 0; i < 128; i++) {
+                *Flash_ptrD++ = *Flash_ptrC++;
+        }
+        
+        FCTL1 = FWKEY;                  // Clear WRT bit 
+        FCTL3 = FWKEY + LOCK;           // Set LOCK bit
+}
