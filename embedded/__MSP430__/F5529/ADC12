@@ -1,36 +1,49 @@
 /*******************************************************************************
         => MSP430-F5529-ADC12
 *******************************************************************************/
+//ADC-12
+__________________________________________________________
+        1 12位逐次逼近（SAR）内核
+        2 模拟输入多路复用器
+        3 参考电压发生器
+        4 采样及转换所需时序控制电路
+        5 转换结果缓冲及控制寄存器
+        
+        
 |_________________________________________________________|
 |  模拟电压信号  =>采样  =>保持  =>量化  =>编码  =>数字信号    |
 |_________________________________________________________|
 
 
- //12bit-ADC 计算公式
+ // 12bit-ADC 计算公式
+ __________________________________________________________
  //Vin          输入电压的幅值
- //V_R负        负的参考电压
- //V_R正        正的参考电压
+ //V_R负        负的参考电压   0V
+ //V_R正        正的参考电压   3.3V
 |_________________________________________________________|
 |  N_ADC = 4095 * (Vin - V_R负) / (V_R正 - V_R负)          |
+|        = 4095 * Vin / 3.3                               |
 |_________________________________________________________|
 
 
 
-//采样周期
+// 采样周期
 __________________________________________________________
 采样周期是指每两次采样的时间间隔
 
 
-//采样频率
+
+// 采样频率
 __________________________________________________________
-采样频率，定义每秒人连续信号中提取组成离散信号的采样个数，单位为（Hz）
+采样频率，定义每秒从连续信号中提取组成离散信号的采样个数，单位为（Hz）
 采样频率是“采样周期的倒数”。 为了确定对一个模拟信号的采样频率，在此简单
 介绍“香农定理”， 即在进行模数转换过程中， 当采样频率Fs大于信号中最高
 频率分量Fmax的“2倍”时（Fs >= 2Fmax）， 采样后的数字信号能保留原始
 信号中的信息。 在一般应用中， 采样频率应为被采样信号中最高频率的“5~10”倍。
 
 
-//ADC12寄存器
+
+// ADC12寄存器
 __________________________________________________________
         ADC12CTL0       //ADC12控制寄存器“0”
         ADC12CTL1       //ADC12控制寄存器“1”
@@ -38,8 +51,15 @@ __________________________________________________________
         ADC12IFG        //ADC12中断标志寄存器
         ADC12IE         //ADC12中断使能寄存器
         ADC12IV         //ADC12中断向量寄存器
-        ADC12MEM        //ADC12(0~15)缓冲寄存器
-        ADC12MCT        //ADC12(0~15)存储控制寄存器
+        ADC12MEMx       //ADC12(x = 0~15)缓冲寄存器
+        ADC12MCTx       //ADC12(x = 0~15)存储控制寄存器
+
+// ADC-12采样定时器
+__________________________________________________________
+        MSC=0           //采样定时器每次都需要（SHI）的上升沿触发
+        MSC=1           //采样定时器在第一次需要（SHI）的上升沿触发
+
+
 
 
 
@@ -49,17 +69,21 @@ __________________________________________________________
 
 1 单通道单次
 __________________________________________________________
+        // SHP=0; MSC=0;
         //一个通道转换一次      （ADC12CONSEQx =00）
         
 2 序列通道单次转换
 __________________________________________________________
+        // SHP=1; MSC=1;
         //一个序列多个通道转换一次（ADC12CONSEQx =01）
 3 单通多次转换
 __________________________________________________________
+        // SHP=1; MSC=1;
         //一个通道重复转换       （ADC12CONSEQx =10）
         
 4 序列通道多次转换
 __________________________________________________________
+        // SHP=1; MSC=1;
         //一个序列多个通道重复转换（ADC12CONSEQx =01）
 
 
@@ -71,11 +95,12 @@ __________________________________________________________
 int man(void)
 {
         WDTCTL     = WDTPW + WDTHOLD;           //Stop WDT
+      //ADC12CTL0 &= ~ADC12ENC;
         ADC12CTL0  = ADC12SHT02 + ADC12ON;      //Sampling time, ADC12 On
         ADC12CTL1  = ADC12SHP;                  //Use samping timer
         ADC12IE    = 0x01;                      //Use interrupt
+      //以上配置必需在“ADC12ENC=0”时，才可以进行配置
         
-        //以上配置必需在“ADC12ENC=0”时，才可以进行配置
         ADC12CTL0 |= ADC12ENC;
         P6SEL     |= 0x01;                      //P6.0 ADC option select
         P1DIR     |= 0x01;                      //P1.0 output
@@ -127,18 +152,20 @@ int main(void)
 {
         WDTCTL     = WDTPW + WDTHOLD;           //Stop WDT
         P6SEL      = 0x0F;                      //Enbale A/D channel inputs
-        ADC12CTL0  = ADC12ON + ADC12MSC + ADC12SHT0_2;//Turn on ADC12, set sampling time
+                                                //Turn on ADC12, set sampling time
+        ADC12CTL0  = ADC12ON + ADC12MSC + ADC12SHT0_2;
         ADC12CTL1  = ADC12SHP + ADC12CONSEQ_1;  //Use sampling timer, single sequence
         ADC12MCTL0 = ADC12INCH_0;               //ref+=AVcc, channel = A0
         ADC12MCTL1 = ADC12INCH_1;               //ref+=AVcc, channel = A1
         ADC12MCTL2 = ADC12INCH_2;               //ref+=AVcc, channel = A2
         ADC12MCTL3 = ADC12INCH_3 + ADC12EOS;    //ref+=AVcc, channel = A3, end seq.
-        ADC12IE    = 0x80;                      //Enable ADC12IFG.3
+        ADC12IE    = 0x08;                      //Enable ADC12IFG.3
         ADC12CTL0 |= ADC12ENC;                  //Enable conversions
         while (1) {
                 ADC12CTL0 |= ADC12ENC;          //Enable conversions
                 ADC12CTL0 |= ADC12SC;           //start convert ->sofware trigger
-                __bis_SR_register(LPM4_bits + GIE); //Enter LPM4, Enable interrupts
+                                                //Enter LPM4, Enable interrupts
+                __bis_SR_register(LPM4_bits + GIE); 
                 __no_operation();               //For debugger
         }
 }
@@ -151,7 +178,8 @@ __interrupt void ADC12_ISR(void)
                 results[1] = ADC12MEM1; //Move results, IFG is cleared
                 results[2] = ADC12MEM2; //Move results, IFG is cleared
                 results[3] = ADC12MEM3; //Move results, IFG is cleared
-                __bic_SR_register_on_exit(LPM4_bits);//Exit active CPU, SET BREADPOINt HER
+                                        //退出低功耗模式
+                __bic_SR_register_on_exit(LPM4_bits);
         }
         default: break;
 }
@@ -161,15 +189,15 @@ __interrupt void ADC12_ISR(void)
 /*******************************************************************************
         => ADC12 单通道多次转换
 *******************************************************************************/
-#define Num_of_Reaults  8
+#define Num_of_Results  8
 volatile unsigned int results[Num_of_Results];
 
 int main(void)
 {
         WDTCTL     = WDTPW + WDTHOLD;           //Stop watchdog timer
-        P6SEL     |= 0x01;                      //Enable A/D channel A0
-                                //Turn on ADC12, set sampling time
-                                //set multiple sample conversion
+        P6SEL     |= 0x01;                      //Enable A/D channel A0( P6.0 )
+                                                //Turn on ADC12, set sampling time
+                                                //set multiple sample conversion
         ADC12CTL0  = ADC12ON + ADC12SHT0_8 + ADC12MSC;
         ADC12CTL1  = ADC12SHP + ADC12CONSEQ_2;  //Use sampling, set mode
         ADC12IE    = 0x01;                      //Enable ADC12IFG.0
@@ -190,6 +218,7 @@ __interrupt void ADC12_ISR(void)
                 if (index == 8) {
                         index = 0;
                 }
+                break;
         }
         default break;
 }
@@ -199,6 +228,10 @@ __interrupt void ADC12_ISR(void)
 /*******************************************************************************
         => ADC12 序列通道多次转换
 *******************************************************************************/
+//      Vin0 --->| P6.0/CB0/A0 |
+//      Vin1 --->| P6.1/CB1/A1 |
+//      Vin2 --->| P6.2/CB0/A2 |
+//      Vin3 --->| P6.3/CB0/A3 |
 #define Num_of_Results 8
 volatile unsigned int A0results[Num_of_Results];
 volatile unsigned int A1results[Num_of_Results];
@@ -208,9 +241,12 @@ volatile unsigned int A3results[Num_of_Results];
 int main(void)
 {
         WDTCTL     = WDTPW + WDTHOLD;           //Stop watchdog timer
+        
+                                                //P6.0 P6.1 P6.2 P6.3
         P6SEL      = 0x0F;                      //Enable A/D channel inputs
-                                //Turn ON ADC12, extend sampling time
-                                //to avoid overflow of results
+        
+                                                //Turn ON ADC12, extend sampling time
+                                                //to avoid overflow of results
         ADC12CTL0  = ADC12ON + ADC12MSC + ADC12SHT0_8;
         ADC12CTL1  = ADC12SHP + ADC12CONSEQ_3;  //Use sampling timer, repeated sequence
         ADC12MCTL0 = ADC12INCH_0;               //ref+=AVcc, channel = A0
@@ -229,46 +265,16 @@ __interrupt void ADC12_ISR(void)
 {
         static unsigned int index = 0;
         switch (__event_in_range(ADC12IV, 34)) {
-        case 12:
+        case 12:                                //ACD12_IFG.3中断入口
                 A0results[index] = ADC12MEM0;   //Move A0 results, IFG is cleared
-                A0results[index] = ADC12MEM1;   //Move A1 results, IFG is cleared
-                A0results[index] = ADC12MEM2;   //Move A2 results, IFG is cleared
-                A0results[index] = ADC12MEM3;   //Move A3 results, IFG is cleared
-                if (index == 8)
+                A1results[index] = ADC12MEM1;   //Move A1 results, IFG is cleared
+                A2results[index] = ADC12MEM2;   //Move A2 results, IFG is cleared
+                A3results[index] = ADC12MEM3;   //Move A3 results, IFG is cleared
+                index++;
+                if (index == 8) {
                         index = 0;
-                default: break;
+                }
+        default: break;
         }
 
 }
-
-
-
-/*******************************************************************************
-        => 比较器
-*******************************************************************************/
-比较器B输入通道“CB0”接外部模拟信号，并引至比较器“+”输入端。
-内部参考电压发生器利用共享电压源产生“2.0V参考电压”，并引至“—”输入端。
-最终产生结果：当CB0输入模拟信号电压高于“2.0V”时，CBOUT输出高电平；
-当CBO输入模拟信号电压低于“2.0V”时， CBOUT输出低电平。
-
-
-int main(void)
-{
-        WDTCTL = WDTPW + WDTHOLD;       //Stop WDT
-        P1DIR |= BIT6;          //P1.6 ouput direction
-        P1SEL |= BIT6;          //Select CBOUT function on P1.6/CBOUT
-        
-//Setup copartorB
-        CBCTL0 |= CBIPEN + CBIPSEL_0;   //Enable V+, input channel CB0
-        CBCTL1 |= CBPWRMD_1;            //normal power mode
-        CBCTL2 |= CBRSEL;               //VREF is applided to “-”termianl
-        CBCTL2 |= CBRS_3 + CBREFL_2;    //R-ladder off; bandgap ref voltage (1.2)
-                                        //supplied ref amplifier t get Vcref=2.0V (CBREFL_2);
-                                        
-        CBCTL3 |= BIT0;                 //Input Buffer Disable @P6.0/CB0
-        CBCTL3 |= CBON;                 //Turn On Comparator8
-        __delay_cycles(75);
-        __bis_SR_register(LPM4_bits)    //Enter LPM4
-        __no_operation();               //For debugger
-}
-

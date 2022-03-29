@@ -130,8 +130,8 @@ int main(void)
                 UCB0CTL1 |= UCTXSTT;            //IIC start condition
                 while (UCB0CTL1 & UCTXSTT);     //Start condition sent?
                 UCB0CTL1 |= UCTXSTP;            //I2C stop condition
-                
-                __bis_SR_register(LPM0_bits + GIE);//Enter LPM0, enable interrupts
+                                                //Enter LPM0, enable interrupts
+                __bis_SR_register(LPM0_bits + GIE);
                 __no_operation();               //For debugger
                 
                 //判断接收到的数据是否正确？

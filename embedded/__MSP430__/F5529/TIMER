@@ -1,0 +1,244 @@
+/*******************************************************************************
+        => MSP430F5529 - 定时器A
+*******************************************************************************/
+// 增计数模式（Timer_A从 0 计数到 TA0CCR0） ( MC = 01 )
+//_____________________________________________________________
+//采用（SMCLK）作为其计数参考时钟，并启用（TA0CCR0）计数中断
+//在TA0中断服务程序中反转（P1.0）端口状态
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // Stop WDT
+        P1DIR   |= 0x01;                        // P1.0 output
+        TA0CCTL0 = CCIE;                        // CCR0 interrupt enable
+        TA0CCR0  = 50000;                       // 定时器A的计数周期设置                           
+        TA0CTL   = TASSEL_2 + MC_1 + TACLR;     // SMCLK, upmode, clear TAR
+        
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+        __no_operation();                       // For debugger
+}
+// Timer0 A0 interrupt sevice routine
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void TIMER0_A0_ISR(void)
+{
+        P1OUT ^= 0x01;          // Toggle P1.0
+}
+
+
+
+// 连续计数模式（Timer_A从 0 计数到 0xFFFF） ( MC = 10 )
+//_____________________________________________________________
+//利用TA1定时器，使其工作在连续计数模式下，采用（SMCLK）作为参考时钟
+//使能（TAIFG）中断， 在TA1中断服务程序中反转P1.0端口
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // Stop WDT
+        P1DIR   |= 0x01;                        // P1.0 output
+        // SMCLK, contmode, clear TAR, enable interrupt
+        TA1CTL   = TASSEL_2 + MC_2 + TACLR + TIE;
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+        __no_operation();                       // For debugger
+}
+// Timer1_A1 Interrupt Vector (TAIV) handler
+#pragma vector=TIMER1_A1_VECTOR
+__interrupt void TIMER1_A1_ISR(void)
+{
+        switch (__event_in_range(TA1IV, 14)) {
+        case 0:         break;  // No interrupt
+        case 2:         break;  // CCR1 noe used
+        case 4:         break;  // CCR2 noe used
+        case 6:         break;  // reserved
+        case 8:         break;  // reserved
+        case 10:        break;  // reserved
+        case 12:        break;  // reserved
+        case 14:                // overflow
+                P1OUT ^= 0x01;
+                break;
+        default:
+                break;
+        }
+}
+
+
+
+// 增减计数模式 ( MC = 11 )
+// 计数器增计数从--->TAxCCR0-1 计数到 TAxCCR0 时， TAxCTL_TAIFG （置位）
+// 计数器减计数从--->0x0001    计数到 0x0000  时， TAxCCR0_CCIFG（置位）  
+//_____________________________________________________________
+//利用TA0定时器，使其工作在增/减计数模式，采用（SMCLK）作为参考时钟
+//并启用TA0CCR0计数中断，在TA0中断服务程序中反转（P1.0）端口
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // Stop WDT
+        P1DIR   |= 0x01;                        // P1.0 output
+        TA0CCTL0 = CCIE;                        // CCR0 interrupt enable
+        TA0CCR0  = 50000;                       // 定时器A的计数周期设置                           
+        TA0CTL   = TASSEL_2 + MC_3 + TACLR;     // SMCLK, up/down mode, clear TAR
+        
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+        __no_operation();                       // For debugger
+}
+// Timer0 A0 interrupt sevice routine
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void TIMER0_A0_ISR(void)
+{
+        P1OUT ^= 0x01;          // Toggle P1.0
+}
+
+
+
+// 定时A捕获模式
+// CAP控制位为（1），捕获/比较模块设置为（捕获模式）
+// CCIS控制位，可配置捕获输入CCIxA和CCIxB可连接外部引脚或内部引脚
+// CM控制位，配置捕获输入信号触发沿的极性（上升沿，下降没，双边沿触发）
+// 如果产生捕获事件，则
+//      1 主计数器的数值复制到ATxCCRn寄存器中
+//      2 置位中断标志位（CCIFG）
+//_____________________________________________________________
+//      第一次捕获设置为（N1）
+//      第二次捕获设置为（N2）
+//      计数器溢出次数为（n）
+//      定时器捕获寄存器（CCR0）
+// 如果 n = 0 测量方波周期
+        T = (N2 - N1) * 定时器的频率
+// 如果 n > 0 测量方波周期
+        T = ( CCR0 - N1 + (n-1) * CCR0 + N2 ) * 定时器的频率
+        
+//利用TA1定时器， 使其工作在捕获模式，上升沿触发捕获，参选时钟为（SMCLK）
+//通过中断读取定时器捕获寄存器的数值
+
+int i = 0;
+int Cycle[2] = {0, 0};
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // 关闭看门狗
+        P2DIR   &= ~BIT0;                       // P2.0 引脚配置为定时器捕获输入模式
+        P2SEL   |= BIT0;                             
+        TA1CTL  |= TASSEL_2 + MC_2 + TACLR;     // MSCLK, 连续计数模式, 清空计数器     
+        TA1CCTL1 = CM0 + SCS + CAP + CCIE;      // 上升沿触发，同步，CCR1工作于捕获模式，使能捕获中断
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+}
+//TA1 中断服务程序
+#pragma vector=TIMER1_A1_VETOR
+__interrupt void TIMER0_A1_ISR(void)
+{
+        Cycle[i] = TA1CCR1;     //读取捕获数值
+        i++;
+        if (i == 2) {
+                i = 0;
+        }
+        TA1CCTL1 &= ~CCIFG;     //清除中断标志位
+        LPM0_EXIT;              //退出低功耗模式0
+}
+
+
+
+// 输出比较模式
+// CAP控制位为（0）时，捕获/比较模块工作在比较模式
+// 此时，TAxCCRn的值可以由软件写入
+// 并通过比较器与主计数器数值进行比较，当TAR计数到TAxCCRn时，产生以下事件
+//      1 置位中断标志位（CCIFG）
+//      2 产生内部信号（EQUn=1）
+//      3 EQUn信号根据不同的输出模式触发输出控制逻辑
+//      4 输入信号CCI被锁在到SCCI
+//_____________________________________________________________
+        OUTMODx         输出控制模式
+          000           // 电平输出
+          001           // 置位
+          010           // 取反/置位
+          011           // 置位/复位
+          100           // 取反
+          101           // 复位
+          110           // 取反/复位
+          111           // 复位/置位
+//_____________________________________________________________
+// 利用定时器TA0，使其工作在增计数模式下，选择ACLK作为其参选时钟
+// 将（P1.2和P1.3）引脚配置为定时器输出，且CCR1和CCR2工作在比较
+// 输入模式（7）下，最终P1.2引脚输出(%75)占空比，P1.3输出（%25）
+int main(void)
+{
+        WDTCL    = WDTPW + WDTHOLD;     // Stop WDT
+        P1DIR   |= BIT2 + BIT3;         // P1.2 and P1.3 output
+        PSSEL   |= BIT2 + BIT3;         // P1.2 and P1.3 options select
+        TA0CCR0  = 512-1；              // PWM Period
+        TA0CCTL1 = OUTMOD_7;            // CCR1 reset/set
+        TA0CCR1  = 384;                 // CCR1 PWM duty cycle
+        TA0CCTL2 = OUTMOD_7;            // CCR2 reset/set
+        TA0CCR2  = 128;                 // CCR2 PWM duty cycle
+                                        // ACLK, up mode, clear TAR
+        TA0CTL   = TASSEL_1 + MC_1 + TACLR;
+        __bis_SR_register(LPM3_bits);   // Enter LPM3
+        __no_operation();               // For debugger
+        
+}
+
+
+
+/*******************************************************************************
+        => MSP430F5529 - 定时器B
+*******************************************************************************/
+// 利用定时器B， 并使其工作在增计数模式下，选择（SMCLK）作为参选时钟
+// 并启用（TBCCR0）计数中断
+//_____________________________________________________________
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // Stop WDT
+        P1DIR   |= 0x01;                        // Set P1.0 to output direction
+        TBCCTL0  = CCIE;                        // TBCCR0 interrupt enable
+        TBCCR0   = 500000;                      //               
+        TBCTL    = TBSSEL_2 + MC_1 + TBCLR;     // SMCLK, upmode, clear TBR
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+        __no_operation();                       // For debugger
+}
+// Timer B0 interrupt service routine
+#pragma vector=TIMERB0_VECTOR
+__interrupt void TIMERB0_ISR(void)
+{
+        P1OUT ^= 0x01;          // Toggle P1.0 using exclusive-OR
+}
+
+
+
+// 利用Timer_B定时器，使工作在比较输出模式
+// 主计数器选择（SMCLK）作为其参考时钟，且工作在增计数模式
+// TBCCR1 ~ TBCCR6 均工作在比较器输出模式（7）下
+//      TBCCR1(P5.7)    %75     TBCCR1->占空比的PWM波形
+//      TBCCR1(P7.4)    %25     TBCCR2->占空比的PWM波形
+//      TBCCR1(P7.5)    %12.5   TBCCR3->占空比的PWM波形
+//      TBCCR1(P7.6)    %6.26   TBCCR4->占空比的PWM波形
+//      TBCCR1(P3.5)    %3.13   TBCCR5->占空比的PWM波形
+//      TBCCR1(P3.6)    %1.566  TBCCR6->占空比的PWM波形
+//_____________________________________________________________
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;             // Stop WDT
+        
+        P3SEL   |= BIT5 + BIT6;                 // P3.5 - P3.6 option select
+        P3DIR   |= BIT5 + BIT6;                 // P3.5 - P3.6 output
+        P5SEL   |= BIT7;                        // P5.7        option select
+        P5DIR   |= BIT7;                        // P5.7        output
+        P7SEL   |= BIT4 + BIT5 + BIT6;          // P7.4 - P7.6 option select
+        P7DIR   |= BIT4 + BIT5 + BIT6;          // P7.4 - P7.6 output
+        
+        TBCCR0   = 512-1;                       // PWM Period
+        TBCCTL1  = OUTMOD_7;                    // CCR1 reset/set
+        TBCCR1   = 383;                         // CCR1 PWM Duty Cycle
+        TBCCTL2  = OUTMOD_7;                    // CCR2 reset/set
+        TBCCR2   = 128;                         // CCR2 PWM Duty Cycle
+        TBCCTL3  = OUTMOD_7;                    // CCR3 reset/set
+        TBCCR3   = 64;                          // CCR3 PWM Duty Cycle
+        TBCCTL4  = OUTMOD_7;                    // CCR4 reset/set
+        TBCCR4   = 32;                          // CCR4 PWM Duty Cycle
+        TBCCTL5  = OUTMOD_7;                    // CCR5 reset/set
+        TBCCR5   = 16;                          // CCR5 PWM Duty Cycle
+        TBCCTL6  = OUTMOD_7;                    // CCR6 reset/set
+        TBCCR6   = 8;                           // CCR6 PWM Duty Cycle
+        TBCTL    = TBSSEL_2 + MC_1;             // SMCLK, upmode
+        
+        __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0, enable interrupts
+}
+
+
+
+
+
+

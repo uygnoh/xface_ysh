@@ -1,0 +1,176 @@
+/*******************************************************************************
+        => MSP430F5529 - DMA
+*******************************************************************************/
+        // DMA通道优先级可配置
+        // 每次传输仅需在（2个MCLK）时钟周期
+        // 具有（字节，字）或字和字节组合的混合传输能力
+        // 块方式传输右达（65536）个字或字节
+        // 可选择配置触发源
+        // 触发方式可选择（边沿触发或电平触发）
+        // 4种传输方式
+        //_____________________________________________________
+           1 固定地址到固定地址
+           2 固定地址到块地址
+           3 块地址到固定地址
+           4 块地址到块地址
+        // 具有单个，块或者突发块传输模式
+        
+        
+        DMADT           传输方式
+        //_____________________________________________________
+         000            //单次传输
+                        每次传输都需要单独触发，
+                        DMAxSZ规定的传输完成后，DMAEN位自动清零
+         001            //块传输
+                        一次触发可以传输整个数据块，块传输结束后
+                        DMAEN位自动清零
+         010 011        //突发块传输
+                        CPU和块传输交叉运行，突发块传输完成后
+                        DMAEN位自动清零
+         100            //重复单次传输
+                        每次传输需要一次触发，传输结束后，
+                        DMAEN仍保持使能
+         101            //重复块传输
+                        一次触发传输整个块数据，传输结束后，
+                        DMAEN仍保持使能
+         110 111        //重复突发块传输
+                        CPU和块传输交叉运行，传输完成后
+                        DMAEN仍保持使能
+        
+        
+        
+/*******************************************************************************
+        => MSP430F5529 - DMA
+*******************************************************************************/
+
+// DMA 与系统中断
+//_____________________________________________________________
+系统中断不能打断DMA传输，系统中断直到DMA传输完成结束后才能响应
+如果（ENNMI）被置位，NMI中断可以打断DMA传输，DMA事件可以打断
+中断处理程序，如果中断处理程序或其它程序希望被DMA中途打断，应该
+将DMA控制器关闭，这样才能等到优先响应
+
+
+// DMA 控制器中断
+//_____________________________________________________________
+每个DMA通道都有自己的中断标志位（DMAIFG）， 在任何传输模式下，
+只（DMAxSZ）寄存器减计数到（0），则相应通道的中断标志位就会被
+置位。 如果与之对应的DMAIE和GIE置位，则可以产生相应的中断请求
+
+
+// DMA 与 ADC12
+//_____________________________________________________________
+DMA传输独立于任何低功耗模式，DMA传输不需在CPU参与
+        ADC12IFGx       //DMA传输能够被任何ADC12IFGX标志位触发
+        CONSEQx={0, 2}  //ADC12MEMx对应的ADC12IFGx标志位能够触发DMA传输
+        CONSEQx={1, 3}  //序列中最后一个ADC12MEMx对应的ADC12IFGx标志位能够触发DMA传输
+        ADC12MEMx       //当DMA控制器访问ADC12MEMx时，ADC12IFGx标志位会自动清除
+
+
+// DMA 应用 1
+//_____________________________________________________________
+利用DMA0通道采用重复块传输模式将大小为（16）字的数据块从
+（0x1C00 ~ 0x1C1F） 单元传输到 （0x1C20 ~ 0x1C3F）
+程序中每次传输时（P1.0）都为高电平，之后通过置位（DMAREQ）控制位
+启动DMA传输，传输完毕将（P1.0）设置为低电平。
+int main(void)
+{
+        WDTCTL   = WDTPW + WDTHOLD;     // Stop WDT
+        P1DIR   |= 0x01;                // P1.0 output
+                                        // Source block address
+        __data16_write_addr((unsigned short) &DMA0SA, (unsigned long) 0x1C00);
+                                        // Destination single address
+        __data16_write_addr((unsigned short) &DMA0DA, (unsigned long) 0x1C20);
+        
+        DMA0SZ   = 16;                  // Block size
+                                        // Rpt, inc
+                                        // 重复块传输模式，每次传输自增（1）
+        DMA0CTL |= DMADT_5 + DMASRCINCR_3 + DMADSTINCR_3;
+        DMA0CTL |= DMAEN;               // Enable DMA0
+        
+        while (1) {
+                P1OUT   |= 0x01;        // P1.0 = 1, LED ON
+                DMA0CTL |= DMAREQ;      // Trigger block transfer
+                P1OUT   &= ~0x01;       // P1.0 = 0, LED OFF
+        }
+}
+
+
+// DMA 应用 2
+// P6.0 ---> 3.3V       //采集3.3V电压
+//_____________________________________________________________
+        //______________________________//
+        //      P1.0 | ---> LED         //
+        //      P5.7 | ---> TB1 output  //
+        //      P6.0 | <--- A0          //
+        //______________________________//
+利用DMA0通道采用重复单次传输模式将ADC12的A0通道采样的数据
+保存到全局变量中，ADC12采样触发信号由（TB0）定时器定时产生，
+ADC12IFG0标志位触发（DMA传输）
+
+unsigned int DMA_DST;       // ADC conversion result is stored in this variable
+int main(void)
+{
+        WDTCTL   =  WDTPW + WDTHOLD;    // Stop WDT
+        P1OUT   &= ~BIT0;               // P1.0 clear
+        P1DIR   |=  BIT0;               // P1.0 output
+        P5SEL   |=  BIT7;               // P5.7/TB1 option select PWM波输出
+        P5DIR   |=  BIT7;               // Output direction
+        P6SEL   |=  BIT0;               // Enable A/D channel A0
+        
+        
+        // Setup Timer B0
+        // ____________________________________________________
+        TBCCR0   =  0xFFFE;             // PWM Period
+        TBCCR1   =  0x8000;             // PWM Duty Cycle
+        TBCCTL1  =  OUTMOD_3;           // CCR1 set/reset mode
+                                        // SMCLK, Up-Mode
+        TBCTL    =  TBSSEL_2 + MC_1 + TBCLR;
+        
+        
+        // Setup ADC12
+        // ____________________________________________________
+                                        // Sampling time, MSC, ADC12 on
+        ADC12CTL0 = ADC12SHT0_15 + ADC12MSC + ADC12ON;
+                                        // Use sampling timer; ADC12MEM0
+                                        // Sample-and-hold source = CCT0B =
+                                        // TBCCR1 output
+                                        // Repeated-single-channel
+        ADC12CTL1 = ADC12SHS_3 + ADC12CONSEQ_2;
+        ADC12MCTL0= ADC12SREF_0 + ADC12INCH_0;  // V+=AVcc V-=AVss, A0 channel
+        ADC12CTL0 = ADC12ENC;
+        
+        
+        // Setup DMA0
+        // ____________________________________________________
+        DMACTL0 = DMA0TSEL_24;          // ADC12IFGx triggered
+        DMACTL4 = DMARMWDIS;            // Read-modify-write disable
+        DMA0CTL &= ~DMAIFG;             // 清除DMA中断标志位
+                                        // Rpt single tranfer, inc dst, Interrupts
+        DMA0CTL = DMADT_4 + DMAEN + DMADSTINCR_3 + DMAIE;
+        DMA0SZ  = 1;                    // DMA0 Size = 1
+                                        // Source block address
+        __data16_write_addr((unsigned short) &DMA0SA, (unsigned long) &ADC12MEM0);
+                                        // Destination single address
+        __data16_write_addr((unsigned short) &DMA0DA, (unsigned long) &DMA_DST);
+        __bis_SR_register(LPM0_bits + GIE);     // LPM0, interrupts
+        __no_operation();                       // For debugger
+}
+
+// DMA Interrupt Sevice Routine
+#pragma vector=DMA_VECTOR
+__interrupt void DMA_ISR(void)
+{
+        switch (__evnet_in_range(DMAIV, 16) {
+        case 0:         
+                break;
+        case 2:                         // DMA0IFG = DMA Channel 0
+                P1OUT ^= BIT0;          // Toggle P1.0
+                break;
+        case 4: break;                  // DMA1IFG = DMA Channel 1
+        case 6: break;                  // DMA2IFG = DMA Channel 2
+        case 8: break;                  // DMA3IFG = DMA Channel 3
+        default:
+                break;
+        }
+}
