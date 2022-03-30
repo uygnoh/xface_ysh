@@ -57,17 +57,17 @@ void BKP_WriteBackupRegister(uint16_t BKP_DR, uint16_t Data);
 
 //RTC配置流程
 //_________________________________________________________
-1 使能PWR和BKP时钟（RCC_APB1PeriphClockCmd()）
-2 使能后备寄存器访问（PWR_BackupAccessCmd()）
-3 配置RTC时钟源，使能RTC
-  RCC_RTCCLKConfig()
-  RCC_RCCLKCmd()
-  如果使用LSE, RCC_LSEConfig(RCC_LSE_ON)
-4 设置RTC预分频系数（RCT_SetPrescaler()）
-5 设置时间（RTC_SetCounter()）
-6 如果需要开启相关中断（RTC_ITConfig()）
-7 编写中断服务函数（RTC_IRQHandler()）
-8 部分操作要等待写操作完成和同步
-  RTC_WaitForLastTask();
-  RTC_WaitForSynchro();
+        1 使能PWR和BKP时钟（RCC_APB1PeriphClockCmd()）
+        2 使能后备寄存器访问（PWR_BackupAccessCmd()）
+        3 配置RTC时钟源，使能RTC
+          RCC_RTCCLKConfig()
+          RCC_RCCLKCmd()
+          如果使用LSE, RCC_LSEConfig(RCC_LSE_ON)
+        4 设置RTC预分频系数（RCT_SetPrescaler()）
+        5 设置时间（RTC_SetCounter()）
+        6 如果需要开启相关中断（RTC_ITConfig()）
+        7 编写中断服务函数（RTC_IRQHandler()）
+        8 部分操作要等待写操作完成和同步
+          RTC_WaitForLastTask();
+          RTC_WaitForSynchro();
 

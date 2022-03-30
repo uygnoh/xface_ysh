@@ -13,6 +13,7 @@ void rtc_nvic_setup(void)
         NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
         NVIC_Init(&NVIC_InitStructure);
 }
+
 /*******************************************************************************
   函数名称: is_leap_year()
   输入参数: 年份
@@ -40,6 +41,7 @@ uint8_t is_leap_year(uint16_t year)
                 return (0);
         }
 }
+
 /*******************************************************************************
   函数名称: rtc_setup()
   输入参数: 无
@@ -174,6 +176,7 @@ uint8_t rtc_alarm_clock_setup(
         RTC_WaitForLastTask();          //等待最近一次对RTC寄存器的写操作完成
         return (0);     
 }
+
 /*******************************************************************************
   函数名称: rtc_get_time()
   输入参数: 无
@@ -233,6 +236,7 @@ uint8_t rtc_get_time(void)
         calendar.week    = rtc_get_week(calendar.year, calendar.month, calendar.day);
         return (0);
 }
+
 /*******************************************************************************
   函数名称: rtc_get_week()获得现在是星期几
   输入参数: 年，月，日
@@ -259,8 +263,6 @@ uint8_t rtc_get_week(uint16_t year, uint8_t month, uint8_t day)
 	}
 	return (tmp % 7);
 }
-
-
 
 /*******************************************************************************
   函数名称: RTC_IRQHandler()

@@ -203,5 +203,3 @@ void ee_write_page(uint8_t addr, uint8_t *tx_buf, uint8_t num_byte)
         //产生I2C停止信号
         I2C_GenerateSTOP(I2C1, ENABLE);
 }
-//main.c
-uint8_t rx_buf[6];

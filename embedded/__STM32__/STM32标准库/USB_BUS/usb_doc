@@ -1,0 +1,134 @@
+/*******************************************************************************
+        => STM32F103_USB参考文件 UM0424
+*******************************************************************************/
+// Virtual_COM_Port => STM32F10B-EVAL
+//_____________________________________________________________
+#include "core_cm3.h"
+
+
+/*******************************************************************************
+        => STM32F103_USB USB库内核模块
+*******************************************************************************/
+// USB_CORE/STM32_USB-FS-Device_Driver/USB 从机驱动库（不需要修改）
+//_____________________________________________________________
+        Usb_type.h      // 库内核用到的数据类型
+        Usb_reg(.h.c)   // 硬件抽象层
+        Usb_int.c       // 正确传输中断服务程序
+        Usb_init(.h.c)  // USB初始化
+        Usb_core(.h.c)  // USB协议管理（USB2.0）
+        Usb_mem(.h.c)   // 数据传输管理
+        Usb_def.h       // USB定义
+
+
+
+/*******************************************************************************
+        => STM32F103_USB 底层驱动
+*******************************************************************************/
+// 通用寄存器函数
+//_____________________________________________________________
+        CNTR    void SetCNTR(uint16_t wRegValue);
+                U16 GetCNTR(void);
+        
+        ISTR    void SetISTR(uint16_t wRegValue);
+                U16 GetISTR(void);
+                
+        FNR     U16 GetIFNR(void);
+        
+        DADDR   void SetDADDR(uint16_t wRegValue);
+                U16 GetDADDR(void);
+        
+        BTABLE  void SetBTABLE(uint16_t wRegValue);
+                U16 GetBTABLE(void);
+
+// SetEnDPOINT GetENDPOINT
+// 所有端点寄存器操作都可以通过这2个函数完成，但是为了支持对特定
+// 字段操作，从这2个函数派生了很多函数
+// bEpNum = 端点编号； WregValue = 在写入的值
+//_____________________________________________________________
+        SetENDPOINT     void SetENDPOINT(u8 bEpNum, u16 wRegValue);
+                        u16 GetENDPOINT(u8 bEpNum);
+
+
+// 端点类型字段
+//_____________________________________________________________
+#define EP_BULK         (0x0000)        // 批量端点
+#define EP_CONTROL      (0x0200)        // 控制端点
+#define EP_ISOCHRNOUS   (0x0400)        // 同步端点
+#define EP_INTERRUPT    (0x0600)        // 中断端点
+SetEPType       void SetEPType(u8 bEpNum, u16 wtype);
+                u16 GetEPTYPE(u8 bEpNum);
+                
+
+
+// 端点状态字段
+//_____________________________________________________________
+#define EP_TX_DIS       (0x0000)        // 端点发送关闭
+#define EP_TX_STALL     (0x0010)        // 端点发送延迟
+#define EP_TX_NAK       (0x0020)        // 端点发送不应答
+#define EP_TX_VALID     (0x0030)        // 端点发送有效
+#define EP_RX_DIS       (0x0000)        // 端点接收关闭
+#define EP_RX_STALL     (0x1000)        // 端点接收延迟
+#define EP_RX_NAK       (0x2000)        // 端点接收不应答
+#define EP_RX_VALID     (0x3000)        // 端点接收有效
+SetEPTxStatus           void SetEPTxStatus(u8 bEpNum, u16 wState);
+                        u16 GetEPTxStatus(void);
+SetEPRxStatus           void SetEPRxStatus(u8 bEpNum, u16 wState);
+                        u16 GetEPRxStatus(void);
+                        
+// 端点种类字段
+//_____________________________________________________________                   
+void SetEP_KIND(u8 bEpNum);
+void ClearEP_KIND(u8 bEpNum);
+void Set_Status_Out(u8 bEpNum);
+void Clear_Status_Out(u8 bEpNum);
+void SetEPDoubleBuff(u8 bEpNum);
+void ClearEPDoubleBuff(u8 bEpNum);
+                        
+
+// 正在传输 Rx/Tx 字段                
+//_____________________________________________________________                               
+void ClearEP_CTR_RX(u8 bEpNum);
+void ClearEP_CTR_TX(u8 bEpNum);
+            
+                        
+// 数据翻转 Rx/Tx 字段                
+//_____________________________________________________________                 
+void ToggleDTOG_RX(u8 bEpNum);
+void ToggleDTOG_TX(u8 bEpNum);
+
+
+// 地址字段                
+//_____________________________________________________________
+void SetEPAddress(u8 bEpNum, u8 bAddr);
+BYTE GetEPAddress(u8 bEpNum);
+
+
+                        
+/*******************************************************************************
+        => STM32F103_USB 应用层
+*******************************************************************************/
+// USB_CONFIG/CONFIG/
+//_____________________________________________________________
+// 这里没有复制（stm32_it.c），
+// 因为我们会将相关的代码放到（hw_config.c）里面
+//_____________________________________________________________
+        platform_config.h
+        hw_config.h
+        hw_config.c
+        usb_desc.c
+        usb_desc.h
+        usb_endp.c
+        usb_endp.h
+        usb_istr.c
+        usb_istr.c
+        usb_prop.c
+        usb_prop.h
+        usb_pwr.c
+        usb_pwr.h
+        
+        
+        
+        
+/*******************************************************************************
+        => STM32F103_USB参考文件 UM0424
+*******************************************************************************/
