@@ -1,3 +1,91 @@
 /*******************************************************************************
         => ESP8266
 *******************************************************************************/
+// 本例程教你如何将板了设定成 http 的伺服器
+// 本伺服器依照收到的信息去改变 *脚位
+// http://server_ip/gpio/0      会将脚位变成（低电平）
+// http://server_ip/gpio/1      会将脚位变成（高电平）
+// 本伺服器的IP会在串口中显示
+
+
+#include <ESP8266WiFi.h>
+
+const char *ssid = "your-ssid";         // 这里输入WiFi名称
+const char *password = "your-password"; // 这里输入WiFi密码
+WiFiSerer server(80);                    // 打开此板子的端口 80
+
+void setup() {
+        Serial.begin(115200);
+        delay(10);
+        
+        pinMode(2, OUTPUT);     // 将脚位2设定为输出， 对应ESP8266上面的D4引脚
+        digitalWrite(2, 0);     // 先将这个脚位设定为（0电平）
+        
+        // 接下来板子开始要连线到你家的基地台了
+        Serial.println();
+        Serial.println();
+        Serial.print("Connecting to "); 
+        Serial.println(ssid);
+        
+        // 使用你家wifi名称和密码开始连线
+        WiFi.begin(ssid, password); 
+        
+        while (WiFi.status() != WL_CONNECTED) {
+                delay(500);
+                Serial.print(".");
+        }    
+        
+        Serial.println("");
+        Serial.println("WiFi connected");
+        
+        // 伺服器启动
+        server.begin();
+        Serial.println("Serial started");
+        
+        // 列出此伺服器被分配的局域网IP
+        Serial.println(WiFi.localIP());
+}
+
+void loop() {
+        //确定是否连线中，不是的话就跳出去
+        WiFiClient client = server.available();
+        if (!client) {
+                return;
+        }
+        
+        // 等待传到这个伺服器的信息，一直等一直等
+        Serial.println("new client");
+        while (!client.available()) {
+                delay(1);
+        }
+        
+        // 收到传过来的信息后，将收到的信息存成req
+        String req = client.readStringUntil("\r");
+        Serial.println(req);
+        client.flush();
+        
+        //开始比对收到的信息来决定作什么事
+        int val;
+        if (req.indexOf("/gpio/0") != -1)       // 如果收到 /gpio/0
+                val = 0;
+        else if (req.indexOf("gpio/1" != -1)    // 如果收到 /gpio/1
+                val = 1;
+        else {                                  // 如果收到其它
+                Serial.println("invalid request");
+                client.stop();
+                return;
+        }
+        
+        digitalWrite(2, val);
+        client.flush();
+        
+        //准备给发送者回应，内容以 html 的格式，代表发送者收到的简单的网页
+        String s = "HTTP/1.1 200 OK\r\nContent-Type: ";
+        s += (val)?"high":"low";
+        s += "</html>\n";
+        
+        // 准备好了，发送给发送者
+        client.print(s);
+        delay(1);
+        Serial.print("Client disconnected");
+}

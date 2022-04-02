@@ -1,0 +1,24 @@
+// 下载（z3t0/Arduino-IRremote）红外控制程序到本地
+// https://github.com/Arduino-IRremote/Arduino-IRremote
+
+
+#include <IRremote.h>           // 引入函数库
+int RECV_PIN = 11;              // 设定接收红外线的脚位为（11）
+IRrecv irrevcv(RECV_PIN);       // 将接收红外线脚位设定为11
+decode_results results;         // 接收到的红外线信号值
+
+void setup() {
+        Serial.begin(9600);
+        Serial.println("Enabling IRin");
+        irrecv.enableIRIn();    // 启用红外接收
+        Serial.println("Enabled IRin);
+}
+
+void loop() {
+        // 如果接收到了红外线
+        if (irrecv.decode(&results)) {
+                Serial.println(results.value, HEX);
+                irrecv.resume();// 让接收器可以再接收 
+        }
+        delay(100);
+}
