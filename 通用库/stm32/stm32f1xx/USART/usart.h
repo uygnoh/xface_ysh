@@ -3,5 +3,5 @@
 #include "common.h"
 
 void usart_setup(uint32_t brr);
-void uart_send_string(void);
+void uart_print(void);
 #endif

@@ -1,23 +1,13 @@
-#include "reg_adc.h"
+#include "adc.h"
 
-/*******************************************************************************
-  函数名称: void adc_conf(void)
-  输入参数: 无
-  输出参数: 无
-  函数功能: ADC配置（设置系统时钟为72MHz）， ADC1的时钟为（12MHz）
+/*
+  ADC配置（设置系统时钟为72MHz）， ADC1的时钟为（12MHz）
   +________________________________________________________________+
   |    SystemClock / PCLK_DIV_6 = 12MHz                            |
   |________________________________________________________________|
-*******************************************************************************/
-void adc_conf(void)
+*/
+void adc_setup(void)
 {
-        GPIOA_CLOCK_ENABLE();                   //使能PORTA口时钟
-        ADC1_CLOCK_ENABLE();                    //ADC1时钟使能
-        GPIOA->CRL    &= 0XFFFFFF0F;            //PA1__模拟输入
-        RCC->APB2RSTR |= BIT_09;                //ADC1复位
-        RCC->APB2RSTR &= ~(BIT_09);             //ADC1复位结束
-        RCC->CFGR     &= ~(BIT_15 + BIT_14);    //分频因子清零ADC_PRE[15:14]__PCLK2_DIV_2
-        RCC->CFGR     |= BIT_15;                //分频因子设置ADC_PRE[15:14]__PCLK2_DIV_6
         ADC1->CR1     &= 0XF0FFFF;              //ADC1_CR1__工作模式清零__
         ADC1->CR1     |= 0XF0FFFF;              //ADC1_CR1__独立工作模式__
         ADC1->CR1     &= ~(BIT_08);             //ADC1_CR1__非扫描模式
@@ -41,12 +31,14 @@ void adc_conf(void)
         ADC1->CR2     |= BIT_02;                //开启AD校准
         while (ADC1->CR2 & BIT_02);            //等待校准结束
 }
-/*******************************************************************************
-  函数名称: uint16_t get_adc_value(uint8_t channel)
+
+
+
+/*
   输入参数: channel:通道值（0~16）
-  输出参数: 返回值:转换结果
+  返回数值: 转换结果
   函数功能: 获得ADC1某个通道的值
-*******************************************************************************/
+*/
 uint16_t get_adc_value(uint8_t channel)
 {
         adc_conf();
