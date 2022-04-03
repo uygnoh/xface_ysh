@@ -1,7 +1,8 @@
 /*******************************************************************************
         => gcc-arm-none-eabi (CORTEX-M 交叉编译器)
 *******************************************************************************/
-0 //vim $HOME/.bashrc
+// vim $HOME/.bashrc
+//_____________________________________________________________
 export ARM_GCC_CROSS_COMPILER=/opt/gcc-arm-none-eabi-7-2018-q2-update-linux\
                 /gcc-arm-none-eabi-7-2018-q2-update/
 export PATH=$PATH:$ARM_GCC_CROSS_COMPILER/bin
@@ -17,7 +18,7 @@ cannot open shared object file: No such file or directory
 //链接器ld默认的目录是/lib和/usr/lib，如果放在其他路径也可以，需要让ld知道库文件在哪里。
 
 方法0：（完美解决问题）
-//_________________________________________________________
+//_____________________________________________________________
 sudo apt-get install libncurses5
 sudo apt-get install libncurses5-dev
 
@@ -71,7 +72,8 @@ ctrl-x 2            second window; cycle through(%先按ctrl-x，再按2)
 /*******************************************************************************
         => gdb-python
 *******************************************************************************/
-//gdb-python调入python模块并执行相应的功能
+// gdb-python调入python模块并执行相应的功能
+//_____________________________________________________________
 (gdb) python
 >import os
 >print('I am running on pid %d', os.getpid())
