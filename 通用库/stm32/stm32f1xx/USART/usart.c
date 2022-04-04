@@ -18,6 +18,24 @@ void usart_setup(uint32_t brr)
                 brr = 0x1D4C;
         }
         
+        
+        // USART1 CLOCK
+        // ____________________________________________________________
+        RCC->APB2RSTR |=  (BIT_14);     // 开始复位 USART1
+        RCC->APB2RSTR &= ~(BIT_14);     // 停止复位 USART1
+        RCC->APB2ENR  |=  (BIT_14);     // 打开时钟 USART1
+        
+        
+        // GPIOA INITIALIZE
+        //_____________________________________________________________
+        // 设置 TX-PA.09 | 复用推挽输出-50MHz
+        // 设置 RX-PA.10 | 浮空输入，也可以上拉输入
+        GPIOA->CRH  &= (0xFFFFF00FU);
+	GPIOA->CRH  |= (0x000004B0U);
+        
+        
+        // USART1 CONFIGURATION
+        //_____________________________________________________________
 	USART1->CR1  |= BIT_13;                 // USART1模块使能
 	USART1->CR1  &= ~BIT_12;                // 1个起始位, 8个数据位
 	USART1->CR2  &= ~(BIT_13 + BIT_12);     // 1个停止位
@@ -38,18 +56,18 @@ void uart_print(void)
 {
         uint8_t tx_buf[] = "ERROR_CODE = 0x00\n";
         uint8_t *pbuf    = tx_buf;
-        uint16_t timeout = 50000;                     // 设置超时时间
-        while (*pbuf != '\0') {                       // 如果字符不是尾0（循环继续）
-                while ((USART1->SR & BIT_07) == 0) {  // 等待发送数据寄存器空
-                        if (timeout-- == 0) {         // 超时检测
+        uint16_t timeout = 50000U;                      // 设置超时时间
+        while (*pbuf != '\0') {                         // 如果字符不是尾0（循环继续）
+                while ((USART1->SR & BIT_07) == 0U) {   // 等待发送数据寄存器空
+                        if (timeout-- == 0U) {          // 超时检测
                                 return;
                         }
                 }
-                timeout     = 50000;
-                USART1->DR  = *pbuf++;               // 向发送缓冲寄存器写入一个字符
+                timeout     = 50000U;
+                USART1->DR  = *pbuf++;                  // 向发送缓冲寄存器写入一个字符
         }
-        while ((USART1->SR & BIT_06) == 1) {         // 等待发送数据发送完成
-                if (timeout-- == 0) {                // 超时检测
+        while ((USART1->SR & BIT_06) == 1U) {           // 等待发送数据发送完成
+                if (timeout-- == 0U) {                  // 超时检测
                         return;
                 }
         }

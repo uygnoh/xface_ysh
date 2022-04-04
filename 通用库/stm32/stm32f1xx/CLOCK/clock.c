@@ -8,31 +8,16 @@ void peripheral_clock_setup(void)
 {
         // APB1 总线时钟 36MHz
         // ____________________________________________________________
-        // 开始复位         TIM2
-        RCC->APB1RSTR |=  (BIT_00 );
-        // 停止复位         TIM2
-        RCC->APB1RSTR &= ~(BIT_00 );
-        // 打开时钟         TIM2
-        RCC->APB1ENR  |=  (BIT_00 );                     
+        //RCC->APB1RSTR |=  (BIT_00 );  // 开始复位 TIM2
+        //RCC->APB1RSTR &= ~(BIT_00 );  // 停止复位 TIM2
+        //RCC->APB1ENR  |=  (BIT_00 );  // 打开时钟 TIM2
 
 
-           
         // APB2 总线时钟 72MHz
         // ____________________________________________________________
-        // 开始复位         AFIO,    GPIOA,   USART1,  ADC1
-        RCC->APB2RSTR |=  (BIT_00 + BIT_02 + BIT_14 + BIT9);
-        // 停止复位         AFIO,    GPIOA,   USART1,  ADC1
-        RCC->APB2RSTR &= ~(BIT_00 + BIT_02 + BIT_14 + BIT9);
-        // 打开时钟         AFIO,    GPIOA,   USART1,  ADC1
-        RCC->APB2ENR  |=  (BIT_00 + BIT_02 + BIT_14 + BIT9);
-        
-        
-        
-        // ADC
-        // ____________________________________________________________
-        RCC->CFGR     &= ~(BIT_15 + BIT_14);    //分频因子清零ADC_PRE[15:14]__PCLK2_DIV_2
-        RCC->CFGR     |= BIT_15;                //分频因子设置ADC_PRE[15:14]__PCLK2_DIV_6
-
+        RCC->APB2RSTR |=  (BIT_00);     // 开始复位 AFIO
+        RCC->APB2RSTR &= ~(BIT_00);     // 停止复位 AFIO
+        RCC->APB2ENR  |=  (BIT_00);     // 打开时钟 AFIO
 }
 
 

@@ -1,0 +1,43 @@
+
+
+// LDRB 不需要符号位扩展： 运行结果（R0 = 0x80）
+// Address: 0x08000102          Value: 0x80
+MOV     R0, #0
+MOV     R1, #0x100
+LDRB    R0, [R1, #0x2]
+
+
+// 符号位扩展（最高位为：0正， 1负）
+// 如果字节数为（0x80），采用（LDRSB）指令读出时，
+// 则这一数值将被转换成（0xFFFFFF80），再放置到目的寄存器中
+// LDRSB 进行符号位扩展： 运行结果（0xFFFFFF80）
+// Address: 0x08000102          Value: 0x80
+MOV     R0, #0
+MOV     R1, #0x100
+LDRSB   R0, [R1, #0x2]
+
+
+
+
+
+
+
+
+
+
+
+// 数据类型              加载             存储
+8-bit unsigned          LDRB            STRB
+8-bit signed            LDRSB           STRB
+16-bit unsigned         LDRH            STRH
+16-bit signed           LDRSH           STRSH
+32-bit                  LDR             STR
+Multiple 32-bt          LDM             STM
+Double-word 64-bit      LDRD            STRD
+Stack operations 32-bit POP             PUSH
+
+
+
+// 立即偏移访问形式
+LDRB    R0, [R1, #0x3]          ;//从地址（R1+0x3）处读取一个字节值送到R0
+
