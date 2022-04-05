@@ -1,5 +1,5 @@
 /*******************************************************************************
-        => 数据类型
+        => DataType_Define
 *******************************************************************************/
 
         U(u) unsigned           // 无符号
@@ -11,33 +11,83 @@
 // 示你符号位被改变，即负数被移位成正数。 加个u的话就被编译器识别为无符号
 // 数，可以随意移位。 不会影响符号位。
 // ____________________________________________________________
-// 在32位编译器中，int和long都是占4个字节
-// unsigned int  0～4294967295
-// unsigned long 0～4294967295
-// unsigned int和unsigned long并没有区别
+        在32位编译器中，int和long都是占4个字节
+        // unsigned int  0～4294967295
+        // unsigned long 0～4294967295
+        // unsigned int和unsigned long并没有区别
+
+
+
+// C语言数据类型定义（）
+// ____________________________________________________________
+short or (short int)
+        // 最大的（short）不得大于（int），也可能是更小的
+        // C guarantess at least 16bits for short.
+
+int     // The basic integer type for a give system.
+        // C语言确保（int）至少为（16bits）
+        
+long  or(long int)
+        // 它至少和最大的（int）一样大，也可能更大
+        // C guarantess at least 32bits for long.
+        
+long long or (long long int)
+        // 它至少和最大的（long）一样大
+        // The long long type is least 64bits
+        
+char    // 字符类型
+        // C语言规定它必须为（1字节）
+        
+float   // 单精度浮点类型
+        // The basic floating-point type for the system;
+        // it can represent at  least  six  significant
+        // figures accurately
+        
+double  // 双精度浮点类型
+        // A(possibly)larger unit for holding floating-point
+        // numbers.  It may allow more  significant figures
+        // (at least 10, typically more) and perhaps larger 
+        // exponents than float.
+
+_Bool   // The keyword for this type.
+        // It is an unsigned int and need only be large
+        // enough to accommodate the range 0 thorugh 1.
+
+
+
+/*******************************************************************************
+        => STM32 单片机数据类型
+*******************************************************************************/
+// 按照posix标准，一般整形对应的*_t类型为：
+// ____________________________________________________________
+        uint8_t         //1字节
+        uint16_t        //2字节
+        uint32_t        //4字节
+        uint64_t        //8字节
+        #define __IO    volatile
+        typedef unsigned int uint32_t;
+        typedef __IO uint32_t uv32;
 
 
 
 /*******************************************************************************
         => Cortex_M 符号扩展
 *******************************************************************************/
-// LDRB 不需要符号位扩展： 运行结果（R0 = 0x80）
-// Address: 0x08000102          Value: 0x80
-MOV     R0, #0
-MOV     R1, #0x100
-LDRB    R0, [R1, #0x2]
+        // LDRB 不需要符号位扩展： 运行结果（R0 = 0x80）
+        // Address: 0x08000102          Value: 0x80
+        MOV     R0, #0
+        MOV     R1, #0x100
+        LDRB    R0, [R1, #0x2]
 
 
-// 符号位扩展（最高位为：0正， 1负）
-// 如果字节数为（0x80），采用（LDRSB）指令读出时，
-// 则这一数值将被转换成（0xFFFFFF80），再放置到目的寄存器中
-// LDRSB 进行符号位扩展： 运行结果（0xFFFFFF80）
-// Address: 0x08000102          Value: 0x80
-MOV     R0, #0
-MOV     R1, #0x100
-LDRSB   R0, [R1, #0x2]
-
-
+        // 符号位扩展（最高位为：0正， 1负）
+        // 如果字节数为（0x80），采用（LDRSB）指令读出时，
+        // 则这一数值将被转换成（0xFFFFFF80），再放置到目的寄存器中
+        // LDRSB 进行符号位扩展： 运行结果（0xFFFFFF80）
+        // Address: 0x08000102          Value: 0x80
+        MOV     R0, #0
+        MOV     R1, #0x100
+        LDRSB   R0, [R1, #0x2]
 
 
 
