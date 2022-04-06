@@ -1,0 +1,93 @@
+/*******************************************************************************
+        => 433 MHz Modules
+*******************************************************************************/
+             ASK – Amplitude Shift Keying   => 调制模式
+        // ____________________________________________________
+        // RadioHead Packet Radio library for embedded miroprocessors
+        // http://dronebotworkshop.com
+        // https://dronebotworkshop.com/?s=433MHz
+        // http://www.airspayce.com/mikem/arduino/RadioHead/
+        
+        
+        
+        
+/*******************************************************************************
+        => Demo 1 Transmitter Code
+*******************************************************************************/
+/*
+  433 MHz RF Module Transmitter Demonstration 1
+  RF-Xmit-Demo-1.ino
+  Demonstrates 433 MHz RF Transmitter Module
+  Use with Receiver Demonstration 1
+ 
+  DroneBot Workshop 2018
+  https://dronebotworkshop.com
+*/
+ 
+// Include RadioHead Amplitude Shift Keying Library
+#include <RH_ASK.h>
+// Include dependant SPI Library 
+#include <SPI.h> 
+ 
+// Create Amplitude Shift Keying Object
+RH_ASK rf_driver;
+ 
+void setup()
+{
+    // Initialize ASK Object
+    rf_driver.init();
+}
+ 
+void loop()
+{
+    const char *msg = "Welcome to the Workshop!";
+    rf_driver.send((uint8_t *)msg, strlen(msg));
+    rf_driver.waitPacketSent();
+    delay(1000);
+}
+
+
+
+/*******************************************************************************
+        => Demo 1 Receiver Code
+*******************************************************************************/
+/*
+  433 MHz RF Module Receiver Demonstration 1
+  RF-Rcv-Demo-1.ino
+  Demonstrates 433 MHz RF Receiver Module
+  Use with Transmitter Demonstration 1
+ 
+  DroneBot Workshop 2018
+  https://dronebotworkshop.com
+*/
+ 
+// Include RadioHead Amplitude Shift Keying Library
+#include <RH_ASK.h>
+// Include dependant SPI Library 
+#include <SPI.h> 
+ 
+// Create Amplitude Shift Keying Object
+RH_ASK rf_driver;
+ 
+void setup()
+{
+    // Initialize ASK Object
+    rf_driver.init();
+    // Setup Serial Monitor
+    Serial.begin(9600);
+}
+ 
+void loop()
+{
+    // Set buffer to size of expected message
+    uint8_t buf[24];
+    uint8_t buflen = sizeof(buf);
+    // Check if received packet is correct size
+    if (rf_driver.recv(buf, &buflen))
+    {
+      
+      // Message received with valid checksum
+      Serial.print("Message Received: ");
+      Serial.println((char*)buf);         
+    }
+}

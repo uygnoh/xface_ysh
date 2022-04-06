@@ -1,0 +1,95 @@
+/*******************************************************************************
+        => 315 MHz Modules
+*******************************************************************************/
+        
+        编码芯片PT2262 | SC2262
+        解码芯片PT2272 | SC2272
+        
+        
+        
+/*******************************************************************************
+        => 315 MHz 接收器
+*******************************************************************************/
+#include <RCSwitch.h>                   //  调用RC开关函数库
+RCSwitch my_switch = RCSwitch();        //  增加一个RC开关并设置名称
+const int FRR = 15;                     //  设置315模块的接收引脚
+
+void setup() {  
+        Serial.begin(115200);           // 设置波特率
+        my_switch.enableReceive(FRR);   // 设置启用接收（并设置接收管脚）
+}
+
+void loop() {
+        if (my_switch.available) {      // 判断是否接收到数据
+                Serial.print("读数据：");
+                Serial.print(my_switch.getReceivedValue());     // 输出接收到的值 
+                Serial.print(" / ");
+                Serial.print(my_switch.GetReceiveBitlength());  // 获取输出到数据的长度
+                Serial.print("bit");
+                Serial.print("协议：");
+                Serial.println(my_switch.getReceivedProtocol());// 获取输出协议
+                my_switch.resetAvailable();                     // 重置可用的值
+        }
+}
+
+
+
+/*******************************************************************************
+        => 315 MHz 接收器
+*******************************************************************************/
+#include <RCSwitch.h>
+RCSwitch my_switch = RCSwitch();
+const int LED = 23;                      // 设置LED控制管脚
+const int FRR = 15;                      // 设置315MHz无线模块接收管脚
+const unsigned long KEY_00 = 5592844;   // 遥控器A的值
+const unsigned long KEY_11 = 5592896;   // 遥控器B的值
+void setup() {
+        pinMode(LED, OUTPUT);
+        Serial.begin(115200);
+        my_switch.enableReceive(FRR);
+}
+void loop() {
+        if (my_switch.available()) {
+                unsigned long value = my_switch.getReceiveValue();
+                Serial.println(value);
+                if (value == KEY_00) {
+                        digitalWrite(LED, HIGH);
+                } else if (value == KEY_11) {
+                        digitalWrite(LED, LOW);
+                }
+                my_switch.resetAvailable();
+        }
+}
+
+
+/*******************************************************************************
+        => 315 MHz 发射器
+*******************************************************************************/
+#include <RCSitch.h>
+RCSwitch my_switch = RCSwitch();
+const int FRT = 4;                      // 设置315MHz无线模块发送管脚
+const unsigned long AKEY = 5754816;    // 遥控器A的值
+const unsigned long AKEY = 5754672;    // 遥控器B的值
+const unsigned long AKEY = 5754636;    // 遥控器C的值
+const unsigned long AKEY = 5754627;    // 遥控器D的值
+void setup() {
+        Serial.begin(115200);
+        my_switch.enableTransmit(FRT);  // 设置启用发送，并设置发送管脚
+}
+void loop() {                           
+        while (Serial.available() > 0) {                // 判断串口是否有数据
+                char val = Serial.read();               // 读取串口接收到的值
+                if (val == 'A') {
+                        my_switch.send(AKEY, 24);       // 发送24位遥控器A的值
+                }
+                if (val == 'B') {
+                        my_switch.send(BKEY, 24);       // 发送24位遥控器A的值
+                }
+                if (val == 'C') {
+                        my_switch.send(CKEY, 24);       // 发送24位遥控器A的值
+                }
+                if (val == 'D') {
+                        my_switch.send(DKEY, 24);       // 发送24位遥控器A的值
+                }
+        }
+}
