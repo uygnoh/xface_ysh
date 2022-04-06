@@ -1,0 +1,15 @@
+/*******************************************************************************
+        => ESP8266-IDF
+*******************************************************************************/
+        // 下载ESP8266-SDK源码
+        cd ~/esp
+        git clone https://github.com/espressif/ESP8266_RTOS_SDK.git
+        export IDF_PATH=~/esp/ESP8266_RTOS_SDK
+        
+        
+        // 下载交叉编译工具链，配置交叉工具链到环境变量中
+        https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz
+        
+
+        // 安装menuconfig需要的依赖
+        make menuconfig

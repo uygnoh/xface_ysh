@@ -1,0 +1,119 @@
+/*******************************************************************************
+        => Notifiction Sync  消息同步
+*******************************************************************************/
+static TaskHandle_t task11 = NULL;
+//static TaskHandle_t task22 = NULL;
+
+void task11(void *pvParam)
+{       
+        for (;;) {
+                printf("TASK11 begin!\n");
+                printf("TASK11 wait notification ...\n");
+                // 任务11阻塞自身， 等待任务22通知来唤醒自己
+                ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+                printf("TASK11 got notification!\n");
+                vTaskDelay(pdMS_TO_TICKS(3000));
+        }
+
+}
+
+void task22(void *pvParam)
+{
+        for (;;) {
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                printf("TASK22 notify TASK11!\n");
+                // task22通知任务task11
+                xTaskNotifyGive(task11);
+        }
+}
+
+void app_main(void)
+{
+        vTaskSupendAll();
+        xTaskCreate(task11, "TASK11", 1024 * 5, NULL, 1, &task11);
+        xTaskCreate(task11, "TASK22", 1024 * 5, NULL, 1, NULL);
+        vTaskResumeAll();
+}
+
+
+
+/*******************************************************************************
+        => Notifiction Value  通知值
+*******************************************************************************/
+BaseType_t xTaskNotifyWait( uint32_t ulBitsToClearOnEntry,      // 在进入在这个函数清除所有通知值
+                            uint32_t ulBitsToClearOnExit,       // 在退出在这个函数清除所有通知值
+                            uint32_t *pulNotificationValue,     // 取得任务通知值
+                            TickType_t xTicksToWait);            // 超时等待
+
+
+
+void task11(void *pvParam)
+{       
+        uint32_t ulNotifiedValue;
+        for (;;) {
+                printf("TASK11 begin!\n");
+                printf("TASK11 wait notification ...\n");
+
+                xTaskNotifyWait( 0x00,          // 在进入这个函数时，不要清除任何通知的位
+                                 ULONG_MAX,     // 在退出这个函数时，清除所有通知的位
+                                 &ulNotifiedValue, // 取得当前通知值
+                                 portMAX_DELY); // 无限等待
+                                 
+                if ((ulNotifiedValue & 0x01) != 0) {
+                        prvProcessBit0Event();
+                }
+                if ((ulNotifiedValue & 0x02) != 0) {
+                        prvProcessBit1Event();
+                }
+                if ((ulNotifiedValue & 0x04) != 0) {
+                        prvProcessBit2Event();
+                }            
+                                 
+                vTaskDelay(pdMS_TO_TICKS(3000));
+        }
+
+}
+
+void task22(void *pvParam)
+{
+        for (;;) {
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                printf("TASK22 notify TASK11!\n");
+                // task22发送通知值到(0x01)task11     Bit0
+                xTaskNotify(task11, 0x01, eSetValueWithOverwrite);
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                
+                // task22发送通知值到(0x02)task11     Bit1
+                xTaskNotify(task11, 0x02, eSetValueWithOverwrite);
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                
+                // task22发送通知值到(0x04)task11     Bit2
+                xTaskNotify(task11, 0x04, eSetValueWithOverwrite);
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                
+        }
+}
+
+void prvProcessBit0Event(void)
+{
+        printf("SET BIT0\n");
+}
+void prvProcessBit1Event(void)
+{
+        printf("SET BIT1\n");
+}
+void prvProcessBit2Event(void)
+{
+        printf("SET BIT2\n");
+}
+
+void app_main(void)
+{
+        vTaskSupendAll();
+        xTaskCreate(task11, "TASK11", 1024 * 5, NULL, 1, NULL);
+        xTaskCreate(task11, "TASK22", 1024 * 5, NULL, 1, NULL);
+        vTaskResumeAll();
+}
+
+
+
