@@ -1,7 +1,8 @@
 /*******************************************************************************
         => nrf24L01__发射端主程序__
 *******************************************************************************/
-//空闲状态SCK为0，CPOL=0；数据在时钟第一个跳变沿采集，CPHA=0；
+// CPOL = 0     |       空闲状态SCK为0
+// CPHA = 0     |       数据在时钟第一个跳变沿采集
 void main(void)
 {
         uint8_t tx_buf[] = {1};         //发送的信息为“1”
@@ -16,15 +17,17 @@ void main(void)
         }
         
         while (1) {
-                rx_mode();                              //先把自己设置为接收模式
-                //如果没有接收到数据，则执行下面的语句---------------------------------
-                while (!nrf24l01_rx_packet(rx_buf)) {   //等待接收数据，返回“1”，则接收到数据
-                        if (KEY_01 == 0) {              //如果这按下了按键“KEY_01”, 则变成发送模式
-                                delay_ms(5);            //消除按键抖动
-                                if (KEY_01 == 0) {      //再次检测按键是否按下
-                                        while (!KEY_01);//松手检测(等它抬起来)
-                                        tx_mode();      //进入发送模式
-                                        tx_buf[0] = 1;  //将数据“1”发送出去
+                // 先把自己设置为接收模式
+                rx_mode();                              
+                // 如果没有接收到数据，则执行下面的语句
+                // _____________________________________________________________
+                while (!nrf24l01_rx_packet(rx_buf)) {   // 等待接收数据，返回“1”，则接收到数据
+                        if (KEY_01 == 0) {              // 如果这按下了按键“KEY_01”, 则变成发送模式
+                                delay_ms(5);            // 消除按键抖动
+                                if (KEY_01 == 0) {      // 再次检测按键是否按下
+                                        while (!KEY_01);// 松手检测(等它抬起来)
+                                        tx_mode();      // 进入发送模式
+                                        tx_buf[0] = 1;  // 将数据“1”发送出去
                                         nrf24l01_tx_packet(tx_buf);
                                         LED_01 = 0;
                                         delay_ms(300);
@@ -46,7 +49,8 @@ void main(void)
                                 }
                         }
                 }
-                //如果接收到了数据，则实现对应的功能----------------------------------
+                // 如果接收到了数据，则实现对应的功能 
+                // _____________________________________________________________
                 if (rx_buf[0] == 1) {
                         rx_buf[0] = 0;  //把接收到的数据清空
                         LED_02 = 0;     //LED_02闪烁一次
@@ -56,6 +60,8 @@ void main(void)
                 }
         }
 }
+
+
 
 /*******************************************************************************
         => nrf24L01__接收端主程序__
@@ -74,15 +80,17 @@ void main(void)
         }
         
         while (1) {
-                rx_mode();                              //先把自己设置为接收模式
-                //如果没有接收到数据，则执行下面的语句---------------------------------
-                while (!nrf24l01_rx_packet(rx_buf)) {   //等待接收数据，返回“1”，则接收到数据
-                        if (KEY_04 == 0) {              //如果这按下了按键“KEY_04”, 则变成发送模式
-                                delay_ms(5);            //消除按键抖动
-                                if (KEY_01 == 0) {      //再次检测按键是否按下
-                                        while (!KEY_01);//松手检测(等它抬起来)
-                                        tx_mode();      //进入发送模式
-                                        tx_buf[0] = 1;  //将数据“1”发送出去
+                //先把自己设置为接收模式
+                rx_mode();                              
+                // 如果没有接收到数据，则执行下面的语句
+                // _____________________________________________________________
+                while (!nrf24l01_rx_packet(rx_buf)) {   // 等待接收数据，返回“1”，则接收到数据
+                        if (KEY_04 == 0) {              // 如果这按下了按键“KEY_04”, 则变成发送模式
+                                delay_ms(5);            // 消除按键抖动
+                                if (KEY_01 == 0) {      // 再次检测按键是否按下
+                                        while (!KEY_01);// 松手检测(等它抬起来)
+                                        tx_mode();      // 进入发送模式
+                                        tx_buf[0] = 1;  // 将数据“1”发送出去
                                         nrf24l01_tx_packet(tx_buf);
                                         LED_02 = 0;
                                         delay_ms(300);
@@ -92,7 +100,9 @@ void main(void)
                                 }
                         }
                 }
-                //如果接收到了数据，对数据进行分析来控制LED灯--------------------------
+                // 如果接收到了数据，对数据进行分析来控制LED灯
+                // _____________________________________________________________
+                
                 switch (rx_buf[0]) {
                 case 0:
                         break;
@@ -115,6 +125,8 @@ void main(void)
         }
 }
 
+
+
 /*******************************************************************************
         => nrf24L01__底层驱动__
 *******************************************************************************/
@@ -135,8 +147,8 @@ uint8_t nrf24l01_check(void)
         uint8_t tmp1[5] = {0xA5, 0xA5, 0xA5, 0xA5, 0xA5};
         uint8_t tmp2[5];
         uint8_t i;
-        spi_write_buf(WRITE_REG + TX_ADDR, tmp1, 5);    //写入5个字节地址
-        spi_read_buf(TX_ADDR, tmp2, 5);                 //读出写入的地址
+        spi_write_buffer(WRITE_REG + TX_ADDR, tmp1, 5);  // 写入5个字节地址
+        spi_read_buffer(READ_REG + TX_ADDR, tmp2, 5);    // 读出写入的地址
         for (i = 0; i < 5; i++) {
                 if (tmp2[i] != 0xA5)
                         break;
@@ -147,8 +159,8 @@ uint8_t nrf24l01_check(void)
         return 0;               //nRF24L01存在
 }
 
-//nRF24l01 发送一个字节(MOSI和MISO数据传递)先发送高位
-//_________________________________________________________
+// nRF24l01 发送一个字节(MOSI和MISO数据传递)先发送高位
+// _________________________________________________________
 uint8_t nrf24l01_spi_send_byte(uint8_t dat)
 {
         uint8_t i;
@@ -177,10 +189,11 @@ void nrf24l01_init(void)
         delay_us(100);
         CE  = 0;        //chip enable
         CSN = 0;        //spi enable
-        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug测试原来的本地址
+        // debug测试原来的本地址
+        spi_read_buffer(READ_REG + TX_ADDR, buf, TX_ADR_WIDTH); 
 }
 
-//nRF24l01 读取指定寄存器的内容
+// nRF24l01 读取指定寄存器的内容
 //_________________________________________________________
 uint8_t spi_read_register(uint8_t reg)
 {
@@ -192,7 +205,7 @@ uint8_t spi_read_register(uint8_t reg)
         return(reg_val);                        //return register value
 }
 
-//nRF24l01 写入指定寄存器的内容
+// nRF24l01 写入指定寄存器的内容
 //_________________________________________________________
 uint8_t spi_write_register(uint8_t reg, uint8_t value)
 {
@@ -209,7 +222,7 @@ uint8_t spi_write_register(uint8_t reg, uint8_t value)
 // pbuf: 为待读出数据地址
 // len:  读出数据的个数
 //_________________________________________________________
-uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
+uint8_t spi_read_buffer(uint8_t reg, uint8_t *pbuf, uint8_t len)
 {
         uint16_t status, i;
         CSN = 0;
@@ -226,7 +239,7 @@ uint8_t spi_read_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
 // pbuf: 为待写入数据地址
 // len:  写入数据的个数
 //_________________________________________________________
-uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
+uint8_t spi_write_buffer(uint8_t reg, uint8_t *pbuf, uint8_t len)
 {
         uint16_t status, i;
         CSN = 0;
@@ -239,42 +252,43 @@ uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t len)
         return(status);
 }
 
-//nRF24l01 数据读取后放入“rx_buf”接收缓冲区中
+// nRF24l01 数据读取后放入“rx_buf”接收缓冲区中
 //_________________________________________________________
 uint8_t nrf24l01_rx_packet(uint8_t *rx_buf)
 {
         uint8_t flag = 0;
         uint8_t status;
-        status = spi_read_register(NRFRegSTATUS);
-        if (status & 0x40) {    //读取状态寄存器来判断是否接收到数据
-                CE = 0;         //SPI使能
-                spi_read_buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);
+        status = spi_read_register(STATUS);
+        if (status & 0x40) {    // 读取状态寄存器来判断是否接收到数据
+                CE = 0;         // SPI使能
+                spi_read_buffer(R_RX_PAYLOAD, rx_buf, RX_PLOAD_WIDTH);
                 flag = 1;
         }
-        //接收到数据后，清除状态寄存器
-        spi_write_register(WRITE_REG + NRFRegSTATUS, status);
+        // 接收到数据后，清除状态寄存器
+        spi_write_register(WRITE_REG + STATUS, status);
         return flag;
 }
 
-//nRF24l01 接收数据包
+// nRF24l01 发送数据包
 //_________________________________________________________
-void nrf24l01_tx_packet(uint8_t *rx_buf)
+void nrf24l01_tx_packet(uint8_t *tx_buf)
 {
         CE = 0;
-        spi_write_buf(WRITE_REG + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
-        spi_write_buf(WR_TX_PLOAD, tx_buf, TX_PLOAD_WIDTH);
+        // 将数据写入到数据缓冲区
+        spi_write_buffer(W_TX_PAYLOAD, tx_buf, TX_PLOAD_WIDTH);
         CE = 1;
 }
 
-//nRF24l01发接收式配置
+// nRF24l01 接收模式配置
 //_________________________________________________________
 void rx_mode(void)
 {
         uint8_t buf[5] = {0};
         CE = 0;
-        spi_read_buf(TX_ADDR, buf, TX_ADR_WIDTH); //debug 测试原来的本地址
+        // debug 测试原来的本地址
+        spi_read_buffer(READ_REG + TX_ADDR, buf, TX_ADR_WIDTH); 
         
-        spi_write_buf(WRITE_REG + RX_ADDR_P0, RX_ADDRESS, RX_ADR_WIDTH);
+        spi_write_buffer(WRITE_REG + RX_ADDR_P0, RX_ADDRESS, RX_ADR_WIDTH);
         spi_write_register(WRITE_REG + EN_AA, 0);               //频道0自动应答
         spi_write_register(WRITE_REG + EN_RXADDR, 0x01);        //允许接收地址
         spi_write_register(WRITE_REG + SETUP_RETR, 0x1A);       //设置自动重发时间
@@ -287,13 +301,13 @@ void rx_mode(void)
         delay_us(200);
 }
 
-//nRF24l01发射模式配置
+// nRF24l01 发射模式配置
 //_________________________________________________________
 void tx_mode(void)
 {
         CE = 0;
-        spi_write_buf(WRITE_REG + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
-        spi_write_buf(WRITE_REG + RX_ADDR_P0, RX_ADDRESS, RX_ADR_WIDTH);
+        spi_write_buffer(WRITE_REG + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
+        spi_write_buffer(WRITE_REG + RX_ADDR_P0, RX_ADDRESS, RX_ADR_WIDTH);
         spi_write_register(WRITE_REG + EN_AA, 0);
         spi_write_register(WRITE_REG + EN_RXADDR, 0);
         spi_write_register(WRITE_REG + SETUP_RETR, 0);

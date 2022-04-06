@@ -1,19 +1,17 @@
 /*******************************************************************************
         => nRF24L01是NORDIC公司生产的无线通信芯片
 *******************************************************************************/
-//采用FSK调制, 可以实现点对点，或是1对6的通信, 无线通信速度可达2Mbps
+// 采用FSK调制, 可以实现点对点，或是1对6的通信, 无线通信速度可达2Mbps
 //_________________________________________________________
-1   GND     //电源地
-2   VCC     //电源正极
-3   CE      //模块控制线，CSN为低时，CE协同CONFIG寄存器共同决定NRF24L01状态
-4   CSN     //从器件使能信号(SPI片选线)
-5   SCK     //时钟信号，由主器件产生
-6   MOSI    //主器件输出，从器件输入
-7   MISO    //主器件输入，从器件输出
-8   IRQ     //中断信号(中断时变为低电平，在以下三种情况变低)
-            1 Tx FIFO发完并且收到ACK（使能ACK情况下）、
-            2 Rx FIFO收到数据
-            3 达到最大重发次数
+1   GND     // 电源地
+2   VCC     // 电源正极
+3   CE      // 模块控制线，CSN为低时，CE协同CONFIG寄存器共同决定NRF24L01状态
+4   CSN     // 从器件使能信号(SPI片选线)
+5   SCK     // 时钟信号，由主器件产生
+6   MOSI    // 主器件输出，从器件输入
+7   MISO    // 主器件输入，从器件输出
+8   IRQ     // 中断信号(中断时变为低电平，在以下三种情况变低)
+
 
     
 
@@ -196,11 +194,21 @@ uint8_t spi_write_buf(uint8_t reg, uint8_t *pbuf, uint8_t bytes)
 /*******************************************************************************
         => nRF24L01 接收模式
 *******************************************************************************/
+        // nRF24L01 Receive Mode
+        1 写Rx节点的地址 RX_ADDR_P0
+        2 使能 AUTO_ACK EN_AA
+        3 使能 PIPE 0 EN_RXADDR
+        4 选择通信频率 RF_CH
+        5 选择通道 0 有效数据宽度 Rx_Pw_P0
+        6 配置发射参数（低噪放大器增益，发射功率，无线速率）
+        7 配置基本参数经及切换工作模式 CONF
+
+
 void RX_Mode(void)
 {
         CE = 0;
         //0 Write TX_Address to nRF24L01
-        spi_write_buf(W_REGISTER + TX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
+        spi_write_buf(W_REGISTER + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
         //1 Use the same address on the RX device as the TX device
         spi_write_buf(W_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
 
@@ -225,15 +233,29 @@ void RX_Mode(void)
 /*******************************************************************************
         => nRF24L01 发射模式
 *******************************************************************************/
+        // nRF24L01 Transmitter Mode
+        1 写Tx节点的地址 RX_ADDR_P0
+        2 写Rx节点的地址（主要是为了使能 Auot Ack）
+        3 使能自动应答模式 AUTO_ACK EN_AA
+        4 使能通道0 PIPE 0 EN_RXADDR
+        5 配置自动重发次数 SETUP_RETR
+        6 选择通信频率 RF_CH
+        7 配置发射参数（低噪放大器增益，发射功率，无线速率）
+        8 选择通道 0 有效数据宽度 Rx_Pw_P0
+        9 配置基本参数经及切换工作模式 CONF
+        
+        
 void TX_Mode(void)
 {
         CE = 0;
+        spi_rw_reg(FLUSH_TX, 0xff);
+        
         //1 Write TX_Address to nRF24L01
         spi_write_buf(W_REGISTER + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
         //2 RX_Addr0 same TX_Adr for Auto.Ack 
         spi_write_buf(W_REGISTER + RX_ADDR_P0, TX_ADDRESS, TX_ADR_WIDTH);
         //3 Writes data to TX payload
-        spi_write_buf(W_TX_PLOAD, tx_buf, TX_PLOAD_WIDTH);
+        //spi_write_buf(W_TX_PLOAD, tx_buf, TX_PLOAD_WIDTH);
 
         //4 Enable Auto.Ack:Pipe0
         spi_rw_reg(W_REGISTER + EN_AA, 0x01);
@@ -256,15 +278,15 @@ void TX_Mode(void)
         => 测试nRF24L01模块，接收代码
         => 如果检测到五个0x23， P2^0引脚的LED翻转
 *******************************************************************************/
-#define TX_ADR_WIDTH    5                       //定义接收和发射地址的宽度
-#define TX_PLOAD_WIDTH  5                       //定义发射数据的字节的宽度
-uint8_t code TX_ADDRESS[TX_ADR_WIDTH] = {       //定义nRF24L01接收地址
+#define TX_ADR_WIDTH    5                       // 定义接收和发射地址的宽度
+#define TX_PLOAD_WIDTH  5                       // 定义发射数据的字节的宽度
+uint8_t code TX_ADDRESS[TX_ADR_WIDTH] = {       // 定义nRF24L01接收地址
         0x34, 0x43, 0x10, 0x10, 0x01 
 };  
-uint8_t rx_buf[TX_PLOAD_WIDTH];                 //定义nRF24L01接收缓冲区大小
+uint8_t rx_buf[TX_PLOAD_WIDTH];         // 定义nRF24L01接收缓冲区大小
 
 
-////nf24l01__IO__初始化 
+//// nf24l01__IO__初始化 
 void init_nf24l01_io(void)
 {
         CE  = 0;    //chip enable
@@ -281,15 +303,20 @@ int main(void)
         delay_ms(1000);                 //延时1000ms
         RX_Mode();                      //配置为接收模式 
         while (1) {
-                status = spi_read(STATUS); //读取芯片的状态寄存器
-                //判断是否发生了接收数据完成的中断, 是的话，将收到数据存到数组rx_buf里
-                //R_RX_PAYLOAD(读RX有效数据,1~32字节,用于接收)
+                // 读取芯片的状态寄存器
+                status = spi_read(STATUS);
+                
+                // 判断是否发生了接收数据完成的中断, 是的话，将收到数据存到数组rx_buf里
+                // R_RX_PAYLOAD(读RX有效数据,1~32字节,用于接收)
                 if ((status & 0x40) != 0 ) {
                         spi_read_buf(R_RX_PAYLOAD, rx_buf, TX_PLOAD_WIDTH);
                 }
+                
                 //判断收到的数据是不是0x23
-                if ((rx_buf[0] == 0x23) && (rx_buf[1] == 0x23) &&      \
-                    (rx_buf[2] == 0x23) && (rx_buf[3] == 0x23) &&      \
+                if ((rx_buf[0] == 0x23) && 
+                    (rx_buf[1] == 0x23) &&
+                    (rx_buf[2] == 0x23) && 
+                    (rx_buf[3] == 0x23) &&
                     (rx_buf[4] == 0x23)) { 
                         LED = ~LED;
                 }
@@ -333,7 +360,7 @@ int main(void)
         TX_Mode();
         while (1) {
                 CE = 0;
-                //将数据送入发送缓冲区
+                // 将数据送入发送缓冲区
                 spi_write_buf(W_TX_PAYLOAD, tx_buf, TX_PLOAD_WIDTH);
                 CE = 1;
                 while (IRQ);                                    //等待发射完成中断
