@@ -17,17 +17,17 @@ avr-objcopy -j .text -j .data -O ihex main.o main.hex
 *******************************************************************************/
         x = B, C, D
 |_________________________________________________________|
-|       DDRx          Data direction                      |//数据方向寄存器
-|       PORTx         Output                              |//数据输出寄存器
-|       PINx          Input                               |//数据输入寄存器
+|       DDRx          Data direction                      |// 数据方向寄存器
+|       PORTx         Output                              |// 数据输出寄存器
+|       PINx          Input                               |// 数据输入寄存器
 |_________________________________________________________|
 
 
         输出模式(Output Mode)
 |__________________________________________________________|
-|       DDRx = 0xFF                                        |//输出模式，DDRx设置为“1”
-|       PINx is NOT used                                   |//PINx没有使用
-|       PORTx contains the output voltages                 |//写入(0 或 1)到PORTx寄存器
+|       DDRx = 0xFF                                        |// 输出模式，DDRx设置为“1”
+|       PINx is NOT used                                   |// PINx没有使用
+|       PORTx contains the output voltages                 |// 写入(0 或 1)到PORTx寄存器
 |       |______________________|                           |
 |       |     1 logic high     |                           |
 |       |     0 logic low      |                           |
@@ -44,10 +44,10 @@ avr-objcopy -j .text -j .data -O ihex main.o main.hex
 
 
 
- //输入模式, 无上拉(Input Mode without Pull-up)
+ // 输入模式, 无上拉(Input Mode without Pull-up)
 |__________________________________________________________|
-|       DDRx = 0x00                                        |//输入模式，DDRx设置为“0”
-|       PINx contains the input logic signal               |//输入模式，读取PINx寄存器
+|       DDRx = 0x00                                        |// 输入模式，DDRx设置为“0”
+|       PINx contains the input logic signal               |// 输入模式，读取PINx寄存器
 |       |______________________|                           |
 |       |   1   logic high     |                           |
 |       |______________________|                           |
@@ -58,17 +58,17 @@ avr-objcopy -j .text -j .data -O ihex main.o main.hex
 
 
 
-  //输入模式, 有上拉(Input Mode with Pull-up)
+  // 输入模式, 有上拉(Input Mode with Pull-up)
 |__________________________________________________________|
-|       DDRx = 0                                           |//输入模式，DDRx设置为“0”
-|       PINx contains the input logic signal               |//输入模式，读取PINx寄存器
+|       DDRx = 0                                           |// 输入模式，DDRx设置为“0”
+|       PINx contains the input logic signal               |// 输入模式，读取PINx寄存器
 |       |______________________|                           |
 |       |   1   logic high     |                           |
 |       |______________________|                           |
 |       |   0   logic low      |                           |
 |       |______________________|                           |
-|       PORTx determines if pull-up                        |//配置为“1”，打开上拉电阻
-|       resistors are connected or not                     |//配置为“0”，关闭上拉电阻
+|       PORTx determines if pull-up                        |// 配置为“1”，打开上拉电阻
+|       resistors are connected or not                     |// 配置为“0”，关闭上拉电阻
 |       |______________________|                           |
 |       |   1   pull-up ON     |                           |
 |       |______________________|                           |
@@ -81,36 +81,12 @@ avr-objcopy -j .text -j .data -O ihex main.o main.hex
 /*******************************************************************************
         => ATmega328p 时钟源选择
 *******************************************************************************/
-// CLKPR 预分频器选择(Prescaler Options)   
-__________________________________________________________      
-| CLKPCE | - | - | - | CLKPS3 | CLKPS2 | CLKPS1 | CLKPS0 |        
-|________|___|___|___|________|________|________|________|_______
-|          CLKPR = (1 << CLKPCE)  //打开保险                      |
-|________________________________________________________________|
-|   CLKPS3   CLKPS2   CLKPS1   CLKPS0    Clock Division Factor   |
-|     0        0        0        0        //1分频                 |
-|     0        0        0        1        //2分频                 |
-|     0        0        1        0        //4分频                 |
-|     0        0        1        1        //8分频                 |
-|     0        1        0        0        //16分频                |
-|                                                                |
-|________________________________________________________________|
-#difine F_CPU   1000000UL       //调整软件也为1MHz
-#include <util/delay.h>         //这样延时函数才能正常工作
 
-
-// 使用内置（8MHz）RC振荡器， 预分频器选择为（8分频）
-//_________________________________________________________
-CLKPR = (1 << CLKPCE);  //打开保险
-CLKPR = 0b00000011;     //设置AVR_CPU时钟频率为（1MHz）
-
-
-
-//_________________________________________________________
         => 设置容丝位
 //_________________________________________________________
-1 //时钟源选择(Clock Source Options)
-  //时钟源选择使用“fuse”位(Clock source selected by fuse bits CKSEL3:CLSEL0)
+        // 时钟源选择(Clock Source Options)
+        // 时钟源选择使用“fuse”位(CKSEL3:CLSEL0)
+        // 设置容丝位需要特殊的操作
 |-----------------------------------|--------------------|--------------------|
 |    Device Clocking Option         |      CKSEL3...0    |                    |
 |___________________________________|____________________|____________________|
@@ -122,121 +98,183 @@ CLKPR = 0b00000011;     //设置AVR_CPU时钟频率为（1MHz）
 | External Clock                    |             0000   | //外接时钟源        |
 | Reserved                          |             0001   |                    |
 |___________________________________|____________________|____________________|
-
-//Fuse Low
+        // Fuse Low
 ____________________________________________________________________        
 | CKDIV8 | CKOUT | SUT1 | SUT0 | CKSEL3 | CKSEL2 | CKSEL1 | CKSEL0 |
 |________|_______|______|______|________|________|________|________|    
-//Fuse High
+        // Fuse High
 __________________________________________________________________________
 | RSTDISBL | DWEN | SPIEN | WDTON | EESAVE | BOOTSZ1 | BOOTSZ0 | BOOTRST |
 |__________|______|_______|_______|________|_________|_________|_________|
-//Fuse Ext.
+        // Fuse Ext.
 _________________________________________________________        
 | - | - | - | - | - |BODLEVEL2 | BODLEVEL1  | BODLEVEL0 |
 |___|___|___|___|___|__________|____________|___________|
 
 
 
+        => CLKPR 预分频器选择(Prescaler Options)   
+//_________________________________________________________
+__________________________________________________________      
+| CLKPCE | - | - | - | CLKPS3 | CLKPS2 | CLKPS1 | CLKPS0 |        
+|________|___|___|___|________|________|________|________|_______
+|          CLKPR = (1 << CLKPCE)        // 打开保险               |
+|________________________________________________________________|
+|   CLKPS3   CLKPS2   CLKPS1   CLKPS0    Clock Division Factor   |
+|     0        0        0        0      // 1分频                 |
+|     0        0        0        1      // 2分频                 |
+|     0        0        1        0      // 4分频                 |
+|     0        0        1        1      // 8分频                 |
+|     0        1        0        0      // 16分频                |
+|                                                                |
+|________________________________________________________________|
+
+
+// Atmega328p 使用内置RC振荡器，运行于（1MHz）
+// 使用内置（8MHz）RC振荡器， 预分频器选择为（8分频）
+// PD0 连接 LED_00， LED_00闪烁1Hz
+//_________________________________________________________
+#difine F_CPU   1000000UL       // 软件也要调整为1MHz
+#include <util/delay.h>         // 这样延时函数才能正常工作
+int main(void)
+{
+        CLKPR = (1 << CLKPCE);  // 打开保险
+        CLKPR = 0b00000011;     // 设置AVR_CPU时钟频率为（1MHz）
+        DDRD  = 0b11111111;     // 设置PD0端口为输出模式
+        while (1) {
+                PORTD = 0b00000001;
+                _delay_ms(500);
+                PORTD = 0b00000000;
+                _delay_ms(500);
+        }
+}
+
+
+
+
+
 /*******************************************************************************
         => Timer
 *******************************************************************************/
-TCNT0   //定时器“0”计数寄存器( Timer/counter register )
+//      定时器0计数寄存器 | counter register
+// ____________________________________________________________
+        TCNT0
 
 
-//定时器“0”控制寄存器( TCCR0A | TCCR0B )
-//Timer/counter control register)
-//TCCR0A
+
+//     定时器0控制寄存器 | counter control register
+// ____________________________________________________________
+        TCCR0A -> 定时器“0”控制寄存器 A
+        TCCR0B -> 定时器“0”控制寄存器 B
+// ____________________________________________________________
+        // TCCR0A
 _____________________________________________________________
 | COM0A1 | COM0A0 | COM0B1 | COM0B0 | - | - | WGM01 | WGM00 |
 |________|________|________|________|___|___|_______|_______|
-//TCCR0B
+        // TCCR0B
 _____________________________________________________________
 | FOC0A | FOC0B | - | - |  WGM02  |  CS02  |  CS01  |  CS00 |
 |_______|_______|___|___|_________|________|________|_______|
-1 //时钟选择(Clock Selector)
+        // 定时器时钟源选择(Clock Selector)
+//_________________________________________________________
   CS02  CS01  CS00      Comment
-    0     0     0       //No clock source(Timer/counter stopped)
-    0     0     1       //clk (No prescaling)
-    0     1     0       //clk / 8
-    0     1     1       //clk / 64
-    1     0     0       //clk / 256
-    1     0     1       //clk / 1024
-    1     1     0       //External clock source on T0 pin; clock on falling dege
-    1     1     1       //External clock source on T0 pin; clock on rising dege
-____________________________________________________________________________
+    0     0     0       // No clock source(定时器/计数器停止工作)
+    0     0     1       // clk (No prescaling)
+    0     1     0       // clk / 8
+    0     1     1       // clk / 64
+    1     0     0       // clk / 256
+    1     0     1       // clk / 1024
+    1     1     0       // External clock source on T0 pin; clock on falling edge
+    1     1     1       // External clock source on T0 pin; clock on rising edge
+        // 定时器工作模式（Opreation Mode）
+//_________________________________________________________
  WGM02  WGM01  WGM00    Comment
-    0     0     0       //Normal
-    0     0     1       //PWM, phase correct
-    0     1     0       //CTC ( clear timer on compare match )
-    0     1     1       //Fast PWM
-    1     0     0       //Reserved
-    1     0     1       //PWM, phase correct
-    1     1     0       //Reserved
-    1     1     1       //Fast PWM
+    0     0     0       // Normal
+    0     0     1       // PWM, phase correct
+    0     1     0       // CTC ( clear timer on compare match )
+    0     1     1       // Fast PWM
+    1     0     0       // Reserved
+    1     0     1       // PWM, phase correct
+    1     1     0       // Reserved
+    1     1     1       // Fast PWM
 
 
 
-// AVR定时器__计数（14）次
-____________________________________________________________________________
-while (1) {
-        TCNT0 = 0xF2;                           //1: n = (0xFF - 0xF2) = 14
-        TCCR0A = 0x00;                          //2: normal mode, init clock
-        TCCR0B = 0x01;                          //3: start Timer0
-        while ((TIFR0 & (0b00000001)) == 0);    //4: wait for flag TOV0=1
-        TCCR0B = 0x00;                          //5: stop Timer0
-        TIFR0 = (1 << TOV0);                    //6: clear TOV0
-}
-____________________________________________________________________________
-   //定时器“0”溢出标志寄存器( TIFR0 )
-   //TOV0(Timer overflow flag), TOV0由软件清零
+//      定时器（0）溢出标志寄存器
+//      TOV0(Timer overflow flag), TOV0由软件清零
+// ____________________________________________________________
+        TIFR0
 ____________________________________________
 | - | - | - | - | - | OCF0B | OCF0A | TOV0 |
 |___|___|___|___|___|_______|_______|______|
 
 
 
-  // Time Delay Produced by Timer（AVR使用定时器计时）
-|___________________________________________________________|
-| 1. Machine cycles:       n                                |
-| 2. Prescalar factor:     p                                |
-| 3. Machine cycle period: T = 1/f = 1/1Mhz = 1us           |
-| //Time delay:                                             |
-|         t = n * p * T                                     |
-|___________________________________________________________|
 
-
-
-  //Square Wave at 10Hz,（输出10hz方波, 定时器为“normal”模式）
-  // 1024*50
+// 定时器（0）计数（14）次， 工作于Normal Mode
+// TCNT0 从（255）变成（0）时， TOV0从（0）变成（1），需要软件清除它
 ____________________________________________________________________________
-CLKPR = (1 << CLKPCE);
-CLKPR = 0b00000011;     //Set clk to 1MHz
-DDRD  = 0b00000001;     //PD0 as output
-PORTD = 0;              //initial output 0
 while (1) {
-        TCNT0  = 206;                   //n=(256-206)=50
-        TCCR0A = 0;                     //normal mode, init clk
-        TCCR0B = 0b00000101;            //p=1024, start Timer
-        while ((TIFR0 & (1 << TOV0));   //wait for flag TOV0=1
-        TCCR0B = 0;                     //Stop Timer
-        TIFR0  = (1 << TOV0);           //clear TOV0
-        PORTD  = (PORTD ^ 0b00000001);  //Toogle
+        TCNT0  = 0xF2;                          //1: n = (0xFF - 14) = 0xF2-1
+        TCCR0A = 0x00;                          //2: normal mode, init clock
+        TCCR0B = 0x01;                          //3: start Timer0
+        while ((TIFR0 & (0b00000001)) == 0);    //4: wait for flag TOV0=1
+        TCCR0B = 0x00;                          //5: stop Timer0
+        TIFR0  = (1 << TOV0);                   //6: clear TOV0
 }
 
 
 
+
+/*******************************************************************************
+        => Timer 定时时间计算（Normal Mode 正常工作模式）
+*******************************************************************************/
+  // Time Delay Produced by Timer（AVR使用定时器计时）
+|___________________________________________________________|
+| 1. Machine cycles:       n                                | // 计数器向上计数次数 
+| 2. Prescalar factor:     p                                | // 分频系数
+| 3. Machine cycle period: T = 1/f = 1/1Mhz = 1us           | // 计数器时钟频率
+| //Time delay:                                             | // 延时时间计算
+|         t = n * p * T                                     |
+|___________________________________________________________|
+
+
+// 输出10hz方波, 定时器为“normal”模式
+// t = n * p * T
+// 50 * 10^-3 = n * p * 10^-6
+//            = n * 1024 * 10^-6
+            n = 50
+// ____________________________________________________________
+CLKPR = (1 << CLKPCE);
+CLKPR = 0b00000011;                     // Set clk to 1MHz
+DDRD  = 0b00000001;                     // PD0 as output
+PORTD = 0;                              // initial output 0
+while (1) {
+        TCNT0  = 206;                   // n = (256-206) = 50
+        TCCR0A = 0;                     // normal mode, init clk
+        TCCR0B = 0b00000101;            // p = 1024, start Timer
+        while ((TIFR0 & (1 << TOV0));   // wait for flag TOV0=1
+        TCCR0B = 0;                     // Stop Timer
+        TIFR0  = (1 << TOV0);           // clear TOV0
+        PORTD  = (PORTD ^ 0b00000001);  // Toogle
+}
+
+
+
+/*******************************************************************************
+        => 定时器工作模式： CTC_Mode 模式（比较）
+*******************************************************************************/
   //CTC_Mode模式（比较）
   当（TCNT0 == OCR0A）， 则OCF0A=1
   //Counting 14 Machine Cycles （定时器为“CTC mode”模式）
 ____________________________________________________________________________
-OCR0A   = 13;   //n=14（设置计数器初值）
-TCCR0A  = 0x02; //CTC mode, init clk（初始化计数器）
+OCR0A   = 13;                                   // n = 14（设置计数器初值）
+TCCR0A  = 0x02;                                 // CTC mode, init clk
 while (1) {
-        TCCR0B = 0x01;                          //start Timer0
-        while ((TIFR0 & (1 << OCF0A)) == 0)     //wait for flag OCF0A=1
-        TCCR0B = 0x00;                          //stop Timer0
-        TIFR0 = TIFR0 | (1 << OCF0A);           //clear OCF0A（相应位写入“1”）清零
+        TCCR0B = 0x01;                          // start Timer0
+        while ((TIFR0 & (1 << OCF0A)) == 0)     // wait for flag OCF0A=1
+        TCCR0B = 0x00;                          // stop Timer0
+        TIFR0 = TIFR0 | (1 << OCF0A);           // clear OCF0A（相应位写入“1”）清零
 }
 
 
@@ -556,7 +594,11 @@ int main(void)
         }       
 }
 
-//ADC数据读取
+
+
+
+// ADC数据读取
+// ____________________________________________________________
 uint16_t adc_read(const int channel)
 {
         ADMUX   = 0b01000000;
@@ -581,24 +623,6 @@ void usart_putstring(char *str_ptr)
 /*******************************************************************************
         => PWM
 *******************************************************************************/
-  //Fast PWM Duty Cycle (OC0A)
-  //OCR0A determines the duty cycle
-  TCNT0 < OCR0A           =>PWM: High
-  TCNTO > OCR0A           =>PWM: Low
-|___________________________________________________________|
-| //Non-inverted mode                                       |
-|                   OCR0A + 1                               |
-|    Duty cycle = _____________ * 100                       |
-|                      256                                  |
-|                                                           |
-|                                                           |
-| //inverted mode                                           |
-|                   256 - OCR0A                             |
-|    Duty cycle = _______________ * 100                     |
-|                      256                                  |
-|___________________________________________________________|
-
-
 //TCCR0A
 _____________________________________________________________
 | COM0A1 | COM0A0 | COM0B1 | COM0B0 | - | - | WGM01 | WGM00 |
@@ -607,7 +631,22 @@ _____________________________________________________________
 _____________________________________________________________
 | FOC0A | FOC0B | - | - |  WGM02  |  CS02  |  CS01  |  CS00 |
 |_______|_______|___|___|_________|________|________|_______|
-|
+// (TCCR0A + TCCR0B) PWM 模式选择
+//_________________________________________________________
+ WGM02  WGM01  WGM00    Comment
+    0     0     0       // Normal
+    0     0     1       // Phase Correct PWM, top 0xFF
+    0     1     0       // CTC ( Clear Timer on Compare Match )
+    0     1     1       // Fast PWM, top 0xFF
+    1     0     0       // Reserved
+    1     0     1       // Phase Correct PWM, top OCR0A
+    1     1     0       // Reserved
+    1     1     1       // Fast PWM, top OCR0A
+    
+    
+    
+// Fast PWM  + Phase Correct PWM
+//_________________________________________________________
 |____________________________________________________________________
 |         |COMOA1   COMOA0   Comment                                 |
 |         |  0        0      PWM off                                 |
@@ -623,9 +662,31 @@ _____________________________________________________________
 |  PWM    |  1        0      PWM, non-inverted                       |
 |         |  1        1      PWM, inverted                           |
 |_________|__________________________________________________________|
+    
+    
+    
+// Fast PWM Duty Cycle (OC0A)
+// OCR0A determines the duty cycle
+//_________________________________________________________
+        TCNT0 < OCR0A   =>   PWM: High
+        TCNTO > OCR0A   =>   PWM: Low
+|___________________________________________________________|
+| //Non-inverted mode                                       |
+|                   OCR0A + 1                               |
+|    Duty cycle = _____________ * 100                       |
+|                      256                                  |
+|                                                           |
+|                                                           |
+| //inverted mode                                           |
+|                   256 - OCR0A                             |
+|    Duty cycle = _______________ * 100                     |
+|                      256                                  |
+|___________________________________________________________|
 
 
-| //EXample: Fast PWM
+
+
+| // EXample: Fast PWM at 3.8Hz
 |____________________________________________________________________|
 |f_pwm = f_clock / prescaler / 256                                   |
 |____________________________________________________________________|
@@ -635,7 +696,7 @@ _____________________________________________________________
 |       4 output a wave of 20% duty cycle at PD5(OC0B)               |
 |       5 Prescaler factor p = 1024                                  |
 |____________________________________________________________________|
-|  f_pwm = 10^6 / 1024 / 256 =(3.8Hz)                                |
+|  f_pwm = 10^6 / 1024 / 256 = 3.8 Hz                                |
 |                                                                    |
 |                  OCR0A + 1                                         |
 |   Duty cycle = _____________ * 100 == 80  => (OCR0A = 203)         |
@@ -649,12 +710,12 @@ _____________________________________________________________
 int main(void)
 {
         CLKPR   = (1 << CLKPCE);
-        CLKPR   = 0b00000011;           //set clk to 1MHz
-        DDRD    = 0xFF;                 //PORTD as output
-        OCR0A   = 203;                  //80% duty cycle
-        OCR0B   = 50;                   //20% duty cycle
-        TCCR0A  = 0b10100011;           //fast PWM, non-inverted
-        TCCR0B  = 0b00000101;           //timer prescaler  
+        CLKPR   = 0b00000011;           // set clk to 1MHz
+        DDRD    = 0xFF;                 // PORTD as output
+        OCR0A   = 203;                  // 80% duty cycle
+        OCR0B   = 50;                   // 20% duty cycle
+        TCCR0A  = 0b10100011;           // fast PWM, non-inverted
+        TCCR0B  = 0b00000101;           // timer prescaler，并且启动PWM 
 }
 
 
@@ -667,11 +728,11 @@ int main(void)
 
 int main(void)
 {
-        sei();          //enable global interrupt
-        EIMSK   = 0x01; //enable INT0
+        sei();          // enable global interrupt
+        EIMSK   = 0x01; // enable INT0
 }
 
-ISR(INT0_vect)          //interrupt service routine
+ISR(INT0_vect)          // interrupt service routine
 {
 }
 
@@ -721,17 +782,17 @@ _____________________________|______|________________________
 volatile unsigned int value;
 int main(void)
 {
-        DDRC    = 0x00;         //PORTC as input
-        sei();                  //enable global interrupt
-        ADMUX   = 0b01000000;   //ref volt + channel
-        ADCSRA  = 0xFF;         //free running & interrupt;
-        while (1);              //idle
+        DDRC    = 0x00;                 // PORTC as input
+        sei();                          // enable global interrupt
+        ADMUX   = 0b01000000;           // ref volt + channel
+        ADCSRA  = 0xFF;                 // free running & interrupt;
+        while (1);                      // idle
 }
 ISR(ADC_vect)
 {
         unsigned char low, high;
-        ADCSRA  |= (1 << ADIF);         //clear ADIF
-        low      = ADCL;                //read low byte first
+        ADCSRA  |= (1 << ADIF);         // clear ADIF
+        low      = ADCL;                // read low byte first
         high     = ADCH;
-        value    = (high << 8) + low;   //calulate integer value
+        value    = (high << 8) + low;   // calulate integer value
 }
