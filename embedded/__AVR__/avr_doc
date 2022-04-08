@@ -283,109 +283,115 @@ while (1) {
 /*******************************************************************************
         => ADC
 *******************************************************************************/
-AVCC    //加上一个低通滤波器，使测量更准确
-AREF    //用户自己定义电压
+        AVCC    // 加上一个低通滤波器，使测量更准确
+        AREF    // 用户自己定义电压
 
 
-ADMUX //Input pin and reference voltage control
+
+        ADMUX   //Input pin and reference voltage control
+// ____________________________________________________________
 _________________________________________________________
 | REFS1 | REFS0 | ADLAR | - | MUX3 | MUX2 | MUX1 | MUX0 |
 |_______|_______|_______|___|______|______|______|______|___
-|//Voltage Reference Selection(ADC参考电压选择)               |
-|  REFS1  REFS0          Comment                            |
-|    0      0            //Aref                             |
-|    0      1            //Avcc                             |
-|    1      0            //Reserved                         |
-|    1      1            //Internal 1.1V                    |
-|___________________________________________________________|
-|//ADC Left Adjust Result(ADC读出的数据对齐方式)               |
-|  AKLAR                 Comment                            |
-|    0                   //Right adjusted                   |
-|    1                   //Left adjusted                    |
-|___________________________________________________________|
-|//Input Channel Selection(ADC通道选择)                      |
-| MUX3 MUX2 MUX1 MUX0   Comment                             |
-|    0    0    0    0    //ADC0                             |
-|    0    0    0    1    //ADC1                             |
-|    0    0    1    0    //ADC2                             |
-|    0    0    1    1    //ADC3                             |
-|    0    1    0    0    //ADC4                             |
-|    0    1    0    1    //ADC5                             |
-|    1    1    1    1    //0V                               |
-|___________________________________________________________|
+        // ADC参考电压选择-Voltage Reference Selection
+        REFS1  REFS0            Comment
+          0      0              // Aref
+          0      1              // Avcc
+          1      0              // Reserved 
+          1      1              // Internal 1.1V
+
+        // ADC读出的数据对齐方式-ADC Left Adjust Result
+        AKLAR                   Comment
+          0                     // Right adjusted 
+          1                     // Left adjusted 
+
+        // ADC通道选择-Input Channel Selection
+        MUX3 MUX2 MUX1 MUX0     Comment
+          0    0    0    0      // ADC0
+          0    0    0    1      // ADC1
+          0    0    1    0      // ADC2
+          0    0    1    1      // ADC3
+          0    1    0    0      // ADC4
+          0    1    0    1      // ADC5
+          1    1    1    1      // 0V                               |
 
 
-ADCSRA  //Status and prescalar control
+
+
+        ADCSRA  //Status and prescalar control
+// ____________________________________________________________
 _____________________________________________________________
 | ADEN | ADSC | ADATE | ADIF | ADIE | ADPS2 | ADPS1 | ADPS0 |
 |______|______|_______|______|______|_______|_______|_______|
-| //ADC Enable(ADC启动)                                      |
-| ADEN     Comment                                          |
-|   0      //ADC off                                        |
-|   1      //ADC on                                         |
-|___________________________________________________________|
-| //ADC Start Conversion(ADC开始转换)                        |
-| ADSC     Comment                                         |
-|   0      //No effect (turns to 0 when the ADC is done)   |
-|   1      //Start conversion                               |
-|___________________________________________________________|
-| //ADC Auto Trigger Enable(ADC自动触发)                     |
-| ADATE    Comment                                          |
-|   0      //No effect (turns to 0 when the ADC is done)    |
-|   1      //Auto trigger on                                |
-|___________________________________________________________|
-| //ADC Interrupt Flag                                      |
-| //Note: ADIF can be cleared by written 1 into the bit     |
-| ADIF     Comment                                          |
-|   0      //No effect                                      |
-|   1      //Clear the flag                                 |
-|___________________________________________________________|
-| //ADC Interrupt Enable                                    |
-| ADIE     Comment                                          |
-|   0      //Disable interrupt                              |
-|   1      //Enable interrupt                               |
-|___________________________________________________________|
-| //ADC Prescaler Selection                                 |
-| ADPS2 ADPS1 ADPS0       Comment                           |
-|   0     0     0         //2分频                            |
-|   0     0     1         //2分频                            |
-|   0     1     0         //4分频                            |
-|   0     1     1         //8分频                            |
-|   1     0     0         //16分频                           |
-|   1     0     1         //32分频                           |
-|   1     1     0         //64分频                           |
-|   1     1     1         //128分频                          |
-|___________________________________________________________|
+        // ADC Enable
+        ADEN     Comment
+          0      // ADC off
+          1      // ADC on
+        
+        // ADC Start Conversion
+        ADSC     Comment
+          0      // No effect (turns to 0 when the ADC is done)
+          1      // Start conversion
+        
+        // ADC Auto Trigger Enable
+        ADATE    Comment
+          0      //No effect (turns to 0 when the ADC is done)
+          1      //Auto trigger on
+
+        // ADC Interrupt Flag
+        // Note: ADIF can be cleared by written 1 into the bit
+        ADIF     Comment 
+          0      // No effect
+          1      // Clear the flag 
+
+        // ADC Interrupt Enable 
+        ADIE     Comment
+          0      //Disable interrupt
+          1      //Enable interrupt
+
+        // ADC Prescaler Selection
+        ADPS2 ADPS1 ADPS0       Comment
+          0     0     0         // 2分频
+          0     0     1         // 2分频
+          0     1     0         // 4分频
+          0     1     1         // 8分频
+          1     0     0         // 16分频
+          1     0     1         // 32分频
+          1     1     0         // 64分频
+          1     1     1         // 128分频
+
   
 
-  //ADC数据存储寄存器
-|__________________________________________________________|
-| ADCH    //ADC data storage                               |
-| ADCL    //10-bit ADC needs 2 bytes for storing           |
-|__________________________________________________________|
+
+// ADC数据存储寄存器
+// ____________________________________________________________
+
+        ADCH    // ADC data storage 
+        ADCL    // 10-bit ADC needs 2 bytes for storing 
 
 
 
-//Read DMS Sensor
-____________________________________________________
+
+// Read DMS Sensor
+// ____________________________________________________________
 #define F_CPU           (1000000UL)
 #include <avr/io.h>
 #include <util/delay.h>
 int main(void)
 {
         CLKPR  = (1 << CLKPCE);
-        CLKPR  = 0b00000011;    //set clk to 1MHz
-        DDRB   = 0xFF;          //PORTB as output
-        DDRD   = 0xFF;          //PORTD as output
-        DDRC   = 0x00;          //PORTC as input
-        ADCSRA = 0b10000111;    //enable   + prescaler
-        ADMUX  = 0b11000000;    //ref volt + channel
+        CLKPR  = 0b00000011;    // set clk to 1MHz
+        DDRB   = 0xFF;          // PORTB as output
+        DDRD   = 0xFF;          // PORTD as output
+        DDRC   = 0x00;          // PORTC as input
+        ADCSRA = 0b10000111;    // enable   + prescaler
+        ADMUX  = 0b11000000;    // ref volt + channel-0
         
         while (1) {
-                ADCSRA |= (1 << ADIF);                //clear ADIF
-                ADCSRA |= (1 << ADSC);                //start ADC
-                while ((ADCSRA & (1 << ADIF)) == 0); //wait for adc done
-                PORTD   = ADCL;                       //read low byte first
+                ADCSRA |= (1 << ADIF);                // clear ADIF
+                ADCSRA |= (1 << ADSC);                // start ADC
+                while ((ADCSRA & (1 << ADIF)) == 0); // wait for adc done
+                PORTD   = ADCL;                       // read low byte first
                 PORTB   = ADCH;
                 _delay_ms(200);
         }
@@ -393,25 +399,25 @@ int main(void)
 
 
 
-//Read DMS Sensor (Free Running)
-//Note: Do not need to check the flag ADIF
-____________________________________________________
+// Read DMS Sensor (Free Running)
+// Note: Do not need to check the flag ADIF
+// ____________________________________________________________
 #define F_CPU           (1000000UL)
 #include <avr/io.h>
 #include <util/delay.h>
-
 int main(void)
 {
         CLKPR   = (1 << CLKPCE);
-        CLKPR   = 0b00000011;    //set clk to 1MHz
-        DDRB    = 0xFF;          //PORTB as output
-        DDRD    = 0xFF;          //PORTD as output
-        DDRC    = 0x00;          //PORTC as input
-        ADCSRA  = 0b10100111;    //free running mode
-        ADMUX   = 0b11000000;    //ref volt + channel
-        ADCSRA |= (1 << ADSC);   //start ADC
+        CLKPR   = 0b00000011;    // set clk to 1MHz
+        DDRB    = 0xFF;          // PORTB as output
+        DDRD    = 0xFF;          // PORTD as output
+        DDRC    = 0x00;          // PORTC as input
+                                 // ADATE设置为（1） => ADC Auto Trigger Enable
+        ADCSRA  = 0b10100111;    // free running mode
+        ADMUX   = 0b11000000;    // ref volt + channel
+        ADCSRA |= (1 << ADSC);   // start ADC
         while (1) {
-                PORTD   = ADCL; //read low byte first
+                PORTD   = ADCL; // read low byte first
                 PORTB   = ADCH;
                 _delay_ms(200);
         }
@@ -420,7 +426,7 @@ int main(void)
 
 
 /*******************************************************************************
-        => USART
+        => UART
 *******************************************************************************/
 |// 波特率设置寄存器高 8 位 //
 |__________________________________________________________|
@@ -430,6 +436,18 @@ int main(void)
 |__________________________________________________________|
 | UBRR0L                                                   |
 |__________________________________________________________|
+|// USART Buffer 发送和接收数据寄存器
+|__________________________________________________________|
+| UDR0                                                     |
+|__________________________________________________________|
+        
+
+
+
+// UBRR0[H:L] Baud Rate Setup
+// ____________________________________________________________
+        fOSC / (16 * (UBRR +1)) = BaudRate
+
 
 
 | UCSR0C   // 同步，异步，奇偶校验位，停止位，数据大小 //
@@ -493,15 +511,20 @@ int main(void)
 
 
 
-//Transmit Letter 'A' through 'Z'
+// Transmit Letter 'A' through 'Z'
+// Baud rate 9600
+// Asynchronous
+// No parity
+// 8 data bits
+// 1 stop bit
 ___________________________________________________________
-#define F_CPU           (8000000UL)     //8MHz
+#define F_CPU           (8000000UL)     // 8MHz
 #include <avr/io.h>
 #include <util/delay.h>
 int main(void)
 {
-        CLKPR   = 0b10000000;
-        CLKPR   = 0b00000000;
+        CLKPR   = 0b10000000;                           // 解锁
+        CLKPR   = 0b00000000;                           // 8*1000*1000Hz
         unsigned int baud_rate  = 9600;
         unsigned int ubrr_value = (F_CPU / (baud_rate * 16UL)) - 1;
         UBRR0H  = (unsigned char)(ubrr_value >> 8);     //set Baud rate
@@ -521,7 +544,7 @@ int main(void)
 
 
 
-//Hello World
+// Hello World
 ___________________________________________________________
 #define F_CPU           (8000000UL)     //8MHz
 #include <avr/io.h>
