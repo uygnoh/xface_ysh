@@ -1,0 +1,65 @@
+/*******************************************************************************
+        => Raspberry-Pico RP2040
+*******************************************************************************/
+        pico-sdk                        // rp2040 软件开发工具包
+        pico-examples                   // rp2040 例程
+        pico-project-generator          // rp2040 自动生成例程工具
+
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico 相关文件下载
+*******************************************************************************/
+        mkdir rp2040_pico
+        cd    rp2040_pico
+        git   clone -b master https://github.com/raspberrypi/pico-sdk.git
+        cd    pico-sdk
+        git   submodule update --init
+        cd    rp2040_pico
+        git   clone -b master https://github.com/raspberrypi/pico-examples.git
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico 安装工具链 （toolchain - 工具链）
+*******************************************************************************/
+// 编译器安装
+// ____________________________________________________________
+        sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi 
+        build-essential libssl-dev tk python3-tk
+
+
+// 安装CMake
+// ____________________________________________________________
+        cd   $HOME
+        wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
+        tar  -zxvf cmake-3.19.4.tar.gz
+        cd   cmake-3.19.4
+        ./bootstrap
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico Project
+*******************************************************************************/
+// 自动生成Demo
+// ____________________________________________________________
+        cd  $HOME/rp2040_pico
+        git clone https://github.com/raspberrypi/pico-project-generator.git
+        cd $HOME/rp2040_pico/pico-project-generator
+        export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
+        export DISPLAY=:0
+
+// 生成源码文件
+// ____________________________________________________________
+        cd $HOME/rp2040_pico/pico-project-generator
+        ./pico_project.py --gui
+        
+        
+// 编译源码 
+// ____________________________________________________________
+【1】     进入自动生的工程文件夹
+【2】     cd build
+【3】     cmake ..
+【4】     make

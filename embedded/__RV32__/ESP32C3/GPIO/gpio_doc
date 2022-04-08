@@ -1,0 +1,93 @@
+/*******************************************************************************
+        => GPIO输出
+*******************************************************************************/
+        // https://www.jianshu.com/p/a10c180315b0
+        
+        
+#include "driver/gpio.h"
+// 简单方法
+// ____________________________________________________________
+gpio_pad_select_gpio(GPIO_NUM_22);                // 选择一个GPIO
+gpio_set_direction(GPIO_NUM_22, GPIO_MODE_OUTPUT);// 把这个GPIO作为输出
+gpio_set_level(GPIO_NUM_22, 0);                   // 把这个GPIO输出低电平
+
+
+
+// 结构体方法
+// ____________________________________________________________
+#define GPIO_OUTPUT_IO_0    22
+#define GPIO_OUTPUT_PIN_SEL  (1ULL<<GPIO_OUTPUT_IO_0)  // 配置GPIO_OUT位寄存器
+
+void gpio_init(void)
+{
+    gpio_config_t io_conf;  // 定义一个gpio_config类型的结构体，下面的都算对其进行的配置
+
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;  // 禁止中断  
+    io_conf.mode = GPIO_MODE_OUTPUT;            // 选择输出模式
+    io_conf.pin_bit_mask = GPIO_OUTPUT_PIN_SEL; // 配置GPIO_OUT寄存器
+    io_conf.pull_down_en = 0;                   // 禁止下拉
+    io_conf.pull_up_en = 0;                     // 禁止上拉
+
+    gpio_config(&io_conf);                      // 最后配置使能
+}
+
+gpio_set_level(GPIO_OUTPUT_IO_0, 0);            // 把这个GPIO输出低电平
+gpio_set_level(GPIO_OUTPUT_IO_0, 1);            // 把这个GPIO输出高电平
+
+
+
+/*******************************************************************************
+        => GPIO输入
+*******************************************************************************/
+// 简单方法
+// ____________________________________________________________
+gpio_pad_select_gpio(GPIO_NUM_36);                 // 选择一个GPIO
+gpio_set_direction(GPIO_NUM_36, GPIO_MODE_INPUT);  // 把这个GPIO作为输入
+gpio_get_level(GPIO_NUM_36);
+
+
+// 结构体方法
+// ____________________________________________________________
+#define GPIO_INPUT_IO_0    36
+#define GPIO_INPUT_PIN_SEL  (1ULL<<GPIO_INPUT_IO_0)  // 配置GPIO_IN位寄存器
+
+void gpio_init(void)
+{
+    gpio_config_t io_conf;  // 定义一个gpio_config类型的结构体，下面的都算对其进行的配置
+
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;  // 禁止中断  
+    io_conf.mode = GPIO_MODE_INPUT;             // 选择输入模式
+    io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;  // 配置GPIO_IN寄存器
+    io_conf.pull_down_en = 0;                   // 禁止下拉
+    io_conf.pull_up_en = 0;                     // 禁止上拉
+
+    gpio_config(&io_conf);                      // 最后配置使能
+}
+
+gpio_get_level(GPIO_INPUT_IO_0, 0);            // 读取这个GPIO电平
+
+
+
+/*******************************************************************************
+        => 轮询检测按键输入
+*******************************************************************************/
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+
+void app_main(void)
+{
+    gpio_pad_select_gpio(GPIO_NUM_36);
+    //gpio_init();
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(GPIO_NUM_36, GPIO_MODE_INPUT);
+    while(1) 
+    {
+        printf(" Current Gpio36 Level is : %d \r\n\r\n",
+                gpio_get_level(GPIO_NUM_36));
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
