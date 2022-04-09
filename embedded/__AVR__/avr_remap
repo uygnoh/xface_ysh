@@ -1,0 +1,3 @@
+// 外设复用功能
+对于ADC和DAC， 在GPIOx_MODER寄存器中将所需I/O配置为模拟通道
+对于其它外设， 在GPIOx_MODER寄存器中将所需I/O配置为复用功能
