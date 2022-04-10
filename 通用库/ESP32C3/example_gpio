@@ -1,0 +1,85 @@
+/*******************************************************************************
+        => GPIO 配置为输出模式
+*******************************************************************************/
+#include <stdio.h>
+#include <unistd.h>
+#include "driver/gpio.h"
+
+#define LED_01          5                               // 定义一个GPIO引脚
+
+void app_main(void)
+{
+        gpio_reset_pin(LED_01);                         // 先复位该引脚
+        gpio_pad_select_gpio(LED_01);                   // 配置引脚为GPIO功能
+        gpio_set_direction(LED_01, GPIO_MODE_OUTPUT);   // 设置引脚方向
+        
+        while (1) {
+                gpio_set_level(LED_01, 0);              // 设置LED_01输出为低电平
+                sleep(1);
+        }
+}
+
+
+
+/*******************************************************************************
+        => GPIO 配置为输入模式
+*******************************************************************************/
+#include <stdio.h>
+#include <unistd.h>
+#include "driver/gpio.h"
+
+#define KEY_01          18
+
+void app_main(void)
+{
+        gpio_reset_pin(KEY_01);
+        gpio_pad_select_gpio(KEY_01);
+        gpio_set_direction(KEY_01, GPIO_MODE_INPUT);
+        gpio_pullup_en(KEY_01);         // 上拉打开
+        gpio_pulldown_dis(KEY_01);      // 下拉关闭
+        
+        while (true) {
+                int level = gpio_get_level(KEY_01);
+                printf("Key01 status %d\n\r", level);
+                sleep(1);
+        }
+}
+
+
+
+/*******************************************************************************
+        => GPIO 配置为中断模式
+*******************************************************************************/
+#include <stdio.h>
+#include "driver/gpio.h"
+#include "esp_rom_sys.h"
+
+#define KEY_01          18
+
+typedef struct {
+        int gpio_num;
+        int isr_cnt;
+} gpio_sir_param_t;
+
+static void gpio_isr_handler(void *arg)
+{
+        gpio_isr_param_t *param = (gpio_isr_param_t *)arg;
+        esp_rom_print("GPIO[%d] intr, val: %d\n", param->gpio_num, gpio_get_level(param->gpio_num));
+        param->isr_cnt++;
+}
+
+void app_main(void)
+{
+        static gpio_isr_param_t io18_param = {
+                .gpio_num = KEY_01;
+                .isr_cnt  = 0;
+        };
+        
+        gpio_pad_select_gpio(KEY_01);
+        gpio_set_direction(KEY_01, GPIO_MODE_INPUT);
+        gpio_pulldown_dis(KEY_01);
+        gpio_pullup_en(KEY_01);
+        gpio_set_intr_type(KEY_01, GPIO_INTR_ANYEDGE);
+        gpio_install_isr_service(0);
+        gpio_isr_handler_add(KEY_01, gpio_isr_handler, (void *)&io18_param);
+}

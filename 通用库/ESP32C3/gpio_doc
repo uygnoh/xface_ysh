@@ -1,0 +1,197 @@
+
+
+static gpio_hal_context_t _gpio_hal = {
+        .dev = GPIO_HAL_GET_HW(GPIO_PORT_0)
+};
+
+static gpio_context_t gpio_context = {
+        .gpio_hal = &_gpio_hal,
+        .gpio_spinlock = portMUX_INITIALIZER_UNLOCKED,
+        .isr_core_id = GPIO_ISR_CORE_ID_UNINIT,
+        .gpio_isr_func = NULL,
+};
+
+
+
+esp_err_t gpio_set_intr_type(gpio_num_t gpio_num, gpio_int_type_t intr_type)
+{
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    GPIO_CHECK(intr_type < GPIO_INTR_MAX, "GPIO interrupt type error", ESP_ERR_INVALID_ARG);
+
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    gpio_hal_set_intr_type(gpio_context.gpio_hal, gpio_num, intr_type);
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    return ESP_OK;
+}
+
+static esp_err_t gpio_intr_enable_on_core(gpio_num_t gpio_num, uint32_t core_id)
+{
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    gpio_hal_intr_enable_on_core(gpio_context.gpio_hal, gpio_num, core_id);
+    return ESP_OK;
+}
+
+esp_err_t gpio_intr_enable(gpio_num_t gpio_num)
+{
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    if(gpio_context.isr_core_id == GPIO_ISR_CORE_ID_UNINIT) {
+        gpio_context.isr_core_id = xPortGetCoreID();
+    }
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    return gpio_intr_enable_on_core (gpio_num, gpio_context.isr_core_id);
+}
+
+esp_err_t gpio_intr_disable(gpio_num_t gpio_num)
+{
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    gpio_hal_intr_disable(gpio_context.gpio_hal, gpio_num);
+    return ESP_OK;
+}
+
+
+static inline void IRAM_ATTR gpio_isr_loop(uint32_t status, const uint32_t gpio_num_start)
+{
+    while (status) {
+        int nbit = __builtin_ffs(status) - 1;
+        status &= ~(1 << nbit);
+        int gpio_num = gpio_num_start + nbit;
+
+        if (gpio_context.gpio_isr_func[gpio_num].fn != NULL) {
+            gpio_context.gpio_isr_func[gpio_num].fn(gpio_context.gpio_isr_func[gpio_num].args);
+        }
+    }
+}
+
+static void IRAM_ATTR gpio_intr_service(void *arg)
+{
+    //GPIO intr process
+    if (gpio_context.gpio_isr_func == NULL) {
+        return;
+    }
+
+    //read status to get interrupt status for GPIO0-31
+    uint32_t gpio_intr_status;
+    gpio_hal_get_intr_status(gpio_context.gpio_hal, gpio_context.isr_core_id, &gpio_intr_status);
+
+    if (gpio_intr_status) {
+        gpio_isr_loop(gpio_intr_status, 0);
+        gpio_hal_clear_intr_status(gpio_context.gpio_hal, gpio_intr_status);
+    }
+
+    //read status1 to get interrupt status for GPIO32-39
+    uint32_t gpio_intr_status_h;
+    gpio_hal_get_intr_status_high(gpio_context.gpio_hal, gpio_context.isr_core_id, &gpio_intr_status_h);
+
+    if (gpio_intr_status_h) {
+        gpio_isr_loop(gpio_intr_status_h, 32);
+        gpio_hal_clear_intr_status_high(gpio_context.gpio_hal, gpio_intr_status_h);
+    }
+}
+
+esp_err_t gpio_install_isr_service(int intr_alloc_flags)
+{
+    GPIO_CHECK(gpio_context.gpio_isr_func == NULL, "GPIO isr service already installed", ESP_ERR_INVALID_STATE);
+    esp_err_t ret;
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    gpio_context.gpio_isr_func = (gpio_isr_func_t *) calloc(GPIO_NUM_MAX, sizeof(gpio_isr_func_t));
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    if (gpio_context.gpio_isr_func == NULL) {
+        ret = ESP_ERR_NO_MEM;
+    } else {
+        ret = gpio_isr_register(gpio_intr_service, NULL, intr_alloc_flags, &gpio_context.gpio_isr_handle);
+    }
+
+    return ret;
+}
+
+esp_err_t gpio_isr_handler_add(gpio_num_t gpio_num, gpio_isr_t isr_handler, void *args)
+{
+    GPIO_CHECK(gpio_context.gpio_isr_func != NULL, "GPIO isr service is not installed, call gpio_install_isr_service() first", ESP_ERR_INVALID_STATE);
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    gpio_intr_disable(gpio_num);
+    if (gpio_context.gpio_isr_func) {
+        gpio_context.gpio_isr_func[gpio_num].fn = isr_handler;
+        gpio_context.gpio_isr_func[gpio_num].args = args;
+    }
+    gpio_intr_enable_on_core (gpio_num, esp_intr_get_cpu(gpio_context.gpio_isr_handle));
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    return ESP_OK;
+}
+
+esp_err_t gpio_isr_handler_remove(gpio_num_t gpio_num)
+{
+    GPIO_CHECK(gpio_context.gpio_isr_func != NULL, "GPIO isr service is not installed, call gpio_install_isr_service() first", ESP_ERR_INVALID_STATE);
+    GPIO_CHECK(GPIO_IS_VALID_GPIO(gpio_num), "GPIO number error", ESP_ERR_INVALID_ARG);
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    gpio_intr_disable(gpio_num);
+    if (gpio_context.gpio_isr_func) {
+        gpio_context.gpio_isr_func[gpio_num].fn = NULL;
+        gpio_context.gpio_isr_func[gpio_num].args = NULL;
+    }
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    return ESP_OK;
+}
+
+void gpio_uninstall_isr_service(void)
+{
+    if (gpio_context.gpio_isr_func == NULL) {
+        return;
+    }
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    esp_intr_free(gpio_context.gpio_isr_handle);
+    free(gpio_context.gpio_isr_func);
+    gpio_context.gpio_isr_func = NULL;
+    gpio_context.isr_core_id = GPIO_ISR_CORE_ID_UNINIT;
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    return;
+}
+
+
+static void gpio_isr_register_on_core_static(void *param)
+{
+    gpio_isr_alloc_t *p = (gpio_isr_alloc_t *)param;
+    //We need to check the return value.
+    p->ret = esp_intr_alloc(p->source, p->intr_alloc_flags, p->fn, p->arg, p->handle);
+}
+
+esp_err_t gpio_isr_register(void (*fn)(void *), void *arg, int intr_alloc_flags, gpio_isr_handle_t *handle)
+{
+    GPIO_CHECK(fn, "GPIO ISR null", ESP_ERR_INVALID_ARG);
+    gpio_isr_alloc_t p;
+    p.source = ETS_GPIO_INTR_SOURCE;
+    p.intr_alloc_flags = intr_alloc_flags;
+    p.fn = fn;
+    p.arg = arg;
+    p.handle = handle;
+    portENTER_CRITICAL(&gpio_context.gpio_spinlock);
+    if(gpio_context.isr_core_id == GPIO_ISR_CORE_ID_UNINIT) {
+        gpio_context.isr_core_id = xPortGetCoreID();
+    }
+    portEXIT_CRITICAL(&gpio_context.gpio_spinlock);
+    esp_err_t ret;
+#if CONFIG_FREERTOS_UNICORE
+    gpio_isr_register_on_core_static(&p);
+    ret = ESP_OK;
+#else /* CONFIG_FREERTOS_UNICORE */
+    ret = esp_ipc_call_blocking(gpio_context.isr_core_id, gpio_isr_register_on_core_static, (void *)&p);
+#endif /* !CONFIG_FREERTOS_UNICORE */
+    if(ret != ESP_OK || p.ret != ESP_OK) {
+        return ESP_ERR_NOT_FOUND;
+    }
+    return ESP_OK;
+}
+
+
+void gpio_iomux_in(uint32_t gpio, uint32_t signal_idx)
+{
+    gpio_hal_iomux_in(gpio_context.gpio_hal, gpio, signal_idx);
+}
+
+void gpio_iomux_out(uint8_t gpio_num, int func, bool oen_inv)
+{
+    gpio_hal_iomux_out(gpio_context.gpio_hal, gpio_num, func, (uint32_t)oen_inv);
+}
+
+        

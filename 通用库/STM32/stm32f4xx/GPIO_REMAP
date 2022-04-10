@@ -9,7 +9,13 @@
         PA13    JTMS/SWDAT      // 处于下拉状态
         PB4     NJTRST          // 处于上拉状态
         PB3     JTDO            // 处于浮空状态
-        
+
+
+
+// Serial Wire
+// ____________________________________________________________
+        PA13    SWDIO           // ST-LINK
+        PA14    SWCLK           // ST-LINK
         
         
 
