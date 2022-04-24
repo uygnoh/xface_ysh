@@ -253,7 +253,7 @@ _________________________________
 |   T   //T Flag        Source and Destination for BLD and BST                 |
 |   H   //Half carry    Set if an Add/Sub. has Carry between Bits 4&3          |
 |   S   //Signd Flag    Used for Signed Tests                                  |
-|   V   //oVerflow      Set if an Add/Sub Results in Signed Overflow           |
+|   V   //Overflow      Set if an Add/Sub Results in Signed Overflow           |
 |   N   //Negative      Set if a Result is Negative                            |
 |   Z   //Zero          Set if a Add/Subtract resutl is zero                   |
 |   C   //Carry         Set if an Add/Subtract has Carry                       |
