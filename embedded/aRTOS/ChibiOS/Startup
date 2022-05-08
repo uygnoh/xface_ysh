@@ -1,0 +1,245 @@
+/*******************************************************************************
+        => vectors.S 主要是中断向量表的定义，我截取了一部分
+*******************************************************************************/
+_vectors:
+        .long       __main_stack_end__
+        .long       Reset_Handler
+        .long       NMI_Handler
+        .long       HardFault_Handler
+        .long       MemManage_Handler
+        .long       BusFault_Handler
+        .long       UsageFault_Handler
+        .long       Vector1C
+        .long       Vector20
+        .long       Vector24
+        .long       Vector28
+        .long       SVC_Handler
+        .long       DebugMon_Handler
+        .long       Vector34
+        .long       PendSV_Handler
+        .long       SysTick_Handler
+
+
+
+/*******************************************************************************
+        => crt1.c 定义了一些会被crt0_v7m.S调用的函数：
+*******************************************************************************/
+// lint -save -e9075 [8.4] All symbols are invoked from asm context.
+void __core_init(void) 
+{
+        #if CORTEX_MODEL == 7
+        SCB_EnableICache();
+        SCB_EnableDCache();
+        #endif
+}
+
+
+//lint -save -e9075 [8.4] All symbols are invoked from asm context.
+void __early_init(void)
+{
+}
+/*lint -restore*/
+
+
+// lint -save -e9075 [8.4] All symbols are invoked from asm context.
+void __late_init(void)
+{
+}
+/*lint -restore*/
+
+
+// lint -save -e9075 [8.4] All symbols are invoked from asm context.
+void __default_exit(void) 
+{
+        /*lint -restore*/
+        while (true) {
+        }
+}
+
+
+/**
+ * @brief   Performs the initialization of the various RAM areas.
+ */
+void __init_ram_areas(void)
+{
+        #if CRT1_AREAS_NUMBER > 0
+        .......
+        #endif
+}
+
+
+
+/*******************************************************************************
+        => crt0_v7m.S
+*******************************************************************************/
+// 先省略掉这个文件定义的一些宏，直接从代码部分看起。
+// 这是vectors.S里面的复位中断服务函数定义：
+        .thumb_func
+        .weak           Reset_Handler
+
+Reset_Handler:
+        b               _crt0_entry
+
+
+// 而在crt0_v7m.S可以看到_crt0_entry的详细定义：
+// CRT0 entry point.
+               .align  2
+               .thumb_func
+               .global _crt0_entry
+_crt0_entry:
+
+
+// 首先是MSP(主堆栈指针)，PSP(用户堆栈指针)的初始化：
+// ____________________________________________________________
+        // Interrupts are globally masked initially. 全局关中断
+        cpsid   i
+
+#if CRT0_FORCE_MSP_INIT == TRUE
+        // MSP stack pointers initialization. 主堆栈指针初始化
+        msr     MSP, r0
+#endif
+
+        // PSP stack pointers initialization. 用户堆栈指针初始化
+        ldr     r0, =__process_stack_end__
+        msr     PSP, r0
+
+
+// 然后是有关浮点计算单元FPU的初始化：
+// ____________________________________________________________
+#if CRT0_INIT_FPU == TRUE
+        // FPU FPCCR initialization.
+        movw    r0, #CRT0_FPCCR_INIT & 0xFFFF
+        movt    r0, #CRT0_FPCCR_INIT >> 16
+        movw    r1, #SCB_FPCCR & 0xFFFF
+        movt    r1, #SCB_FPCCR >> 16
+        str     r0, [r1]
+        dsb
+        isb
+
+        // CPACR initialization.
+        movw    r0, #CRT0_CPACR_INIT & 0xFFFF
+        movt    r0, #CRT0_CPACR_INIT >> 16
+        movw    r1, #SCB_CPACR & 0xFFFF
+        movt    r1, #SCB_CPACR >> 16
+        str     r0, [r1]
+        dsb
+        isb
+
+        // FPU FPSCR initially cleared.
+        mov     r0, #0
+        vmsr    FPSCR, r0
+
+        // FPU FPDSCR initially cleared.
+        movw    r1, #SCB_FPDSCR & 0xFFFF
+        movt    r1, #SCB_FPDSCR >> 16
+        str     r0, [r1]
+
+        // Enforcing FPCA bit in the CONTROL register.
+        movs    r0, #CRT0_CONTROL_INIT | CONTROL_FPCA
+
+#else
+        movs    r0, #CRT0_CONTROL_INIT
+#endif
+
+
+// 然后是跳转到crt1.c里定义的这两个函数：
+// ____________________________________________________________
+#if CRT0_INIT_CORE == TRUE
+        /* Core initialization. 内核初始化*/
+        bl      __core_init
+#endif
+        /* Early initialization. 早期初始化*/
+        bl      __early_init
+
+
+// 接着是主堆栈和用户堆栈区域的初始化：
+// ____________________________________________________________
+#if CRT0_INIT_STACKS == TRUE
+        ldr     r0, =CRT0_STACKS_FILL_PATTERN
+        /* Main Stack initialization. Note, it assumes that the
+           stack size is a multiple of 4 so the linker file must
+           ensure this. 主堆栈初始化*/
+        ldr     r1, =__main_stack_base__
+        ldr     r2, =__main_stack_end__
+msloop:
+        cmp     r1, r2
+        itt     lo
+        strlo   r0, [r1], #4
+        blo     msloop
+
+        /* Process Stack initialization. Note, it assumes that the
+           stack size is a multiple of 4 so the linker file must
+           ensure this. 用户堆栈初始化*/
+        ldr     r1, =__process_stack_base__
+        ldr     r2, =__process_stack_end__
+psloop:
+        cmp     r1, r2
+        itt     lo
+        strlo   r0, [r1], #4
+        blo     psloop
+#endif
+
+
+// 然后是DATA段，BSS段的初始化：
+// ____________________________________________________________
+#if CRT0_INIT_DATA == TRUE
+        /* Data initialization. Note, it assumes that the DATA size
+          is a multiple of 4 so the linker file must ensure this. Data段初始化*/
+        ldr     r1, =__textdata_base__
+        ldr     r2, =__data_base__
+        ldr     r3, =__data_end__
+dloop:
+        cmp     r2, r3
+        ittt    lo
+        ldrlo   r0, [r1], #4
+        strlo   r0, [r2], #4
+        blo     dloop
+#endif
+
+#if CRT0_INIT_BSS == TRUE
+        /* BSS initialization. Note, it assumes that the DATA size
+          is a multiple of 4 so the linker file must ensure this. BSS段初始化*/
+        movs    r0, #0
+        ldr     r1, =__bss_base__
+        ldr     r2, =__bss_end__
+bloop:
+        cmp     r1, r2
+        itt     lo
+        strlo   r0, [r1], #4
+        blo     bloop
+#endif
+
+
+// 然后是RAM段的初始化，__init_ram_areas这个函数在crt1.c里有定义。
+// ____________________________________________________________
+#if CRT0_INIT_RAM_AREAS == TRUE
+        /* RAM areas initialization. RAM初始化*/
+        bl      __init_ram_areas
+#endif
+
+
+// 接着跳转到crt1.c的后期初始化：
+// ____________________________________________________________
+        /* Late initialization.. 后期初始化*/
+        bl      __late_init
+
+
+// 最后就跳转到我们心心念念的main函数了：
+// ____________________________________________________________
+        /* Main program invocation, r0 contains the returned value.*/
+        bl      main
+
+
+
+/*******************************************************************************
+        => 启动过程调用函数梳理
+*******************************************************************************/
+// 启动过程从复位函数开始，转到_crt0_entry。在这个函数内部有陆续调用了以下的这些函数，
+// 这些函数是弱定义，如果在其他地方也定义了就会覆盖这块的定义。
+// __init_ram_areas在crt1.c里已有详细定义，重点讲其他函数：
+        __core_init
+        __early_init
+        __init_ram_areas
+        __late_init
+        main
+        __default_exit

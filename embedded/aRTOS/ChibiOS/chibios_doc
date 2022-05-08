@@ -42,10 +42,10 @@
 /*******************************************************************************
         => chibios
 *******************************************************************************/
-kernel          //OS kernel中與平台無關的部份
-port layer      //OS kernel中與結構/編譯器 相關的部份
-platform layer  //包含許多device drivers的實作
-various         //提供各種額外但不包含在特定組件的工具的函式庫
+kernel                          //OS kernel中與平台無關的部份
+port layer                      //OS kernel中與結構/編譯器 相關的部份
+platform layer                  //包含許多device drivers的實作
+various                         //提供各種額外但不包含在特定組件的工具的函式庫
 HAL(hardware abstraction layer) //包含許多抽象的device drivers，
                                 //提供普遍的I/O API給不同平台的應用程式
 
@@ -246,13 +246,3 @@ HAL(hardware abstraction layer) //包含許多抽象的device drivers，
   直到被傳送者喚醒後，會從自己的 p_msgqueue 裡面提取訊息接收
   最後把傳送者的狀態設成 ( THD_STATE_SNDMSG )，並呼叫 chMsgRelease()喚醒傳送者，
   告知訊息傳遞已經結束，可以起來了
-
-
-
-
-
-
-
-    
-    
-
