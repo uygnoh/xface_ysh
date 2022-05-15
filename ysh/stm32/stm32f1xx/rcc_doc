@@ -6,26 +6,26 @@
 *******************************************************************************/
 void rcc_hsi_init(void)
 {
-        //Set HSION bit
+        // Set HSION bit
         RCC->CR |= (uint32_t)0x00000001;
 
-        //Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits
-        //(MCO: 微控制器时钟输出)   (ADCPRE[1:0]:ADC预分频)
-        //(PPRE2[2:0]: 高速APB预分频APB2) (PPRE1[2:0]:低速APB预分频APB1)
-        //(HPRE [3:0]: AHB预分频)
-        //(SWS  [1:0]: 系统时钟切换状态) (SW[1:0]:系统时钟切换)
+        // Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits
+        // (MCO: 微控制器时钟输出)   (ADCPRE[1:0]:ADC预分频)
+        // (PPRE2[2:0]: 高速APB预分频APB2) (PPRE1[2:0]:低速APB预分频APB1)
+        // (HPRE [3:0]: AHB预分频)
+        // (SWS  [1:0]: 系统时钟切换状态) (SW[1:0]:系统时钟切换)
         RCC->CFGR &= (uint32_t)0xF8FF0000;
 
-        //Reset HSEON, CSSON and PLLON bits
+        // Reset HSEON, CSSON and PLLON bits
         RCC->CR &= (uint32_t)0xFEF6FFFF;
 
-        //Reset HSEBYP bit (0:外部4-16MHz振荡器没有旁路)
+        // Reset HSEBYP bit (0:外部4-16MHz振荡器没有旁路)
         RCC->CR &= (uint32_t)0xFFFBFFFF;
 
-        //Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits
+        // Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits
         RCC->CFGR &= (uint32_t)0xFF80FFFF;
 
-        //Disable all interrupts and clear pending bits
+        // Disable all interrupts and clear pending bits
         RCC->CIR = 0x009F0000;
 }
 /*******************************************************************************
@@ -98,6 +98,3 @@ void rcc_setup(void)
                 // configuration. User can add here some code to deal with this error
         }
 }
-    
-    
-
