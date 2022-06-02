@@ -181,5 +181,99 @@ _Bool   // The keyword for this type.
 
 
 
+/*******************************************************************************
+        => Cortex-M SVC
+*******************************************************************************/
+// 程序运行流程
+// ____________________________________________________________
+z = svc_service_add(x, y);       // 呼叫 SVC 0
+__asm void SVC_Handler(void);   // 处理 SVC异常程序
+B       __cpp(svc_handler_main)  // 跳转到(svc_handler_main)
+// 根据获得到的（SVC编号）并执行相关的代码
+// 最后把（R0）中的值赋值给（Z）
 
 
+
+
+
+// SVC 中断服务函数
+// ____________________________________________________________
+int __svc(0x0)  svc_service_add(int x, int y);          // SVC 0
+int __svc(0x1)  svc_service_sub(int x, int y);          // SVC 1
+int __svc(0x2)  svc_service_incr(int x);                // SVC 2
+// 等同于 SVC 3
+// ____________________________________________________________
+__asm int svc_service_deincr(int x)
+{
+        svc 3
+        bx lr
+}
+
+
+// 函数声明
+// ____________________________________________________________
+void svc_handler_main(unsigned int *svc_args);
+
+
+
+// SVC处理 - 提取栈帧起始地址的汇编包装代码
+// ____________________________________________________________
+__asm void SVC_Handler(void)
+{
+        TST     LR, #4  ;// 检查 EXC_RETRUN 的第2位
+        ITE     EQ
+        MRSEQ   R0, MSP ;// 若为0，压栈使用MSP
+        MRSNE   R0, PSP ;// 若为1，压栈使用PSP
+        B       __cpp(svc_handler_main)
+        ALIGN   4
+}
+
+
+// 获取SVC异常（特殊号码），并处理相关代码
+// ____________________________________________________________
+void svc_handler_main(unsigned int *svc_args)
+{
+        unsigned int svc_number;
+        svc_number = ((char *)svc_args[6])[-2];
+        switch(svc_number) {
+        case 0:
+                svc_args[0] = svc_args[0] + svc_args[1];
+                break;
+        case 1:
+                svc_args[0] = svc_args[0] - svc_args[1];
+                break;
+        case 2:
+                svc_args[0] = svc_args[0] + 1;
+                break;
+        case 3:
+                svc_args[0] = svc_args[0] - 1;
+                break;
+        default:
+                break;
+        }
+        
+        return;
+}
+
+
+// MAIN
+// 函数返回值存入（R0）中
+// ____________________________________________________________
+int main(void)
+{
+        int x, y, z;
+        x = 3;
+        y = 5;
+        z = svc_service_add(x, y);
+        
+        x = 9;
+        y = 5;
+        z = svc_service_sub(x, y);
+        
+        x = 9;
+        z = svc_service_incr(x);
+        
+        x = 9;
+        z = svc_service_deincr(int x);
+        while(1);
+}
