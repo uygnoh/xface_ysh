@@ -64,9 +64,10 @@
 //_____________________________________________________________   
 // 对于使用硬件的I2C、SPI等设备，需要进行AF配置的，那么就需要配置为复用模式，这
 // 里以串口为例，比如PA0和PA1作为UART4的TX和RX复用，那么可以配置如下：
-        palSetPadMode(GPIOA, 0, PAL_MODE_ALTERNATE(7));
-        palSetPadMode(GPIOA, 1, PAL_MODE_ALTERNATE(7));
-        
+/* Configuring PC6 as AF8 assigning it to USART6_TX. */
+palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(8));
+/* Configuring PC7 as AF8 assigning it to USART6_RX. */
+palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(8));
         
         
 /*******************************************************************************

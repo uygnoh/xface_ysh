@@ -32,15 +32,15 @@ Fraction[3:0]           // USARTDIV小数部分
 
 // USART->BRR 寄存器配置                   
 //_____________________________________________________________          
-        float Float_U;        //浮点数
-        u16 Mantissa,           //整数部分
-        u16 Fraction,           //小数部分
-        u16 BRR;                //最终存入寄存器的数值
-        u32 BoundRate;          //波特率设置
-        BoundRate               = 9600;
+        float    Float_U;                       // 浮点数
+        uint16_t Mantissa,                      // 整数部分
+        uint16_t Fraction,                      // 小数部分
+        uint16_t BRR;                           // 最终存入寄存器的数值
+        uint32_t BoundRate;                     // 波特率设置
+BoundRate       = 9600;                          // 9600bps
 Float_U         = (float)(72 * 1000 * 1000) / (BoundRate * 16);
-Mantissa        = Float_U;                    // 取整数部分
-Fraction        = (Float_U - Mantissa) * 16;  // 小数部分
+Mantissa        = Float_U;                      // 取整数部分
+Fraction        = (Float_U - Mantissa) * 16;    // 小数部分
 // 整合整数部分和小数部分
 BRR             = (Mantissa << 4) + Fraction;
 USART1->BRR     = BRR;
