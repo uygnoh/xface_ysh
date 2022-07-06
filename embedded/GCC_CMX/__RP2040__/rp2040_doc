@@ -30,6 +30,7 @@
         build-essential libssl-dev tk python3-tk
 
 
+
 // 安装CMake
 // ____________________________________________________________
         cd   $HOME
@@ -51,10 +52,13 @@
         export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
         export DISPLAY=:0
 
+
+
 // 生成源码文件
 // ____________________________________________________________
         cd $HOME/rp2040_pico/pico-project-generator
         ./pico_project.py --gui
+        
         
         
 // 编译源码 
@@ -63,3 +67,6 @@
 【2】     cd build
 【3】     cmake ..
 【4】     make
+
+
+

@@ -1,138 +1,230 @@
 /*******************************************************************************
-                                 cmake  
+        => CMAKE cross platform make 开放源码的跨平台自动化构建系统 
 *******************************************************************************/
-//cmake version
-cmake_minimum_required(VERSION 2.6)
+1 编写核心文件  CMakeLists.txt
+2 指令cmake 根据CMakeLists.txt生成 makefile
+3 指令make  根据makefile 生成可执行文件
 
-//设定工程文件名
-PROJECT(demoA)
 
-//把库文件保存到LIBRARIES变量中
-SET(LIBRARIES /usr/lib/x86-linux-gnu/libm.so)
 
-//把3个文件保存到ALL_CORE_LIST变量中
-SET(ALL_CODE_LIST demo.cpp sqrt.cpp sqrt.h)
+/*******************************************************************************
+        => project 定义工程名称
+*******************************************************************************/
+PROJECT(projectname [CXX][C][java])          
+// 这条语句默认会自定义两个环境变量
+//（编译目录projectname_BINARY_DIR 工程目录projectname_SOURCE_DIR）
 
-//打印变量和变量的值 MESSAGE(${ALL_CODE_LIST})
-MESSGAE(STATUS "This is BINARY dir" ${demoA_BINARY_DIR})
-MESSAGE(STATUS "This is SOURCE dir" ${demoA_SOURCE_DIR})
+1 PROJECT_SOURCE_DIR //工程的根目录
+2 PROJECT_BINARY_DIR //运行cmake命令的目录,通常是${PROJECT_SOURCE_DIR}/build
+//CMAKE_BINARY_DIR 等价于 PROJECT_BINARY_DIR 
 
+
+
+/*******************************************************************************
+        => CMakeLists.txt 基本语法规则
+*******************************************************************************/
+1 cmake变量使用     ${}   方式取值, 但是在IF控制语句中是直接使用变量名
+2 cmake环境变量使用 $ENV{} 方式取值, 使用SET(ENV{VAR} VALUE)赋值
+3 指令(参数1 参数2…)
+4 参数使用括弧括起,参数之间使用空格或分号分开。
+5 指令是大小写无关的,参数和变量是大小写相关的。推荐你全部使用大写指令。
+
+建议：在Project根目录先建立build,然后在build文件夹内运行cmake ..，
+这样就不会污染源代码, 如果不想要这些自动生成的文件了，只要简单的删除build文件夹就可以
+
+
+//声明CMake的版本要求
+CMAKE_MINIMUM_REQUIRED(VERSION version_number [FATAL_ERROR])
+
+
+
+/*******************************************************************************
+        => if() 指令
+*******************************************************************************/
+IF(var)		
+//如果变量不是，空，0, N, NO, OFF, FALSE, NOTFOUND或<var>_NOTFOUND时，表达式为真。
+IF(NOT var)		                //与上述条件相反
+IF(var1 AND var2)	                //当两个变量都为真时，此表达式才为真
+IF(var1 OR var2)	                //只要有一个变量为真时，此表达式就为真
+IF(EXISTS dir) 或 IF(EXISTS file)        //当目录或文件名存在时为真
+
+
+
+/*******************************************************************************
+        => add_definitions() 宏定义
+*******************************************************************************/
+//向C/C++编译器添加-D定义
+ADD_DEFINITIONS(-DENABLE_DEBUG -DABC)   //参数之间用空格分隔
+
+
+
+/*******************************************************************************
+        => 开关选项
+*******************************************************************************/
+BUILD_SHARED_LIBS   //控制默认的库编译方式。
+                    //如果未进行设置,使用ADD_LIBRARY时又没有指定库类型,
+                    //默认编译生成的库都是静态库（可在t3中稍加修改进行验证）
+CMAKE_C_FLAGS       //设置C  编译选项
+CMAKE_CXX_FLAGS     //设置C++编译选项
+
+
+
+/*******************************************************************************
+        => include_directories()
+*******************************************************************************/
+INCLUDE_DIRECTORIES([AFTER][BEFORE][SYSTEM] dir1 dir2 ...)
+# 将给指定的路径添加到编译器搜索include文件(.h)的路径列表中
+# [AFTER][BEFORE]选项 ->选择[追加][加在前端]操作
+# 缺省情况下，该路径会附加在前面路径列表的后面
+# 通过设置 CMAKE_include_directories_BEFORE变量为 ON
+# SYSTEM选项，编译器将会认为该路径是某种平台上的系统包含路径
+
+
+
+/*******************************************************************************
+        => aux_source_directory()
+*******************************************************************************/
+//将指定directory目录下的所有源文件保存到VAR变量中
+AUX_SOURCE_DIRECTORY(directory VAR) 
+
+//将当前目录下的源文件全部保存到变量DIR_SRCS
+AUX_SOURCE_DIRECTORY(. DIR_SRCS) 
+
+//选择指定目录下的源文件保存到变量 
+AUX_SOURCE_DIRECTORY(./hello/src HELLO_LIB_CPP)
+AUX_SOURCE_DIRECTORY(./sqrt/src  SQRT_LIB_CPP)
+
+
+
+/*******************************************************************************
+        => add_subdirectory()
+*******************************************************************************/
+ADD_SUBDIRECTORY(source_dir [binary_dir][EXCLUDE_FROM_ALL])
+
+  
+// 例如： 那么src目录的构建过程产生的中间文件和输出文件都会出现在 build/bin
+ADD_SUBDIRCTORY(src bin)
+
+//那么src目录的构建过程产生的中间文件和输出文件都会出现在 build/src
+ADD_SUBDIRTORY(src)
+
+
+
+/*******************************************************************************
+        => set()
+*******************************************************************************/
+SET(VALUE [VALUE][CACHE TYPE DOCSTRING [FORCE]])
+
+
+//把库文件保存到LIBRARIES变量中 
+SET(LIBRARIES /usr/lib/x86-linux-gun/libm.so) 
+ 
+//把3个文 件保存到ALL_CORE_LIST变量中
+SET(ALL_CODE_LIST demo.cpp sqrt.cpp sqrt.h)     
+
+
+SET(<variable> <value> [[CACHE <type> <docstring> [FORCE]]| PARENT_SCOPE])
+//将变量<variable>的值设置为<value>
+//如果有CACHE选项，那么<variable>就会添加到CACHE中，这时<type>，<docstring>是必需的。
+//<type>被CMake GUI用来选择一个窗口，让用户设置。
+//如果指定了PARENT_SCOPE选项，变量<variable>将会被设置为当前作用域之上的作用域中。
+//每一个新的路径或者函数都可以创建一个新的作用域，该命令可以把一个变量的值设置到
+//父路径或者调用函数中（或者任何类似的可用情形中）
+
+
+
+/*******************************************************************************
+        => message()
+*******************************************************************************/
+MESSAGE([SEND_ERROR | STATUS | FATAL_ERROR] "message")
+
+
+//print the value of variable
+SEND_ERROR                      //产生错误，生成过程被跳过
+STATUS                          //输出前缀为一的信息
+FATAL_ERROR                     //立即终止所有的cmake过程
+MESSAGE(${ALL_CODE_LIST})
+
+
+
+/*******************************************************************************
+        => list()
+*******************************************************************************/
+LIST(APPEND <list> <element> [<element>...])
+LIST(LENGTH <list> <output variable>)
+LIST(GET <list> <element index> [<element index>...] <output variable>)
+LIST(FIND <list> <value> <outputvariable>)
+LIST(INSERT <list> <element_index> <element> [<element>...])
+LIST(REMOVE_ITEM <list> <value> [<value>...])
+
+
+
+/*******************************************************************************
+        => add_library()
+*******************************************************************************/
+//生成动态库或静态库
+ADD_LIBRARY(libname [SHARED | STATIC | MODULE] [EXCLUDE_FROM_ALL] SRC_LIST)
+SHARED                  //动态库
+STATIC                  //静态库
+MODULE                  //在使用dyld的系统有效,若不支持dyld,等同于SHARED
+EXCLUDE_FROM_ALL        //表示该库不会被默认构建
+
+
+
+/*******************************************************************************
+        => link_directories()
+*******************************************************************************/
+//添加非标准的共享库搜索路径
+LINK_DIRECTORIES(dir1 dir2 …)
+
+
+
+/*******************************************************************************
+        => find_file()
+*******************************************************************************/
+//VAR变量代表找到的文件全路径,包含文件名
+FIND_FILE(<VAR> name path1 path2 …)
+
+//VAR变量代表找到的库全路径,包含库文件名
+FIND_LIBRARY(<VAR> name path1 path2 …)
+
+//VAR变量代表包含这个文件的路径
+FIND_PATH(<VAR> name path1 path2 …)
+
+//VAR变量代表包含这个程序的全路径
+FIND_PROGRAM(<VAR> name path1 path2 …)
+
+
+FIND_PACKAGE(<name> [major.minor] [QUIET] 
+        [NO_MODULE] [[REQUIRED | COMPONENTS] [componets …]])
+//用来调用预定义在CMAKE_MODULE_PATH下的Find<name>.cmake模块,你也可以自己定义Find<name>
+//模块,通过SET(CMAKE_MODULE_PATH dir)将其放入工程的某个目录供工程使用
+
+
+
+/*******************************************************************************
+        => add_executable()
+*******************************************************************************/
 //添加可执行文件
-ADD_EXECUTABLE(sqrtDemoA ${ALL_CODE_LIST})
+ADD_EXECUTABLE(sqrtDemoA ${ALL_CODE_LIST})    
 
+
+
+/*******************************************************************************
+        => target_link_libraries()
+*******************************************************************************/
 //添加可执行文件所需要的库
-TARGET_LINK_LIBRARIES(sqrtDemoA ${LIBRARIES})
-
-//设置输出文件路径
-//CMAKE == DemoA == PROJECT
-SET(EXECUTABLE_OUTPUT_PATH "{CMAKE_BINARY_DIR}/bin")
-
-=============================
-1 此例程使用外部构建方法：
-2 mkdir build
-3 cd build
-4 cmake ..
-5 make
-=============================
+TARGET_LINK_LIBRARIES(sqrtDemoA ${LIBRARIES}) 
 
 
 
 /*******************************************************************************
-                  这个工程有子目录，但是只有一个 CMakeLists.txt 
+        => CMAKE外部构建方式(out-of-source build)
 *******************************************************************************/
-//本一程全部文件： tree指令查看目录树
-b/CMakeLists.txt
-b/src/sqrt.cpp
-b/src/demo.cpp
-b/include/sqrt.h
-=============================
-//cmake version
-cmake_minimum_required(VERSION 2.6)
-
-IF(WIN32)
-	MESSAGE(FATAL_ERROR "windows is error!")
-ELSEIF(UNIX)
-	MESSAGE(STATUS"This is Linux.")
-ENDIF(WIN32)
-
-PROJECT(demoB)
-
-INCLUDE_DIRCTORIES(./include)
-
-AUX_SOURCE_DIRCTORY(./src CPP_FILES)
-MESSAGE(STATUS"CPP_FILES" $(CPP_FILES)}
-MESSAGE(STATUS"binary_dir" $(PROJECT_BINARY_DIR)}
-MESSAGE(STATUS"source_dir" $(PROJECT_SOURCE_DIR)}
-SET(LIBRARIES /usr/lib/x86-linux-gnu/libm.so)
-ADD_EXECUTABLE(sqrtDemoB ${CPP_FILES})
-TARGET_LINK_LIBRARIES(sqrtDemoB m)
-SET(EXECUTABLE_OUTPUT_PATH"${CMAKE_BINARY_DIR}/bin")
-
-
-
-/*******************************************************************************
-                              多级目录CMake
-*******************************************************************************/
-//多目录构建===标准工程	tree查看目录树
-//每个目录都有一个CMakeLists.txt
-//本次工程的全部文件：
-2/CMakeLists.txt
-2/core/sqrt.cpp
-2/core/sqrt.h
-2/core/CMakeLists.txt
-2/example/demo.cpp
-2/example/CMakeLists.txt
-=============================
-
-
-2/CMakeLists.txt
-//=============================
-//cmake version
-cmake_minimum_required(VERSION 2.8)
-PROJECT(demoB)
-
-SET(CPP_LIST ${})
-MESSAGE(STATUS "initial_cpplist=" ${CPP_LIST})
-
-ADD_SUBDIRECTORY(./core)
-MESSAGE(STATUS "cpplsit_after_core=${CPP_LIST}")
-ADD_SUBDIRECTORY(./example)
-MESSAGE(STATUS "EXT_LIB_main" ${EXT_LIB})
-MESSAGE(STATUS "CMAKE_BINARY_DIR=" ${CMAKE_BINARY_DIR})
-MESSAGE(STATUS "PROJECT_BINARY_DIR=" ${PROJECT_BINARY_DIR})
-MESSAGE(STATUS "PROJECT_SOURCE_DIR=" ${PROJECT_SOURCE_DIR})
-
-//主要通过MESSAGE去跟踪CPP_LIST和EXT_LIB两个变量，进而理解整个构建过程。
-
-
-2/core/CMakeLists.txt
-//============================= 
-INCLUDE_DIRECTORIES(.)
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/core CORE_CPP_LIST)
-LIST(APPEND CPP_LIST ${CPP_LIST} ${CORE_CPP_LIST})
-MESSAGE(STATUS "cpplist_core=${CPP_LIST}")
-SET(CPP_LIST ${CPP_LIST} PARENT_SCOPE)
-SET(EXT_LIB /usr/lib/x86_64-linux-gnu/libm.so)
-SET(EXT_LIB ${EXT_LIB} PARENT_SCOPE)
-MESSAGE(STATUS "EXT_LIB_cor=" ${EXT_LIB})
-
-
-2/example/CMakeLists.txt
-//=============================
-AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/example EXAM_CPP_LIST)
-MESSAGE(STATUS "EXAM_CPP_LIST=${EXAM_CPP_LIST}")
-MESSAGE(STATUS "before exam cpp_list=${EXAM_CPP_LIST}")
-LIST(APPEND CPP_LIST $(CPP_LIST} ${EXAM_CPP_LIST})
-MESSAGE(STATUS "cpplist_example=${CPP_LIST}")
-ADD_EXECUTABLE(sqrtDemoC ${CPP_LIST})
-SET(EXECUTABLE_OUTPUT_PATH"${CMAKE_BINARY_DIR}/bin")
-MESSAGE(STATUS "EXT_LIB_example="${EXT_LIB})
-TARGET_LINK_LIBRARBIES(sqrtDemoC ${EXT_LIB})
-
-
-//============================= 
-2/ mkdir build
-cd build
-cmake ..
-make
-//============================= 
+//就是在外部任意位置建立编译目录, 需要注意的是，外部构建时：
+//projectname_SOURCE_DIR 变量依然指的是工程目录 
+//projectname_BINARY_DIR 变量则是代码编译目录
+1 mkdir build
+2 cd build
+3 cmake ..
+4 make
