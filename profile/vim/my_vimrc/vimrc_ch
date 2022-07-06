@@ -1,9 +1,9 @@
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""//___________________________________________________________________________
 " => 安装vim-plug插件管理器                  
 " Download plug.vim and put it in ~/.vim/autoload
 " curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+"""//___________________________________________________________________________
 " plug-in 插件配置
 call plug#begin('~/.vim/plugged')                   
 Plug 'scrooloose/nerdtree'
@@ -137,7 +137,6 @@ cnoremap <C-e> <End>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 inoremap jk <esc> " 映射插入模式下的 jk 键为 ESC 键
 inoremap vv <esc> " 映射插入模式下的 vv 键为 ESC 键
-
 
 
 

@@ -10,27 +10,28 @@ time dd if=ubuntu-20.04.1-desktop-amd64.iso of=/dev/sdd bs=2M status=progress of
 /*******************************************************************************
         => dd命令描述
 *******************************************************************************/
-dd [bs=<字节数>][cbs=<字节数>][conv=<关键字>][count=<区块数>]   \
+dd [bs=<字节数>][cbs=<字节数>][conv=<关键字>][count=<区块数>]    \
    [ibs=<字节数>][if=<文件>][obs=<字节数>][of=<文件>]           \
    [seek=<区块数>][skip=<区块数>][--help][--version]
-//测试方式：使用dd指令，对磁盘进行连续写入，不使用内存缓冲区，
-//每次写入8k的数据，总共写入20万次，产生1.6G大小的文件。
-//测试指令: dd if=/dev/zero of=/data01/test.dbf bs=8k count=200000 conv=fdatasync
+// 测试方式：使用dd指令，对磁盘进行连续写入，不使用内存缓冲区，
+// 每次写入8k的数据，总共写入20万次，产生1.6G大小的文件。
+// 测试指令: 
+        dd if=/dev/zero of=/data01/test.dbf bs=8k count=200000 conv=fdatasync
 
 
 
 /*******************************************************************************
         => dd常用选项说明
 *******************************************************************************/
-if=FILE         //从FILE中读取数据，而不是默认的标准输入。
-of=FILE         //往FILE中写入数据，而不是默认的标准输出。
-ibs=BYTES       //读取数据时，一次性读出BYTES大小的块，如果不指定，默认512字节。
-obs=BYTES       //写入数据时，一次性写入BYTES大小的块，如果不指定，默认512字节。
-bs=BYTES        //统一ibs和obs的值（如果指定了ibs或者obs，则bs会将ibs和obs覆盖掉）。
-skip=N          //跳过N*ibs字节数再开始读取数据。
-seek=N          //跳过N*obs字节数再开始写入数据。
-count=N         //总共读取N*ibs字节数的数据，当然写入的数据也是这个大小。
-status=LEVEL    //LEVEL用来控制dd程序的输出信息的。
+if=FILE         // 从FILE中读取数据，而不是默认的标准输入。
+of=FILE         // 往FILE中写入数据，而不是默认的标准输出。
+ibs=BYTES       // 读取数据时，一次性读出BYTES大小的块，如果不指定，默认512字节。
+obs=BYTES       // 写入数据时，一次性写入BYTES大小的块，如果不指定，默认512字节。
+bs=BYTES        // 统一ibs和obs的值（如果指定了ibs或者obs，则bs会将ibs和obs覆盖掉）
+skip=N          // 跳过N*ibs字节数再开始读取数据。
+seek=N          // 跳过N*obs字节数再开始写入数据。
+count=N         // 总共读取N*ibs字节数的数据，当然写入的数据也是这个大小。
+status=LEVEL    // LEVEL用来控制dd程序的输出信息的。
 	分别有三个，“none”，“noxfer”和“progress”，
 	1 “progress”    输出所有信息
 	2 “none”        的意思是不输出任何相关信息，除非出错信息。
@@ -38,105 +39,113 @@ status=LEVEL    //LEVEL用来控制dd程序的输出信息的。
    
 	
 // 补充：在上面所有选项的BYTES和N中，
-我们都可以使用特殊的字符来表示数据大小，
-常用的有b=512，K=1024，M=1024*1024，G=1024*1024*1024。
+        我们都可以使用特殊的字符来表示数据大小，
+        常用的有b=512，K=1024，M=1024*1024，G=1024*1024*1024。
 
 
-% iflag=FLAG[,FLAG]...
-使用iflag来控制读取数据时的行为特征。
-常用的iflags有“count_bytes”，
-当指定了“count_bytes”后，count=N表示的不再是读取N*ibs大小的数据了，
-而只是代表N字节的数据。
-指定“skip_bytes”后，
-skip=N后表示的是跳过的字节数不再是N*ibs大小的数据了，而只是代表跳过N字节的数据。
+// iflag=FLAG[,FLAG]...
+        使用iflag来控制读取数据时的行为特征。
+        常用的iflags有“count_bytes”，
+        当指定了“count_bytes”后，count=N表示的不再是读取N*ibs大小的数据了，
+        而只是代表N字节的数据。
+        指定“skip_bytes”后，
+        skip=N后表示的是跳过的字节数不再是N*ibs大小的数据了，而只是代表跳过N字节的数据。
 
 
-% oflag=FLAG[,FLAG]...
-使用oflag来控制写入数据时的行为特征。
-“append”以追加方式写入数据，一般配合conv=notrunc来使用。
-“seek_bytes”的意识和“skip_bytes”一样。
+// oflag=FLAG[,FLAG]...
+        使用oflag来控制写入数据时的行为特征。
+        “append”以追加方式写入数据，一般配合conv=notrunc来使用。
+        “seek_bytes”的意识和“skip_bytes”一样。
 
 
-% conv=CONVERSION[,CONVERSION]...
-conv,用来在将数据写入文件时的转换规则。一下列出常用的：
-lcase       用来将大写字母转换成小写字母。
-ucase       用来将小写字母转换成大写字母。
-notrunc     如果目的文件已经存在，那么不要截断文件内容。默认是会截断成0字节大小的。
-            一般配合oflag=append使用，不截断并且以追加方式写入数据。
-noerror     尽管发生错误，也不要停止整个拷贝过程。
+// conv=CONVERSION[,CONVERSION]...
+        // conv,用来在将数据写入文件时的转换规则。一下列出常用的：
+        lcase       // 用来将大写字母转换成小写字母。
+        ucase       // 用来将小写字母转换成大写字母。
+        notrunc     // 如果目的文件已经存在，那么不要截断文件内容。默认是会截断成0字节大小的。
+                    // 一般配合oflag=append使用，不截断并且以追加方式写入数据。
+        noerror     // 尽管发生错误，也不要停止整个拷贝过程。
 
 
 
 /*******************************************************************************
         => dd 数据备份
 *******************************************************************************/
-1 备份整个磁盘到磁盘; 将sdx整盘备份到sdy中去
-% dd if=/dev/sdx  of=/dev/dev/sdy
+1 // 备份整个磁盘到磁盘; 将sdx整盘备份到sdy中去
+        dd if=/dev/sdx  of=/dev/dev/sdy
 
-2 备份整盘到目录; 将sdx整盘被分到目录中去
-% dd if=/dev/sdx  of=/PATH/back
 
-3 整盘备份并压缩; 整盘压缩后备份到制动路径
-% dd if=/dev/sdx  | gzip > /path/back.gz
+2 // 备份整盘到目录; 将sdx整盘被分到目录中去
+        dd if=/dev/sdx  of=/PATH/back
+
+
+3 // 整盘备份并压缩; 整盘压缩后备份到制动路径
+        dd if=/dev/sdx  | gzip > /path/back.gz
 
 
 
 /*******************************************************************************
         => dd 数据恢复
 *******************************************************************************/
-1 整盘恢复
-% dd if=/dev/sdy of=/dev/md0    #磁盘到磁盘
-% dd if=/PATH/dir of=/dev/md0   #目录到磁盘
+1 // 整盘恢复
+        dd if=/dev/sdy of=/dev/md0    // 磁盘到磁盘
+        dd if=/PATH/dir of=/dev/md0   // 目录到磁盘
 
-2 整盘的压缩文件恢复; 将文件解压缩到标准输出，通过管道用dd输出到磁盘
-  #-d解压；-c解压缩到标准输出
-% gzip -dc /path/back.gz | dd of=/dev/md0
+
+2 // 整盘的压缩文件恢复; 将文件解压缩到标准输出，通过管道用dd输出到磁盘
+  // -d解压； -c解压缩到标准输出
+        gzip -dc /path/back.gz | dd of=/dev/md0
 
 
 
 /*******************************************************************************
         => dd测试
 *******************************************************************************/
-1 得到最恰当的block size; 通过执行时间确定系统的最佳block size
-% dd if=/dev/zero bs=1024 count=1000000 of=/G.file
-% dd if=/dev/zero bs=2048 count=500000 of=/G.file
-% dd if=/dev/zero bs=4096 count=250000 of=/G.file
+1 // 得到最恰当的block size; 通过执行时间确定系统的最佳block size
+        dd if=/dev/zero bs=1024 count=1000000 of=/G.file
+        dd if=/dev/zero bs=2048 count=500000 of=/G.file
+        dd if=/dev/zero bs=4096 count=250000 of=/G.file
 
-2 测试读写速度  
-% dd if=/dev/zero of=/1G.file bs=1024 count=1000000   #测试读  
-% dd if=/1G.file bs=64k | dd of=/dev/null             #测试写
 
-3 将文件中所有小写字母转换成大写字母，并输出到标准输出
-% dd if=file.txt status=none conv=ucase
+2 // 测试读写速度  
+        dd if=/dev/zero of=/1G.file bs=1024 count=1000000   #测试读  
+        dd if=/1G.file bs=64k | dd of=/dev/null             #测试写
+
+
+3 // 将文件中所有小写字母转换成大写字母，并输出到标准输出
+        dd if=file.txt status=none conv=ucase
 
 
 
 /*******************************************************************************
         => MBR表的备份与恢复
 *******************************************************************************/
-dd if=/dev/sdx of=sdxmbr.bak bs=512 count=1
-dd if=sdxmbr.bak of=/dev/sdx bs=512 count=1
+        dd if=/dev/sdx of=sdxmbr.bak bs=512 count=1
+        dd if=sdxmbr.bak of=/dev/sdx bs=512 count=1
 
 
 
 /*******************************************************************************
         => dd 其他功能
 *******************************************************************************/
-1 修复硬盘
-当硬盘长时间未使用，磁盘会产生消磁点。
-当磁头读到这些区域时会遇到困难，容易产生I/O错误。
-如果这些情况发生到第一个扇区时，可能会导致报废。
-所以使用磁盘修复功能，这个过程安全高效
-% dd if=/dev/sda  of=/dev/sda
+1 // 修复硬盘
+        当硬盘长时间未使用，磁盘会产生消磁点。
+        当磁头读到这些区域时会遇到困难，容易产生I/O错误。
+        如果这些情况发生到第一个扇区时，可能会导致报废。
+        所以使用磁盘修复功能，这个过程安全高效
+        dd if=/dev/sda  of=/dev/sda
 
-2 复制内存中的数据
-% dd if=/dev/mem  of=/root/mem.bin bs=1024
 
-3 生成镜像
-% dd if=/dev/cdrom of=/root/cdrom.iso
+2 // 复制内存中的数据
+        dd if=/dev/mem  of=/root/mem.bin bs=1024
 
-4 销毁磁盘数据; 利用随机数填充数据，
-% dd if=/dev/urandom  of=/dev/sda1
+
+3 // 生成镜像
+        dd if=/dev/cdrom of=/root/cdrom.iso
+
+
+4 // 销毁磁盘数据; 利用随机数填充数据，
+        dd if=/dev/urandom  of=/dev/sda1
 
 
 

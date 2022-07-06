@@ -1,9 +1,9 @@
 /*******************************************************************************
         => fdisk
 *******************************************************************************/
-% fdisk 删除分区
+// fdisk 删除分区
 root@localhost:~# fdisk /dev/sda
-%   command
+//   command
 a   toggle a bootable flag                   //设置引导扇区
 b   edit bsd disklabel                       //编辑卷标（linux下使用的卷标bsd通用）
 c   toggle the dos compatibility flag
