@@ -1,0 +1,117 @@
+//______________________________________________________________________________
+//      platformIO
+//______________________________________________________________________________
+Project Wizard
+        Name:           superBlink
+        Board:          HiFive1 (SiFive)
+        Framework:      Freedom E SDK
+
+
+
+//______________________________________________________________________________
+//      src  
+//______________________________________________________________________________
+src     ////////////////////////////////////////////////////////////////////////
+                                superBlink.c
+        ////////////////////////////////////////////////////////////////////////
+                #include <stdio.h>
+                #include "superBlink.h"
+                
+                int main(void)
+                {
+                        int error = 0;
+                        int ledNum = 0;
+                        int colors[NUM_LEDS] = {GREEN_LED, RED_LED, BLUE_LED);
+                        
+                        setupGPIO();
+                        
+                        while (error) {
+                                setLED(colors[ledNum], ON);
+                                error = setLED(colors[ledNum], OFF);
+                                delay(DELAY);
+                                if (ledNum == NUM_LEDS) {
+                                        ledNum = 0;
+                                }
+                        }
+                }
+        ////////////////////////////////////////////////////////////////////////
+                                superBlink.h
+        ////////////////////////////////////////////////////////////////////////
+                #define ON              0x01
+                #define OFF             0x00
+                #define NUM_LEDS        0x03    // 记录有多少个LED灯
+                #define RED_LED         0x40000
+                #define BLUE_LED        0x20000
+                #define GREEN_LED       0x80000
+                void setupGPIO();
+                int setLED(int color, int state);
+                void delay(int milliseconds);
+                
+                
+        ////////////////////////////////////////////////////////////////////////
+                                setupGPIO.S
+        ////////////////////////////////////////////////////////////////////////
+        .section        .text
+        .align          2
+        .globl          setuGPIO
+        
+        #inclue "memory_map_map.inc"
+        #inclue "gpio.inc"
+        
+        setupGPIO:
+                addi    sp, sp, -16             // Allocate the stack frame
+                sw      ra, 12(sp)              // Save the return address onto the stack
+                
+                li      t0, GPIO_CTRL_ADDR      // Load the base GPIO address
+                li      t1, GPIO_RGB_PINS       // Get the RGB Pins offset
+                sw      t1, GPIO_OUTPUT_EN(t0)  // Enable output on the RGB so they are writable
+                sw      t1, GPIO_OUTPUT_XOR(t0) // Set the XOR so the RGB Pins are Activ High
+                sw      x0, GPIO_OUTPUT_VAL(t0) // Set all the writeable pins to 0 to clear the LEDs
+                
+                lw      ra, 12(sp)              // Restore the return address
+                addi    sp, sp, 16              // Deallocating the stack frame
+                ret
+        ////////////////////////////////////////////////////////////////////////
+                                setLED.S
+        ////////////////////////////////////////////////////////////////////////        
+        .section        .text
+        .align          2
+        .globl          setLED
+        
+        #inclue "memory_map_map.inc"
+        #inclue "gpio.inc"
+        
+        .equ            NOERROR,        0x0
+        .equ            ERROR,          0x1
+        .equ            LEDON,          0x1
+        
+        // which LED to set comes into register         a0
+        // Desired On/Off state comes into register     a1
+        
+        setLED:     
+                addi    sp, sp, -16             // Allocate the stack frame
+                sw      ra, 12(sp)              // Save our return address onto the stack
+                
+                li      t0, GPIO_CTRL_ADDR      // Load the GPIO Address
+                lw      t1, GPIO_OUTPUT_VAL(t0) // Get the current value ov the pins
+        ////////////////////////////////////////////////////////////////////////
+                                gpio.inc
+        ////////////////////////////////////////////////////////////////////////
+        .equ    GPIO_OUTPUT_EN,         0x008
+        .equ    GPIO_OUTPUT_VAL,        0x00C
+        .equ    GPIO_OUTPUT_XOR,        0x040
+        
+        .equ    GPIO_RGB_PINS,          0x680000
+        .equ    GPIO_RED_LED,           0x400000
+        .equ    GPIO_BLUE_LED,          0x200000
+        .equ    GPIO_GREEN_LED,         0x080000
+        ////////////////////////////////////////////////////////////////////////
+                                memory_map.inc
+        ////////////////////////////////////////////////////////////////////////
+        .equ    GPIO_CTRL_ADDR, 0x10012000
+                
+                
+                
+//______________________________________________________________________________
+//      
+//______________________________________________________________________________
