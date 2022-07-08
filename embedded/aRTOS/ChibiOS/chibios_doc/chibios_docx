@@ -42,64 +42,64 @@
 /*******************************************************************************
         => chibios
 *******************************************************************************/
-kernel                          //OS kernel中與平台無關的部份
-port layer                      //OS kernel中與結構/編譯器 相關的部份
-platform layer                  //包含許多device drivers的實作
-various                         //提供各種額外但不包含在特定組件的工具的函式庫
-HAL(hardware abstraction layer) //包含許多抽象的device drivers，
-                                //提供普遍的I/O API給不同平台的應用程式
+kernel                          // OS kernel中與平台無關的部份
+port layer                      // OS kernel中與結構/編譯器 相關的部份
+platform layer                  // 包含許多device drivers的實作
+various                         // 提供各種額外但不包含在特定組件的工具的函式庫
+HAL(hardware abstraction layer) // 包含許多抽象的device drivers，
+                                // 提供普遍的I/O API給不同平台的應用程式
 
 
         => 系统状态(System States)
 //_____________________________________________________________
-//Init
+// Init
         1 ChibiOS/RT進行OS初始化之前的狀態， 進行所謂的物理重置
           (physical reset)時也會進到這個狀態
         2 呼叫chSysInit()這個函式進行初始化
         3 在這個狀態裡所有可以發出Maskable Interrupt的sources全部失效
         4 初始化完後進到 Normal
-//Normal
+// Normal
         1 初始化完後到達的狀態
         2 在這裡可以執行Thread, 接收並處理任何中斷及呼叫任何system API
-//Suspended
+// Suspended
         1 在這個狀態裡，無法接收正常中斷(IRQ)，但是可以接收快速中斷(FIQ)
         2 除了可以呼叫chSysDisable()到達Disable狀態，以及chSysEnable()
           到達Normal狀態之外，其他所有system API都不能呼叫
-//Disabled
+// Disabled
         1 所有可遮罩式中斷資源全部失效，系統僅能處理不可遮罩式中斷(NMI)
         2 除了可以呼叫chSysEnable()到達Normal狀態，以及chSysSuspend()
           到達Suspended狀態之外，其他所有system API都不能呼叫
-//Sleep
+// Sleep
         1 當系統中沒有其他的Thread要跑時，此時系統會執行一個 idle thread，到達這個狀態
         2 此時系統將處於 low power mode，並等待一個中斷跳出這個狀態
         3 接收到一個IRQ時，將會跑到 SRI 狀態去處理中斷，處理完後會回到 Normal
-//S-Locked
+// S-Locked
         1 在 Normal 的狀態中呼叫 chSysLock() 之後會進入此狀態
         2 此時系統會進入 Kernel locked 的狀態
         3 此時處理器會跑在 thread-privileged mode
         4 在這個狀態裡，無法接收正常中斷(IRQ)，但是可以接收快速中斷(FIQ)
         5 在這個狀態裡可以使用 S class 和 I class 的 API
         6 呼叫 chSysUnlock() 會回到 Normal 狀態
-//I-Locked
+// I-Locked
         1 在 SRI 的狀態中呼叫 chSysLockFromIsr() 之後會進入這個狀態
         2 此時系統會進入 Kernel locked 的狀態
         3 此時處理器會跑在 exception-privileged mode
         4 在這個狀態裡，無法接收正常中斷(IRQ)，但是可以接收快速中斷(FIQ)
         5 在這個狀態裡可以使用 I class 的 API
         6 呼叫 chSysUnlockFromIsr() 會回到 SRI 狀態
-//Serving Regular Interuupt(SRI)
+// Serving Regular Interuupt(SRI)
         1 處理一個正常中斷 ( IRQ ) 時，會進入這個狀態
         2 此時只有更高等級的中斷能夠進行搶佔
         3 此時處理器會跑在 exception-privileged mode
         4 此時無法呼叫大部分的 system API，
           除非先呼叫 chSysLockFromIsr() 進入 I-Locked state，
           之後才能夠進行其他 API 的呼叫
-//Serving Fast Interrupt(SFI)
+// Serving Fast Interrupt(SFI)
         1 處理一個快速中斷 ( FIQ ) 時會進入這個狀態
         2 無法呼叫所有 system API
         3 除了 Init , Halted , SNMI , Disabled 之外的任一狀態，
           只要接收到 FIQ 就會跳到這個狀態，處理完後會回到上一狀態
-//Serving Non-Maskable Interrupt(SNNI)
+// Serving Non-Maskable Interrupt(SNNI)
         1 處裡一個不可遮罩式的中斷時 (NMI) 會進入這個狀態
         2 無法呼叫所有 system API
         3 除了 Halted 的任一狀態裡只要接收到 NMI，
@@ -113,19 +113,19 @@ HAL(hardware abstraction layer) //包含許多抽象的device drivers，
 
         => Chibi OS/RT 的中斷類別 
 //_____________________________________________________________
-//正常中斷 ( Regular Interrupts ):
+// 正常中斷 ( Regular Interrupts ):
         1 可遮罩式的中斷
         2 在 GCC Ports / ARM Cortex-Mx / ARMv7-M 的移植版本中，
           優先度等級較低的中斷將被視為正常中斷
         3 無法搶佔部分的 kernel code
         4 在此類的 interrupt handler 裡面可以呼叫 operating system APIs。
-//快速中斷 ( Fast Interrupts ):
+// 快速中斷 ( Fast Interrupts ):
         1 可遮罩式的中斷
         2 在 GCC Ports / ARM Cortex-Mx / ARMv7-M 的移植版本中，
           優先度等級較高的中斷將被視為快速中斷
         3 可以搶佔 kernel code ，也因此有較短的延遲 ( lantency ) 。
         4 在此類的 interrupt handler 裡面無法呼叫任何一個 operating system API 
-//不可遮罩式中斷 ( Non Maskable Interrupts, NMI):
+// 不可遮罩式中斷 ( Non Maskable Interrupts, NMI):
         1 不受OS控制的中斷，擁有最短的延遲 ( lowest latency )
 
 
@@ -143,15 +143,15 @@ HAL(hardware abstraction layer) //包含許多抽象的device drivers，
 
         => 執行緒(Thread)狀態
 //_____________________________________________________________
-        Start           //初始的狀態
-        Suspended       //Thread剛被create出來時的狀態,尚未決定要被放
-                        //進ReadyList等待執行或是直接執行
-        Running         //正在執行中的狀態
-        Stop            //終止的狀態,到達這個狀態表示Thread被執行完了
-        Sleeping        //Thread暫時不進行工作。此時Thread會被暫時移出
-                        //ReadyList。等待Mutex解鎖,等待其他Thread執行
-                        //完,或是等待接收訊息時都會進入這個狀態。
-        Ready           //被放進ReadyList, 等待被執行的狀態
+        Start           // 初始的狀態
+        Suspended       // Thread剛被create出來時的狀態,尚未決定要被放
+                        // 進ReadyList等待執行或是直接執行
+        Running         // 正在執行中的狀態
+        Stop            // 終止的狀態,到達這個狀態表示Thread被執行完了
+        Sleeping        // Thread暫時不進行工作。此時Thread會被暫時移出
+                        // ReadyList。等待Mutex解鎖,等待其他Thread執行
+                        // 完,或是等待接收訊息時都會進入這個狀態。
+        Ready           // 被放進ReadyList, 等待被執行的狀態
 
 
 

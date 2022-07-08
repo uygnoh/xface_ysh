@@ -32,10 +32,10 @@ BaseType_t xPortStartScheduler( void )
 
 // CM3中断屏幕寄存器
 //_____________________________________________________________
-MOV     R0, #1
-MSR     PRIMASK, R0     //关闭中断
-MOV     R0, #0
-MSR     PRIMASK, R0     //开中断
+        MOV     R0, #1
+        MSR     PRIMASK, R0     //关闭中断
+        MOV     R0, #0
+        MSR     PRIMASK, R0     //开中断
 
 
 

@@ -1,12 +1,12 @@
 /*******************************************************************************
         => FreeRTOS
 *******************************************************************************/
-Source          //源码文件
-portable        //与编译器相关文件
-MemMang         //内存管理相关文件
-Demo            //各种开发平台完整工程文件
-License         //许可文件
-FreeRTOS-Plus   //第三方产品
+        Source          // 源码文件
+        portable        // 与编译器相关文件
+        MemMang         // 内存管理相关文件
+        Demo            // 各种开发平台完整工程文件
+        License         // 许可文件
+        FreeRTOS-Plus   // 第三方产品
 
 
 
@@ -15,16 +15,16 @@ FreeRTOS-Plus   //第三方产品
 *******************************************************************************/
 // freertos
 //_____________________________________________________________
-FreeRTOSConfig.h        //FreeRTOS配置文件
-include/
-portable/
-list.c
-tasks.c
-queue.c
-timers.c
-croutine.c
-event_groups.c
-stream_buffer.c
+        FreeRTOSConfig.h        //FreeRTOS配置文件
+        include/
+        portable/
+        list.c
+        tasks.c
+        queue.c
+        timers.c
+        croutine.c
+        event_groups.c
+        stream_buffer.c
 
 
 // stm32f10x_it.c
@@ -56,10 +56,10 @@ void SysTick_Handler(void)
 /*******************************************************************************
         => vTaskDelayUntil()
 *******************************************************************************/
-xTimeIncrement          //任务周期时间
-pxPreviousWakeTime      //上一次唤醒的时间点
-xTimeToWake             //下一次唤醒的时间点
-xConstTickCount         //进入延时的时间点
+        xTimeIncrement          //任务周期时间
+        pxPreviousWakeTime      //上一次唤醒的时间点
+        xTimeToWake             //下一次唤醒的时间点
+        xConstTickCount         //进入延时的时间点
 
 
 
@@ -92,33 +92,37 @@ int _write(int file, char *ptr, int len)
 }
 
 
-//空闲任务内存分配
+//      空闲任务内存分配
 //_____________________________________________________________
 static StackType_t      IdleTaskStack[configMINIMAL_STACK_SIZE];
 static StaticTask_t     IdleTaskTCB;
-//定时器任务内存分配
+
+
+//      定时器任务内存分配
 //_____________________________________________________________
 static StackType_t      TimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 static StaticTask_t     TimerTaskTCB;
 
-//_____________________________________________________________
-//  任务__00__数据
+
+//      任务__00__数据
 //_____________________________________________________________
 #define TASK00_STACK_SIZE                       1024
 #define TASK00_PRIO                             3
 TaskHandle_t task00_handle = NULL;
 StackType_t task00_stack[TASK00_STACK_SIZE];
 StaticTask_t task00_tcb;
-//_____________________________________________________________
-//  任务__11__数据
+
+
+//      任务__11__数据
 //_____________________________________________________________
 #define TASK11_STACK_SIZE                       1024
 #define TASK11_PRIO                             3
 TaskHandle_t task11_handle = NULL;
 StackType_t task11_stack[TASK11_STACK_SIZE];
 StaticTask_t task11_tcb;
-//_____________________________________________________________
-//  任务__22__数据
+
+
+//      任务__22__数据
 //_____________________________________________________________
 #define TASK22_STACK_SIZE                       512
 #define TASK22_PRIO                             3
@@ -144,6 +148,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
         *pulIdleTaskStackSize   = configMINIMAL_STACK_SIZE;
 }
 
+
 //      => 定时器任务
 //_____________________________________________________________
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
@@ -154,6 +159,7 @@ void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer,
         *ppxTimerTaskStackBuffer = TimerTaskStack;
         *pulTimerTaskStackSize   = configTIMER_TASK_STACK_DEPTH;
 }
+
 
 //      => 任务 00
 //_____________________________________________________________
@@ -214,6 +220,7 @@ void task22(void *parameters)
         }
 }
 
+
 int main(void)
 {
         HAL_Init();
@@ -240,8 +247,5 @@ int main(void)
 
         }
 }
-
-
-
 
 

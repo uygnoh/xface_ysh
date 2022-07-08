@@ -197,9 +197,9 @@
         => 中断相关配置选项                                                 
 *******************************************************************************/
 #ifdef __NVIC_PRIO_BITS
-	#define configPRIO_BITS                         	__NVIC_PRIO_BITS
+	#define configPRIO_BITS                         __NVIC_PRIO_BITS
 #else
-	#define configPRIO_BITS                         	(4)
+	#define configPRIO_BITS                         (4)
 #endif
 //中断最低优先级
 #define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         (15)
@@ -207,11 +207,11 @@
 //系统可管理的最高中断优先级
 #define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    (5)
 
-#define configKERNEL_INTERRUPT_PRIORITY \
-( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
+#define configKERNEL_INTERRUPT_PRIORITY                 \
+        ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY \
-( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY            \
+        ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
 
 
