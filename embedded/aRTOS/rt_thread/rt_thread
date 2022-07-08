@@ -1,0 +1,51 @@
+//______________________________________________________________________________
+//      => RT-Thread 工程源码结构
+//______________________________________________________________________________
+        applications            // 用户应用代码
+        drivers                 // RT-Thread的驱动，不同平台底层驱动具体实现
+        kernel-sample           // 内核例程
+        Libraries               // STM32固件库
+        rt-thread               // RT-Thread 源码结构
+             |
+             |————src           // RT-Thread内核代码文件
+             |————include       // RT-Thread内核头文件
+             |————libcpu        // 各类芯片，内核移植代码，比如STM32
+             |————components    // RT-Thread外部组件代码，比如Finsh, Lwip
+
+
+
+
+//______________________________________________________________________________
+//      => RT-Thread 启动
+//______________________________________________________________________________
+int $Sub$$main(void)
+{
+        rt_hw_interupt_disable();
+        rtthread_startup();
+        return 0;
+}
+
+
+// RT-Thread 启动顺序
+        1       SystemInit()
+        2       $Sub$$main()
+        3       rtthread_startup()
+        4       rt_application_init()
+        5       main_thread_entry
+        6       $Super$$main()
+        7       main()
+
+
+
+//______________________________________________________________________________
+//      => RT-Thread 移植
+//______________________________________________________________________________
+libcpu          // ( CPU 架构移植 )
+                // libcpu 抽象层适配不同CPU架构
+实现
+        rt_hw_interrupt_enable/disable()
+        rt_hw_stack_init()
+        rt_hw_context_switch()
+        rt_tick_increase()
+                
+

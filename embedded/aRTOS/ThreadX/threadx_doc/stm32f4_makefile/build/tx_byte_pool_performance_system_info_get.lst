@@ -1,0 +1,294 @@
+ARM GAS  /tmp/ccPQX36y.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"tx_byte_pool_performance_system_info_get.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._tx_byte_pool_performance_system_info_get,"ax",%progbits
+  18              		.align	1
+  19              		.global	_tx_byte_pool_performance_system_info_get
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_tx_byte_pool_performance_system_info_get:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/tx_byte_pool_performance_system_info_get.c"
+   1:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+   2:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+   3:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+   5:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  10:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  11:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  12:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  13:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  14:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  15:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**                                                                       */
+  16:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**                                                                       */
+  18:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**   Byte Memory                                                         */
+  19:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**                                                                       */
+  20:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  21:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  22:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  23:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #define TX_SOURCE_CODE
+  24:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  25:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  26:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /* Include necessary system files.  */
+  27:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  28:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #include "tx_api.h"
+  29:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #include "tx_byte_pool.h"
+  30:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #ifdef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
+  31:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #include "tx_trace.h"
+ARM GAS  /tmp/ccPQX36y.s 			page 2
+
+
+  32:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #endif
+  33:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  34:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  35:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  36:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  FUNCTION                                               RELEASE        */
+  37:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  38:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    _tx_byte_pool_performance_system_info_get           PORTABLE C      */
+  39:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                           6.1          */
+  40:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  AUTHOR                                                                */
+  41:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  42:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  43:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  44:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  DESCRIPTION                                                           */
+  45:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  46:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    This function retrieves byte pool performance information.          */
+  47:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  48:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  INPUT                                                                 */
+  49:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  50:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    allocates                         Destination for total number of   */
+  51:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        allocates                       */
+  52:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    releases                          Destination for total number of   */
+  53:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        releases                        */
+  54:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    fragments_searched                Destination for total number of   */
+  55:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        fragments searched during       */
+  56:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        allocation                      */
+  57:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    merges                            Destination for total number of   */
+  58:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        adjacent free fragments merged  */
+  59:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    splits                            Destination for total number of   */
+  60:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        fragments split during          */
+  61:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        allocation                      */
+  62:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    suspensions                       Destination for total number of   */
+  63:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        suspensions                     */
+  64:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    timeouts                          Destination for total number of   */
+  65:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                        timeouts                        */
+  66:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  67:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  OUTPUT                                                                */
+  68:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  69:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    status                            Completion status                 */
+  70:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  71:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  CALLS                                                                 */
+  72:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  73:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    None                                                                */
+  74:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  75:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  CALLED BY                                                             */
+  76:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  77:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    Application Code                                                    */
+  78:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  79:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  RELEASE HISTORY                                                       */
+  80:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  81:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*    DATE              NAME                      DESCRIPTION             */
+  82:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  83:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  84:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+  85:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                            resulting in version 6.1    */
+  86:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /*                                                                        */
+  87:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** /**************************************************************************/
+  88:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** UINT  _tx_byte_pool_performance_system_info_get(ULONG *allocates, ULONG *releases,
+ARM GAS  /tmp/ccPQX36y.s 			page 3
+
+
+  89:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****                     ULONG *fragments_searched, ULONG *merges, ULONG *splits, ULONG *suspensions, UL
+  90:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** {
+  28              		.loc 1 90 0
+  29              		.cfi_startproc
+  30              		@ args = 12, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  91:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  92:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #ifdef TX_BYTE_POOL_ENABLE_PERFORMANCE_INFO
+  93:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  94:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** TX_INTERRUPT_SAVE_AREA
+  95:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  96:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+  97:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Disable interrupts.  */
+  98:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     TX_DISABLE
+  99:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 100:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* If trace is enabled, insert this event into the trace buffer.  */
+ 101:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     TX_TRACE_IN_LINE_INSERT(TX_TRACE_BYTE_POOL__PERFORMANCE_SYSTEM_INFO_GET, 0, 0, 0, 0, TX_TRACE_B
+ 102:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 103:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Log this kernel call.  */
+ 104:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     TX_EL_BYTE_POOL_PERFORMANCE_SYSTEM_INFO_GET_INSERT
+ 105:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 106:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve all the pertinent information and return it in the supplied
+ 107:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****        destinations.  */
+ 108:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 109:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool allocates.  */
+ 110:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (allocates != TX_NULL)
+ 111:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 112:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 113:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *allocates =  _tx_byte_pool_performance_allocate_count;
+ 114:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 115:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 116:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool releases.  */
+ 117:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (releases != TX_NULL)
+ 118:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 119:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 120:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *releases =  _tx_byte_pool_performance_release_count;
+ 121:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 122:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 123:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool fragments searched.  */
+ 124:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (fragments_searched != TX_NULL)
+ 125:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 126:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 127:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *fragments_searched =  _tx_byte_pool_performance_search_count;
+ 128:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 129:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 130:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool fragments merged.  */
+ 131:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (merges != TX_NULL)
+ 132:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 133:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 134:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *merges =  _tx_byte_pool_performance_merge_count;
+ 135:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 136:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 137:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool fragment splits.  */
+ 138:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (splits != TX_NULL)
+ 139:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ARM GAS  /tmp/ccPQX36y.s 			page 4
+
+
+ 140:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 141:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *splits =  _tx_byte_pool_performance_split_count;
+ 142:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 143:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 144:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool suspensions.  */
+ 145:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (suspensions != TX_NULL)
+ 146:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 147:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 148:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *suspensions =  _tx_byte_pool_performance_suspension_count;
+ 149:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 150:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 151:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Retrieve the total number of byte pool timeouts.  */
+ 152:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (timeouts != TX_NULL)
+ 153:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 154:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 155:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         *timeouts =  _tx_byte_pool_performance_timeout_count;
+ 156:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 157:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 158:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Restore interrupts.  */
+ 159:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     TX_RESTORE
+ 160:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 161:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Return completion status.  */
+ 162:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     return(TX_SUCCESS);
+ 163:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 164:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #else
+ 165:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 166:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** UINT        status;
+ 167:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 168:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 169:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Access input arguments just for the sake of lint, MISRA, etc.  */
+ 170:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     if (allocates != TX_NULL)
+ 171:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 172:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 173:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 174:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 175:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 176:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (releases != TX_NULL)
+ 177:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 178:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 179:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 180:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 181:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 182:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (fragments_searched != TX_NULL)
+ 183:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 184:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 185:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 186:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 187:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 188:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (merges != TX_NULL)
+ 189:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 190:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 191:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 192:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 193:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 194:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (splits != TX_NULL)
+ 195:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 196:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ARM GAS  /tmp/ccPQX36y.s 			page 5
+
+
+ 197:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 198:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 199:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 200:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (suspensions != TX_NULL)
+ 201:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 202:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 203:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 204:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 205:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 206:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else if (timeouts != TX_NULL)
+ 207:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 208:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 209:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 210:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 211:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 212:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     else
+ 213:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     {
+ 214:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 215:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         /* Not enabled, return error.  */
+ 216:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****         status =  TX_FEATURE_NOT_ENABLED;
+ 217:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     }
+ 218:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** 
+ 219:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     /* Return completion status.  */
+ 220:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c ****     return(status);
+ 221:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** #endif
+ 222:ThreadX/common/src/tx_byte_pool_performance_system_info_get.c **** }
+  34              		.loc 1 222 0
+  35 0000 FF20     		movs	r0, #255
+  36              	.LVL1:
+  37 0002 7047     		bx	lr
+  38              		.cfi_endproc
+  39              	.LFE8:
+  41              		.text
+  42              	.Letext0:
+  43              		.file 2 "/usr/include/newlib/sys/lock.h"
+  44              		.file 3 "/usr/include/newlib/sys/_types.h"
+  45              		.file 4 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+  46              		.file 5 "/usr/include/newlib/sys/reent.h"
+  47              		.file 6 "/usr/include/newlib/stdlib.h"
+  48              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+  49              		.file 8 "ThreadX/common/inc/tx_api.h"
+  50              		.file 9 "ThreadX/common/inc/tx_byte_pool.h"
+ARM GAS  /tmp/ccPQX36y.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 tx_byte_pool_performance_system_info_get.c
+     /tmp/ccPQX36y.s:18     .text._tx_byte_pool_performance_system_info_get:0000000000000000 $t
+     /tmp/ccPQX36y.s:25     .text._tx_byte_pool_performance_system_info_get:0000000000000000 _tx_byte_pool_performance_system_info_get
+
+NO UNDEFINED SYMBOLS

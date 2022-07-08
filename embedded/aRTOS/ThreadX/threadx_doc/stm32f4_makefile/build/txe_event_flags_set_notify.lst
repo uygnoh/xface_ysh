@@ -1,0 +1,217 @@
+ARM GAS  /tmp/cc6pPDhD.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"txe_event_flags_set_notify.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._txe_event_flags_set_notify,"ax",%progbits
+  18              		.align	1
+  19              		.global	_txe_event_flags_set_notify
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	_txe_event_flags_set_notify:
+  26              	.LFB8:
+  27              		.file 1 "ThreadX/common/src/txe_event_flags_set_notify.c"
+   1:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+   2:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+   3:ThreadX/common/src/txe_event_flags_set_notify.c **** /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+   4:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+   5:ThreadX/common/src/txe_event_flags_set_notify.c **** /*       This software is licensed under the Microsoft Software License   */
+   6:ThreadX/common/src/txe_event_flags_set_notify.c **** /*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+   7:ThreadX/common/src/txe_event_flags_set_notify.c **** /*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+   8:ThreadX/common/src/txe_event_flags_set_notify.c **** /*       and in the root directory of this software.                      */
+   9:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  10:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  11:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  12:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  13:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  14:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  15:ThreadX/common/src/txe_event_flags_set_notify.c **** /**                                                                       */
+  16:ThreadX/common/src/txe_event_flags_set_notify.c **** /** ThreadX Component                                                     */
+  17:ThreadX/common/src/txe_event_flags_set_notify.c **** /**                                                                       */
+  18:ThreadX/common/src/txe_event_flags_set_notify.c **** /**   Event Flags                                                         */
+  19:ThreadX/common/src/txe_event_flags_set_notify.c **** /**                                                                       */
+  20:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  21:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  22:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  23:ThreadX/common/src/txe_event_flags_set_notify.c **** #define TX_SOURCE_CODE
+  24:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  25:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  26:ThreadX/common/src/txe_event_flags_set_notify.c **** /* Include necessary system files.  */
+  27:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  28:ThreadX/common/src/txe_event_flags_set_notify.c **** #include "tx_api.h"
+  29:ThreadX/common/src/txe_event_flags_set_notify.c **** #include "tx_event_flags.h"
+  30:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  31:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+ARM GAS  /tmp/cc6pPDhD.s 			page 2
+
+
+  32:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  33:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  34:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  FUNCTION                                               RELEASE        */
+  35:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  36:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    _txe_event_flags_set_notify                         PORTABLE C      */
+  37:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                           6.1          */
+  38:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  AUTHOR                                                                */
+  39:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  40:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    William E. Lamie, Microsoft Corporation                             */
+  41:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  42:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  DESCRIPTION                                                           */
+  43:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  44:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    This function checks for errors in the event flags set notify       */
+  45:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    callback function call.                                             */
+  46:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  47:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  INPUT                                                                 */
+  48:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  49:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    group_ptr                             Pointer to group control block*/
+  50:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    group_put_notify                      Application callback function */
+  51:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                            (TX_NULL disables notify)   */
+  52:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  53:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  OUTPUT                                                                */
+  54:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  55:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    status                                Service return status         */
+  56:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  57:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  CALLS                                                                 */
+  58:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  59:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    _tx_event_flags_set_notify            Actual event flags set notify */
+  60:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                            call                        */
+  61:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  62:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  CALLED BY                                                             */
+  63:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  64:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    Application Code                                                    */
+  65:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  66:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  RELEASE HISTORY                                                       */
+  67:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  68:ThreadX/common/src/txe_event_flags_set_notify.c **** /*    DATE              NAME                      DESCRIPTION             */
+  69:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  70:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  05-19-2020     William E. Lamie         Initial Version 6.0           */
+  71:ThreadX/common/src/txe_event_flags_set_notify.c **** /*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+  72:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                            resulting in version 6.1    */
+  73:ThreadX/common/src/txe_event_flags_set_notify.c **** /*                                                                        */
+  74:ThreadX/common/src/txe_event_flags_set_notify.c **** /**************************************************************************/
+  75:ThreadX/common/src/txe_event_flags_set_notify.c **** UINT  _txe_event_flags_set_notify(TX_EVENT_FLAGS_GROUP *group_ptr, VOID (*events_set_notify)(TX_EVE
+  76:ThreadX/common/src/txe_event_flags_set_notify.c **** {
+  28              		.loc 1 76 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  77:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  78:ThreadX/common/src/txe_event_flags_set_notify.c **** UINT    status;
+  79:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  80:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  81:ThreadX/common/src/txe_event_flags_set_notify.c ****     /* Check for an invalid group pointer.  */
+  82:ThreadX/common/src/txe_event_flags_set_notify.c ****     if (group_ptr == TX_NULL)
+  33              		.loc 1 82 0
+ARM GAS  /tmp/cc6pPDhD.s 			page 3
+
+
+  34 0000 58B1     		cbz	r0, .L3
+  76:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  35              		.loc 1 76 0
+  36 0002 08B5     		push	{r3, lr}
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 8
+  39              		.cfi_offset 3, -8
+  40              		.cfi_offset 14, -4
+  41 0004 0346     		mov	r3, r0
+  83:ThreadX/common/src/txe_event_flags_set_notify.c ****     {
+  84:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  85:ThreadX/common/src/txe_event_flags_set_notify.c ****         /* Event flags group pointer is invalid, return appropriate error code.  */
+  86:ThreadX/common/src/txe_event_flags_set_notify.c ****         status =  TX_GROUP_ERROR;
+  87:ThreadX/common/src/txe_event_flags_set_notify.c ****     }
+  88:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  89:ThreadX/common/src/txe_event_flags_set_notify.c ****     /* Now check for invalid event group ID.  */
+  90:ThreadX/common/src/txe_event_flags_set_notify.c ****     else if (group_ptr -> tx_event_flags_group_id != TX_EVENT_FLAGS_ID)
+  42              		.loc 1 90 0
+  43 0006 0068     		ldr	r0, [r0]
+  44              	.LVL1:
+  45 0008 054A     		ldr	r2, .L10
+  46 000a 9042     		cmp	r0, r2
+  47 000c 01D0     		beq	.L9
+  91:ThreadX/common/src/txe_event_flags_set_notify.c ****     {
+  92:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  93:ThreadX/common/src/txe_event_flags_set_notify.c ****         /* Event flags group pointer is invalid, return appropriate error code.  */
+  94:ThreadX/common/src/txe_event_flags_set_notify.c ****         status =  TX_GROUP_ERROR;
+  48              		.loc 1 94 0
+  49 000e 0620     		movs	r0, #6
+  50              	.LVL2:
+  51              	.L1:
+  95:ThreadX/common/src/txe_event_flags_set_notify.c ****     }
+  96:ThreadX/common/src/txe_event_flags_set_notify.c ****     else
+  97:ThreadX/common/src/txe_event_flags_set_notify.c ****     {
+  98:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+  99:ThreadX/common/src/txe_event_flags_set_notify.c ****         /* Call actual event flags set notify function.  */
+ 100:ThreadX/common/src/txe_event_flags_set_notify.c ****         status =  _tx_event_flags_set_notify(group_ptr, events_set_notify);
+ 101:ThreadX/common/src/txe_event_flags_set_notify.c ****     }
+ 102:ThreadX/common/src/txe_event_flags_set_notify.c **** 
+ 103:ThreadX/common/src/txe_event_flags_set_notify.c ****     /* Return completion status.  */
+ 104:ThreadX/common/src/txe_event_flags_set_notify.c ****     return(status);
+ 105:ThreadX/common/src/txe_event_flags_set_notify.c **** }
+  52              		.loc 1 105 0
+  53 0010 08BD     		pop	{r3, pc}
+  54              	.LVL3:
+  55              	.L9:
+  56 0012 1846     		mov	r0, r3
+ 100:ThreadX/common/src/txe_event_flags_set_notify.c ****     }
+  57              		.loc 1 100 0
+  58 0014 FFF7FEFF 		bl	_tx_event_flags_set_notify
+  59              	.LVL4:
+  60 0018 FAE7     		b	.L1
+  61              	.LVL5:
+  62              	.L3:
+  63              	.LCFI1:
+  64              		.cfi_def_cfa_offset 0
+  65              		.cfi_restore 3
+ARM GAS  /tmp/cc6pPDhD.s 			page 4
+
+
+  66              		.cfi_restore 14
+  86:ThreadX/common/src/txe_event_flags_set_notify.c ****     }
+  67              		.loc 1 86 0
+  68 001a 0620     		movs	r0, #6
+  69              	.LVL6:
+  70              		.loc 1 105 0
+  71 001c 7047     		bx	lr
+  72              	.L11:
+  73 001e 00BF     		.align	2
+  74              	.L10:
+  75 0020 4E445644 		.word	1146504270
+  76              		.cfi_endproc
+  77              	.LFE8:
+  79              		.text
+  80              	.Letext0:
+  81              		.file 2 "/usr/include/newlib/sys/lock.h"
+  82              		.file 3 "/usr/include/newlib/sys/_types.h"
+  83              		.file 4 "/usr/lib/gcc/arm-none-eabi/7.3.1/include/stddef.h"
+  84              		.file 5 "/usr/include/newlib/sys/reent.h"
+  85              		.file 6 "/usr/include/newlib/stdlib.h"
+  86              		.file 7 "ThreadX/ports/cortex_m4/gnu/inc/tx_port.h"
+  87              		.file 8 "ThreadX/common/inc/tx_api.h"
+  88              		.file 9 "ThreadX/common/inc/tx_event_flags.h"
+ARM GAS  /tmp/cc6pPDhD.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 txe_event_flags_set_notify.c
+     /tmp/cc6pPDhD.s:18     .text._txe_event_flags_set_notify:0000000000000000 $t
+     /tmp/cc6pPDhD.s:25     .text._txe_event_flags_set_notify:0000000000000000 _txe_event_flags_set_notify
+     /tmp/cc6pPDhD.s:75     .text._txe_event_flags_set_notify:0000000000000020 $d
+
+UNDEFINED SYMBOLS
+_tx_event_flags_set_notify

@@ -1,0 +1,10 @@
+//______________________________________________________________________________
+//      => SysTick for stm32 HAL
+//______________________________________________________________________________
+void SysTick_Handler(void)
+{
+        rt_interrupt_enter();
+        HAL_IncTick();
+        rt_tick_increase();
+        rt_interrupt_leave;
+}
