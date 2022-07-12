@@ -1,83 +1,73 @@
 //______________________________________________________________________________
-//      => OpenOCD  ST_Link 安装
+//      => OpenOCD
 //______________________________________________________________________________
-
-// sudo apt-get install openocd
-git clone https://github.com/texane/stlink.git
-apt-get install cmake libusb-1.0
-cd stlink/
-make
-cp st-flash /usr/bin
-cp ~/stlink/etc/udev/rules.d/49-stlinkv2-1.rules /etc/udev/rules.d
-	
-//___________________________________________________________             
-// 添加规则，其中OWNER 修改为你的用户名
-sudo cp 49-stlinkv2.rules  /etc/udev/rules.d/
-SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="3748",  \
-MODE:="0666", SYMLINK+="stlinkv2_%n" ,OWNER="ysh"
-
-// 让系统识别新的规则
-sudo udevadm control --reload-rules
-sudo udevadm trigger
+// OpenOCD支持ST-Link的三个版本，
+// 分别是ST-LINK, ST-LINK/V2, ST-LINK/V2-1配置文件要引用对应的
+// ST-LINK配置，可以通过 “lsusb”命令 查看所使用的ST-LINK的ID确定版本
+//___________________________________________________________
+ST-LINK         interface/stlink-v1.cfg         0483:3744
+ST-LINK/V2      interface/stlink-v2.cfg         0483:3748
+ST-LINK/V2-1    interface/stlink-v2-1.cfg       0483:374b
+//___________________________________________________________
+//排除权限问题后，如果还出现open failed错误，那么需要检查ST-LINK版本是否对上了
 
 
 
-//______________________________________________________________________________
-//      => GDB_Debug
-//______________________________________________________________________________
+// OpenOCD 调式STM32
+// 打开第 1 个终端输入
+//__________________________________________________________
+openocd -f board/st_nucleo_f4.cfg
+openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
 
-// GDB Debugger
 
-1.openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
-
-2.arm-none-eabi-gdb blink.elf
+// 打开第 2 个终端输入
+//__________________________________________________________
+// 不过我们还没有完成所有的初始操作，此时我们需要输入指令来(复位, 停止MCU, 并加载elf文件)
+arm-none-eabi-gdb blink.elf
+        // 若是本地如下，若是局域网内则填写ip:port
 	(gdb)	target remote localhost:3333
+	
+	// 进行初始化操作( 这里monitor意为这向连接的外部软件发送指令，此处即向Jlink发送指令，
+	// 因为reset halt等指令不是GDB的内部指令 )
 	(gdb)	monitor reset
 	(gdb)	monitor halt
+	
+	//装载调试程序
+        (gdb)   file <编译生成的elf文件>
 	(gdb)	load
-
-
-//___________________________________________________________
-// 串口调试软件安装
-sudo apt-get install minicom 
-sudo minicom -s
-Serial Device: /dev/ttyUSB0
-
 
 
 //______________________________________________________________________________
 //      => arm-none-eabi-gdb的调试指令
 //______________________________________________________________________________
-// 在GDB的指令窗口我们输入
-(gdb)-		对就是一个 减号，然后回车我们来见证奇迹的时刻
+        l               //list指令的缩写，意为列出当前执行的源代码。
+                        //同时输入指令后重复按回车等效于再次输入上次的指令
+                         
+        c               //continue的缩写，在嵌入式GDB中我们不能使用RUN指令来运行代码，
+                        //相应的我们需要continue指令来运行。
+                        
+        si              //step缩写，会进入子函数的单步运行
+        ni              //next缩写，即会跳过子函数的单步运行
+        u               //until缩写使用时后方加行号如： u 16 即运行到第16行
+        p               //print缩写，使用时后面加变量名称如：p tmp ，用来显示变量数值
+        display         //使用时后面加变量名称如：display tmp ，用于跟踪变量数值，
+                        //在每次执行停下时会自动显示变量数值。
+                        
+        finish          //完成并跳出当前的子函数
 
+        b               //break缩写，用于在程序中打断点，使用方式有很多种
+        b 16            //在当前低16行代码出加断点。
+        b i=1           //当i等于1时停止,类似于这种条件式断点的方式也是GDB独有的一种强大功能
+        b main          //在main函数的入口打断点。
 
-//___________________________________________________________
-// 打开tui模式(Text User Interface)
-// 使用"gdbtui -q" 或 "gdb -tui -q"开始一个调试
-$ gdbtui -q test_struct
-(gdb) ....
+        i b             //info break 缩写，显示当前设置的断点信息。
+	                //如下面这个查到了在main函数处有两个断点，序号分别为1 和 2.
+	                
+        d break         //delet break 缩写，删除所有断点
+        d break 1       //删除序号为1的断点
+        bt              //查看堆栈
+        q/Ctrl+d        //使用q即quit指令或快捷键Ctrl+d来正常退出GDB
 
-
-//___________________________________________________________
-$ gcc -gdb3 simple_gdb.c -o simple_gdb
-$ gdb simple_gdb 
-(gdb) start
-"ctrl+x ctrl+a" or "ctrl+x A"
-
-
-//___________________________________________________________
-// TUI模式下有4个窗口
-// 除command 窗口外,其他三个窗口不可同时显示.其可用 layout 命令来进行选择
-// 自己需要的窗口. 可参见 `help layout` 
-        command                 // 命令窗口. 可以键入调试命令
-        source                  // 源代码窗口. 显示当前行,断点等信息
-        assembly                // 汇编代码窗口
-        register               // 寄存器窗口
-  
-  
-//___________________________________________________________
-// GDB指令
 
         list                    // 查看程序源代码
         break function          // 在某函数的入口设定断点
@@ -94,6 +84,36 @@ $ gdb simple_gdb
         display
         quit
 
+
+
+//______________________________________________________________________________
+//      => gdb文本图形界面
+//______________________________________________________________________________
+
+// 打开tui模式(Text User Interface)
+// 使用"gdbtui -q" 或 "gdb -tui -q"开始一个调试
+//___________________________________________________________
+        $ gdbtui -q test_struct
+        (gdb) ....
+
+
+// 启动gdb_命令行下的图形界面
+//___________________________________________________________
+        $ gcc -gdb3 simple_gdb.c -o simple_gdb
+        $ gdb simple_gdb 
+        (gdb) start
+        "ctrl+x ctrl+a" or "ctrl+x A"
+
+
+
+// TUI模式下有4个窗口
+// 除command 窗口外,其他三个窗口不可同时显示.其可用 layout 命令来进行选择
+// 自己需要的窗口. 可参见 `help layout` 
+//___________________________________________________________
+        command                 // 命令窗口. 可以键入调试命令
+        source                  // 源代码窗口. 显示当前行,断点等信息
+        assembly                // 汇编代码窗口
+        register               // 寄存器窗口
 
 
 
@@ -153,6 +173,3 @@ CFLAGSlib       +=-D USE_STDPERIPH_DRIVER
 	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
 	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
 // 修改完成后，保存！注意，请再选中工程项目，刷新F5，再一次编译
-
-
-

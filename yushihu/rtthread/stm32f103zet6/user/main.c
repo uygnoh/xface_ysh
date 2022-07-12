@@ -12,6 +12,7 @@ int main(void)
         while (1) {
                 HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_SET);
                 rt_thread_mdelay(500);
+                rt_thread_mdelay(500);
                 HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
                 rt_thread_mdelay(500);
         }

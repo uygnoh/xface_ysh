@@ -18,7 +18,7 @@ SIZE            := $(PREFIX)-size
 ###     => 头文件位置
 ###############################################################################
 YUSHIHU         := $(shell readlink -f "$(dir $(lastword $(MAKEFILE_LIST)))")
-INCLUDE	        := -I$(YUSHIHU)/include
+INCLUDE	        := -I$(YUSHIHU)/config
 INCLUDE	        += -I$(YUSHIHU)/user
 INCLUDE	        += -I$(YUSHIHU)/cmsis
 INCLUDE	        += -I$(YUSHIHU)/library
