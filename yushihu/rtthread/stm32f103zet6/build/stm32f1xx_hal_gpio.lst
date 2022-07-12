@@ -1,0 +1,1582 @@
+ARM GAS  /tmp/ccSBsZ6X.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"stm32f1xx_hal_gpio.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.HAL_GPIO_Init,"ax",%progbits
+  16              		.align	1
+  17              		.global	HAL_GPIO_Init
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu softvfp
+  23              	HAL_GPIO_Init:
+  24              	.LFB65:
+  25              		.file 1 "library/src/stm32f1xx_hal_gpio.c"
+   1:library/src/stm32f1xx_hal_gpio.c **** /**
+   2:library/src/stm32f1xx_hal_gpio.c ****   ******************************************************************************
+   3:library/src/stm32f1xx_hal_gpio.c ****   * @file    stm32f1xx_hal_gpio.c
+   4:library/src/stm32f1xx_hal_gpio.c ****   * @author  MCD Application Team
+   5:library/src/stm32f1xx_hal_gpio.c ****   * @brief   GPIO HAL module driver.
+   6:library/src/stm32f1xx_hal_gpio.c ****   *          This file provides firmware functions to manage the following
+   7:library/src/stm32f1xx_hal_gpio.c ****   *          functionalities of the General Purpose Input/Output (GPIO) peripheral:
+   8:library/src/stm32f1xx_hal_gpio.c ****   *           + Initialization and de-initialization functions
+   9:library/src/stm32f1xx_hal_gpio.c ****   *           + IO operation functions
+  10:library/src/stm32f1xx_hal_gpio.c ****   *
+  11:library/src/stm32f1xx_hal_gpio.c ****   @verbatim
+  12:library/src/stm32f1xx_hal_gpio.c ****   ==============================================================================
+  13:library/src/stm32f1xx_hal_gpio.c ****                     ##### GPIO Peripheral features #####
+  14:library/src/stm32f1xx_hal_gpio.c ****   ==============================================================================
+  15:library/src/stm32f1xx_hal_gpio.c ****   [..]
+  16:library/src/stm32f1xx_hal_gpio.c ****   Subject to the specific hardware characteristics of each I/O port listed in the datasheet, each
+  17:library/src/stm32f1xx_hal_gpio.c ****   port bit of the General Purpose IO (GPIO) Ports, can be individually configured by software
+  18:library/src/stm32f1xx_hal_gpio.c ****   in several modes:
+  19:library/src/stm32f1xx_hal_gpio.c ****   (+) Input mode
+  20:library/src/stm32f1xx_hal_gpio.c ****   (+) Analog mode
+  21:library/src/stm32f1xx_hal_gpio.c ****   (+) Output mode
+  22:library/src/stm32f1xx_hal_gpio.c ****   (+) Alternate function mode
+  23:library/src/stm32f1xx_hal_gpio.c ****   (+) External interrupt/event lines
+  24:library/src/stm32f1xx_hal_gpio.c **** 
+  25:library/src/stm32f1xx_hal_gpio.c ****   [..]
+  26:library/src/stm32f1xx_hal_gpio.c ****   During and just after reset, the alternate functions and external interrupt
+  27:library/src/stm32f1xx_hal_gpio.c ****   lines are not active and the I/O ports are configured in input floating mode.
+  28:library/src/stm32f1xx_hal_gpio.c **** 
+  29:library/src/stm32f1xx_hal_gpio.c ****   [..]
+  30:library/src/stm32f1xx_hal_gpio.c ****   All GPIO pins have weak internal pull-up and pull-down resistors, which can be
+  31:library/src/stm32f1xx_hal_gpio.c ****   activated or not.
+  32:library/src/stm32f1xx_hal_gpio.c **** 
+  33:library/src/stm32f1xx_hal_gpio.c ****   [..]
+ARM GAS  /tmp/ccSBsZ6X.s 			page 2
+
+
+  34:library/src/stm32f1xx_hal_gpio.c ****   In Output or Alternate mode, each IO can be configured on open-drain or push-pull
+  35:library/src/stm32f1xx_hal_gpio.c ****   type and the IO speed can be selected depending on the VDD value.
+  36:library/src/stm32f1xx_hal_gpio.c **** 
+  37:library/src/stm32f1xx_hal_gpio.c ****   [..]
+  38:library/src/stm32f1xx_hal_gpio.c ****   All ports have external interrupt/event capability. To use external interrupt
+  39:library/src/stm32f1xx_hal_gpio.c ****   lines, the port must be configured in input mode. All available GPIO pins are
+  40:library/src/stm32f1xx_hal_gpio.c ****   connected to the 16 external interrupt/event lines from EXTI0 to EXTI15.
+  41:library/src/stm32f1xx_hal_gpio.c **** 
+  42:library/src/stm32f1xx_hal_gpio.c ****   [..]
+  43:library/src/stm32f1xx_hal_gpio.c ****   The external interrupt/event controller consists of up to 20 edge detectors in connectivity
+  44:library/src/stm32f1xx_hal_gpio.c ****   line devices, or 19 edge detectors in other devices for generating event/interrupt requests.
+  45:library/src/stm32f1xx_hal_gpio.c ****   Each input line can be independently configured to select the type (event or interrupt) and
+  46:library/src/stm32f1xx_hal_gpio.c ****   the corresponding trigger event (rising or falling or both). Each line can also masked
+  47:library/src/stm32f1xx_hal_gpio.c ****   independently. A pending register maintains the status line of the interrupt requests
+  48:library/src/stm32f1xx_hal_gpio.c **** 
+  49:library/src/stm32f1xx_hal_gpio.c ****                      ##### How to use this driver #####
+  50:library/src/stm32f1xx_hal_gpio.c ****   ==============================================================================
+  51:library/src/stm32f1xx_hal_gpio.c ****  [..]
+  52:library/src/stm32f1xx_hal_gpio.c ****    (#) Enable the GPIO APB2 clock using the following function : __HAL_RCC_GPIOx_CLK_ENABLE().
+  53:library/src/stm32f1xx_hal_gpio.c **** 
+  54:library/src/stm32f1xx_hal_gpio.c ****    (#) Configure the GPIO pin(s) using HAL_GPIO_Init().
+  55:library/src/stm32f1xx_hal_gpio.c ****        (++) Configure the IO mode using "Mode" member from GPIO_InitTypeDef structure
+  56:library/src/stm32f1xx_hal_gpio.c ****        (++) Activate Pull-up, Pull-down resistor using "Pull" member from GPIO_InitTypeDef
+  57:library/src/stm32f1xx_hal_gpio.c ****             structure.
+  58:library/src/stm32f1xx_hal_gpio.c ****        (++) In case of Output or alternate function mode selection: the speed is
+  59:library/src/stm32f1xx_hal_gpio.c ****             configured through "Speed" member from GPIO_InitTypeDef structure
+  60:library/src/stm32f1xx_hal_gpio.c ****        (++) Analog mode is required when a pin is to be used as ADC channel
+  61:library/src/stm32f1xx_hal_gpio.c ****             or DAC output.
+  62:library/src/stm32f1xx_hal_gpio.c ****        (++) In case of external interrupt/event selection the "Mode" member from
+  63:library/src/stm32f1xx_hal_gpio.c ****             GPIO_InitTypeDef structure select the type (interrupt or event) and
+  64:library/src/stm32f1xx_hal_gpio.c ****             the corresponding trigger event (rising or falling or both).
+  65:library/src/stm32f1xx_hal_gpio.c **** 
+  66:library/src/stm32f1xx_hal_gpio.c ****    (#) In case of external interrupt/event mode selection, configure NVIC IRQ priority
+  67:library/src/stm32f1xx_hal_gpio.c ****        mapped to the EXTI line using HAL_NVIC_SetPriority() and enable it using
+  68:library/src/stm32f1xx_hal_gpio.c ****        HAL_NVIC_EnableIRQ().
+  69:library/src/stm32f1xx_hal_gpio.c **** 
+  70:library/src/stm32f1xx_hal_gpio.c ****    (#) To get the level of a pin configured in input mode use HAL_GPIO_ReadPin().
+  71:library/src/stm32f1xx_hal_gpio.c **** 
+  72:library/src/stm32f1xx_hal_gpio.c ****    (#) To set/reset the level of a pin configured in output mode use
+  73:library/src/stm32f1xx_hal_gpio.c ****        HAL_GPIO_WritePin()/HAL_GPIO_TogglePin().
+  74:library/src/stm32f1xx_hal_gpio.c **** 
+  75:library/src/stm32f1xx_hal_gpio.c ****    (#) To lock pin configuration until next reset use HAL_GPIO_LockPin().
+  76:library/src/stm32f1xx_hal_gpio.c **** 
+  77:library/src/stm32f1xx_hal_gpio.c ****    (#) During and just after reset, the alternate functions are not
+  78:library/src/stm32f1xx_hal_gpio.c ****        active and the GPIO pins are configured in input floating mode (except JTAG
+  79:library/src/stm32f1xx_hal_gpio.c ****        pins).
+  80:library/src/stm32f1xx_hal_gpio.c **** 
+  81:library/src/stm32f1xx_hal_gpio.c ****    (#) The LSE oscillator pins OSC32_IN and OSC32_OUT can be used as general purpose
+  82:library/src/stm32f1xx_hal_gpio.c ****        (PC14 and PC15, respectively) when the LSE oscillator is off. The LSE has
+  83:library/src/stm32f1xx_hal_gpio.c ****        priority over the GPIO function.
+  84:library/src/stm32f1xx_hal_gpio.c **** 
+  85:library/src/stm32f1xx_hal_gpio.c ****    (#) The HSE oscillator pins OSC_IN/OSC_OUT can be used as
+  86:library/src/stm32f1xx_hal_gpio.c ****        general purpose PD0 and PD1, respectively, when the HSE oscillator is off.
+  87:library/src/stm32f1xx_hal_gpio.c ****        The HSE has priority over the GPIO function.
+  88:library/src/stm32f1xx_hal_gpio.c **** 
+  89:library/src/stm32f1xx_hal_gpio.c ****   @endverbatim
+  90:library/src/stm32f1xx_hal_gpio.c ****   ******************************************************************************
+ARM GAS  /tmp/ccSBsZ6X.s 			page 3
+
+
+  91:library/src/stm32f1xx_hal_gpio.c ****   * @attention
+  92:library/src/stm32f1xx_hal_gpio.c ****   *
+  93:library/src/stm32f1xx_hal_gpio.c ****   * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics.
+  94:library/src/stm32f1xx_hal_gpio.c ****   * All rights reserved.</center></h2>
+  95:library/src/stm32f1xx_hal_gpio.c ****   *
+  96:library/src/stm32f1xx_hal_gpio.c ****   * This software component is licensed by ST under BSD 3-Clause license,
+  97:library/src/stm32f1xx_hal_gpio.c ****   * the "License"; You may not use this file except in compliance with the
+  98:library/src/stm32f1xx_hal_gpio.c ****   * License. You may obtain a copy of the License at:
+  99:library/src/stm32f1xx_hal_gpio.c ****   *                        opensource.org/licenses/BSD-3-Clause
+ 100:library/src/stm32f1xx_hal_gpio.c ****   *
+ 101:library/src/stm32f1xx_hal_gpio.c ****   ******************************************************************************
+ 102:library/src/stm32f1xx_hal_gpio.c ****   */
+ 103:library/src/stm32f1xx_hal_gpio.c **** 
+ 104:library/src/stm32f1xx_hal_gpio.c **** /* Includes ------------------------------------------------------------------*/
+ 105:library/src/stm32f1xx_hal_gpio.c **** #include "stm32f1xx_hal.h"
+ 106:library/src/stm32f1xx_hal_gpio.c **** 
+ 107:library/src/stm32f1xx_hal_gpio.c **** /** @addtogroup STM32F1xx_HAL_Driver
+ 108:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 109:library/src/stm32f1xx_hal_gpio.c ****   */
+ 110:library/src/stm32f1xx_hal_gpio.c **** 
+ 111:library/src/stm32f1xx_hal_gpio.c **** /** @defgroup GPIO GPIO
+ 112:library/src/stm32f1xx_hal_gpio.c ****   * @brief GPIO HAL module driver
+ 113:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 114:library/src/stm32f1xx_hal_gpio.c ****   */
+ 115:library/src/stm32f1xx_hal_gpio.c **** 
+ 116:library/src/stm32f1xx_hal_gpio.c **** #ifdef HAL_GPIO_MODULE_ENABLED
+ 117:library/src/stm32f1xx_hal_gpio.c **** 
+ 118:library/src/stm32f1xx_hal_gpio.c **** /* Private typedef -----------------------------------------------------------*/
+ 119:library/src/stm32f1xx_hal_gpio.c **** /* Private define ------------------------------------------------------------*/
+ 120:library/src/stm32f1xx_hal_gpio.c **** /** @addtogroup GPIO_Private_Constants GPIO Private Constants
+ 121:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 122:library/src/stm32f1xx_hal_gpio.c ****   */
+ 123:library/src/stm32f1xx_hal_gpio.c **** #define GPIO_MODE             0x00000003u
+ 124:library/src/stm32f1xx_hal_gpio.c **** #define EXTI_MODE             0x10000000u
+ 125:library/src/stm32f1xx_hal_gpio.c **** #define GPIO_MODE_IT          0x00010000u
+ 126:library/src/stm32f1xx_hal_gpio.c **** #define GPIO_MODE_EVT         0x00020000u
+ 127:library/src/stm32f1xx_hal_gpio.c **** #define RISING_EDGE           0x00100000u
+ 128:library/src/stm32f1xx_hal_gpio.c **** #define FALLING_EDGE          0x00200000u
+ 129:library/src/stm32f1xx_hal_gpio.c **** #define GPIO_OUTPUT_TYPE      0x00000010u
+ 130:library/src/stm32f1xx_hal_gpio.c **** 
+ 131:library/src/stm32f1xx_hal_gpio.c **** #define GPIO_NUMBER           16u
+ 132:library/src/stm32f1xx_hal_gpio.c **** 
+ 133:library/src/stm32f1xx_hal_gpio.c **** /* Definitions for bit manipulation of CRL and CRH register */
+ 134:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_MODE_INPUT         0x00000000u /*!< 00: Input mode (reset state)  */
+ 135:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_ANALOG         0x00000000u /*!< 00: Analog mode  */
+ 136:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_INPUT_FLOATING 0x00000004u /*!< 01: Floating input (reset state)  */
+ 137:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_INPUT_PU_PD    0x00000008u /*!< 10: Input with pull-up / pull-down  */
+ 138:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_GP_OUTPUT_PP   0x00000000u /*!< 00: General purpose output push-pull  */
+ 139:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_GP_OUTPUT_OD   0x00000004u /*!< 01: General purpose output Open-drain  */
+ 140:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_AF_OUTPUT_PP   0x00000008u /*!< 10: Alternate function output Push-pull  */
+ 141:library/src/stm32f1xx_hal_gpio.c **** #define  GPIO_CR_CNF_AF_OUTPUT_OD   0x0000000Cu /*!< 11: Alternate function output Open-drain  */
+ 142:library/src/stm32f1xx_hal_gpio.c **** 
+ 143:library/src/stm32f1xx_hal_gpio.c **** /**
+ 144:library/src/stm32f1xx_hal_gpio.c ****   * @}
+ 145:library/src/stm32f1xx_hal_gpio.c ****   */
+ 146:library/src/stm32f1xx_hal_gpio.c **** /* Private macro -------------------------------------------------------------*/
+ 147:library/src/stm32f1xx_hal_gpio.c **** /* Private variables ---------------------------------------------------------*/
+ARM GAS  /tmp/ccSBsZ6X.s 			page 4
+
+
+ 148:library/src/stm32f1xx_hal_gpio.c **** /* Private function prototypes -----------------------------------------------*/
+ 149:library/src/stm32f1xx_hal_gpio.c **** /* Private functions ---------------------------------------------------------*/
+ 150:library/src/stm32f1xx_hal_gpio.c **** /* Exported functions --------------------------------------------------------*/
+ 151:library/src/stm32f1xx_hal_gpio.c **** /** @defgroup GPIO_Exported_Functions GPIO Exported Functions
+ 152:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 153:library/src/stm32f1xx_hal_gpio.c ****   */
+ 154:library/src/stm32f1xx_hal_gpio.c **** 
+ 155:library/src/stm32f1xx_hal_gpio.c **** /** @defgroup GPIO_Exported_Functions_Group1 Initialization and de-initialization functions
+ 156:library/src/stm32f1xx_hal_gpio.c ****  *  @brief    Initialization and Configuration functions
+ 157:library/src/stm32f1xx_hal_gpio.c ****  *
+ 158:library/src/stm32f1xx_hal_gpio.c **** @verbatim
+ 159:library/src/stm32f1xx_hal_gpio.c ****  ===============================================================================
+ 160:library/src/stm32f1xx_hal_gpio.c ****               ##### Initialization and de-initialization functions #####
+ 161:library/src/stm32f1xx_hal_gpio.c ****  ===============================================================================
+ 162:library/src/stm32f1xx_hal_gpio.c ****   [..]
+ 163:library/src/stm32f1xx_hal_gpio.c ****     This section provides functions allowing to initialize and de-initialize the GPIOs
+ 164:library/src/stm32f1xx_hal_gpio.c ****     to be ready for use.
+ 165:library/src/stm32f1xx_hal_gpio.c **** 
+ 166:library/src/stm32f1xx_hal_gpio.c **** @endverbatim
+ 167:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 168:library/src/stm32f1xx_hal_gpio.c ****   */
+ 169:library/src/stm32f1xx_hal_gpio.c **** 
+ 170:library/src/stm32f1xx_hal_gpio.c **** 
+ 171:library/src/stm32f1xx_hal_gpio.c **** /**
+ 172:library/src/stm32f1xx_hal_gpio.c ****   * @brief  Initializes the GPIOx peripheral according to the specified parameters in the GPIO_Init
+ 173:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 174:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Init: pointer to a GPIO_InitTypeDef structure that contains
+ 175:library/src/stm32f1xx_hal_gpio.c ****   *         the configuration information for the specified GPIO peripheral.
+ 176:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 177:library/src/stm32f1xx_hal_gpio.c ****   */
+ 178:library/src/stm32f1xx_hal_gpio.c **** void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
+ 179:library/src/stm32f1xx_hal_gpio.c **** {
+  26              		.loc 1 179 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 8
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  31              	.LVL0:
+  32 0000 F0B4     		push	{r4, r5, r6, r7}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 7, -4
+  39 0002 82B0     		sub	sp, sp, #8
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 24
+  42              	.LVL1:
+ 180:library/src/stm32f1xx_hal_gpio.c ****   uint32_t position = 0x00u;
+ 181:library/src/stm32f1xx_hal_gpio.c ****   uint32_t ioposition;
+ 182:library/src/stm32f1xx_hal_gpio.c ****   uint32_t iocurrent;
+ 183:library/src/stm32f1xx_hal_gpio.c ****   uint32_t temp;
+ 184:library/src/stm32f1xx_hal_gpio.c ****   uint32_t config = 0x00u;
+  43              		.loc 1 184 0
+  44 0004 0026     		movs	r6, #0
+ 180:library/src/stm32f1xx_hal_gpio.c ****   uint32_t position = 0x00u;
+ARM GAS  /tmp/ccSBsZ6X.s 			page 5
+
+
+  45              		.loc 1 180 0
+  46 0006 3246     		mov	r2, r6
+ 185:library/src/stm32f1xx_hal_gpio.c ****   __IO uint32_t *configregister; /* Store the address of CRL or CRH register based on pin number */
+ 186:library/src/stm32f1xx_hal_gpio.c ****   uint32_t registeroffset;       /* offset used during computation of CNF and MODE bits placement i
+ 187:library/src/stm32f1xx_hal_gpio.c **** 
+ 188:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 189:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_ALL_INSTANCE(GPIOx));
+ 190:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Init->Pin));
+ 191:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_MODE(GPIO_Init->Mode));
+ 192:library/src/stm32f1xx_hal_gpio.c **** 
+ 193:library/src/stm32f1xx_hal_gpio.c ****   /* Configure the port pins */
+ 194:library/src/stm32f1xx_hal_gpio.c ****   while (((GPIO_Init->Pin) >> position) != 0x00u)
+  47              		.loc 1 194 0
+  48 0008 ABE0     		b	.L2
+  49              	.LVL2:
+  50              	.L41:
+ 195:library/src/stm32f1xx_hal_gpio.c ****   {
+ 196:library/src/stm32f1xx_hal_gpio.c ****     /* Get the IO position */
+ 197:library/src/stm32f1xx_hal_gpio.c ****     ioposition = (0x01uL << position);
+ 198:library/src/stm32f1xx_hal_gpio.c **** 
+ 199:library/src/stm32f1xx_hal_gpio.c ****     /* Get the current IO position */
+ 200:library/src/stm32f1xx_hal_gpio.c ****     iocurrent = (uint32_t)(GPIO_Init->Pin) & ioposition;
+ 201:library/src/stm32f1xx_hal_gpio.c **** 
+ 202:library/src/stm32f1xx_hal_gpio.c ****     if (iocurrent == ioposition)
+ 203:library/src/stm32f1xx_hal_gpio.c ****     {
+ 204:library/src/stm32f1xx_hal_gpio.c ****       /* Check the Alternate function parameters */
+ 205:library/src/stm32f1xx_hal_gpio.c ****       assert_param(IS_GPIO_AF_INSTANCE(GPIOx));
+ 206:library/src/stm32f1xx_hal_gpio.c **** 
+ 207:library/src/stm32f1xx_hal_gpio.c ****       /* Based on the required mode, filling config variable with MODEy[1:0] and CNFy[3:2] correspo
+ 208:library/src/stm32f1xx_hal_gpio.c ****       switch (GPIO_Init->Mode)
+  51              		.loc 1 208 0
+  52 000a 002D     		cmp	r5, #0
+  53 000c 63D0     		beq	.L9
+  54 000e 012D     		cmp	r5, #1
+  55 0010 00D1     		bne	.L11
+ 209:library/src/stm32f1xx_hal_gpio.c ****       {
+ 210:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in OUTPUT push-pull mode */
+ 211:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_OUTPUT_PP:
+ 212:library/src/stm32f1xx_hal_gpio.c ****           /* Check the GPIO speed parameter */
+ 213:library/src/stm32f1xx_hal_gpio.c ****           assert_param(IS_GPIO_SPEED(GPIO_Init->Speed));
+ 214:library/src/stm32f1xx_hal_gpio.c ****           config = GPIO_Init->Speed + GPIO_CR_CNF_GP_OUTPUT_PP;
+  56              		.loc 1 214 0
+  57 0012 CE68     		ldr	r6, [r1, #12]
+  58              	.LVL3:
+  59              	.L11:
+ 215:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 216:library/src/stm32f1xx_hal_gpio.c **** 
+ 217:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in OUTPUT open-drain mode */
+ 218:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_OUTPUT_OD:
+ 219:library/src/stm32f1xx_hal_gpio.c ****           /* Check the GPIO speed parameter */
+ 220:library/src/stm32f1xx_hal_gpio.c ****           assert_param(IS_GPIO_SPEED(GPIO_Init->Speed));
+ 221:library/src/stm32f1xx_hal_gpio.c ****           config = GPIO_Init->Speed + GPIO_CR_CNF_GP_OUTPUT_OD;
+ 222:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 223:library/src/stm32f1xx_hal_gpio.c **** 
+ 224:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in ALTERNATE FUNCTION push-pull mode */
+ 225:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_AF_PP:
+ 226:library/src/stm32f1xx_hal_gpio.c ****           /* Check the GPIO speed parameter */
+ARM GAS  /tmp/ccSBsZ6X.s 			page 6
+
+
+ 227:library/src/stm32f1xx_hal_gpio.c ****           assert_param(IS_GPIO_SPEED(GPIO_Init->Speed));
+ 228:library/src/stm32f1xx_hal_gpio.c ****           config = GPIO_Init->Speed + GPIO_CR_CNF_AF_OUTPUT_PP;
+ 229:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 230:library/src/stm32f1xx_hal_gpio.c **** 
+ 231:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in ALTERNATE FUNCTION open-drain mode */
+ 232:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_AF_OD:
+ 233:library/src/stm32f1xx_hal_gpio.c ****           /* Check the GPIO speed parameter */
+ 234:library/src/stm32f1xx_hal_gpio.c ****           assert_param(IS_GPIO_SPEED(GPIO_Init->Speed));
+ 235:library/src/stm32f1xx_hal_gpio.c ****           config = GPIO_Init->Speed + GPIO_CR_CNF_AF_OUTPUT_OD;
+ 236:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 237:library/src/stm32f1xx_hal_gpio.c **** 
+ 238:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in INPUT (also applicable to EVENT and IT mode) */
+ 239:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_INPUT:
+ 240:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_IT_RISING:
+ 241:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_IT_FALLING:
+ 242:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_IT_RISING_FALLING:
+ 243:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_EVT_RISING:
+ 244:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_EVT_FALLING:
+ 245:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_EVT_RISING_FALLING:
+ 246:library/src/stm32f1xx_hal_gpio.c ****           /* Check the GPIO pull parameter */
+ 247:library/src/stm32f1xx_hal_gpio.c ****           assert_param(IS_GPIO_PULL(GPIO_Init->Pull));
+ 248:library/src/stm32f1xx_hal_gpio.c ****           if (GPIO_Init->Pull == GPIO_NOPULL)
+ 249:library/src/stm32f1xx_hal_gpio.c ****           {
+ 250:library/src/stm32f1xx_hal_gpio.c ****             config = GPIO_CR_MODE_INPUT + GPIO_CR_CNF_INPUT_FLOATING;
+ 251:library/src/stm32f1xx_hal_gpio.c ****           }
+ 252:library/src/stm32f1xx_hal_gpio.c ****           else if (GPIO_Init->Pull == GPIO_PULLUP)
+ 253:library/src/stm32f1xx_hal_gpio.c ****           {
+ 254:library/src/stm32f1xx_hal_gpio.c ****             config = GPIO_CR_MODE_INPUT + GPIO_CR_CNF_INPUT_PU_PD;
+ 255:library/src/stm32f1xx_hal_gpio.c **** 
+ 256:library/src/stm32f1xx_hal_gpio.c ****             /* Set the corresponding ODR bit */
+ 257:library/src/stm32f1xx_hal_gpio.c ****             GPIOx->BSRR = ioposition;
+ 258:library/src/stm32f1xx_hal_gpio.c ****           }
+ 259:library/src/stm32f1xx_hal_gpio.c ****           else /* GPIO_PULLDOWN */
+ 260:library/src/stm32f1xx_hal_gpio.c ****           {
+ 261:library/src/stm32f1xx_hal_gpio.c ****             config = GPIO_CR_MODE_INPUT + GPIO_CR_CNF_INPUT_PU_PD;
+ 262:library/src/stm32f1xx_hal_gpio.c **** 
+ 263:library/src/stm32f1xx_hal_gpio.c ****             /* Reset the corresponding ODR bit */
+ 264:library/src/stm32f1xx_hal_gpio.c ****             GPIOx->BRR = ioposition;
+ 265:library/src/stm32f1xx_hal_gpio.c ****           }
+ 266:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 267:library/src/stm32f1xx_hal_gpio.c **** 
+ 268:library/src/stm32f1xx_hal_gpio.c ****         /* If we are configuring the pin in INPUT analog mode */
+ 269:library/src/stm32f1xx_hal_gpio.c ****         case GPIO_MODE_ANALOG:
+ 270:library/src/stm32f1xx_hal_gpio.c ****           config = GPIO_CR_MODE_INPUT + GPIO_CR_CNF_ANALOG;
+ 271:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 272:library/src/stm32f1xx_hal_gpio.c **** 
+ 273:library/src/stm32f1xx_hal_gpio.c ****         /* Parameters are checked with assert_param */
+ 274:library/src/stm32f1xx_hal_gpio.c ****         default:
+ 275:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 276:library/src/stm32f1xx_hal_gpio.c ****       }
+ 277:library/src/stm32f1xx_hal_gpio.c **** 
+ 278:library/src/stm32f1xx_hal_gpio.c ****       /* Check if the current bit belongs to first half or last half of the pin count number
+ 279:library/src/stm32f1xx_hal_gpio.c ****        in order to address CRH or CRL register*/
+ 280:library/src/stm32f1xx_hal_gpio.c ****       configregister = (iocurrent < GPIO_PIN_8) ? &GPIOx->CRL     : &GPIOx->CRH;
+  60              		.loc 1 280 0
+  61 0014 FF2B     		cmp	r3, #255
+  62 0016 72D8     		bhi	.L15
+ARM GAS  /tmp/ccSBsZ6X.s 			page 7
+
+
+  63              		.loc 1 280 0 is_stmt 0 discriminator 1
+  64 0018 8446     		mov	ip, r0
+  65              	.L16:
+  66              	.LVL4:
+ 281:library/src/stm32f1xx_hal_gpio.c ****       registeroffset = (iocurrent < GPIO_PIN_8) ? (position << 2u) : ((position - 8u) << 2u);
+  67              		.loc 1 281 0 is_stmt 1 discriminator 4
+  68 001a FF2B     		cmp	r3, #255
+  69 001c 72D8     		bhi	.L17
+  70              		.loc 1 281 0 is_stmt 0 discriminator 1
+  71 001e 9500     		lsls	r5, r2, #2
+  72              	.L18:
+  73              	.LVL5:
+ 282:library/src/stm32f1xx_hal_gpio.c **** 
+ 283:library/src/stm32f1xx_hal_gpio.c ****       /* Apply the new configuration of the pin to the register */
+ 284:library/src/stm32f1xx_hal_gpio.c ****       MODIFY_REG((*configregister), ((GPIO_CRL_MODE0 | GPIO_CRL_CNF0) << registeroffset), (config <
+  74              		.loc 1 284 0 is_stmt 1 discriminator 4
+  75 0020 DCF80040 		ldr	r4, [ip]
+  76              	.LVL6:
+  77 0024 0F27     		movs	r7, #15
+  78 0026 AF40     		lsls	r7, r7, r5
+  79 0028 24EA0704 		bic	r4, r4, r7
+  80 002c 06FA05F5 		lsl	r5, r6, r5
+  81              	.LVL7:
+  82 0030 2C43     		orrs	r4, r4, r5
+  83 0032 CCF80040 		str	r4, [ip]
+ 285:library/src/stm32f1xx_hal_gpio.c **** 
+ 286:library/src/stm32f1xx_hal_gpio.c ****       /*--------------------- EXTI Mode Configuration ------------------------*/
+ 287:library/src/stm32f1xx_hal_gpio.c ****       /* Configure the External Interrupt or event for the current IO */
+ 288:library/src/stm32f1xx_hal_gpio.c ****       if ((GPIO_Init->Mode & EXTI_MODE) == EXTI_MODE)
+  84              		.loc 1 288 0 discriminator 4
+  85 0036 4C68     		ldr	r4, [r1, #4]
+  86 0038 14F0805F 		tst	r4, #268435456
+  87 003c 00F09080 		beq	.L3
+  88              	.LBB2:
+ 289:library/src/stm32f1xx_hal_gpio.c ****       {
+ 290:library/src/stm32f1xx_hal_gpio.c ****         /* Enable AFIO Clock */
+ 291:library/src/stm32f1xx_hal_gpio.c ****         __HAL_RCC_AFIO_CLK_ENABLE();
+  89              		.loc 1 291 0
+  90 0040 664C     		ldr	r4, .L42
+  91 0042 A569     		ldr	r5, [r4, #24]
+  92 0044 45F00105 		orr	r5, r5, #1
+  93 0048 A561     		str	r5, [r4, #24]
+  94 004a A469     		ldr	r4, [r4, #24]
+  95 004c 04F00104 		and	r4, r4, #1
+  96 0050 0194     		str	r4, [sp, #4]
+  97 0052 019C     		ldr	r4, [sp, #4]
+  98              	.LBE2:
+ 292:library/src/stm32f1xx_hal_gpio.c ****         temp = AFIO->EXTICR[position >> 2u];
+  99              		.loc 1 292 0
+ 100 0054 9508     		lsrs	r5, r2, #2
+ 101 0056 AF1C     		adds	r7, r5, #2
+ 102 0058 614C     		ldr	r4, .L42+4
+ 103 005a 54F827C0 		ldr	ip, [r4, r7, lsl #2]
+ 104              	.LVL8:
+ 293:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(temp, (0x0Fu) << (4u * (position & 0x03u)));
+ 105              		.loc 1 293 0
+ 106 005e 02F00304 		and	r4, r2, #3
+ARM GAS  /tmp/ccSBsZ6X.s 			page 8
+
+
+ 107 0062 A700     		lsls	r7, r4, #2
+ 108 0064 0F24     		movs	r4, #15
+ 109 0066 BC40     		lsls	r4, r4, r7
+ 110 0068 2CEA040C 		bic	ip, ip, r4
+ 111              	.LVL9:
+ 294:library/src/stm32f1xx_hal_gpio.c ****         SET_BIT(temp, (GPIO_GET_INDEX(GPIOx)) << (4u * (position & 0x03u)));
+ 112              		.loc 1 294 0
+ 113 006c 5D4C     		ldr	r4, .L42+8
+ 114 006e A042     		cmp	r0, r4
+ 115 0070 4ED0     		beq	.L30
+ 116              		.loc 1 294 0 is_stmt 0 discriminator 1
+ 117 0072 04F58064 		add	r4, r4, #1024
+ 118 0076 A042     		cmp	r0, r4
+ 119 0078 00F08C80 		beq	.L31
+ 120              		.loc 1 294 0 discriminator 3
+ 121 007c 04F58064 		add	r4, r4, #1024
+ 122 0080 A042     		cmp	r0, r4
+ 123 0082 00F08980 		beq	.L32
+ 124              		.loc 1 294 0 discriminator 5
+ 125 0086 04F58064 		add	r4, r4, #1024
+ 126 008a A042     		cmp	r0, r4
+ 127 008c 00F08680 		beq	.L33
+ 128              		.loc 1 294 0 discriminator 7
+ 129 0090 04F58064 		add	r4, r4, #1024
+ 130 0094 A042     		cmp	r0, r4
+ 131 0096 00F08380 		beq	.L34
+ 132              		.loc 1 294 0 discriminator 9
+ 133 009a 04F58064 		add	r4, r4, #1024
+ 134 009e A042     		cmp	r0, r4
+ 135 00a0 34D0     		beq	.L37
+ 136              		.loc 1 294 0
+ 137 00a2 0624     		movs	r4, #6
+ 138 00a4 35E0     		b	.L19
+ 139              	.LVL10:
+ 140              	.L6:
+ 208:library/src/stm32f1xx_hal_gpio.c ****       {
+ 141              		.loc 1 208 0 is_stmt 1
+ 142 00a6 504F     		ldr	r7, .L42+12
+ 143 00a8 BD42     		cmp	r5, r7
+ 144 00aa 14D0     		beq	.L9
+ 145 00ac 0BD9     		bls	.L38
+ 146 00ae 4F4F     		ldr	r7, .L42+16
+ 147 00b0 BD42     		cmp	r5, r7
+ 148 00b2 10D0     		beq	.L9
+ 149 00b4 07F58037 		add	r7, r7, #65536
+ 150 00b8 BD42     		cmp	r5, r7
+ 151 00ba 0CD0     		beq	.L9
+ 152 00bc A7F58017 		sub	r7, r7, #1048576
+ 153 00c0 BD42     		cmp	r5, r7
+ 154 00c2 A7D1     		bne	.L11
+ 155 00c4 07E0     		b	.L9
+ 156              	.L38:
+ 157 00c6 A7F58017 		sub	r7, r7, #1048576
+ 158 00ca BD42     		cmp	r5, r7
+ 159 00cc 03D0     		beq	.L9
+ 160 00ce 07F58037 		add	r7, r7, #65536
+ 161 00d2 BD42     		cmp	r5, r7
+ARM GAS  /tmp/ccSBsZ6X.s 			page 9
+
+
+ 162 00d4 9ED1     		bne	.L11
+ 163              	.L9:
+ 248:library/src/stm32f1xx_hal_gpio.c ****           {
+ 164              		.loc 1 248 0
+ 165 00d6 8D68     		ldr	r5, [r1, #8]
+ 166 00d8 7DB1     		cbz	r5, .L29
+ 252:library/src/stm32f1xx_hal_gpio.c ****           {
+ 167              		.loc 1 252 0
+ 168 00da 012D     		cmp	r5, #1
+ 169 00dc 08D0     		beq	.L39
+ 170              	.LVL11:
+ 264:library/src/stm32f1xx_hal_gpio.c ****           }
+ 171              		.loc 1 264 0
+ 172 00de 4461     		str	r4, [r0, #20]
+ 261:library/src/stm32f1xx_hal_gpio.c **** 
+ 173              		.loc 1 261 0
+ 174 00e0 0826     		movs	r6, #8
+ 175 00e2 97E7     		b	.L11
+ 176              	.LVL12:
+ 177              	.L7:
+ 228:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 178              		.loc 1 228 0
+ 179 00e4 CE68     		ldr	r6, [r1, #12]
+ 180              	.LVL13:
+ 181 00e6 0836     		adds	r6, r6, #8
+ 182              	.LVL14:
+ 229:library/src/stm32f1xx_hal_gpio.c **** 
+ 183              		.loc 1 229 0
+ 184 00e8 94E7     		b	.L11
+ 185              	.L5:
+ 235:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 186              		.loc 1 235 0
+ 187 00ea CE68     		ldr	r6, [r1, #12]
+ 188              	.LVL15:
+ 189 00ec 0C36     		adds	r6, r6, #12
+ 190              	.LVL16:
+ 236:library/src/stm32f1xx_hal_gpio.c **** 
+ 191              		.loc 1 236 0
+ 192 00ee 91E7     		b	.L11
+ 193              	.L39:
+ 194              	.LVL17:
+ 257:library/src/stm32f1xx_hal_gpio.c ****           }
+ 195              		.loc 1 257 0
+ 196 00f0 0461     		str	r4, [r0, #16]
+ 254:library/src/stm32f1xx_hal_gpio.c **** 
+ 197              		.loc 1 254 0
+ 198 00f2 0826     		movs	r6, #8
+ 199 00f4 8EE7     		b	.L11
+ 200              	.LVL18:
+ 201              	.L28:
+ 270:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 202              		.loc 1 270 0
+ 203 00f6 0026     		movs	r6, #0
+ 204              	.LVL19:
+ 205 00f8 8CE7     		b	.L11
+ 206              	.LVL20:
+ 207              	.L29:
+ARM GAS  /tmp/ccSBsZ6X.s 			page 10
+
+
+ 250:library/src/stm32f1xx_hal_gpio.c ****           }
+ 208              		.loc 1 250 0
+ 209 00fa 0426     		movs	r6, #4
+ 210              	.LVL21:
+ 211 00fc 8AE7     		b	.L11
+ 212              	.LVL22:
+ 213              	.L15:
+ 280:library/src/stm32f1xx_hal_gpio.c ****       registeroffset = (iocurrent < GPIO_PIN_8) ? (position << 2u) : ((position - 8u) << 2u);
+ 214              		.loc 1 280 0 discriminator 2
+ 215 00fe 00F1040C 		add	ip, r0, #4
+ 216 0102 8AE7     		b	.L16
+ 217              	.LVL23:
+ 218              	.L17:
+ 281:library/src/stm32f1xx_hal_gpio.c **** 
+ 219              		.loc 1 281 0 discriminator 2
+ 220 0104 A2F10805 		sub	r5, r2, #8
+ 221 0108 AD00     		lsls	r5, r5, #2
+ 222 010a 89E7     		b	.L18
+ 223              	.LVL24:
+ 224              	.L37:
+ 225              		.loc 1 294 0
+ 226 010c 0524     		movs	r4, #5
+ 227 010e 00E0     		b	.L19
+ 228              	.L30:
+ 229 0110 0024     		movs	r4, #0
+ 230              	.L19:
+ 231              		.loc 1 294 0 is_stmt 0 discriminator 24
+ 232 0112 BC40     		lsls	r4, r4, r7
+ 233 0114 44EA0C04 		orr	r4, r4, ip
+ 234              	.LVL25:
+ 295:library/src/stm32f1xx_hal_gpio.c ****         AFIO->EXTICR[position >> 2u] = temp;
+ 235              		.loc 1 295 0 is_stmt 1 discriminator 24
+ 236 0118 0235     		adds	r5, r5, #2
+ 237 011a 314F     		ldr	r7, .L42+4
+ 238 011c 47F82540 		str	r4, [r7, r5, lsl #2]
+ 296:library/src/stm32f1xx_hal_gpio.c **** 
+ 297:library/src/stm32f1xx_hal_gpio.c **** 
+ 298:library/src/stm32f1xx_hal_gpio.c ****         /* Configure the interrupt mask */
+ 299:library/src/stm32f1xx_hal_gpio.c ****         if ((GPIO_Init->Mode & GPIO_MODE_IT) == GPIO_MODE_IT)
+ 239              		.loc 1 299 0 discriminator 24
+ 240 0120 4C68     		ldr	r4, [r1, #4]
+ 241              	.LVL26:
+ 242 0122 14F4803F 		tst	r4, #65536
+ 243 0126 3DD0     		beq	.L20
+ 300:library/src/stm32f1xx_hal_gpio.c ****         {
+ 301:library/src/stm32f1xx_hal_gpio.c ****           SET_BIT(EXTI->IMR, iocurrent);
+ 244              		.loc 1 301 0
+ 245 0128 314D     		ldr	r5, .L42+20
+ 246              	.LVL27:
+ 247 012a 2C68     		ldr	r4, [r5]
+ 248 012c 1C43     		orrs	r4, r4, r3
+ 249 012e 2C60     		str	r4, [r5]
+ 250              	.LVL28:
+ 251              	.L21:
+ 302:library/src/stm32f1xx_hal_gpio.c ****         }
+ 303:library/src/stm32f1xx_hal_gpio.c ****         else
+ 304:library/src/stm32f1xx_hal_gpio.c ****         {
+ARM GAS  /tmp/ccSBsZ6X.s 			page 11
+
+
+ 305:library/src/stm32f1xx_hal_gpio.c ****           CLEAR_BIT(EXTI->IMR, iocurrent);
+ 306:library/src/stm32f1xx_hal_gpio.c ****         }
+ 307:library/src/stm32f1xx_hal_gpio.c **** 
+ 308:library/src/stm32f1xx_hal_gpio.c ****         /* Configure the event mask */
+ 309:library/src/stm32f1xx_hal_gpio.c ****         if ((GPIO_Init->Mode & GPIO_MODE_EVT) == GPIO_MODE_EVT)
+ 252              		.loc 1 309 0
+ 253 0130 4C68     		ldr	r4, [r1, #4]
+ 254 0132 14F4003F 		tst	r4, #131072
+ 255 0136 3BD0     		beq	.L22
+ 310:library/src/stm32f1xx_hal_gpio.c ****         {
+ 311:library/src/stm32f1xx_hal_gpio.c ****           SET_BIT(EXTI->EMR, iocurrent);
+ 256              		.loc 1 311 0
+ 257 0138 2D4D     		ldr	r5, .L42+20
+ 258 013a 6C68     		ldr	r4, [r5, #4]
+ 259 013c 1C43     		orrs	r4, r4, r3
+ 260 013e 6C60     		str	r4, [r5, #4]
+ 261              	.L23:
+ 312:library/src/stm32f1xx_hal_gpio.c ****         }
+ 313:library/src/stm32f1xx_hal_gpio.c ****         else
+ 314:library/src/stm32f1xx_hal_gpio.c ****         {
+ 315:library/src/stm32f1xx_hal_gpio.c ****           CLEAR_BIT(EXTI->EMR, iocurrent);
+ 316:library/src/stm32f1xx_hal_gpio.c ****         }
+ 317:library/src/stm32f1xx_hal_gpio.c **** 
+ 318:library/src/stm32f1xx_hal_gpio.c ****         /* Enable or disable the rising trigger */
+ 319:library/src/stm32f1xx_hal_gpio.c ****         if ((GPIO_Init->Mode & RISING_EDGE) == RISING_EDGE)
+ 262              		.loc 1 319 0
+ 263 0140 4C68     		ldr	r4, [r1, #4]
+ 264 0142 14F4801F 		tst	r4, #1048576
+ 265 0146 39D0     		beq	.L24
+ 320:library/src/stm32f1xx_hal_gpio.c ****         {
+ 321:library/src/stm32f1xx_hal_gpio.c ****           SET_BIT(EXTI->RTSR, iocurrent);
+ 266              		.loc 1 321 0
+ 267 0148 294D     		ldr	r5, .L42+20
+ 268 014a AC68     		ldr	r4, [r5, #8]
+ 269 014c 1C43     		orrs	r4, r4, r3
+ 270 014e AC60     		str	r4, [r5, #8]
+ 271              	.L25:
+ 322:library/src/stm32f1xx_hal_gpio.c ****         }
+ 323:library/src/stm32f1xx_hal_gpio.c ****         else
+ 324:library/src/stm32f1xx_hal_gpio.c ****         {
+ 325:library/src/stm32f1xx_hal_gpio.c ****           CLEAR_BIT(EXTI->RTSR, iocurrent);
+ 326:library/src/stm32f1xx_hal_gpio.c ****         }
+ 327:library/src/stm32f1xx_hal_gpio.c **** 
+ 328:library/src/stm32f1xx_hal_gpio.c ****         /* Enable or disable the falling trigger */
+ 329:library/src/stm32f1xx_hal_gpio.c ****         if ((GPIO_Init->Mode & FALLING_EDGE) == FALLING_EDGE)
+ 272              		.loc 1 329 0
+ 273 0150 4C68     		ldr	r4, [r1, #4]
+ 274 0152 14F4001F 		tst	r4, #2097152
+ 275 0156 37D0     		beq	.L26
+ 330:library/src/stm32f1xx_hal_gpio.c ****         {
+ 331:library/src/stm32f1xx_hal_gpio.c ****           SET_BIT(EXTI->FTSR, iocurrent);
+ 276              		.loc 1 331 0
+ 277 0158 254D     		ldr	r5, .L42+20
+ 278 015a EC68     		ldr	r4, [r5, #12]
+ 279 015c 2343     		orrs	r3, r3, r4
+ 280              	.LVL29:
+ 281 015e EB60     		str	r3, [r5, #12]
+ARM GAS  /tmp/ccSBsZ6X.s 			page 12
+
+
+ 282              	.L3:
+ 332:library/src/stm32f1xx_hal_gpio.c ****         }
+ 333:library/src/stm32f1xx_hal_gpio.c ****         else
+ 334:library/src/stm32f1xx_hal_gpio.c ****         {
+ 335:library/src/stm32f1xx_hal_gpio.c ****           CLEAR_BIT(EXTI->FTSR, iocurrent);
+ 336:library/src/stm32f1xx_hal_gpio.c ****         }
+ 337:library/src/stm32f1xx_hal_gpio.c ****       }
+ 338:library/src/stm32f1xx_hal_gpio.c ****     }
+ 339:library/src/stm32f1xx_hal_gpio.c **** 
+ 340:library/src/stm32f1xx_hal_gpio.c **** 	position++;
+ 283              		.loc 1 340 0
+ 284 0160 0132     		adds	r2, r2, #1
+ 285              	.LVL30:
+ 286              	.L2:
+ 194:library/src/stm32f1xx_hal_gpio.c ****   {
+ 287              		.loc 1 194 0
+ 288 0162 0B68     		ldr	r3, [r1]
+ 289 0164 33FA02F4 		lsrs	r4, r3, r2
+ 290 0168 34D0     		beq	.L40
+ 197:library/src/stm32f1xx_hal_gpio.c **** 
+ 291              		.loc 1 197 0
+ 292 016a 0124     		movs	r4, #1
+ 293 016c 9440     		lsls	r4, r4, r2
+ 294              	.LVL31:
+ 200:library/src/stm32f1xx_hal_gpio.c **** 
+ 295              		.loc 1 200 0
+ 296 016e 2340     		ands	r3, r3, r4
+ 297              	.LVL32:
+ 202:library/src/stm32f1xx_hal_gpio.c ****     {
+ 298              		.loc 1 202 0
+ 299 0170 9C42     		cmp	r4, r3
+ 300 0172 F5D1     		bne	.L3
+ 208:library/src/stm32f1xx_hal_gpio.c ****       {
+ 301              		.loc 1 208 0
+ 302 0174 4D68     		ldr	r5, [r1, #4]
+ 303 0176 122D     		cmp	r5, #18
+ 304 0178 B7D0     		beq	.L5
+ 305 017a 94D8     		bhi	.L6
+ 306 017c 022D     		cmp	r5, #2
+ 307 017e B1D0     		beq	.L7
+ 308 0180 7FF643AF 		bls	.L41
+ 309 0184 032D     		cmp	r5, #3
+ 310 0186 B6D0     		beq	.L28
+ 311 0188 112D     		cmp	r5, #17
+ 312 018a 7FF443AF 		bne	.L11
+ 221:library/src/stm32f1xx_hal_gpio.c ****           break;
+ 313              		.loc 1 221 0
+ 314 018e CE68     		ldr	r6, [r1, #12]
+ 315              	.LVL33:
+ 316 0190 0436     		adds	r6, r6, #4
+ 317              	.LVL34:
+ 222:library/src/stm32f1xx_hal_gpio.c **** 
+ 318              		.loc 1 222 0
+ 319 0192 3FE7     		b	.L11
+ 320              	.LVL35:
+ 321              	.L31:
+ 294:library/src/stm32f1xx_hal_gpio.c ****         AFIO->EXTICR[position >> 2u] = temp;
+ARM GAS  /tmp/ccSBsZ6X.s 			page 13
+
+
+ 322              		.loc 1 294 0
+ 323 0194 0124     		movs	r4, #1
+ 324              	.LVL36:
+ 325 0196 BCE7     		b	.L19
+ 326              	.LVL37:
+ 327              	.L32:
+ 328 0198 0224     		movs	r4, #2
+ 329 019a BAE7     		b	.L19
+ 330              	.L33:
+ 331 019c 0324     		movs	r4, #3
+ 332 019e B8E7     		b	.L19
+ 333              	.L34:
+ 334 01a0 0424     		movs	r4, #4
+ 335 01a2 B6E7     		b	.L19
+ 336              	.LVL38:
+ 337              	.L20:
+ 305:library/src/stm32f1xx_hal_gpio.c ****         }
+ 338              		.loc 1 305 0
+ 339 01a4 124D     		ldr	r5, .L42+20
+ 340              	.LVL39:
+ 341 01a6 2C68     		ldr	r4, [r5]
+ 342 01a8 24EA0304 		bic	r4, r4, r3
+ 343 01ac 2C60     		str	r4, [r5]
+ 344              	.LVL40:
+ 345 01ae BFE7     		b	.L21
+ 346              	.L22:
+ 315:library/src/stm32f1xx_hal_gpio.c ****         }
+ 347              		.loc 1 315 0
+ 348 01b0 0F4D     		ldr	r5, .L42+20
+ 349 01b2 6C68     		ldr	r4, [r5, #4]
+ 350 01b4 24EA0304 		bic	r4, r4, r3
+ 351 01b8 6C60     		str	r4, [r5, #4]
+ 352 01ba C1E7     		b	.L23
+ 353              	.L24:
+ 325:library/src/stm32f1xx_hal_gpio.c ****         }
+ 354              		.loc 1 325 0
+ 355 01bc 0C4D     		ldr	r5, .L42+20
+ 356 01be AC68     		ldr	r4, [r5, #8]
+ 357 01c0 24EA0304 		bic	r4, r4, r3
+ 358 01c4 AC60     		str	r4, [r5, #8]
+ 359 01c6 C3E7     		b	.L25
+ 360              	.L26:
+ 335:library/src/stm32f1xx_hal_gpio.c ****         }
+ 361              		.loc 1 335 0
+ 362 01c8 094D     		ldr	r5, .L42+20
+ 363 01ca EC68     		ldr	r4, [r5, #12]
+ 364 01cc 24EA0303 		bic	r3, r4, r3
+ 365              	.LVL41:
+ 366 01d0 EB60     		str	r3, [r5, #12]
+ 367 01d2 C5E7     		b	.L3
+ 368              	.LVL42:
+ 369              	.L40:
+ 341:library/src/stm32f1xx_hal_gpio.c ****   }
+ 342:library/src/stm32f1xx_hal_gpio.c **** }
+ 370              		.loc 1 342 0
+ 371 01d4 02B0     		add	sp, sp, #8
+ 372              	.LCFI2:
+ARM GAS  /tmp/ccSBsZ6X.s 			page 14
+
+
+ 373              		.cfi_def_cfa_offset 16
+ 374              		@ sp needed
+ 375 01d6 F0BC     		pop	{r4, r5, r6, r7}
+ 376              	.LCFI3:
+ 377              		.cfi_restore 7
+ 378              		.cfi_restore 6
+ 379              		.cfi_restore 5
+ 380              		.cfi_restore 4
+ 381              		.cfi_def_cfa_offset 0
+ 382              	.LVL43:
+ 383 01d8 7047     		bx	lr
+ 384              	.L43:
+ 385 01da 00BF     		.align	2
+ 386              	.L42:
+ 387 01dc 00100240 		.word	1073876992
+ 388 01e0 00000140 		.word	1073807360
+ 389 01e4 00080140 		.word	1073809408
+ 390 01e8 00002110 		.word	270598144
+ 391 01ec 00003110 		.word	271646720
+ 392 01f0 00040140 		.word	1073808384
+ 393              		.cfi_endproc
+ 394              	.LFE65:
+ 396              		.section	.text.HAL_GPIO_DeInit,"ax",%progbits
+ 397              		.align	1
+ 398              		.global	HAL_GPIO_DeInit
+ 399              		.syntax unified
+ 400              		.thumb
+ 401              		.thumb_func
+ 402              		.fpu softvfp
+ 404              	HAL_GPIO_DeInit:
+ 405              	.LFB66:
+ 343:library/src/stm32f1xx_hal_gpio.c **** 
+ 344:library/src/stm32f1xx_hal_gpio.c **** /**
+ 345:library/src/stm32f1xx_hal_gpio.c ****   * @brief  De-initializes the GPIOx peripheral registers to their default reset values.
+ 346:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 347:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: specifies the port bit to be written.
+ 348:library/src/stm32f1xx_hal_gpio.c ****   *         This parameter can be one of GPIO_PIN_x where x can be (0..15).
+ 349:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 350:library/src/stm32f1xx_hal_gpio.c ****   */
+ 351:library/src/stm32f1xx_hal_gpio.c **** void HAL_GPIO_DeInit(GPIO_TypeDef  *GPIOx, uint32_t GPIO_Pin)
+ 352:library/src/stm32f1xx_hal_gpio.c **** {
+ 406              		.loc 1 352 0
+ 407              		.cfi_startproc
+ 408              		@ args = 0, pretend = 0, frame = 0
+ 409              		@ frame_needed = 0, uses_anonymous_args = 0
+ 410              		@ link register save eliminated.
+ 411              	.LVL44:
+ 353:library/src/stm32f1xx_hal_gpio.c ****   uint32_t position = 0x00u;
+ 412              		.loc 1 353 0
+ 413 0000 0022     		movs	r2, #0
+ 354:library/src/stm32f1xx_hal_gpio.c ****   uint32_t iocurrent;
+ 355:library/src/stm32f1xx_hal_gpio.c ****   uint32_t tmp;
+ 356:library/src/stm32f1xx_hal_gpio.c ****   __IO uint32_t *configregister; /* Store the address of CRL or CRH register based on pin number */
+ 357:library/src/stm32f1xx_hal_gpio.c ****   uint32_t registeroffset;
+ 358:library/src/stm32f1xx_hal_gpio.c **** 
+ 359:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 360:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_ALL_INSTANCE(GPIOx));
+ARM GAS  /tmp/ccSBsZ6X.s 			page 15
+
+
+ 361:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Pin));
+ 362:library/src/stm32f1xx_hal_gpio.c **** 
+ 363:library/src/stm32f1xx_hal_gpio.c ****   /* Configure the port pins */
+ 364:library/src/stm32f1xx_hal_gpio.c ****   while ((GPIO_Pin >> position) != 0u)
+ 414              		.loc 1 364 0
+ 415 0002 74E0     		b	.L61
+ 416              	.LVL45:
+ 417              	.L68:
+ 418              	.LCFI4:
+ 419              		.cfi_def_cfa_offset 16
+ 420              		.cfi_offset 4, -16
+ 421              		.cfi_offset 5, -12
+ 422              		.cfi_offset 6, -8
+ 423              		.cfi_offset 7, -4
+ 365:library/src/stm32f1xx_hal_gpio.c ****   {
+ 366:library/src/stm32f1xx_hal_gpio.c ****     /* Get current io position */
+ 367:library/src/stm32f1xx_hal_gpio.c ****     iocurrent = (GPIO_Pin) & (1uL << position);
+ 368:library/src/stm32f1xx_hal_gpio.c **** 
+ 369:library/src/stm32f1xx_hal_gpio.c ****     if (iocurrent)
+ 370:library/src/stm32f1xx_hal_gpio.c ****     {
+ 371:library/src/stm32f1xx_hal_gpio.c ****       /*------------------------- EXTI Mode Configuration --------------------*/
+ 372:library/src/stm32f1xx_hal_gpio.c ****       /* Clear the External Interrupt or Event for the current IO */
+ 373:library/src/stm32f1xx_hal_gpio.c **** 
+ 374:library/src/stm32f1xx_hal_gpio.c ****       tmp = AFIO->EXTICR[position >> 2u];
+ 375:library/src/stm32f1xx_hal_gpio.c ****       tmp &= 0x0FuL << (4u * (position & 0x03u));
+ 376:library/src/stm32f1xx_hal_gpio.c ****       if (tmp == (GPIO_GET_INDEX(GPIOx) << (4u * (position & 0x03u))))
+ 424              		.loc 1 376 0
+ 425 0004 0526     		movs	r6, #5
+ 426 0006 00E0     		b	.L47
+ 427              	.L54:
+ 428 0008 0026     		movs	r6, #0
+ 429              	.L47:
+ 430              		.loc 1 376 0 is_stmt 0 discriminator 24
+ 431 000a 06FA04F4 		lsl	r4, r6, r4
+ 432 000e AC42     		cmp	r4, r5
+ 433 0010 4BD0     		beq	.L66
+ 434              	.LVL46:
+ 435              	.L48:
+ 377:library/src/stm32f1xx_hal_gpio.c ****       {
+ 378:library/src/stm32f1xx_hal_gpio.c ****         tmp = 0x0FuL << (4u * (position & 0x03u));
+ 379:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(AFIO->EXTICR[position >> 2u], tmp);
+ 380:library/src/stm32f1xx_hal_gpio.c **** 
+ 381:library/src/stm32f1xx_hal_gpio.c ****         /* Clear EXTI line configuration */
+ 382:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->IMR, (uint32_t)iocurrent);
+ 383:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->EMR, (uint32_t)iocurrent);
+ 384:library/src/stm32f1xx_hal_gpio.c **** 
+ 385:library/src/stm32f1xx_hal_gpio.c ****         /* Clear Rising Falling edge configuration */
+ 386:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->RTSR, (uint32_t)iocurrent);
+ 387:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->FTSR, (uint32_t)iocurrent);
+ 388:library/src/stm32f1xx_hal_gpio.c ****       }
+ 389:library/src/stm32f1xx_hal_gpio.c ****       /*------------------------- GPIO Mode Configuration --------------------*/
+ 390:library/src/stm32f1xx_hal_gpio.c ****       /* Check if the current bit belongs to first half or last half of the pin count number
+ 391:library/src/stm32f1xx_hal_gpio.c ****        in order to address CRH or CRL register */
+ 392:library/src/stm32f1xx_hal_gpio.c ****       configregister = (iocurrent < GPIO_PIN_8) ? &GPIOx->CRL     : &GPIOx->CRH;
+ 436              		.loc 1 392 0 is_stmt 1
+ 437 0012 FF2B     		cmp	r3, #255
+ 438 0014 61D8     		bhi	.L49
+ARM GAS  /tmp/ccSBsZ6X.s 			page 16
+
+
+ 439              		.loc 1 392 0 is_stmt 0 discriminator 1
+ 440 0016 8446     		mov	ip, r0
+ 441              	.L50:
+ 442              	.LVL47:
+ 393:library/src/stm32f1xx_hal_gpio.c ****       registeroffset = (iocurrent < GPIO_PIN_8) ? (position << 2u) : ((position - 8u) << 2u);
+ 443              		.loc 1 393 0 is_stmt 1 discriminator 4
+ 444 0018 FF2B     		cmp	r3, #255
+ 445 001a 61D8     		bhi	.L51
+ 446              		.loc 1 393 0 is_stmt 0 discriminator 1
+ 447 001c 9700     		lsls	r7, r2, #2
+ 448              	.L52:
+ 449              	.LVL48:
+ 394:library/src/stm32f1xx_hal_gpio.c **** 
+ 395:library/src/stm32f1xx_hal_gpio.c ****       /* CRL/CRH default value is floating input(0x04) shifted to correct position */
+ 396:library/src/stm32f1xx_hal_gpio.c ****       MODIFY_REG(*configregister, ((GPIO_CRL_MODE0 | GPIO_CRL_CNF0) << registeroffset), GPIO_CRL_CN
+ 450              		.loc 1 396 0 is_stmt 1 discriminator 4
+ 451 001e DCF80040 		ldr	r4, [ip]
+ 452 0022 0F26     		movs	r6, #15
+ 453 0024 BE40     		lsls	r6, r6, r7
+ 454 0026 24EA0604 		bic	r4, r4, r6
+ 455 002a 0425     		movs	r5, #4
+ 456 002c BD40     		lsls	r5, r5, r7
+ 457 002e 2C43     		orrs	r4, r4, r5
+ 458 0030 CCF80040 		str	r4, [ip]
+ 397:library/src/stm32f1xx_hal_gpio.c **** 
+ 398:library/src/stm32f1xx_hal_gpio.c ****       /* ODR default value is 0 */
+ 399:library/src/stm32f1xx_hal_gpio.c ****       CLEAR_BIT(GPIOx->ODR, iocurrent);
+ 459              		.loc 1 399 0 discriminator 4
+ 460 0034 C468     		ldr	r4, [r0, #12]
+ 461 0036 24EA0303 		bic	r3, r4, r3
+ 462              	.LVL49:
+ 463 003a C360     		str	r3, [r0, #12]
+ 464              	.L46:
+ 400:library/src/stm32f1xx_hal_gpio.c ****     }
+ 401:library/src/stm32f1xx_hal_gpio.c **** 
+ 402:library/src/stm32f1xx_hal_gpio.c ****     position++;
+ 465              		.loc 1 402 0
+ 466 003c 0132     		adds	r2, r2, #1
+ 467              	.LVL50:
+ 364:library/src/stm32f1xx_hal_gpio.c ****   {
+ 468              		.loc 1 364 0
+ 469 003e 31FA02F3 		lsrs	r3, r1, r2
+ 470 0042 51D0     		beq	.L67
+ 367:library/src/stm32f1xx_hal_gpio.c **** 
+ 471              		.loc 1 367 0
+ 472 0044 0123     		movs	r3, #1
+ 473 0046 9340     		lsls	r3, r3, r2
+ 474              	.LVL51:
+ 369:library/src/stm32f1xx_hal_gpio.c ****     {
+ 475              		.loc 1 369 0
+ 476 0048 0B40     		ands	r3, r3, r1
+ 477              	.LVL52:
+ 478 004a F7D0     		beq	.L46
+ 479              	.LVL53:
+ 480              	.L62:
+ 374:library/src/stm32f1xx_hal_gpio.c ****       tmp &= 0x0FuL << (4u * (position & 0x03u));
+ 481              		.loc 1 374 0
+ARM GAS  /tmp/ccSBsZ6X.s 			page 17
+
+
+ 482 004c 4FEA920C 		lsr	ip, r2, #2
+ 483 0050 0CF10205 		add	r5, ip, #2
+ 484 0054 2B4C     		ldr	r4, .L71
+ 485 0056 54F82550 		ldr	r5, [r4, r5, lsl #2]
+ 486              	.LVL54:
+ 375:library/src/stm32f1xx_hal_gpio.c ****       if (tmp == (GPIO_GET_INDEX(GPIOx) << (4u * (position & 0x03u))))
+ 487              		.loc 1 375 0
+ 488 005a 02F00304 		and	r4, r2, #3
+ 489 005e A400     		lsls	r4, r4, #2
+ 490 0060 0F26     		movs	r6, #15
+ 491 0062 06FA04F7 		lsl	r7, r6, r4
+ 492 0066 3D40     		ands	r5, r5, r7
+ 493              	.LVL55:
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 494              		.loc 1 376 0
+ 495 0068 274E     		ldr	r6, .L71+4
+ 496 006a B042     		cmp	r0, r6
+ 497 006c CCD0     		beq	.L54
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 498              		.loc 1 376 0 is_stmt 0 discriminator 1
+ 499 006e 06F58066 		add	r6, r6, #1024
+ 500 0072 B042     		cmp	r0, r6
+ 501 0074 11D0     		beq	.L55
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 502              		.loc 1 376 0 discriminator 3
+ 503 0076 06F58066 		add	r6, r6, #1024
+ 504 007a B042     		cmp	r0, r6
+ 505 007c 0FD0     		beq	.L56
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 506              		.loc 1 376 0 discriminator 5
+ 507 007e 06F58066 		add	r6, r6, #1024
+ 508 0082 B042     		cmp	r0, r6
+ 509 0084 0DD0     		beq	.L57
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 510              		.loc 1 376 0 discriminator 7
+ 511 0086 06F58066 		add	r6, r6, #1024
+ 512 008a B042     		cmp	r0, r6
+ 513 008c 0BD0     		beq	.L58
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 514              		.loc 1 376 0 discriminator 9
+ 515 008e 06F58066 		add	r6, r6, #1024
+ 516 0092 B042     		cmp	r0, r6
+ 517 0094 B6D0     		beq	.L68
+ 376:library/src/stm32f1xx_hal_gpio.c ****       {
+ 518              		.loc 1 376 0
+ 519 0096 0626     		movs	r6, #6
+ 520 0098 B7E7     		b	.L47
+ 521              	.L55:
+ 522 009a 0126     		movs	r6, #1
+ 523 009c B5E7     		b	.L47
+ 524              	.L56:
+ 525 009e 0226     		movs	r6, #2
+ 526 00a0 B3E7     		b	.L47
+ 527              	.L57:
+ 528 00a2 0326     		movs	r6, #3
+ 529 00a4 B1E7     		b	.L47
+ 530              	.L58:
+ARM GAS  /tmp/ccSBsZ6X.s 			page 18
+
+
+ 531 00a6 0426     		movs	r6, #4
+ 532 00a8 AFE7     		b	.L47
+ 533              	.L66:
+ 534              	.LVL56:
+ 379:library/src/stm32f1xx_hal_gpio.c **** 
+ 535              		.loc 1 379 0 is_stmt 1
+ 536 00aa 164D     		ldr	r5, .L71
+ 537 00ac 0CF10204 		add	r4, ip, #2
+ 538 00b0 55F82460 		ldr	r6, [r5, r4, lsl #2]
+ 539 00b4 26EA0706 		bic	r6, r6, r7
+ 540 00b8 45F82460 		str	r6, [r5, r4, lsl #2]
+ 382:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->EMR, (uint32_t)iocurrent);
+ 541              		.loc 1 382 0
+ 542 00bc 134C     		ldr	r4, .L71+8
+ 543 00be 2668     		ldr	r6, [r4]
+ 544 00c0 DD43     		mvns	r5, r3
+ 545 00c2 2E40     		ands	r6, r6, r5
+ 546 00c4 2660     		str	r6, [r4]
+ 383:library/src/stm32f1xx_hal_gpio.c **** 
+ 547              		.loc 1 383 0
+ 548 00c6 6668     		ldr	r6, [r4, #4]
+ 549 00c8 2E40     		ands	r6, r6, r5
+ 550 00ca 6660     		str	r6, [r4, #4]
+ 386:library/src/stm32f1xx_hal_gpio.c ****         CLEAR_BIT(EXTI->FTSR, (uint32_t)iocurrent);
+ 551              		.loc 1 386 0
+ 552 00cc A668     		ldr	r6, [r4, #8]
+ 553 00ce 2E40     		ands	r6, r6, r5
+ 554 00d0 A660     		str	r6, [r4, #8]
+ 387:library/src/stm32f1xx_hal_gpio.c ****       }
+ 555              		.loc 1 387 0
+ 556 00d2 E668     		ldr	r6, [r4, #12]
+ 557 00d4 3540     		ands	r5, r5, r6
+ 558 00d6 E560     		str	r5, [r4, #12]
+ 559 00d8 9BE7     		b	.L48
+ 560              	.LVL57:
+ 561              	.L49:
+ 392:library/src/stm32f1xx_hal_gpio.c ****       registeroffset = (iocurrent < GPIO_PIN_8) ? (position << 2u) : ((position - 8u) << 2u);
+ 562              		.loc 1 392 0 discriminator 2
+ 563 00da 00F1040C 		add	ip, r0, #4
+ 564 00de 9BE7     		b	.L50
+ 565              	.LVL58:
+ 566              	.L51:
+ 393:library/src/stm32f1xx_hal_gpio.c **** 
+ 567              		.loc 1 393 0 discriminator 2
+ 568 00e0 A2F10805 		sub	r5, r2, #8
+ 569 00e4 AF00     		lsls	r7, r5, #2
+ 570 00e6 9AE7     		b	.L52
+ 571              	.LVL59:
+ 572              	.L67:
+ 403:library/src/stm32f1xx_hal_gpio.c ****   }
+ 404:library/src/stm32f1xx_hal_gpio.c **** }
+ 573              		.loc 1 404 0
+ 574 00e8 F0BC     		pop	{r4, r5, r6, r7}
+ 575              	.LCFI5:
+ 576              		.cfi_restore 7
+ 577              		.cfi_restore 6
+ 578              		.cfi_restore 5
+ARM GAS  /tmp/ccSBsZ6X.s 			page 19
+
+
+ 579              		.cfi_restore 4
+ 580              		.cfi_def_cfa_offset 0
+ 581              	.LVL60:
+ 582 00ea 7047     		bx	lr
+ 583              	.LVL61:
+ 584              	.L70:
+ 402:library/src/stm32f1xx_hal_gpio.c ****   }
+ 585              		.loc 1 402 0
+ 586 00ec 0132     		adds	r2, r2, #1
+ 587              	.LVL62:
+ 588              	.L61:
+ 364:library/src/stm32f1xx_hal_gpio.c ****   {
+ 589              		.loc 1 364 0
+ 590 00ee 31FA02F3 		lsrs	r3, r1, r2
+ 591 00f2 05D0     		beq	.L69
+ 367:library/src/stm32f1xx_hal_gpio.c **** 
+ 592              		.loc 1 367 0
+ 593 00f4 0123     		movs	r3, #1
+ 594 00f6 9340     		lsls	r3, r3, r2
+ 595              	.LVL63:
+ 369:library/src/stm32f1xx_hal_gpio.c ****     {
+ 596              		.loc 1 369 0
+ 597 00f8 0B40     		ands	r3, r3, r1
+ 598              	.LVL64:
+ 599 00fa F7D0     		beq	.L70
+ 352:library/src/stm32f1xx_hal_gpio.c ****   uint32_t position = 0x00u;
+ 600              		.loc 1 352 0
+ 601 00fc F0B4     		push	{r4, r5, r6, r7}
+ 602              	.LCFI6:
+ 603              		.cfi_def_cfa_offset 16
+ 604              		.cfi_offset 4, -16
+ 605              		.cfi_offset 5, -12
+ 606              		.cfi_offset 6, -8
+ 607              		.cfi_offset 7, -4
+ 608 00fe A5E7     		b	.L62
+ 609              	.LVL65:
+ 610              	.L69:
+ 611              	.LCFI7:
+ 612              		.cfi_def_cfa_offset 0
+ 613              		.cfi_restore 4
+ 614              		.cfi_restore 5
+ 615              		.cfi_restore 6
+ 616              		.cfi_restore 7
+ 617 0100 7047     		bx	lr
+ 618              	.L72:
+ 619 0102 00BF     		.align	2
+ 620              	.L71:
+ 621 0104 00000140 		.word	1073807360
+ 622 0108 00080140 		.word	1073809408
+ 623 010c 00040140 		.word	1073808384
+ 624              		.cfi_endproc
+ 625              	.LFE66:
+ 627              		.section	.text.HAL_GPIO_ReadPin,"ax",%progbits
+ 628              		.align	1
+ 629              		.global	HAL_GPIO_ReadPin
+ 630              		.syntax unified
+ 631              		.thumb
+ARM GAS  /tmp/ccSBsZ6X.s 			page 20
+
+
+ 632              		.thumb_func
+ 633              		.fpu softvfp
+ 635              	HAL_GPIO_ReadPin:
+ 636              	.LFB67:
+ 405:library/src/stm32f1xx_hal_gpio.c **** 
+ 406:library/src/stm32f1xx_hal_gpio.c **** /**
+ 407:library/src/stm32f1xx_hal_gpio.c ****   * @}
+ 408:library/src/stm32f1xx_hal_gpio.c ****   */
+ 409:library/src/stm32f1xx_hal_gpio.c **** 
+ 410:library/src/stm32f1xx_hal_gpio.c **** /** @defgroup GPIO_Exported_Functions_Group2 IO operation functions
+ 411:library/src/stm32f1xx_hal_gpio.c ****  *  @brief   GPIO Read and Write
+ 412:library/src/stm32f1xx_hal_gpio.c ****  *
+ 413:library/src/stm32f1xx_hal_gpio.c **** @verbatim
+ 414:library/src/stm32f1xx_hal_gpio.c ****  ===============================================================================
+ 415:library/src/stm32f1xx_hal_gpio.c ****                        ##### IO operation functions #####
+ 416:library/src/stm32f1xx_hal_gpio.c ****  ===============================================================================
+ 417:library/src/stm32f1xx_hal_gpio.c ****   [..]
+ 418:library/src/stm32f1xx_hal_gpio.c ****     This subsection provides a set of functions allowing to manage the GPIOs.
+ 419:library/src/stm32f1xx_hal_gpio.c **** 
+ 420:library/src/stm32f1xx_hal_gpio.c **** @endverbatim
+ 421:library/src/stm32f1xx_hal_gpio.c ****   * @{
+ 422:library/src/stm32f1xx_hal_gpio.c ****   */
+ 423:library/src/stm32f1xx_hal_gpio.c **** 
+ 424:library/src/stm32f1xx_hal_gpio.c **** /**
+ 425:library/src/stm32f1xx_hal_gpio.c ****   * @brief  Reads the specified input port pin.
+ 426:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 427:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: specifies the port bit to read.
+ 428:library/src/stm32f1xx_hal_gpio.c ****   *         This parameter can be GPIO_PIN_x where x can be (0..15).
+ 429:library/src/stm32f1xx_hal_gpio.c ****   * @retval The input port pin value.
+ 430:library/src/stm32f1xx_hal_gpio.c ****   */
+ 431:library/src/stm32f1xx_hal_gpio.c **** GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
+ 432:library/src/stm32f1xx_hal_gpio.c **** {
+ 637              		.loc 1 432 0
+ 638              		.cfi_startproc
+ 639              		@ args = 0, pretend = 0, frame = 0
+ 640              		@ frame_needed = 0, uses_anonymous_args = 0
+ 641              		@ link register save eliminated.
+ 642              	.LVL66:
+ 433:library/src/stm32f1xx_hal_gpio.c ****   GPIO_PinState bitstatus;
+ 434:library/src/stm32f1xx_hal_gpio.c **** 
+ 435:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 436:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Pin));
+ 437:library/src/stm32f1xx_hal_gpio.c **** 
+ 438:library/src/stm32f1xx_hal_gpio.c ****   if ((GPIOx->IDR & GPIO_Pin) != (uint32_t)GPIO_PIN_RESET)
+ 643              		.loc 1 438 0
+ 644 0000 8368     		ldr	r3, [r0, #8]
+ 645 0002 1942     		tst	r1, r3
+ 646 0004 01D1     		bne	.L76
+ 439:library/src/stm32f1xx_hal_gpio.c ****   {
+ 440:library/src/stm32f1xx_hal_gpio.c ****     bitstatus = GPIO_PIN_SET;
+ 441:library/src/stm32f1xx_hal_gpio.c ****   }
+ 442:library/src/stm32f1xx_hal_gpio.c ****   else
+ 443:library/src/stm32f1xx_hal_gpio.c ****   {
+ 444:library/src/stm32f1xx_hal_gpio.c ****     bitstatus = GPIO_PIN_RESET;
+ 647              		.loc 1 444 0
+ 648 0006 0020     		movs	r0, #0
+ 649              	.LVL67:
+ARM GAS  /tmp/ccSBsZ6X.s 			page 21
+
+
+ 445:library/src/stm32f1xx_hal_gpio.c ****   }
+ 446:library/src/stm32f1xx_hal_gpio.c ****   return bitstatus;
+ 447:library/src/stm32f1xx_hal_gpio.c **** }
+ 650              		.loc 1 447 0
+ 651 0008 7047     		bx	lr
+ 652              	.LVL68:
+ 653              	.L76:
+ 440:library/src/stm32f1xx_hal_gpio.c ****   }
+ 654              		.loc 1 440 0
+ 655 000a 0120     		movs	r0, #1
+ 656              	.LVL69:
+ 657 000c 7047     		bx	lr
+ 658              		.cfi_endproc
+ 659              	.LFE67:
+ 661              		.section	.text.HAL_GPIO_WritePin,"ax",%progbits
+ 662              		.align	1
+ 663              		.global	HAL_GPIO_WritePin
+ 664              		.syntax unified
+ 665              		.thumb
+ 666              		.thumb_func
+ 667              		.fpu softvfp
+ 669              	HAL_GPIO_WritePin:
+ 670              	.LFB68:
+ 448:library/src/stm32f1xx_hal_gpio.c **** 
+ 449:library/src/stm32f1xx_hal_gpio.c **** /**
+ 450:library/src/stm32f1xx_hal_gpio.c ****   * @brief  Sets or clears the selected data port bit.
+ 451:library/src/stm32f1xx_hal_gpio.c ****   *
+ 452:library/src/stm32f1xx_hal_gpio.c ****   * @note   This function uses GPIOx_BSRR register to allow atomic read/modify
+ 453:library/src/stm32f1xx_hal_gpio.c ****   *         accesses. In this way, there is no risk of an IRQ occurring between
+ 454:library/src/stm32f1xx_hal_gpio.c ****   *         the read and the modify access.
+ 455:library/src/stm32f1xx_hal_gpio.c ****   *
+ 456:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 457:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: specifies the port bit to be written.
+ 458:library/src/stm32f1xx_hal_gpio.c ****   *          This parameter can be one of GPIO_PIN_x where x can be (0..15).
+ 459:library/src/stm32f1xx_hal_gpio.c ****   * @param  PinState: specifies the value to be written to the selected bit.
+ 460:library/src/stm32f1xx_hal_gpio.c ****   *          This parameter can be one of the GPIO_PinState enum values:
+ 461:library/src/stm32f1xx_hal_gpio.c ****   *            @arg GPIO_PIN_RESET: to clear the port pin
+ 462:library/src/stm32f1xx_hal_gpio.c ****   *            @arg GPIO_PIN_SET: to set the port pin
+ 463:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 464:library/src/stm32f1xx_hal_gpio.c ****   */
+ 465:library/src/stm32f1xx_hal_gpio.c **** void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)
+ 466:library/src/stm32f1xx_hal_gpio.c **** {
+ 671              		.loc 1 466 0
+ 672              		.cfi_startproc
+ 673              		@ args = 0, pretend = 0, frame = 0
+ 674              		@ frame_needed = 0, uses_anonymous_args = 0
+ 675              		@ link register save eliminated.
+ 676              	.LVL70:
+ 467:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 468:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Pin));
+ 469:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN_ACTION(PinState));
+ 470:library/src/stm32f1xx_hal_gpio.c **** 
+ 471:library/src/stm32f1xx_hal_gpio.c ****   if (PinState != GPIO_PIN_RESET)
+ 677              		.loc 1 471 0
+ 678 0000 12B9     		cbnz	r2, .L80
+ 472:library/src/stm32f1xx_hal_gpio.c ****   {
+ 473:library/src/stm32f1xx_hal_gpio.c ****     GPIOx->BSRR = GPIO_Pin;
+ARM GAS  /tmp/ccSBsZ6X.s 			page 22
+
+
+ 474:library/src/stm32f1xx_hal_gpio.c ****   }
+ 475:library/src/stm32f1xx_hal_gpio.c ****   else
+ 476:library/src/stm32f1xx_hal_gpio.c ****   {
+ 477:library/src/stm32f1xx_hal_gpio.c ****     GPIOx->BSRR = (uint32_t)GPIO_Pin << 16u;
+ 679              		.loc 1 477 0
+ 680 0002 0904     		lsls	r1, r1, #16
+ 681              	.LVL71:
+ 682 0004 0161     		str	r1, [r0, #16]
+ 478:library/src/stm32f1xx_hal_gpio.c ****   }
+ 479:library/src/stm32f1xx_hal_gpio.c **** }
+ 683              		.loc 1 479 0
+ 684 0006 7047     		bx	lr
+ 685              	.LVL72:
+ 686              	.L80:
+ 473:library/src/stm32f1xx_hal_gpio.c ****   }
+ 687              		.loc 1 473 0
+ 688 0008 0161     		str	r1, [r0, #16]
+ 689 000a 7047     		bx	lr
+ 690              		.cfi_endproc
+ 691              	.LFE68:
+ 693              		.section	.text.HAL_GPIO_TogglePin,"ax",%progbits
+ 694              		.align	1
+ 695              		.global	HAL_GPIO_TogglePin
+ 696              		.syntax unified
+ 697              		.thumb
+ 698              		.thumb_func
+ 699              		.fpu softvfp
+ 701              	HAL_GPIO_TogglePin:
+ 702              	.LFB69:
+ 480:library/src/stm32f1xx_hal_gpio.c **** 
+ 481:library/src/stm32f1xx_hal_gpio.c **** /**
+ 482:library/src/stm32f1xx_hal_gpio.c ****   * @brief  Toggles the specified GPIO pin
+ 483:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 484:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: Specifies the pins to be toggled.
+ 485:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 486:library/src/stm32f1xx_hal_gpio.c ****   */
+ 487:library/src/stm32f1xx_hal_gpio.c **** void HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
+ 488:library/src/stm32f1xx_hal_gpio.c **** {
+ 703              		.loc 1 488 0
+ 704              		.cfi_startproc
+ 705              		@ args = 0, pretend = 0, frame = 0
+ 706              		@ frame_needed = 0, uses_anonymous_args = 0
+ 707              		@ link register save eliminated.
+ 708              	.LVL73:
+ 489:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 490:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Pin));
+ 491:library/src/stm32f1xx_hal_gpio.c **** 
+ 492:library/src/stm32f1xx_hal_gpio.c ****   if ((GPIOx->ODR & GPIO_Pin) != 0x00u)
+ 709              		.loc 1 492 0
+ 710 0000 C368     		ldr	r3, [r0, #12]
+ 711 0002 0B42     		tst	r3, r1
+ 712 0004 01D1     		bne	.L84
+ 493:library/src/stm32f1xx_hal_gpio.c ****   {
+ 494:library/src/stm32f1xx_hal_gpio.c ****     GPIOx->BRR = (uint32_t)GPIO_Pin;
+ 495:library/src/stm32f1xx_hal_gpio.c ****   }
+ 496:library/src/stm32f1xx_hal_gpio.c ****   else
+ 497:library/src/stm32f1xx_hal_gpio.c ****   {
+ARM GAS  /tmp/ccSBsZ6X.s 			page 23
+
+
+ 498:library/src/stm32f1xx_hal_gpio.c ****     GPIOx->BSRR = (uint32_t)GPIO_Pin;
+ 713              		.loc 1 498 0
+ 714 0006 0161     		str	r1, [r0, #16]
+ 499:library/src/stm32f1xx_hal_gpio.c ****   }
+ 500:library/src/stm32f1xx_hal_gpio.c **** }
+ 715              		.loc 1 500 0
+ 716 0008 7047     		bx	lr
+ 717              	.L84:
+ 494:library/src/stm32f1xx_hal_gpio.c ****   }
+ 718              		.loc 1 494 0
+ 719 000a 4161     		str	r1, [r0, #20]
+ 720 000c 7047     		bx	lr
+ 721              		.cfi_endproc
+ 722              	.LFE69:
+ 724              		.section	.text.HAL_GPIO_LockPin,"ax",%progbits
+ 725              		.align	1
+ 726              		.global	HAL_GPIO_LockPin
+ 727              		.syntax unified
+ 728              		.thumb
+ 729              		.thumb_func
+ 730              		.fpu softvfp
+ 732              	HAL_GPIO_LockPin:
+ 733              	.LFB70:
+ 501:library/src/stm32f1xx_hal_gpio.c **** 
+ 502:library/src/stm32f1xx_hal_gpio.c **** /**
+ 503:library/src/stm32f1xx_hal_gpio.c **** * @brief  Locks GPIO Pins configuration registers.
+ 504:library/src/stm32f1xx_hal_gpio.c **** * @note   The locking mechanism allows the IO configuration to be frozen. When the LOCK sequence
+ 505:library/src/stm32f1xx_hal_gpio.c **** *         has been applied on a port bit, it is no longer possible to modify the value of the port 
+ 506:library/src/stm32f1xx_hal_gpio.c **** *         the next reset.
+ 507:library/src/stm32f1xx_hal_gpio.c **** * @param  GPIOx: where x can be (A..G depending on device used) to select the GPIO peripheral
+ 508:library/src/stm32f1xx_hal_gpio.c **** * @param  GPIO_Pin: specifies the port bit to be locked.
+ 509:library/src/stm32f1xx_hal_gpio.c **** *         This parameter can be any combination of GPIO_Pin_x where x can be (0..15).
+ 510:library/src/stm32f1xx_hal_gpio.c **** * @retval None
+ 511:library/src/stm32f1xx_hal_gpio.c **** */
+ 512:library/src/stm32f1xx_hal_gpio.c **** HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
+ 513:library/src/stm32f1xx_hal_gpio.c **** {
+ 734              		.loc 1 513 0
+ 735              		.cfi_startproc
+ 736              		@ args = 0, pretend = 0, frame = 8
+ 737              		@ frame_needed = 0, uses_anonymous_args = 0
+ 738              		@ link register save eliminated.
+ 739              	.LVL74:
+ 740 0000 82B0     		sub	sp, sp, #8
+ 741              	.LCFI8:
+ 742              		.cfi_def_cfa_offset 8
+ 514:library/src/stm32f1xx_hal_gpio.c ****   __IO uint32_t tmp = GPIO_LCKR_LCKK;
+ 743              		.loc 1 514 0
+ 744 0002 4FF48033 		mov	r3, #65536
+ 745 0006 0193     		str	r3, [sp, #4]
+ 515:library/src/stm32f1xx_hal_gpio.c **** 
+ 516:library/src/stm32f1xx_hal_gpio.c ****   /* Check the parameters */
+ 517:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_LOCK_INSTANCE(GPIOx));
+ 518:library/src/stm32f1xx_hal_gpio.c ****   assert_param(IS_GPIO_PIN(GPIO_Pin));
+ 519:library/src/stm32f1xx_hal_gpio.c **** 
+ 520:library/src/stm32f1xx_hal_gpio.c ****   /* Apply lock key write sequence */
+ 521:library/src/stm32f1xx_hal_gpio.c ****   SET_BIT(tmp, GPIO_Pin);
+ 746              		.loc 1 521 0
+ARM GAS  /tmp/ccSBsZ6X.s 			page 24
+
+
+ 747 0008 019B     		ldr	r3, [sp, #4]
+ 748 000a 0B43     		orrs	r3, r3, r1
+ 749 000c 0193     		str	r3, [sp, #4]
+ 522:library/src/stm32f1xx_hal_gpio.c ****   /* Set LCKx bit(s): LCKK='1' + LCK[15-0] */
+ 523:library/src/stm32f1xx_hal_gpio.c ****   GPIOx->LCKR = tmp;
+ 750              		.loc 1 523 0
+ 751 000e 019B     		ldr	r3, [sp, #4]
+ 752 0010 8361     		str	r3, [r0, #24]
+ 524:library/src/stm32f1xx_hal_gpio.c ****   /* Reset LCKx bit(s): LCKK='0' + LCK[15-0] */
+ 525:library/src/stm32f1xx_hal_gpio.c ****   GPIOx->LCKR = GPIO_Pin;
+ 753              		.loc 1 525 0
+ 754 0012 8161     		str	r1, [r0, #24]
+ 526:library/src/stm32f1xx_hal_gpio.c ****   /* Set LCKx bit(s): LCKK='1' + LCK[15-0] */
+ 527:library/src/stm32f1xx_hal_gpio.c ****   GPIOx->LCKR = tmp;
+ 755              		.loc 1 527 0
+ 756 0014 019B     		ldr	r3, [sp, #4]
+ 757 0016 8361     		str	r3, [r0, #24]
+ 528:library/src/stm32f1xx_hal_gpio.c ****   /* Read LCKK register. This read is mandatory to complete key lock sequence */
+ 529:library/src/stm32f1xx_hal_gpio.c ****   tmp = GPIOx->LCKR;
+ 758              		.loc 1 529 0
+ 759 0018 8369     		ldr	r3, [r0, #24]
+ 760 001a 0193     		str	r3, [sp, #4]
+ 530:library/src/stm32f1xx_hal_gpio.c **** 
+ 531:library/src/stm32f1xx_hal_gpio.c ****   /* read again in order to confirm lock is active */
+ 532:library/src/stm32f1xx_hal_gpio.c ****   if ((uint32_t)(GPIOx->LCKR & GPIO_LCKR_LCKK))
+ 761              		.loc 1 532 0
+ 762 001c 8369     		ldr	r3, [r0, #24]
+ 763 001e 13F4803F 		tst	r3, #65536
+ 764 0022 02D1     		bne	.L89
+ 533:library/src/stm32f1xx_hal_gpio.c ****   {
+ 534:library/src/stm32f1xx_hal_gpio.c ****     return HAL_OK;
+ 535:library/src/stm32f1xx_hal_gpio.c ****   }
+ 536:library/src/stm32f1xx_hal_gpio.c ****   else
+ 537:library/src/stm32f1xx_hal_gpio.c ****   {
+ 538:library/src/stm32f1xx_hal_gpio.c ****     return HAL_ERROR;
+ 765              		.loc 1 538 0
+ 766 0024 0120     		movs	r0, #1
+ 767              	.LVL75:
+ 768              	.L86:
+ 539:library/src/stm32f1xx_hal_gpio.c ****   }
+ 540:library/src/stm32f1xx_hal_gpio.c **** }
+ 769              		.loc 1 540 0
+ 770 0026 02B0     		add	sp, sp, #8
+ 771              	.LCFI9:
+ 772              		.cfi_remember_state
+ 773              		.cfi_def_cfa_offset 0
+ 774              		@ sp needed
+ 775 0028 7047     		bx	lr
+ 776              	.LVL76:
+ 777              	.L89:
+ 778              	.LCFI10:
+ 779              		.cfi_restore_state
+ 534:library/src/stm32f1xx_hal_gpio.c ****   }
+ 780              		.loc 1 534 0
+ 781 002a 0020     		movs	r0, #0
+ 782              	.LVL77:
+ 783 002c FBE7     		b	.L86
+ARM GAS  /tmp/ccSBsZ6X.s 			page 25
+
+
+ 784              		.cfi_endproc
+ 785              	.LFE70:
+ 787              		.section	.text.HAL_GPIO_EXTI_Callback,"ax",%progbits
+ 788              		.align	1
+ 789              		.weak	HAL_GPIO_EXTI_Callback
+ 790              		.syntax unified
+ 791              		.thumb
+ 792              		.thumb_func
+ 793              		.fpu softvfp
+ 795              	HAL_GPIO_EXTI_Callback:
+ 796              	.LFB72:
+ 541:library/src/stm32f1xx_hal_gpio.c **** 
+ 542:library/src/stm32f1xx_hal_gpio.c **** /**
+ 543:library/src/stm32f1xx_hal_gpio.c ****   * @brief  This function handles EXTI interrupt request.
+ 544:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: Specifies the pins connected EXTI line
+ 545:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 546:library/src/stm32f1xx_hal_gpio.c ****   */
+ 547:library/src/stm32f1xx_hal_gpio.c **** void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
+ 548:library/src/stm32f1xx_hal_gpio.c **** {
+ 549:library/src/stm32f1xx_hal_gpio.c ****   /* EXTI line interrupt detected */
+ 550:library/src/stm32f1xx_hal_gpio.c ****   if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u)
+ 551:library/src/stm32f1xx_hal_gpio.c ****   {
+ 552:library/src/stm32f1xx_hal_gpio.c ****     __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
+ 553:library/src/stm32f1xx_hal_gpio.c ****     HAL_GPIO_EXTI_Callback(GPIO_Pin);
+ 554:library/src/stm32f1xx_hal_gpio.c ****   }
+ 555:library/src/stm32f1xx_hal_gpio.c **** }
+ 556:library/src/stm32f1xx_hal_gpio.c **** 
+ 557:library/src/stm32f1xx_hal_gpio.c **** /**
+ 558:library/src/stm32f1xx_hal_gpio.c ****   * @brief  EXTI line detection callbacks.
+ 559:library/src/stm32f1xx_hal_gpio.c ****   * @param  GPIO_Pin: Specifies the pins connected EXTI line
+ 560:library/src/stm32f1xx_hal_gpio.c ****   * @retval None
+ 561:library/src/stm32f1xx_hal_gpio.c ****   */
+ 562:library/src/stm32f1xx_hal_gpio.c **** __weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+ 563:library/src/stm32f1xx_hal_gpio.c **** {
+ 797              		.loc 1 563 0
+ 798              		.cfi_startproc
+ 799              		@ args = 0, pretend = 0, frame = 0
+ 800              		@ frame_needed = 0, uses_anonymous_args = 0
+ 801              		@ link register save eliminated.
+ 802              	.LVL78:
+ 564:library/src/stm32f1xx_hal_gpio.c ****   /* Prevent unused argument(s) compilation warning */
+ 565:library/src/stm32f1xx_hal_gpio.c ****   UNUSED(GPIO_Pin);
+ 566:library/src/stm32f1xx_hal_gpio.c ****   /* NOTE: This function Should not be modified, when the callback is needed,
+ 567:library/src/stm32f1xx_hal_gpio.c ****            the HAL_GPIO_EXTI_Callback could be implemented in the user file
+ 568:library/src/stm32f1xx_hal_gpio.c ****    */
+ 569:library/src/stm32f1xx_hal_gpio.c **** }
+ 803              		.loc 1 569 0
+ 804 0000 7047     		bx	lr
+ 805              		.cfi_endproc
+ 806              	.LFE72:
+ 808              		.section	.text.HAL_GPIO_EXTI_IRQHandler,"ax",%progbits
+ 809              		.align	1
+ 810              		.global	HAL_GPIO_EXTI_IRQHandler
+ 811              		.syntax unified
+ 812              		.thumb
+ 813              		.thumb_func
+ 814              		.fpu softvfp
+ARM GAS  /tmp/ccSBsZ6X.s 			page 26
+
+
+ 816              	HAL_GPIO_EXTI_IRQHandler:
+ 817              	.LFB71:
+ 548:library/src/stm32f1xx_hal_gpio.c ****   /* EXTI line interrupt detected */
+ 818              		.loc 1 548 0
+ 819              		.cfi_startproc
+ 820              		@ args = 0, pretend = 0, frame = 0
+ 821              		@ frame_needed = 0, uses_anonymous_args = 0
+ 822              	.LVL79:
+ 823 0000 08B5     		push	{r3, lr}
+ 824              	.LCFI11:
+ 825              		.cfi_def_cfa_offset 8
+ 826              		.cfi_offset 3, -8
+ 827              		.cfi_offset 14, -4
+ 550:library/src/stm32f1xx_hal_gpio.c ****   {
+ 828              		.loc 1 550 0
+ 829 0002 054B     		ldr	r3, .L95
+ 830 0004 5B69     		ldr	r3, [r3, #20]
+ 831 0006 0342     		tst	r3, r0
+ 832 0008 00D1     		bne	.L94
+ 833              	.LVL80:
+ 834              	.L91:
+ 555:library/src/stm32f1xx_hal_gpio.c **** 
+ 835              		.loc 1 555 0
+ 836 000a 08BD     		pop	{r3, pc}
+ 837              	.LVL81:
+ 838              	.L94:
+ 552:library/src/stm32f1xx_hal_gpio.c ****     HAL_GPIO_EXTI_Callback(GPIO_Pin);
+ 839              		.loc 1 552 0
+ 840 000c 024B     		ldr	r3, .L95
+ 841 000e 5861     		str	r0, [r3, #20]
+ 553:library/src/stm32f1xx_hal_gpio.c ****   }
+ 842              		.loc 1 553 0
+ 843 0010 FFF7FEFF 		bl	HAL_GPIO_EXTI_Callback
+ 844              	.LVL82:
+ 555:library/src/stm32f1xx_hal_gpio.c **** 
+ 845              		.loc 1 555 0
+ 846 0014 F9E7     		b	.L91
+ 847              	.L96:
+ 848 0016 00BF     		.align	2
+ 849              	.L95:
+ 850 0018 00040140 		.word	1073808384
+ 851              		.cfi_endproc
+ 852              	.LFE71:
+ 854              		.text
+ 855              	.Letext0:
+ 856              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 857              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 858              		.file 4 "cmsis/core_cm3.h"
+ 859              		.file 5 "user/system_stm32f1xx.h"
+ 860              		.file 6 "config/stm32f103xe.h"
+ 861              		.file 7 "library/inc/stm32f1xx_hal_def.h"
+ 862              		.file 8 "library/inc/stm32f1xx_hal_gpio.h"
+ 863              		.file 9 "library/inc/stm32f1xx_hal.h"
+ARM GAS  /tmp/ccSBsZ6X.s 			page 27
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 stm32f1xx_hal_gpio.c
+     /tmp/ccSBsZ6X.s:16     .text.HAL_GPIO_Init:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:23     .text.HAL_GPIO_Init:0000000000000000 HAL_GPIO_Init
+     /tmp/ccSBsZ6X.s:387    .text.HAL_GPIO_Init:00000000000001dc $d
+     /tmp/ccSBsZ6X.s:397    .text.HAL_GPIO_DeInit:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:404    .text.HAL_GPIO_DeInit:0000000000000000 HAL_GPIO_DeInit
+     /tmp/ccSBsZ6X.s:621    .text.HAL_GPIO_DeInit:0000000000000104 $d
+     /tmp/ccSBsZ6X.s:628    .text.HAL_GPIO_ReadPin:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:635    .text.HAL_GPIO_ReadPin:0000000000000000 HAL_GPIO_ReadPin
+     /tmp/ccSBsZ6X.s:662    .text.HAL_GPIO_WritePin:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:669    .text.HAL_GPIO_WritePin:0000000000000000 HAL_GPIO_WritePin
+     /tmp/ccSBsZ6X.s:694    .text.HAL_GPIO_TogglePin:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:701    .text.HAL_GPIO_TogglePin:0000000000000000 HAL_GPIO_TogglePin
+     /tmp/ccSBsZ6X.s:725    .text.HAL_GPIO_LockPin:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:732    .text.HAL_GPIO_LockPin:0000000000000000 HAL_GPIO_LockPin
+     /tmp/ccSBsZ6X.s:788    .text.HAL_GPIO_EXTI_Callback:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:795    .text.HAL_GPIO_EXTI_Callback:0000000000000000 HAL_GPIO_EXTI_Callback
+     /tmp/ccSBsZ6X.s:809    .text.HAL_GPIO_EXTI_IRQHandler:0000000000000000 $t
+     /tmp/ccSBsZ6X.s:816    .text.HAL_GPIO_EXTI_IRQHandler:0000000000000000 HAL_GPIO_EXTI_IRQHandler
+     /tmp/ccSBsZ6X.s:850    .text.HAL_GPIO_EXTI_IRQHandler:0000000000000018 $d
+
+NO UNDEFINED SYMBOLS

@@ -1,0 +1,158 @@
+//______________________________________________________________________________
+//      => OpenOCD  ST_Link 安装
+//______________________________________________________________________________
+
+// sudo apt-get install openocd
+git clone https://github.com/texane/stlink.git
+apt-get install cmake libusb-1.0
+cd stlink/
+make
+cp st-flash /usr/bin
+cp ~/stlink/etc/udev/rules.d/49-stlinkv2-1.rules /etc/udev/rules.d
+	
+//___________________________________________________________             
+// 添加规则，其中OWNER 修改为你的用户名
+sudo cp 49-stlinkv2.rules  /etc/udev/rules.d/
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="3748",  \
+MODE:="0666", SYMLINK+="stlinkv2_%n" ,OWNER="ysh"
+
+// 让系统识别新的规则
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+
+
+
+//______________________________________________________________________________
+//      => GDB_Debug
+//______________________________________________________________________________
+
+// GDB Debugger
+
+1.openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg
+
+2.arm-none-eabi-gdb blink.elf
+	(gdb)	target remote localhost:3333
+	(gdb)	monitor reset
+	(gdb)	monitor halt
+	(gdb)	load
+
+
+//___________________________________________________________
+// 串口调试软件安装
+sudo apt-get install minicom 
+sudo minicom -s
+Serial Device: /dev/ttyUSB0
+
+
+
+//______________________________________________________________________________
+//      => arm-none-eabi-gdb的调试指令
+//______________________________________________________________________________
+// 在GDB的指令窗口我们输入
+(gdb)-		对就是一个 减号，然后回车我们来见证奇迹的时刻
+
+
+//___________________________________________________________
+// 打开tui模式(Text User Interface)
+// 使用"gdbtui -q" 或 "gdb -tui -q"开始一个调试
+$ gdbtui -q test_struct
+(gdb) ....
+
+
+//___________________________________________________________
+$ gcc -gdb3 simple_gdb.c -o simple_gdb
+$ gdb simple_gdb 
+(gdb) start
+"ctrl+x ctrl+a" or "ctrl+x A"
+
+
+//___________________________________________________________
+// TUI模式下有4个窗口
+// 除command 窗口外,其他三个窗口不可同时显示.其可用 layout 命令来进行选择
+// 自己需要的窗口. 可参见 `help layout` 
+        command                 // 命令窗口. 可以键入调试命令
+        source                  // 源代码窗口. 显示当前行,断点等信息
+        assembly                // 汇编代码窗口
+        register               // 寄存器窗口
+  
+  
+//___________________________________________________________
+// GDB指令
+
+        list                    // 查看程序源代码
+        break function          // 在某函数的入口设定断点
+        break 行号              // 在指定行添加断点
+        break 行号 if 条件      // 当条件为真时，指定行号处断点生效
+        info break             // 查看断点
+        delete                  // 删除断点
+        run                     // 开始运行程序
+        next                    // 单步运行程序，不进入子函数
+        step                    // 单步运行程序，进入子函数
+        continue                // 继续运行程序
+        print 变量名             // 查看指定变量的值
+        finish                  // 运行程序，直到当前函数结束
+        display
+        quit
+
+
+
+
+//______________________________________________________________________________
+//      => STM32_SDT_V3.5.0
+//______________________________________________________________________________
+// stm32f10x.h
+// _________________________________________________________
+#if !defined (STM32F10X_LD) && !defined (STM32F10X_LD_VL) && \
+    !defined (STM32F10X_MD) && !defined (STM32F10X_MD_VL) && \
+    !defined (STM32F10X_HD) && !defined (STM32F10X_HD_VL) && \
+    !defined (STM32F10X_XL) && !defined (STM32F10X_CL)
+    #error "Please select first the target STM32F10x device  \
+         used in your application (in stm32f10x.h file)"
+#endif
+#if !defined  USE_STDPERIPH_DRIVER
+  /*#define USE_STDPERIPH_DRIVER*/
+#endif
+
+
+// 这里边包含一个条件编译，如果我们要把中断向量表存储在RAM或者FLASH
+// 就要定义相关的宏文件位置 system_stm32f10x.c ->SystemInit();
+// _________________________________________________________
+#ifdef VECT_TAB_RAM
+    NVIC_SetVectorTable(NVIC_VectTab_RAM, 0x0000000);
+#else
+    NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+#endif
+
+
+// 头文件相关 ->stm32f10x.h
+// _________________________________________________________
+#ifdef USE_STDPERIPH_DRIVER
+  #include "stm32f10x_conf.h"
+#endif
+
+
+// Makefile.common
+// _________________________________________________________
+TypeOfMCU       =STM32F10X_MD
+CFLAGSlib       +=-D $(TypeOfMCU)
+CFLAGSlib       +=-D VECT_TAB_FLASH
+CFLAGSlib       +=-D USE_STDPERIPH_DRIVER
+
+
+// 此配置参数针对 STM32F10X标准固件函数库  V3.5.0
+// _________________________________________________________
+
+// 启动文件后缀名改为大写 =>[.S]
+
+// 修改 core_cm3.c文件，针对STM32F10x_StdPeriph_Lib_V3.5.0库函数, 文件在 736 行处
+// 打开工程文件STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\CMSIS\CM3\CoreSupport/core_cm3.c
+// 在此文件的最后几行的位置，找到
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=r" (result) : "r" (addr), "r" (value) );	  
+// 以下两行，并更改如下 _________________________________________________________________________
+	 __ASM volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+	 __ASM volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+// 修改完成后，保存！注意，请再选中工程项目，刷新F5，再一次编译
+
+
+

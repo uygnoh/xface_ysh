@@ -1,0 +1,911 @@
+ARM GAS  /tmp/ccJgnJd9.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"cpuport.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.rt_hw_stack_init,"ax",%progbits
+  16              		.align	1
+  17              		.global	rt_hw_stack_init
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu softvfp
+  23              	rt_hw_stack_init:
+  24              	.LFB15:
+  25              		.file 1 "rtthread/libcpu/cpuport.c"
+   1:rtthread/libcpu/cpuport.c **** /*
+   2:rtthread/libcpu/cpuport.c ****  * Copyright (c) 2006-2021, RT-Thread Development Team
+   3:rtthread/libcpu/cpuport.c ****  *
+   4:rtthread/libcpu/cpuport.c ****  * SPDX-License-Identifier: Apache-2.0
+   5:rtthread/libcpu/cpuport.c ****  *
+   6:rtthread/libcpu/cpuport.c ****  * Change Logs:
+   7:rtthread/libcpu/cpuport.c ****  * Date         Author      Notes
+   8:rtthread/libcpu/cpuport.c ****  * 2009-01-05   Bernard     first version
+   9:rtthread/libcpu/cpuport.c ****  * 2011-02-14   onelife     Modify for EFM32
+  10:rtthread/libcpu/cpuport.c ****  * 2011-06-17   onelife     Merge all of the C source code into cpuport.c
+  11:rtthread/libcpu/cpuport.c ****  * 2012-12-23   aozima      stack addr align to 8byte.
+  12:rtthread/libcpu/cpuport.c ****  * 2012-12-29   Bernard     Add exception hook.
+  13:rtthread/libcpu/cpuport.c ****  * 2013-07-09   aozima      enhancement hard fault exception handler.
+  14:rtthread/libcpu/cpuport.c ****  * 2019-07-03   yangjie     add __rt_ffs() for armclang.
+  15:rtthread/libcpu/cpuport.c ****  */
+  16:rtthread/libcpu/cpuport.c **** 
+  17:rtthread/libcpu/cpuport.c **** #include <rtthread.h>
+  18:rtthread/libcpu/cpuport.c **** 
+  19:rtthread/libcpu/cpuport.c **** struct exception_stack_frame
+  20:rtthread/libcpu/cpuport.c **** {
+  21:rtthread/libcpu/cpuport.c ****     rt_uint32_t r0;
+  22:rtthread/libcpu/cpuport.c ****     rt_uint32_t r1;
+  23:rtthread/libcpu/cpuport.c ****     rt_uint32_t r2;
+  24:rtthread/libcpu/cpuport.c ****     rt_uint32_t r3;
+  25:rtthread/libcpu/cpuport.c ****     rt_uint32_t r12;
+  26:rtthread/libcpu/cpuport.c ****     rt_uint32_t lr;
+  27:rtthread/libcpu/cpuport.c ****     rt_uint32_t pc;
+  28:rtthread/libcpu/cpuport.c ****     rt_uint32_t psr;
+  29:rtthread/libcpu/cpuport.c **** };
+  30:rtthread/libcpu/cpuport.c **** 
+  31:rtthread/libcpu/cpuport.c **** struct stack_frame
+  32:rtthread/libcpu/cpuport.c **** {
+  33:rtthread/libcpu/cpuport.c ****     /* r4 ~ r11 register */
+ARM GAS  /tmp/ccJgnJd9.s 			page 2
+
+
+  34:rtthread/libcpu/cpuport.c ****     rt_uint32_t r4;
+  35:rtthread/libcpu/cpuport.c ****     rt_uint32_t r5;
+  36:rtthread/libcpu/cpuport.c ****     rt_uint32_t r6;
+  37:rtthread/libcpu/cpuport.c ****     rt_uint32_t r7;
+  38:rtthread/libcpu/cpuport.c ****     rt_uint32_t r8;
+  39:rtthread/libcpu/cpuport.c ****     rt_uint32_t r9;
+  40:rtthread/libcpu/cpuport.c ****     rt_uint32_t r10;
+  41:rtthread/libcpu/cpuport.c ****     rt_uint32_t r11;
+  42:rtthread/libcpu/cpuport.c **** 
+  43:rtthread/libcpu/cpuport.c ****     struct exception_stack_frame exception_stack_frame;
+  44:rtthread/libcpu/cpuport.c **** };
+  45:rtthread/libcpu/cpuport.c **** 
+  46:rtthread/libcpu/cpuport.c **** /* flag in interrupt handling */
+  47:rtthread/libcpu/cpuport.c **** rt_uint32_t rt_interrupt_from_thread, rt_interrupt_to_thread;
+  48:rtthread/libcpu/cpuport.c **** rt_uint32_t rt_thread_switch_interrupt_flag;
+  49:rtthread/libcpu/cpuport.c **** /* exception hook */
+  50:rtthread/libcpu/cpuport.c **** static rt_err_t (*rt_exception_hook)(void *context) = RT_NULL;
+  51:rtthread/libcpu/cpuport.c **** 
+  52:rtthread/libcpu/cpuport.c **** /**
+  53:rtthread/libcpu/cpuport.c ****  * This function will initialize thread stack
+  54:rtthread/libcpu/cpuport.c ****  *
+  55:rtthread/libcpu/cpuport.c ****  * @param tentry the entry of thread
+  56:rtthread/libcpu/cpuport.c ****  * @param parameter the parameter of entry
+  57:rtthread/libcpu/cpuport.c ****  * @param stack_addr the beginning stack address
+  58:rtthread/libcpu/cpuport.c ****  * @param texit the function will be called when thread exit
+  59:rtthread/libcpu/cpuport.c ****  *
+  60:rtthread/libcpu/cpuport.c ****  * @return stack address
+  61:rtthread/libcpu/cpuport.c ****  */
+  62:rtthread/libcpu/cpuport.c **** rt_uint8_t *rt_hw_stack_init(void       *tentry,
+  63:rtthread/libcpu/cpuport.c ****                              void       *parameter,
+  64:rtthread/libcpu/cpuport.c ****                              rt_uint8_t *stack_addr,
+  65:rtthread/libcpu/cpuport.c ****                              void       *texit)
+  66:rtthread/libcpu/cpuport.c **** {
+  26              		.loc 1 66 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  31              	.LVL0:
+  32 0000 70B4     		push	{r4, r5, r6}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 12
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 6, -4
+  38 0002 0646     		mov	r6, r0
+  67:rtthread/libcpu/cpuport.c ****     struct stack_frame *stack_frame;
+  68:rtthread/libcpu/cpuport.c ****     rt_uint8_t         *stk;
+  69:rtthread/libcpu/cpuport.c ****     unsigned long       i;
+  70:rtthread/libcpu/cpuport.c **** 
+  71:rtthread/libcpu/cpuport.c ****     stk  = stack_addr + sizeof(rt_uint32_t);
+  39              		.loc 1 71 0
+  40 0004 0432     		adds	r2, r2, #4
+  41              	.LVL1:
+  72:rtthread/libcpu/cpuport.c ****     stk  = (rt_uint8_t *)RT_ALIGN_DOWN((rt_uint32_t)stk, 8);
+  42              		.loc 1 72 0
+  43 0006 22F00705 		bic	r5, r2, #7
+ARM GAS  /tmp/ccJgnJd9.s 			page 3
+
+
+  44              	.LVL2:
+  73:rtthread/libcpu/cpuport.c ****     stk -= sizeof(struct stack_frame);
+  45              		.loc 1 73 0
+  46 000a A5F14000 		sub	r0, r5, #64
+  47              	.LVL3:
+  74:rtthread/libcpu/cpuport.c **** 
+  75:rtthread/libcpu/cpuport.c ****     stack_frame = (struct stack_frame *)stk;
+  76:rtthread/libcpu/cpuport.c **** 
+  77:rtthread/libcpu/cpuport.c ****     /* init all register */
+  78:rtthread/libcpu/cpuport.c ****     for (i = 0; i < sizeof(struct stack_frame) / sizeof(rt_uint32_t); i ++)
+  48              		.loc 1 78 0
+  49 000e 0022     		movs	r2, #0
+  50              	.LVL4:
+  51 0010 03E0     		b	.L2
+  52              	.LVL5:
+  53              	.L3:
+  79:rtthread/libcpu/cpuport.c ****     {
+  80:rtthread/libcpu/cpuport.c ****         ((rt_uint32_t *)stack_frame)[i] = 0xdeadbeef;
+  54              		.loc 1 80 0 discriminator 3
+  55 0012 0D4C     		ldr	r4, .L5
+  56 0014 40F82240 		str	r4, [r0, r2, lsl #2]
+  78:rtthread/libcpu/cpuport.c ****     {
+  57              		.loc 1 78 0 discriminator 3
+  58 0018 0132     		adds	r2, r2, #1
+  59              	.LVL6:
+  60              	.L2:
+  78:rtthread/libcpu/cpuport.c ****     {
+  61              		.loc 1 78 0 is_stmt 0 discriminator 1
+  62 001a 0F2A     		cmp	r2, #15
+  63 001c F9D9     		bls	.L3
+  81:rtthread/libcpu/cpuport.c ****     }
+  82:rtthread/libcpu/cpuport.c **** 
+  83:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.r0  = (unsigned long)parameter; /* r0 : argument */
+  64              		.loc 1 83 0 is_stmt 1
+  65 001e 45F8201C 		str	r1, [r5, #-32]
+  84:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.r1  = 0;                        /* r1 */
+  66              		.loc 1 84 0
+  67 0022 0022     		movs	r2, #0
+  68              	.LVL7:
+  69 0024 45F81C2C 		str	r2, [r5, #-28]
+  85:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.r2  = 0;                        /* r2 */
+  70              		.loc 1 85 0
+  71 0028 45F8182C 		str	r2, [r5, #-24]
+  86:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.r3  = 0;                        /* r3 */
+  72              		.loc 1 86 0
+  73 002c 45F8142C 		str	r2, [r5, #-20]
+  87:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.r12 = 0;                        /* r12 */
+  74              		.loc 1 87 0
+  75 0030 45F8102C 		str	r2, [r5, #-16]
+  88:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.lr  = (unsigned long)texit;     /* lr */
+  76              		.loc 1 88 0
+  77 0034 45F80C3C 		str	r3, [r5, #-12]
+  89:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.pc  = (unsigned long)tentry;    /* entry point, pc */
+  78              		.loc 1 89 0
+  79 0038 45F8086C 		str	r6, [r5, #-8]
+  90:rtthread/libcpu/cpuport.c ****     stack_frame->exception_stack_frame.psr = 0x01000000L;              /* PSR */
+  80              		.loc 1 90 0
+ARM GAS  /tmp/ccJgnJd9.s 			page 4
+
+
+  81 003c 4FF08073 		mov	r3, #16777216
+  82              	.LVL8:
+  83 0040 45F8043C 		str	r3, [r5, #-4]
+  91:rtthread/libcpu/cpuport.c **** 
+  92:rtthread/libcpu/cpuport.c ****     /* return task's current stack address */
+  93:rtthread/libcpu/cpuport.c ****     return stk;
+  94:rtthread/libcpu/cpuport.c **** }
+  84              		.loc 1 94 0
+  85 0044 70BC     		pop	{r4, r5, r6}
+  86              	.LCFI1:
+  87              		.cfi_restore 6
+  88              		.cfi_restore 5
+  89              		.cfi_restore 4
+  90              		.cfi_def_cfa_offset 0
+  91              	.LVL9:
+  92 0046 7047     		bx	lr
+  93              	.L6:
+  94              		.align	2
+  95              	.L5:
+  96 0048 EFBEADDE 		.word	-559038737
+  97              		.cfi_endproc
+  98              	.LFE15:
+ 100              		.section	.text.rt_hw_exception_install,"ax",%progbits
+ 101              		.align	1
+ 102              		.global	rt_hw_exception_install
+ 103              		.syntax unified
+ 104              		.thumb
+ 105              		.thumb_func
+ 106              		.fpu softvfp
+ 108              	rt_hw_exception_install:
+ 109              	.LFB16:
+  95:rtthread/libcpu/cpuport.c **** 
+  96:rtthread/libcpu/cpuport.c **** /**
+  97:rtthread/libcpu/cpuport.c ****  * This function set the hook, which is invoked on fault exception handling.
+  98:rtthread/libcpu/cpuport.c ****  *
+  99:rtthread/libcpu/cpuport.c ****  * @param exception_handle the exception handling hook function.
+ 100:rtthread/libcpu/cpuport.c ****  */
+ 101:rtthread/libcpu/cpuport.c **** void rt_hw_exception_install(rt_err_t (*exception_handle)(void* context))
+ 102:rtthread/libcpu/cpuport.c **** {
+ 110              		.loc 1 102 0
+ 111              		.cfi_startproc
+ 112              		@ args = 0, pretend = 0, frame = 0
+ 113              		@ frame_needed = 0, uses_anonymous_args = 0
+ 114              		@ link register save eliminated.
+ 115              	.LVL10:
+ 103:rtthread/libcpu/cpuport.c ****     rt_exception_hook = exception_handle;
+ 116              		.loc 1 103 0
+ 117 0000 014B     		ldr	r3, .L8
+ 118 0002 1860     		str	r0, [r3]
+ 104:rtthread/libcpu/cpuport.c **** }
+ 119              		.loc 1 104 0
+ 120 0004 7047     		bx	lr
+ 121              	.L9:
+ 122 0006 00BF     		.align	2
+ 123              	.L8:
+ 124 0008 00000000 		.word	.LANCHOR0
+ 125              		.cfi_endproc
+ARM GAS  /tmp/ccJgnJd9.s 			page 5
+
+
+ 126              	.LFE16:
+ 128              		.section	.text.rt_hw_hard_fault_exception,"ax",%progbits
+ 129              		.align	1
+ 130              		.global	rt_hw_hard_fault_exception
+ 131              		.syntax unified
+ 132              		.thumb
+ 133              		.thumb_func
+ 134              		.fpu softvfp
+ 136              	rt_hw_hard_fault_exception:
+ 137              	.LFB17:
+ 105:rtthread/libcpu/cpuport.c **** 
+ 106:rtthread/libcpu/cpuport.c **** #define SCB_CFSR        (*(volatile const unsigned *)0xE000ED28) /* Configurable Fault Status Regis
+ 107:rtthread/libcpu/cpuport.c **** #define SCB_HFSR        (*(volatile const unsigned *)0xE000ED2C) /* HardFault Status Register */
+ 108:rtthread/libcpu/cpuport.c **** #define SCB_MMAR        (*(volatile const unsigned *)0xE000ED34) /* MemManage Fault Address registe
+ 109:rtthread/libcpu/cpuport.c **** #define SCB_BFAR        (*(volatile const unsigned *)0xE000ED38) /* Bus Fault Address Register */
+ 110:rtthread/libcpu/cpuport.c **** #define SCB_AIRCR       (*(volatile unsigned long *)0xE000ED0C)  /* Reset control Address Register 
+ 111:rtthread/libcpu/cpuport.c **** #define SCB_RESET_VALUE 0x05FA0004                               /* Reset value, write to SCB_AIRCR
+ 112:rtthread/libcpu/cpuport.c **** 
+ 113:rtthread/libcpu/cpuport.c **** #define SCB_CFSR_MFSR   (*(volatile const unsigned char*)0xE000ED28)  /* Memory-management Fault St
+ 114:rtthread/libcpu/cpuport.c **** #define SCB_CFSR_BFSR   (*(volatile const unsigned char*)0xE000ED29)  /* Bus Fault Status Register 
+ 115:rtthread/libcpu/cpuport.c **** #define SCB_CFSR_UFSR   (*(volatile const unsigned short*)0xE000ED2A) /* Usage Fault Status Registe
+ 116:rtthread/libcpu/cpuport.c **** 
+ 117:rtthread/libcpu/cpuport.c **** #ifdef RT_USING_FINSH
+ 118:rtthread/libcpu/cpuport.c **** static void usage_fault_track(void)
+ 119:rtthread/libcpu/cpuport.c **** {
+ 120:rtthread/libcpu/cpuport.c ****     rt_kprintf("usage fault:\n");
+ 121:rtthread/libcpu/cpuport.c ****     rt_kprintf("SCB_CFSR_UFSR:0x%02X ", SCB_CFSR_UFSR);
+ 122:rtthread/libcpu/cpuport.c **** 
+ 123:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<0))
+ 124:rtthread/libcpu/cpuport.c ****     {
+ 125:rtthread/libcpu/cpuport.c ****         /* [0]:UNDEFINSTR */
+ 126:rtthread/libcpu/cpuport.c ****         rt_kprintf("UNDEFINSTR ");
+ 127:rtthread/libcpu/cpuport.c ****     }
+ 128:rtthread/libcpu/cpuport.c **** 
+ 129:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<1))
+ 130:rtthread/libcpu/cpuport.c ****     {
+ 131:rtthread/libcpu/cpuport.c ****         /* [1]:INVSTATE */
+ 132:rtthread/libcpu/cpuport.c ****         rt_kprintf("INVSTATE ");
+ 133:rtthread/libcpu/cpuport.c ****     }
+ 134:rtthread/libcpu/cpuport.c **** 
+ 135:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<2))
+ 136:rtthread/libcpu/cpuport.c ****     {
+ 137:rtthread/libcpu/cpuport.c ****         /* [2]:INVPC */
+ 138:rtthread/libcpu/cpuport.c ****         rt_kprintf("INVPC ");
+ 139:rtthread/libcpu/cpuport.c ****     }
+ 140:rtthread/libcpu/cpuport.c **** 
+ 141:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<3))
+ 142:rtthread/libcpu/cpuport.c ****     {
+ 143:rtthread/libcpu/cpuport.c ****         /* [3]:NOCP */
+ 144:rtthread/libcpu/cpuport.c ****         rt_kprintf("NOCP ");
+ 145:rtthread/libcpu/cpuport.c ****     }
+ 146:rtthread/libcpu/cpuport.c **** 
+ 147:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<8))
+ 148:rtthread/libcpu/cpuport.c ****     {
+ 149:rtthread/libcpu/cpuport.c ****         /* [8]:UNALIGNED */
+ 150:rtthread/libcpu/cpuport.c ****         rt_kprintf("UNALIGNED ");
+ 151:rtthread/libcpu/cpuport.c ****     }
+ARM GAS  /tmp/ccJgnJd9.s 			page 6
+
+
+ 152:rtthread/libcpu/cpuport.c **** 
+ 153:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_UFSR & (1<<9))
+ 154:rtthread/libcpu/cpuport.c ****     {
+ 155:rtthread/libcpu/cpuport.c ****         /* [9]:DIVBYZERO */
+ 156:rtthread/libcpu/cpuport.c ****         rt_kprintf("DIVBYZERO ");
+ 157:rtthread/libcpu/cpuport.c ****     }
+ 158:rtthread/libcpu/cpuport.c **** 
+ 159:rtthread/libcpu/cpuport.c ****     rt_kprintf("\n");
+ 160:rtthread/libcpu/cpuport.c **** }
+ 161:rtthread/libcpu/cpuport.c **** 
+ 162:rtthread/libcpu/cpuport.c **** static void bus_fault_track(void)
+ 163:rtthread/libcpu/cpuport.c **** {
+ 164:rtthread/libcpu/cpuport.c ****     rt_kprintf("bus fault:\n");
+ 165:rtthread/libcpu/cpuport.c ****     rt_kprintf("SCB_CFSR_BFSR:0x%02X ", SCB_CFSR_BFSR);
+ 166:rtthread/libcpu/cpuport.c **** 
+ 167:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<0))
+ 168:rtthread/libcpu/cpuport.c ****     {
+ 169:rtthread/libcpu/cpuport.c ****         /* [0]:IBUSERR */
+ 170:rtthread/libcpu/cpuport.c ****         rt_kprintf("IBUSERR ");
+ 171:rtthread/libcpu/cpuport.c ****     }
+ 172:rtthread/libcpu/cpuport.c **** 
+ 173:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<1))
+ 174:rtthread/libcpu/cpuport.c ****     {
+ 175:rtthread/libcpu/cpuport.c ****         /* [1]:PRECISERR */
+ 176:rtthread/libcpu/cpuport.c ****         rt_kprintf("PRECISERR ");
+ 177:rtthread/libcpu/cpuport.c ****     }
+ 178:rtthread/libcpu/cpuport.c **** 
+ 179:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<2))
+ 180:rtthread/libcpu/cpuport.c ****     {
+ 181:rtthread/libcpu/cpuport.c ****         /* [2]:IMPRECISERR */
+ 182:rtthread/libcpu/cpuport.c ****         rt_kprintf("IMPRECISERR ");
+ 183:rtthread/libcpu/cpuport.c ****     }
+ 184:rtthread/libcpu/cpuport.c **** 
+ 185:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<3))
+ 186:rtthread/libcpu/cpuport.c ****     {
+ 187:rtthread/libcpu/cpuport.c ****         /* [3]:UNSTKERR */
+ 188:rtthread/libcpu/cpuport.c ****         rt_kprintf("UNSTKERR ");
+ 189:rtthread/libcpu/cpuport.c ****     }
+ 190:rtthread/libcpu/cpuport.c **** 
+ 191:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<4))
+ 192:rtthread/libcpu/cpuport.c ****     {
+ 193:rtthread/libcpu/cpuport.c ****         /* [4]:STKERR */
+ 194:rtthread/libcpu/cpuport.c ****         rt_kprintf("STKERR ");
+ 195:rtthread/libcpu/cpuport.c ****     }
+ 196:rtthread/libcpu/cpuport.c **** 
+ 197:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_BFSR & (1<<7))
+ 198:rtthread/libcpu/cpuport.c ****     {
+ 199:rtthread/libcpu/cpuport.c ****         rt_kprintf("SCB->BFAR:%08X\n", SCB_BFAR);
+ 200:rtthread/libcpu/cpuport.c ****     }
+ 201:rtthread/libcpu/cpuport.c ****     else
+ 202:rtthread/libcpu/cpuport.c ****     {
+ 203:rtthread/libcpu/cpuport.c ****         rt_kprintf("\n");
+ 204:rtthread/libcpu/cpuport.c ****     }
+ 205:rtthread/libcpu/cpuport.c **** }
+ 206:rtthread/libcpu/cpuport.c **** 
+ 207:rtthread/libcpu/cpuport.c **** static void mem_manage_fault_track(void)
+ 208:rtthread/libcpu/cpuport.c **** {
+ARM GAS  /tmp/ccJgnJd9.s 			page 7
+
+
+ 209:rtthread/libcpu/cpuport.c ****     rt_kprintf("mem manage fault:\n");
+ 210:rtthread/libcpu/cpuport.c ****     rt_kprintf("SCB_CFSR_MFSR:0x%02X ", SCB_CFSR_MFSR);
+ 211:rtthread/libcpu/cpuport.c **** 
+ 212:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_MFSR & (1<<0))
+ 213:rtthread/libcpu/cpuport.c ****     {
+ 214:rtthread/libcpu/cpuport.c ****         /* [0]:IACCVIOL */
+ 215:rtthread/libcpu/cpuport.c ****         rt_kprintf("IACCVIOL ");
+ 216:rtthread/libcpu/cpuport.c ****     }
+ 217:rtthread/libcpu/cpuport.c **** 
+ 218:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_MFSR & (1<<1))
+ 219:rtthread/libcpu/cpuport.c ****     {
+ 220:rtthread/libcpu/cpuport.c ****         /* [1]:DACCVIOL */
+ 221:rtthread/libcpu/cpuport.c ****         rt_kprintf("DACCVIOL ");
+ 222:rtthread/libcpu/cpuport.c ****     }
+ 223:rtthread/libcpu/cpuport.c **** 
+ 224:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_MFSR & (1<<3))
+ 225:rtthread/libcpu/cpuport.c ****     {
+ 226:rtthread/libcpu/cpuport.c ****         /* [3]:MUNSTKERR */
+ 227:rtthread/libcpu/cpuport.c ****         rt_kprintf("MUNSTKERR ");
+ 228:rtthread/libcpu/cpuport.c ****     }
+ 229:rtthread/libcpu/cpuport.c **** 
+ 230:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_MFSR & (1<<4))
+ 231:rtthread/libcpu/cpuport.c ****     {
+ 232:rtthread/libcpu/cpuport.c ****         /* [4]:MSTKERR */
+ 233:rtthread/libcpu/cpuport.c ****         rt_kprintf("MSTKERR ");
+ 234:rtthread/libcpu/cpuport.c ****     }
+ 235:rtthread/libcpu/cpuport.c **** 
+ 236:rtthread/libcpu/cpuport.c ****     if(SCB_CFSR_MFSR & (1<<7))
+ 237:rtthread/libcpu/cpuport.c ****     {
+ 238:rtthread/libcpu/cpuport.c ****         /* [7]:MMARVALID */
+ 239:rtthread/libcpu/cpuport.c ****         rt_kprintf("SCB->MMAR:%08X\n", SCB_MMAR);
+ 240:rtthread/libcpu/cpuport.c ****     }
+ 241:rtthread/libcpu/cpuport.c ****     else
+ 242:rtthread/libcpu/cpuport.c ****     {
+ 243:rtthread/libcpu/cpuport.c ****         rt_kprintf("\n");
+ 244:rtthread/libcpu/cpuport.c ****     }
+ 245:rtthread/libcpu/cpuport.c **** }
+ 246:rtthread/libcpu/cpuport.c **** 
+ 247:rtthread/libcpu/cpuport.c **** static void hard_fault_track(void)
+ 248:rtthread/libcpu/cpuport.c **** {
+ 249:rtthread/libcpu/cpuport.c ****     if(SCB_HFSR & (1UL<<1))
+ 250:rtthread/libcpu/cpuport.c ****     {
+ 251:rtthread/libcpu/cpuport.c ****         /* [1]:VECTBL, Indicates hard fault is caused by failed vector fetch. */
+ 252:rtthread/libcpu/cpuport.c ****         rt_kprintf("failed vector fetch\n");
+ 253:rtthread/libcpu/cpuport.c ****     }
+ 254:rtthread/libcpu/cpuport.c **** 
+ 255:rtthread/libcpu/cpuport.c ****     if(SCB_HFSR & (1UL<<30))
+ 256:rtthread/libcpu/cpuport.c ****     {
+ 257:rtthread/libcpu/cpuport.c ****         /* [30]:FORCED, Indicates hard fault is taken because of bus fault,
+ 258:rtthread/libcpu/cpuport.c ****                         memory management fault, or usage fault. */
+ 259:rtthread/libcpu/cpuport.c ****         if(SCB_CFSR_BFSR)
+ 260:rtthread/libcpu/cpuport.c ****         {
+ 261:rtthread/libcpu/cpuport.c ****             bus_fault_track();
+ 262:rtthread/libcpu/cpuport.c ****         }
+ 263:rtthread/libcpu/cpuport.c **** 
+ 264:rtthread/libcpu/cpuport.c ****         if(SCB_CFSR_MFSR)
+ 265:rtthread/libcpu/cpuport.c ****         {
+ARM GAS  /tmp/ccJgnJd9.s 			page 8
+
+
+ 266:rtthread/libcpu/cpuport.c ****             mem_manage_fault_track();
+ 267:rtthread/libcpu/cpuport.c ****         }
+ 268:rtthread/libcpu/cpuport.c **** 
+ 269:rtthread/libcpu/cpuport.c ****         if(SCB_CFSR_UFSR)
+ 270:rtthread/libcpu/cpuport.c ****         {
+ 271:rtthread/libcpu/cpuport.c ****             usage_fault_track();
+ 272:rtthread/libcpu/cpuport.c ****         }
+ 273:rtthread/libcpu/cpuport.c ****     }
+ 274:rtthread/libcpu/cpuport.c **** 
+ 275:rtthread/libcpu/cpuport.c ****     if(SCB_HFSR & (1UL<<31))
+ 276:rtthread/libcpu/cpuport.c ****     {
+ 277:rtthread/libcpu/cpuport.c ****         /* [31]:DEBUGEVT, Indicates hard fault is triggered by debug event. */
+ 278:rtthread/libcpu/cpuport.c ****         rt_kprintf("debug event\n");
+ 279:rtthread/libcpu/cpuport.c ****     }
+ 280:rtthread/libcpu/cpuport.c **** }
+ 281:rtthread/libcpu/cpuport.c **** #endif /* RT_USING_FINSH */
+ 282:rtthread/libcpu/cpuport.c **** 
+ 283:rtthread/libcpu/cpuport.c **** struct exception_info
+ 284:rtthread/libcpu/cpuport.c **** {
+ 285:rtthread/libcpu/cpuport.c ****     rt_uint32_t exc_return;
+ 286:rtthread/libcpu/cpuport.c ****     struct stack_frame stack_frame;
+ 287:rtthread/libcpu/cpuport.c **** };
+ 288:rtthread/libcpu/cpuport.c **** 
+ 289:rtthread/libcpu/cpuport.c **** /*
+ 290:rtthread/libcpu/cpuport.c ****  * fault exception handler
+ 291:rtthread/libcpu/cpuport.c ****  */
+ 292:rtthread/libcpu/cpuport.c **** void rt_hw_hard_fault_exception(struct exception_info * exception_info)
+ 293:rtthread/libcpu/cpuport.c **** {
+ 138              		.loc 1 293 0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 0
+ 141              		@ frame_needed = 0, uses_anonymous_args = 0
+ 142              	.LVL11:
+ 143 0000 10B5     		push	{r4, lr}
+ 144              	.LCFI2:
+ 145              		.cfi_def_cfa_offset 8
+ 146              		.cfi_offset 4, -8
+ 147              		.cfi_offset 14, -4
+ 148 0002 0446     		mov	r4, r0
+ 149              	.LVL12:
+ 294:rtthread/libcpu/cpuport.c ****     extern long list_thread(void);
+ 295:rtthread/libcpu/cpuport.c ****     struct stack_frame* context = &exception_info->stack_frame;
+ 296:rtthread/libcpu/cpuport.c **** 
+ 297:rtthread/libcpu/cpuport.c ****     if (rt_exception_hook != RT_NULL)
+ 150              		.loc 1 297 0
+ 151 0004 2A4B     		ldr	r3, .L16
+ 152 0006 1B68     		ldr	r3, [r3]
+ 153 0008 13B1     		cbz	r3, .L11
+ 154              	.LBB2:
+ 298:rtthread/libcpu/cpuport.c ****     {
+ 299:rtthread/libcpu/cpuport.c ****         rt_err_t result;
+ 300:rtthread/libcpu/cpuport.c **** 
+ 301:rtthread/libcpu/cpuport.c ****         result = rt_exception_hook(exception_info);
+ 155              		.loc 1 301 0
+ 156 000a 9847     		blx	r3
+ 157              	.LVL13:
+ 302:rtthread/libcpu/cpuport.c ****         if (result == RT_EOK)
+ARM GAS  /tmp/ccJgnJd9.s 			page 9
+
+
+ 158              		.loc 1 302 0
+ 159 000c 0028     		cmp	r0, #0
+ 160 000e 4ED0     		beq	.L10
+ 161              	.LVL14:
+ 162              	.L11:
+ 163              	.LBE2:
+ 303:rtthread/libcpu/cpuport.c ****             return;
+ 304:rtthread/libcpu/cpuport.c ****     }
+ 305:rtthread/libcpu/cpuport.c **** 
+ 306:rtthread/libcpu/cpuport.c ****     rt_kprintf("psr: 0x%08x\n", context->exception_stack_frame.psr);
+ 164              		.loc 1 306 0
+ 165 0010 216C     		ldr	r1, [r4, #64]
+ 166 0012 2848     		ldr	r0, .L16+4
+ 167 0014 FFF7FEFF 		bl	rt_kprintf
+ 168              	.LVL15:
+ 307:rtthread/libcpu/cpuport.c **** 
+ 308:rtthread/libcpu/cpuport.c ****     rt_kprintf("r00: 0x%08x\n", context->exception_stack_frame.r0);
+ 169              		.loc 1 308 0
+ 170 0018 616A     		ldr	r1, [r4, #36]
+ 171 001a 2748     		ldr	r0, .L16+8
+ 172 001c FFF7FEFF 		bl	rt_kprintf
+ 173              	.LVL16:
+ 309:rtthread/libcpu/cpuport.c ****     rt_kprintf("r01: 0x%08x\n", context->exception_stack_frame.r1);
+ 174              		.loc 1 309 0
+ 175 0020 A16A     		ldr	r1, [r4, #40]
+ 176 0022 2648     		ldr	r0, .L16+12
+ 177 0024 FFF7FEFF 		bl	rt_kprintf
+ 178              	.LVL17:
+ 310:rtthread/libcpu/cpuport.c ****     rt_kprintf("r02: 0x%08x\n", context->exception_stack_frame.r2);
+ 179              		.loc 1 310 0
+ 180 0028 E16A     		ldr	r1, [r4, #44]
+ 181 002a 2548     		ldr	r0, .L16+16
+ 182 002c FFF7FEFF 		bl	rt_kprintf
+ 183              	.LVL18:
+ 311:rtthread/libcpu/cpuport.c ****     rt_kprintf("r03: 0x%08x\n", context->exception_stack_frame.r3);
+ 184              		.loc 1 311 0
+ 185 0030 216B     		ldr	r1, [r4, #48]
+ 186 0032 2448     		ldr	r0, .L16+20
+ 187 0034 FFF7FEFF 		bl	rt_kprintf
+ 188              	.LVL19:
+ 312:rtthread/libcpu/cpuport.c ****     rt_kprintf("r04: 0x%08x\n", context->r4);
+ 189              		.loc 1 312 0
+ 190 0038 6168     		ldr	r1, [r4, #4]
+ 191 003a 2348     		ldr	r0, .L16+24
+ 192 003c FFF7FEFF 		bl	rt_kprintf
+ 193              	.LVL20:
+ 313:rtthread/libcpu/cpuport.c ****     rt_kprintf("r05: 0x%08x\n", context->r5);
+ 194              		.loc 1 313 0
+ 195 0040 A168     		ldr	r1, [r4, #8]
+ 196 0042 2248     		ldr	r0, .L16+28
+ 197 0044 FFF7FEFF 		bl	rt_kprintf
+ 198              	.LVL21:
+ 314:rtthread/libcpu/cpuport.c ****     rt_kprintf("r06: 0x%08x\n", context->r6);
+ 199              		.loc 1 314 0
+ 200 0048 E168     		ldr	r1, [r4, #12]
+ 201 004a 2148     		ldr	r0, .L16+32
+ 202 004c FFF7FEFF 		bl	rt_kprintf
+ARM GAS  /tmp/ccJgnJd9.s 			page 10
+
+
+ 203              	.LVL22:
+ 315:rtthread/libcpu/cpuport.c ****     rt_kprintf("r07: 0x%08x\n", context->r7);
+ 204              		.loc 1 315 0
+ 205 0050 2169     		ldr	r1, [r4, #16]
+ 206 0052 2048     		ldr	r0, .L16+36
+ 207 0054 FFF7FEFF 		bl	rt_kprintf
+ 208              	.LVL23:
+ 316:rtthread/libcpu/cpuport.c ****     rt_kprintf("r08: 0x%08x\n", context->r8);
+ 209              		.loc 1 316 0
+ 210 0058 6169     		ldr	r1, [r4, #20]
+ 211 005a 1F48     		ldr	r0, .L16+40
+ 212 005c FFF7FEFF 		bl	rt_kprintf
+ 213              	.LVL24:
+ 317:rtthread/libcpu/cpuport.c ****     rt_kprintf("r09: 0x%08x\n", context->r9);
+ 214              		.loc 1 317 0
+ 215 0060 A169     		ldr	r1, [r4, #24]
+ 216 0062 1E48     		ldr	r0, .L16+44
+ 217 0064 FFF7FEFF 		bl	rt_kprintf
+ 218              	.LVL25:
+ 318:rtthread/libcpu/cpuport.c ****     rt_kprintf("r10: 0x%08x\n", context->r10);
+ 219              		.loc 1 318 0
+ 220 0068 E169     		ldr	r1, [r4, #28]
+ 221 006a 1D48     		ldr	r0, .L16+48
+ 222 006c FFF7FEFF 		bl	rt_kprintf
+ 223              	.LVL26:
+ 319:rtthread/libcpu/cpuport.c ****     rt_kprintf("r11: 0x%08x\n", context->r11);
+ 224              		.loc 1 319 0
+ 225 0070 216A     		ldr	r1, [r4, #32]
+ 226 0072 1C48     		ldr	r0, .L16+52
+ 227 0074 FFF7FEFF 		bl	rt_kprintf
+ 228              	.LVL27:
+ 320:rtthread/libcpu/cpuport.c ****     rt_kprintf("r12: 0x%08x\n", context->exception_stack_frame.r12);
+ 229              		.loc 1 320 0
+ 230 0078 616B     		ldr	r1, [r4, #52]
+ 231 007a 1B48     		ldr	r0, .L16+56
+ 232 007c FFF7FEFF 		bl	rt_kprintf
+ 233              	.LVL28:
+ 321:rtthread/libcpu/cpuport.c ****     rt_kprintf(" lr: 0x%08x\n", context->exception_stack_frame.lr);
+ 234              		.loc 1 321 0
+ 235 0080 A16B     		ldr	r1, [r4, #56]
+ 236 0082 1A48     		ldr	r0, .L16+60
+ 237 0084 FFF7FEFF 		bl	rt_kprintf
+ 238              	.LVL29:
+ 322:rtthread/libcpu/cpuport.c ****     rt_kprintf(" pc: 0x%08x\n", context->exception_stack_frame.pc);
+ 239              		.loc 1 322 0
+ 240 0088 E16B     		ldr	r1, [r4, #60]
+ 241 008a 1948     		ldr	r0, .L16+64
+ 242 008c FFF7FEFF 		bl	rt_kprintf
+ 243              	.LVL30:
+ 323:rtthread/libcpu/cpuport.c **** 
+ 324:rtthread/libcpu/cpuport.c ****     if(exception_info->exc_return & (1 << 2) )
+ 244              		.loc 1 324 0
+ 245 0090 2368     		ldr	r3, [r4]
+ 246 0092 13F0040F 		tst	r3, #4
+ 247 0096 06D0     		beq	.L13
+ 325:rtthread/libcpu/cpuport.c ****     {
+ 326:rtthread/libcpu/cpuport.c ****         rt_kprintf("hard fault on thread: %s\r\n\r\n", rt_thread_self()->name);
+ARM GAS  /tmp/ccJgnJd9.s 			page 11
+
+
+ 248              		.loc 1 326 0
+ 249 0098 FFF7FEFF 		bl	rt_thread_self
+ 250              	.LVL31:
+ 251 009c 0146     		mov	r1, r0
+ 252 009e 1548     		ldr	r0, .L16+68
+ 253 00a0 FFF7FEFF 		bl	rt_kprintf
+ 254              	.LVL32:
+ 255              	.L14:
+ 256 00a4 FEE7     		b	.L14
+ 257              	.L13:
+ 327:rtthread/libcpu/cpuport.c **** 
+ 328:rtthread/libcpu/cpuport.c **** #ifdef RT_USING_FINSH
+ 329:rtthread/libcpu/cpuport.c ****         list_thread();
+ 330:rtthread/libcpu/cpuport.c **** #endif /* RT_USING_FINSH */
+ 331:rtthread/libcpu/cpuport.c ****     }
+ 332:rtthread/libcpu/cpuport.c ****     else
+ 333:rtthread/libcpu/cpuport.c ****     {
+ 334:rtthread/libcpu/cpuport.c ****         rt_kprintf("hard fault on handler\r\n\r\n");
+ 258              		.loc 1 334 0
+ 259 00a6 1448     		ldr	r0, .L16+72
+ 260 00a8 FFF7FEFF 		bl	rt_kprintf
+ 261              	.LVL33:
+ 262 00ac FAE7     		b	.L14
+ 263              	.LVL34:
+ 264              	.L10:
+ 335:rtthread/libcpu/cpuport.c ****     }
+ 336:rtthread/libcpu/cpuport.c **** 
+ 337:rtthread/libcpu/cpuport.c **** #ifdef RT_USING_FINSH
+ 338:rtthread/libcpu/cpuport.c ****     hard_fault_track();
+ 339:rtthread/libcpu/cpuport.c **** #endif /* RT_USING_FINSH */
+ 340:rtthread/libcpu/cpuport.c **** 
+ 341:rtthread/libcpu/cpuport.c ****     while (1);
+ 342:rtthread/libcpu/cpuport.c **** }
+ 265              		.loc 1 342 0
+ 266 00ae 10BD     		pop	{r4, pc}
+ 267              	.LVL35:
+ 268              	.L17:
+ 269              		.align	2
+ 270              	.L16:
+ 271 00b0 00000000 		.word	.LANCHOR0
+ 272 00b4 00000000 		.word	.LC0
+ 273 00b8 10000000 		.word	.LC1
+ 274 00bc 20000000 		.word	.LC2
+ 275 00c0 30000000 		.word	.LC3
+ 276 00c4 40000000 		.word	.LC4
+ 277 00c8 50000000 		.word	.LC5
+ 278 00cc 60000000 		.word	.LC6
+ 279 00d0 70000000 		.word	.LC7
+ 280 00d4 80000000 		.word	.LC8
+ 281 00d8 90000000 		.word	.LC9
+ 282 00dc A0000000 		.word	.LC10
+ 283 00e0 B0000000 		.word	.LC11
+ 284 00e4 C0000000 		.word	.LC12
+ 285 00e8 D0000000 		.word	.LC13
+ 286 00ec E0000000 		.word	.LC14
+ 287 00f0 F0000000 		.word	.LC15
+ 288 00f4 00010000 		.word	.LC16
+ARM GAS  /tmp/ccJgnJd9.s 			page 12
+
+
+ 289 00f8 20010000 		.word	.LC17
+ 290              		.cfi_endproc
+ 291              	.LFE17:
+ 293              		.section	.text.rt_hw_cpu_shutdown,"ax",%progbits
+ 294              		.align	1
+ 295              		.global	rt_hw_cpu_shutdown
+ 296              		.syntax unified
+ 297              		.thumb
+ 298              		.thumb_func
+ 299              		.fpu softvfp
+ 301              	rt_hw_cpu_shutdown:
+ 302              	.LFB18:
+ 343:rtthread/libcpu/cpuport.c **** 
+ 344:rtthread/libcpu/cpuport.c **** /**
+ 345:rtthread/libcpu/cpuport.c ****  * shutdown CPU
+ 346:rtthread/libcpu/cpuport.c ****  */
+ 347:rtthread/libcpu/cpuport.c **** void rt_hw_cpu_shutdown(void)
+ 348:rtthread/libcpu/cpuport.c **** {
+ 303              		.loc 1 348 0
+ 304              		.cfi_startproc
+ 305              		@ args = 0, pretend = 0, frame = 0
+ 306              		@ frame_needed = 0, uses_anonymous_args = 0
+ 307 0000 08B5     		push	{r3, lr}
+ 308              	.LCFI3:
+ 309              		.cfi_def_cfa_offset 8
+ 310              		.cfi_offset 3, -8
+ 311              		.cfi_offset 14, -4
+ 349:rtthread/libcpu/cpuport.c ****     rt_kprintf("shutdown...\n");
+ 312              		.loc 1 349 0
+ 313 0002 0248     		ldr	r0, .L20
+ 314 0004 FFF7FEFF 		bl	rt_kprintf
+ 315              	.LVL36:
+ 350:rtthread/libcpu/cpuport.c **** 
+ 351:rtthread/libcpu/cpuport.c ****     RT_ASSERT(0);
+ 352:rtthread/libcpu/cpuport.c **** }
+ 316              		.loc 1 352 0
+ 317 0008 08BD     		pop	{r3, pc}
+ 318              	.L21:
+ 319 000a 00BF     		.align	2
+ 320              	.L20:
+ 321 000c 00000000 		.word	.LC18
+ 322              		.cfi_endproc
+ 323              	.LFE18:
+ 325              		.section	.text.rt_hw_cpu_reset,"ax",%progbits
+ 326              		.align	1
+ 327              		.weak	rt_hw_cpu_reset
+ 328              		.syntax unified
+ 329              		.thumb
+ 330              		.thumb_func
+ 331              		.fpu softvfp
+ 333              	rt_hw_cpu_reset:
+ 334              	.LFB19:
+ 353:rtthread/libcpu/cpuport.c **** 
+ 354:rtthread/libcpu/cpuport.c **** /**
+ 355:rtthread/libcpu/cpuport.c ****  * reset CPU
+ 356:rtthread/libcpu/cpuport.c ****  */
+ 357:rtthread/libcpu/cpuport.c **** RT_WEAK void rt_hw_cpu_reset(void)
+ARM GAS  /tmp/ccJgnJd9.s 			page 13
+
+
+ 358:rtthread/libcpu/cpuport.c **** {
+ 335              		.loc 1 358 0
+ 336              		.cfi_startproc
+ 337              		@ args = 0, pretend = 0, frame = 0
+ 338              		@ frame_needed = 0, uses_anonymous_args = 0
+ 339              		@ link register save eliminated.
+ 359:rtthread/libcpu/cpuport.c ****     SCB_AIRCR = SCB_RESET_VALUE;
+ 340              		.loc 1 359 0
+ 341 0000 014B     		ldr	r3, .L23
+ 342 0002 024A     		ldr	r2, .L23+4
+ 343 0004 1A60     		str	r2, [r3]
+ 360:rtthread/libcpu/cpuport.c **** }
+ 344              		.loc 1 360 0
+ 345 0006 7047     		bx	lr
+ 346              	.L24:
+ 347              		.align	2
+ 348              	.L23:
+ 349 0008 0CED00E0 		.word	-536810228
+ 350 000c 0400FA05 		.word	100270084
+ 351              		.cfi_endproc
+ 352              	.LFE19:
+ 354              		.comm	rt_thread_switch_interrupt_flag,4,4
+ 355              		.comm	rt_interrupt_to_thread,4,4
+ 356              		.comm	rt_interrupt_from_thread,4,4
+ 357              		.section	.bss.rt_exception_hook,"aw",%nobits
+ 358              		.align	2
+ 359              		.set	.LANCHOR0,. + 0
+ 362              	rt_exception_hook:
+ 363 0000 00000000 		.space	4
+ 364              		.section	.rodata.rt_hw_cpu_shutdown.str1.4,"aMS",%progbits,1
+ 365              		.align	2
+ 366              	.LC18:
+ 367 0000 73687574 		.ascii	"shutdown...\012\000"
+ 367      646F776E 
+ 367      2E2E2E0A 
+ 367      00
+ 368              		.section	.rodata.rt_hw_hard_fault_exception.str1.4,"aMS",%progbits,1
+ 369              		.align	2
+ 370              	.LC0:
+ 371 0000 7073723A 		.ascii	"psr: 0x%08x\012\000"
+ 371      20307825 
+ 371      3038780A 
+ 371      00
+ 372 000d 000000   		.space	3
+ 373              	.LC1:
+ 374 0010 7230303A 		.ascii	"r00: 0x%08x\012\000"
+ 374      20307825 
+ 374      3038780A 
+ 374      00
+ 375 001d 000000   		.space	3
+ 376              	.LC2:
+ 377 0020 7230313A 		.ascii	"r01: 0x%08x\012\000"
+ 377      20307825 
+ 377      3038780A 
+ 377      00
+ 378 002d 000000   		.space	3
+ 379              	.LC3:
+ARM GAS  /tmp/ccJgnJd9.s 			page 14
+
+
+ 380 0030 7230323A 		.ascii	"r02: 0x%08x\012\000"
+ 380      20307825 
+ 380      3038780A 
+ 380      00
+ 381 003d 000000   		.space	3
+ 382              	.LC4:
+ 383 0040 7230333A 		.ascii	"r03: 0x%08x\012\000"
+ 383      20307825 
+ 383      3038780A 
+ 383      00
+ 384 004d 000000   		.space	3
+ 385              	.LC5:
+ 386 0050 7230343A 		.ascii	"r04: 0x%08x\012\000"
+ 386      20307825 
+ 386      3038780A 
+ 386      00
+ 387 005d 000000   		.space	3
+ 388              	.LC6:
+ 389 0060 7230353A 		.ascii	"r05: 0x%08x\012\000"
+ 389      20307825 
+ 389      3038780A 
+ 389      00
+ 390 006d 000000   		.space	3
+ 391              	.LC7:
+ 392 0070 7230363A 		.ascii	"r06: 0x%08x\012\000"
+ 392      20307825 
+ 392      3038780A 
+ 392      00
+ 393 007d 000000   		.space	3
+ 394              	.LC8:
+ 395 0080 7230373A 		.ascii	"r07: 0x%08x\012\000"
+ 395      20307825 
+ 395      3038780A 
+ 395      00
+ 396 008d 000000   		.space	3
+ 397              	.LC9:
+ 398 0090 7230383A 		.ascii	"r08: 0x%08x\012\000"
+ 398      20307825 
+ 398      3038780A 
+ 398      00
+ 399 009d 000000   		.space	3
+ 400              	.LC10:
+ 401 00a0 7230393A 		.ascii	"r09: 0x%08x\012\000"
+ 401      20307825 
+ 401      3038780A 
+ 401      00
+ 402 00ad 000000   		.space	3
+ 403              	.LC11:
+ 404 00b0 7231303A 		.ascii	"r10: 0x%08x\012\000"
+ 404      20307825 
+ 404      3038780A 
+ 404      00
+ 405 00bd 000000   		.space	3
+ 406              	.LC12:
+ 407 00c0 7231313A 		.ascii	"r11: 0x%08x\012\000"
+ 407      20307825 
+ 407      3038780A 
+ARM GAS  /tmp/ccJgnJd9.s 			page 15
+
+
+ 407      00
+ 408 00cd 000000   		.space	3
+ 409              	.LC13:
+ 410 00d0 7231323A 		.ascii	"r12: 0x%08x\012\000"
+ 410      20307825 
+ 410      3038780A 
+ 410      00
+ 411 00dd 000000   		.space	3
+ 412              	.LC14:
+ 413 00e0 206C723A 		.ascii	" lr: 0x%08x\012\000"
+ 413      20307825 
+ 413      3038780A 
+ 413      00
+ 414 00ed 000000   		.space	3
+ 415              	.LC15:
+ 416 00f0 2070633A 		.ascii	" pc: 0x%08x\012\000"
+ 416      20307825 
+ 416      3038780A 
+ 416      00
+ 417 00fd 000000   		.space	3
+ 418              	.LC16:
+ 419 0100 68617264 		.ascii	"hard fault on thread: %s\015\012\015\012\000"
+ 419      20666175 
+ 419      6C74206F 
+ 419      6E207468 
+ 419      72656164 
+ 420 011d 000000   		.space	3
+ 421              	.LC17:
+ 422 0120 68617264 		.ascii	"hard fault on handler\015\012\015\012\000"
+ 422      20666175 
+ 422      6C74206F 
+ 422      6E206861 
+ 422      6E646C65 
+ 423              		.text
+ 424              	.Letext0:
+ 425              		.file 2 "rtthread/include/rtdef.h"
+ 426              		.file 3 "rtthread/include/rtthread.h"
+ARM GAS  /tmp/ccJgnJd9.s 			page 16
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 cpuport.c
+     /tmp/ccJgnJd9.s:16     .text.rt_hw_stack_init:0000000000000000 $t
+     /tmp/ccJgnJd9.s:23     .text.rt_hw_stack_init:0000000000000000 rt_hw_stack_init
+     /tmp/ccJgnJd9.s:96     .text.rt_hw_stack_init:0000000000000048 $d
+     /tmp/ccJgnJd9.s:101    .text.rt_hw_exception_install:0000000000000000 $t
+     /tmp/ccJgnJd9.s:108    .text.rt_hw_exception_install:0000000000000000 rt_hw_exception_install
+     /tmp/ccJgnJd9.s:124    .text.rt_hw_exception_install:0000000000000008 $d
+     /tmp/ccJgnJd9.s:129    .text.rt_hw_hard_fault_exception:0000000000000000 $t
+     /tmp/ccJgnJd9.s:136    .text.rt_hw_hard_fault_exception:0000000000000000 rt_hw_hard_fault_exception
+     /tmp/ccJgnJd9.s:271    .text.rt_hw_hard_fault_exception:00000000000000b0 $d
+     /tmp/ccJgnJd9.s:294    .text.rt_hw_cpu_shutdown:0000000000000000 $t
+     /tmp/ccJgnJd9.s:301    .text.rt_hw_cpu_shutdown:0000000000000000 rt_hw_cpu_shutdown
+     /tmp/ccJgnJd9.s:321    .text.rt_hw_cpu_shutdown:000000000000000c $d
+     /tmp/ccJgnJd9.s:326    .text.rt_hw_cpu_reset:0000000000000000 $t
+     /tmp/ccJgnJd9.s:333    .text.rt_hw_cpu_reset:0000000000000000 rt_hw_cpu_reset
+     /tmp/ccJgnJd9.s:349    .text.rt_hw_cpu_reset:0000000000000008 $d
+                            *COM*:0000000000000004 rt_thread_switch_interrupt_flag
+                            *COM*:0000000000000004 rt_interrupt_to_thread
+                            *COM*:0000000000000004 rt_interrupt_from_thread
+     /tmp/ccJgnJd9.s:358    .bss.rt_exception_hook:0000000000000000 $d
+     /tmp/ccJgnJd9.s:362    .bss.rt_exception_hook:0000000000000000 rt_exception_hook
+     /tmp/ccJgnJd9.s:365    .rodata.rt_hw_cpu_shutdown.str1.4:0000000000000000 $d
+     /tmp/ccJgnJd9.s:369    .rodata.rt_hw_hard_fault_exception.str1.4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+rt_kprintf
+rt_thread_self

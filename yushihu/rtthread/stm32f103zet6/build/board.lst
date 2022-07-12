@@ -1,0 +1,271 @@
+ARM GAS  /tmp/ccA06xHN.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"board.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text._SysTick_Config,"ax",%progbits
+  16              		.align	1
+  17              		.syntax unified
+  18              		.thumb
+  19              		.thumb_func
+  20              		.fpu softvfp
+  22              	_SysTick_Config:
+  23              	.LFB15:
+  24              		.file 1 "user/board.c"
+   1:user/board.c  **** /*
+   2:user/board.c  ****  * Copyright (c) 2006-2019, RT-Thread Development Team
+   3:user/board.c  ****  *
+   4:user/board.c  ****  * SPDX-License-Identifier: Apache-2.0
+   5:user/board.c  ****  *
+   6:user/board.c  ****  * Change Logs:
+   7:user/board.c  ****  * Date           Author       Notes
+   8:user/board.c  ****  * 2017-07-24     Tanek        the first version
+   9:user/board.c  ****  * 2018-11-12     Ernest Chen  modify copyright
+  10:user/board.c  ****  */
+  11:user/board.c  ****  
+  12:user/board.c  **** #include <stdint.h>
+  13:user/board.c  **** #include <rthw.h>
+  14:user/board.c  **** #include <rtthread.h>
+  15:user/board.c  **** 
+  16:user/board.c  **** #define _SCB_BASE       (0xE000E010UL)
+  17:user/board.c  **** #define _SYSTICK_CTRL   (*(rt_uint32_t *)(_SCB_BASE + 0x0))
+  18:user/board.c  **** #define _SYSTICK_LOAD   (*(rt_uint32_t *)(_SCB_BASE + 0x4))
+  19:user/board.c  **** #define _SYSTICK_VAL    (*(rt_uint32_t *)(_SCB_BASE + 0x8))
+  20:user/board.c  **** #define _SYSTICK_CALIB  (*(rt_uint32_t *)(_SCB_BASE + 0xC))
+  21:user/board.c  **** #define _SYSTICK_PRI    (*(rt_uint8_t  *)(0xE000ED23UL))
+  22:user/board.c  **** 
+  23:user/board.c  **** // Updates the variable SystemCoreClock and must be called 
+  24:user/board.c  **** // whenever the core clock is changed during program execution.
+  25:user/board.c  **** extern void SystemCoreClockUpdate(void);
+  26:user/board.c  **** 
+  27:user/board.c  **** // Holds the system core clock, which is the system clock 
+  28:user/board.c  **** // frequency supplied to the SysTick timer and the processor 
+  29:user/board.c  **** // core clock.
+  30:user/board.c  **** extern uint32_t SystemCoreClock;
+  31:user/board.c  **** 
+  32:user/board.c  **** static uint32_t _SysTick_Config(rt_uint32_t ticks)
+  33:user/board.c  **** {
+  25              		.loc 1 33 0
+ARM GAS  /tmp/ccA06xHN.s 			page 2
+
+
+  26              		.cfi_startproc
+  27              		@ args = 0, pretend = 0, frame = 0
+  28              		@ frame_needed = 0, uses_anonymous_args = 0
+  29              		@ link register save eliminated.
+  30              	.LVL0:
+  34:user/board.c  ****     if ((ticks - 1) > 0xFFFFFF)
+  31              		.loc 1 34 0
+  32 0000 0138     		subs	r0, r0, #1
+  33              	.LVL1:
+  34 0002 B0F1807F 		cmp	r0, #16777216
+  35 0006 0DD2     		bcs	.L3
+  35:user/board.c  ****     {
+  36:user/board.c  ****         return 1;
+  37:user/board.c  ****     }
+  38:user/board.c  ****     
+  39:user/board.c  ****     _SYSTICK_LOAD = ticks - 1; 
+  36              		.loc 1 39 0
+  37 0008 074B     		ldr	r3, .L4
+  38 000a 1860     		str	r0, [r3]
+  40:user/board.c  ****     _SYSTICK_PRI = 0xFF;
+  39              		.loc 1 40 0
+  40 000c 03F60F53 		addw	r3, r3, #3343
+  41 0010 FF22     		movs	r2, #255
+  42 0012 1A70     		strb	r2, [r3]
+  41:user/board.c  ****     _SYSTICK_VAL  = 0;
+  43              		.loc 1 41 0
+  44 0014 0020     		movs	r0, #0
+  45              	.LVL2:
+  46 0016 A3F60B53 		subw	r3, r3, #3339
+  47 001a 1860     		str	r0, [r3]
+  42:user/board.c  ****     _SYSTICK_CTRL = 0x07;  
+  48              		.loc 1 42 0
+  49 001c 083B     		subs	r3, r3, #8
+  50 001e 0722     		movs	r2, #7
+  51 0020 1A60     		str	r2, [r3]
+  43:user/board.c  ****     
+  44:user/board.c  ****     return 0;
+  52              		.loc 1 44 0
+  53 0022 7047     		bx	lr
+  54              	.LVL3:
+  55              	.L3:
+  36:user/board.c  ****     }
+  56              		.loc 1 36 0
+  57 0024 0120     		movs	r0, #1
+  58              	.LVL4:
+  45:user/board.c  **** }
+  59              		.loc 1 45 0
+  60 0026 7047     		bx	lr
+  61              	.L5:
+  62              		.align	2
+  63              	.L4:
+  64 0028 14E000E0 		.word	-536813548
+  65              		.cfi_endproc
+  66              	.LFE15:
+  68              		.section	.text.rt_hw_board_init,"ax",%progbits
+  69              		.align	1
+  70              		.global	rt_hw_board_init
+ARM GAS  /tmp/ccA06xHN.s 			page 3
+
+
+  71              		.syntax unified
+  72              		.thumb
+  73              		.thumb_func
+  74              		.fpu softvfp
+  76              	rt_hw_board_init:
+  77              	.LFB16:
+  46:user/board.c  **** 
+  47:user/board.c  **** #if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
+  48:user/board.c  **** #define RT_HEAP_SIZE 1024
+  49:user/board.c  **** static uint32_t rt_heap[RT_HEAP_SIZE];     // heap default size: 4K(1024 * 4)
+  50:user/board.c  **** RT_WEAK void *rt_heap_begin_get(void)
+  51:user/board.c  **** {
+  52:user/board.c  ****     return rt_heap;
+  53:user/board.c  **** }
+  54:user/board.c  **** 
+  55:user/board.c  **** RT_WEAK void *rt_heap_end_get(void)
+  56:user/board.c  **** {
+  57:user/board.c  ****     return rt_heap + RT_HEAP_SIZE;
+  58:user/board.c  **** }
+  59:user/board.c  **** #endif
+  60:user/board.c  **** 
+  61:user/board.c  **** /**
+  62:user/board.c  ****  * This function will initial your board.
+  63:user/board.c  ****  */
+  64:user/board.c  **** void rt_hw_board_init()
+  65:user/board.c  **** {
+  78              		.loc 1 65 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82 0000 08B5     		push	{r3, lr}
+  83              	.LCFI0:
+  84              		.cfi_def_cfa_offset 8
+  85              		.cfi_offset 3, -8
+  86              		.cfi_offset 14, -4
+  66:user/board.c  ****     /* System Clock Update */
+  67:user/board.c  ****     SystemCoreClockUpdate();
+  87              		.loc 1 67 0
+  88 0002 FFF7FEFF 		bl	SystemCoreClockUpdate
+  89              	.LVL5:
+  68:user/board.c  ****     
+  69:user/board.c  ****     /* System Tick Configuration */
+  70:user/board.c  ****     _SysTick_Config(SystemCoreClock / RT_TICK_PER_SECOND);
+  90              		.loc 1 70 0
+  91 0006 054B     		ldr	r3, .L8
+  92 0008 1868     		ldr	r0, [r3]
+  93 000a 054B     		ldr	r3, .L8+4
+  94 000c A3FB0030 		umull	r3, r0, r3, r0
+  95 0010 8009     		lsrs	r0, r0, #6
+  96 0012 FFF7FEFF 		bl	_SysTick_Config
+  97              	.LVL6:
+  71:user/board.c  **** 
+  72:user/board.c  ****     /* Call components board initial (use INIT_BOARD_EXPORT()) */
+  73:user/board.c  **** #ifdef RT_USING_COMPONENTS_INIT
+  74:user/board.c  ****     rt_components_board_init();
+  98              		.loc 1 74 0
+  99 0016 FFF7FEFF 		bl	rt_components_board_init
+ARM GAS  /tmp/ccA06xHN.s 			page 4
+
+
+ 100              	.LVL7:
+  75:user/board.c  **** #endif
+  76:user/board.c  **** 
+  77:user/board.c  **** #if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
+  78:user/board.c  ****     rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
+  79:user/board.c  **** #endif
+  80:user/board.c  **** }
+ 101              		.loc 1 80 0
+ 102 001a 08BD     		pop	{r3, pc}
+ 103              	.L9:
+ 104              		.align	2
+ 105              	.L8:
+ 106 001c 00000000 		.word	SystemCoreClock
+ 107 0020 D34D6210 		.word	274877907
+ 108              		.cfi_endproc
+ 109              	.LFE16:
+ 111              		.section	.text.SysTick_Handler,"ax",%progbits
+ 112              		.align	1
+ 113              		.global	SysTick_Handler
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 117              		.fpu softvfp
+ 119              	SysTick_Handler:
+ 120              	.LFB17:
+  81:user/board.c  **** 
+  82:user/board.c  **** void SysTick_Handler(void)
+  83:user/board.c  **** {
+ 121              		.loc 1 83 0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 0
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+ 125 0000 08B5     		push	{r3, lr}
+ 126              	.LCFI1:
+ 127              		.cfi_def_cfa_offset 8
+ 128              		.cfi_offset 3, -8
+ 129              		.cfi_offset 14, -4
+  84:user/board.c  ****     /* enter interrupt */
+  85:user/board.c  ****     rt_interrupt_enter();
+ 130              		.loc 1 85 0
+ 131 0002 FFF7FEFF 		bl	rt_interrupt_enter
+ 132              	.LVL8:
+  86:user/board.c  **** 
+  87:user/board.c  ****     rt_tick_increase();
+ 133              		.loc 1 87 0
+ 134 0006 FFF7FEFF 		bl	rt_tick_increase
+ 135              	.LVL9:
+  88:user/board.c  **** 
+  89:user/board.c  ****     /* leave interrupt */
+  90:user/board.c  ****     rt_interrupt_leave();
+ 136              		.loc 1 90 0
+ 137 000a FFF7FEFF 		bl	rt_interrupt_leave
+ 138              	.LVL10:
+  91:user/board.c  **** }
+ 139              		.loc 1 91 0
+ 140 000e 08BD     		pop	{r3, pc}
+ 141              		.cfi_endproc
+ARM GAS  /tmp/ccA06xHN.s 			page 5
+
+
+ 142              	.LFE17:
+ 144              		.text
+ 145              	.Letext0:
+ 146              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 147              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 148              		.file 4 "rtthread/include/rtdef.h"
+ 149              		.file 5 "rtthread/include/rtthread.h"
+ARM GAS  /tmp/ccA06xHN.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 board.c
+     /tmp/ccA06xHN.s:16     .text._SysTick_Config:0000000000000000 $t
+     /tmp/ccA06xHN.s:22     .text._SysTick_Config:0000000000000000 _SysTick_Config
+     /tmp/ccA06xHN.s:64     .text._SysTick_Config:0000000000000028 $d
+     /tmp/ccA06xHN.s:69     .text.rt_hw_board_init:0000000000000000 $t
+     /tmp/ccA06xHN.s:76     .text.rt_hw_board_init:0000000000000000 rt_hw_board_init
+     /tmp/ccA06xHN.s:106    .text.rt_hw_board_init:000000000000001c $d
+     /tmp/ccA06xHN.s:112    .text.SysTick_Handler:0000000000000000 $t
+     /tmp/ccA06xHN.s:119    .text.SysTick_Handler:0000000000000000 SysTick_Handler
+
+UNDEFINED SYMBOLS
+SystemCoreClockUpdate
+rt_components_board_init
+SystemCoreClock
+rt_interrupt_enter
+rt_tick_increase
+rt_interrupt_leave

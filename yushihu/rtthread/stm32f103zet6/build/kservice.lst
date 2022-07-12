@@ -1,0 +1,4592 @@
+ARM GAS  /tmp/ccJocHtA.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"kservice.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.print_number,"ax",%progbits
+  16              		.align	1
+  17              		.syntax unified
+  18              		.thumb
+  19              		.thumb_func
+  20              		.fpu softvfp
+  22              	print_number:
+  23              	.LFB32:
+  24              		.file 1 "rtthread/src/kservice.c"
+   1:rtthread/src/kservice.c **** /*
+   2:rtthread/src/kservice.c ****  * Copyright (c) 2006-2021, RT-Thread Development Team
+   3:rtthread/src/kservice.c ****  *
+   4:rtthread/src/kservice.c ****  * SPDX-License-Identifier: Apache-2.0
+   5:rtthread/src/kservice.c ****  *
+   6:rtthread/src/kservice.c ****  * Change Logs:
+   7:rtthread/src/kservice.c ****  * Date           Author       Notes
+   8:rtthread/src/kservice.c ****  * 2006-03-16     Bernard      the first version
+   9:rtthread/src/kservice.c ****  * 2006-05-25     Bernard      rewrite vsprintf
+  10:rtthread/src/kservice.c ****  * 2006-08-10     Bernard      add rt_show_version
+  11:rtthread/src/kservice.c ****  * 2010-03-17     Bernard      remove rt_strlcpy function
+  12:rtthread/src/kservice.c ****  *                             fix gcc compiling issue.
+  13:rtthread/src/kservice.c ****  * 2010-04-15     Bernard      remove weak definition on ICCM16C compiler
+  14:rtthread/src/kservice.c ****  * 2012-07-18     Arda         add the alignment display for signed integer
+  15:rtthread/src/kservice.c ****  * 2012-11-23     Bernard      fix IAR compiler error.
+  16:rtthread/src/kservice.c ****  * 2012-12-22     Bernard      fix rt_kprintf issue, which found by Grissiom.
+  17:rtthread/src/kservice.c ****  * 2013-06-24     Bernard      remove rt_kprintf if RT_USING_CONSOLE is not defined.
+  18:rtthread/src/kservice.c ****  * 2013-09-24     aozima       make sure the device is in STREAM mode when used by rt_kprintf.
+  19:rtthread/src/kservice.c ****  * 2015-07-06     Bernard      Add rt_assert_handler routine.
+  20:rtthread/src/kservice.c ****  */
+  21:rtthread/src/kservice.c **** 
+  22:rtthread/src/kservice.c **** #include <rtthread.h>
+  23:rtthread/src/kservice.c **** #include <rthw.h>
+  24:rtthread/src/kservice.c **** 
+  25:rtthread/src/kservice.c **** /* use precision */
+  26:rtthread/src/kservice.c **** #define RT_PRINTF_PRECISION
+  27:rtthread/src/kservice.c **** 
+  28:rtthread/src/kservice.c **** /**
+  29:rtthread/src/kservice.c ****  * @addtogroup KernelService
+  30:rtthread/src/kservice.c ****  */
+  31:rtthread/src/kservice.c **** 
+  32:rtthread/src/kservice.c **** /**@{*/
+  33:rtthread/src/kservice.c **** 
+  34:rtthread/src/kservice.c **** /* global errno in RT-Thread */
+ARM GAS  /tmp/ccJocHtA.s 			page 2
+
+
+  35:rtthread/src/kservice.c **** static volatile int __rt_errno;
+  36:rtthread/src/kservice.c **** 
+  37:rtthread/src/kservice.c **** #if defined(RT_USING_DEVICE) && defined(RT_USING_CONSOLE)
+  38:rtthread/src/kservice.c **** static rt_device_t _console_device = RT_NULL;
+  39:rtthread/src/kservice.c **** #endif
+  40:rtthread/src/kservice.c **** 
+  41:rtthread/src/kservice.c **** /*
+  42:rtthread/src/kservice.c ****  * This function will get errno
+  43:rtthread/src/kservice.c ****  *
+  44:rtthread/src/kservice.c ****  * @return errno
+  45:rtthread/src/kservice.c ****  */
+  46:rtthread/src/kservice.c **** rt_err_t rt_get_errno(void)
+  47:rtthread/src/kservice.c **** {
+  48:rtthread/src/kservice.c ****     rt_thread_t tid;
+  49:rtthread/src/kservice.c **** 
+  50:rtthread/src/kservice.c ****     if (rt_interrupt_get_nest() != 0)
+  51:rtthread/src/kservice.c ****     {
+  52:rtthread/src/kservice.c ****         /* it's in interrupt context */
+  53:rtthread/src/kservice.c ****         return __rt_errno;
+  54:rtthread/src/kservice.c ****     }
+  55:rtthread/src/kservice.c **** 
+  56:rtthread/src/kservice.c ****     tid = rt_thread_self();
+  57:rtthread/src/kservice.c ****     if (tid == RT_NULL)
+  58:rtthread/src/kservice.c ****         return __rt_errno;
+  59:rtthread/src/kservice.c **** 
+  60:rtthread/src/kservice.c ****     return tid->error;
+  61:rtthread/src/kservice.c **** }
+  62:rtthread/src/kservice.c **** 
+  63:rtthread/src/kservice.c **** /*
+  64:rtthread/src/kservice.c ****  * This function will set errno
+  65:rtthread/src/kservice.c ****  *
+  66:rtthread/src/kservice.c ****  * @param error the errno shall be set
+  67:rtthread/src/kservice.c ****  */
+  68:rtthread/src/kservice.c **** void rt_set_errno(rt_err_t error)
+  69:rtthread/src/kservice.c **** {
+  70:rtthread/src/kservice.c ****     rt_thread_t tid;
+  71:rtthread/src/kservice.c **** 
+  72:rtthread/src/kservice.c ****     if (rt_interrupt_get_nest() != 0)
+  73:rtthread/src/kservice.c ****     {
+  74:rtthread/src/kservice.c ****         /* it's in interrupt context */
+  75:rtthread/src/kservice.c ****         __rt_errno = error;
+  76:rtthread/src/kservice.c **** 
+  77:rtthread/src/kservice.c ****         return;
+  78:rtthread/src/kservice.c ****     }
+  79:rtthread/src/kservice.c **** 
+  80:rtthread/src/kservice.c ****     tid = rt_thread_self();
+  81:rtthread/src/kservice.c ****     if (tid == RT_NULL)
+  82:rtthread/src/kservice.c ****     {
+  83:rtthread/src/kservice.c ****         __rt_errno = error;
+  84:rtthread/src/kservice.c **** 
+  85:rtthread/src/kservice.c ****         return;
+  86:rtthread/src/kservice.c ****     }
+  87:rtthread/src/kservice.c **** 
+  88:rtthread/src/kservice.c ****     tid->error = error;
+  89:rtthread/src/kservice.c **** }
+  90:rtthread/src/kservice.c **** 
+  91:rtthread/src/kservice.c **** /**
+ARM GAS  /tmp/ccJocHtA.s 			page 3
+
+
+  92:rtthread/src/kservice.c ****  * This function returns errno.
+  93:rtthread/src/kservice.c ****  *
+  94:rtthread/src/kservice.c ****  * @return the errno in the system
+  95:rtthread/src/kservice.c ****  */
+  96:rtthread/src/kservice.c **** int *_rt_errno(void)
+  97:rtthread/src/kservice.c **** {
+  98:rtthread/src/kservice.c ****     rt_thread_t tid;
+  99:rtthread/src/kservice.c **** 
+ 100:rtthread/src/kservice.c ****     if (rt_interrupt_get_nest() != 0)
+ 101:rtthread/src/kservice.c ****         return (int *)&__rt_errno;
+ 102:rtthread/src/kservice.c **** 
+ 103:rtthread/src/kservice.c ****     tid = rt_thread_self();
+ 104:rtthread/src/kservice.c ****     if (tid != RT_NULL)
+ 105:rtthread/src/kservice.c ****         return (int *) & (tid->error);
+ 106:rtthread/src/kservice.c **** 
+ 107:rtthread/src/kservice.c ****     return (int *)&__rt_errno;
+ 108:rtthread/src/kservice.c **** }
+ 109:rtthread/src/kservice.c **** 
+ 110:rtthread/src/kservice.c **** /**
+ 111:rtthread/src/kservice.c ****  * This function will set the content of memory to specified value
+ 112:rtthread/src/kservice.c ****  *
+ 113:rtthread/src/kservice.c ****  * @param s the address of source memory
+ 114:rtthread/src/kservice.c ****  * @param c the value shall be set in content
+ 115:rtthread/src/kservice.c ****  * @param count the copied length
+ 116:rtthread/src/kservice.c ****  *
+ 117:rtthread/src/kservice.c ****  * @return the address of source memory
+ 118:rtthread/src/kservice.c ****  */
+ 119:rtthread/src/kservice.c **** void *rt_memset(void *s, int c, rt_ubase_t count)
+ 120:rtthread/src/kservice.c **** {
+ 121:rtthread/src/kservice.c **** #ifdef RT_USING_TINY_SIZE
+ 122:rtthread/src/kservice.c ****     char *xs = (char *)s;
+ 123:rtthread/src/kservice.c **** 
+ 124:rtthread/src/kservice.c ****     while (count--)
+ 125:rtthread/src/kservice.c ****         *xs++ = c;
+ 126:rtthread/src/kservice.c **** 
+ 127:rtthread/src/kservice.c ****     return s;
+ 128:rtthread/src/kservice.c **** #else
+ 129:rtthread/src/kservice.c **** #define LBLOCKSIZE      (sizeof(long))
+ 130:rtthread/src/kservice.c **** #define UNALIGNED(X)    ((long)X & (LBLOCKSIZE - 1))
+ 131:rtthread/src/kservice.c **** #define TOO_SMALL(LEN)  ((LEN) < LBLOCKSIZE)
+ 132:rtthread/src/kservice.c **** 
+ 133:rtthread/src/kservice.c ****     unsigned int i;
+ 134:rtthread/src/kservice.c ****     char *m = (char *)s;
+ 135:rtthread/src/kservice.c ****     unsigned long buffer;
+ 136:rtthread/src/kservice.c ****     unsigned long *aligned_addr;
+ 137:rtthread/src/kservice.c ****     unsigned int d = c & 0xff;  /* To avoid sign extension, copy C to an
+ 138:rtthread/src/kservice.c ****                                 unsigned variable.  */
+ 139:rtthread/src/kservice.c **** 
+ 140:rtthread/src/kservice.c ****     if (!TOO_SMALL(count) && !UNALIGNED(s))
+ 141:rtthread/src/kservice.c ****     {
+ 142:rtthread/src/kservice.c ****         /* If we get this far, we know that n is large and m is word-aligned. */
+ 143:rtthread/src/kservice.c ****         aligned_addr = (unsigned long *)s;
+ 144:rtthread/src/kservice.c **** 
+ 145:rtthread/src/kservice.c ****         /* Store D into each char sized location in BUFFER so that
+ 146:rtthread/src/kservice.c ****          * we can set large blocks quickly.
+ 147:rtthread/src/kservice.c ****          */
+ 148:rtthread/src/kservice.c ****         if (LBLOCKSIZE == 4)
+ARM GAS  /tmp/ccJocHtA.s 			page 4
+
+
+ 149:rtthread/src/kservice.c ****         {
+ 150:rtthread/src/kservice.c ****             buffer = (d << 8) | d;
+ 151:rtthread/src/kservice.c ****             buffer |= (buffer << 16);
+ 152:rtthread/src/kservice.c ****         }
+ 153:rtthread/src/kservice.c ****         else
+ 154:rtthread/src/kservice.c ****         {
+ 155:rtthread/src/kservice.c ****             buffer = 0;
+ 156:rtthread/src/kservice.c ****             for (i = 0; i < LBLOCKSIZE; i ++)
+ 157:rtthread/src/kservice.c ****                 buffer = (buffer << 8) | d;
+ 158:rtthread/src/kservice.c ****         }
+ 159:rtthread/src/kservice.c **** 
+ 160:rtthread/src/kservice.c ****         while (count >= LBLOCKSIZE * 4)
+ 161:rtthread/src/kservice.c ****         {
+ 162:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 163:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 164:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 165:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 166:rtthread/src/kservice.c ****             count -= 4 * LBLOCKSIZE;
+ 167:rtthread/src/kservice.c ****         }
+ 168:rtthread/src/kservice.c **** 
+ 169:rtthread/src/kservice.c ****         while (count >= LBLOCKSIZE)
+ 170:rtthread/src/kservice.c ****         {
+ 171:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 172:rtthread/src/kservice.c ****             count -= LBLOCKSIZE;
+ 173:rtthread/src/kservice.c ****         }
+ 174:rtthread/src/kservice.c **** 
+ 175:rtthread/src/kservice.c ****         /* Pick up the remainder with a bytewise loop. */
+ 176:rtthread/src/kservice.c ****         m = (char *)aligned_addr;
+ 177:rtthread/src/kservice.c ****     }
+ 178:rtthread/src/kservice.c **** 
+ 179:rtthread/src/kservice.c ****     while (count--)
+ 180:rtthread/src/kservice.c ****     {
+ 181:rtthread/src/kservice.c ****         *m++ = (char)d;
+ 182:rtthread/src/kservice.c ****     }
+ 183:rtthread/src/kservice.c **** 
+ 184:rtthread/src/kservice.c ****     return s;
+ 185:rtthread/src/kservice.c **** 
+ 186:rtthread/src/kservice.c **** #undef LBLOCKSIZE
+ 187:rtthread/src/kservice.c **** #undef UNALIGNED
+ 188:rtthread/src/kservice.c **** #undef TOO_SMALL
+ 189:rtthread/src/kservice.c **** #endif
+ 190:rtthread/src/kservice.c **** }
+ 191:rtthread/src/kservice.c **** 
+ 192:rtthread/src/kservice.c **** /**
+ 193:rtthread/src/kservice.c ****  * This function will copy memory content from source address to destination
+ 194:rtthread/src/kservice.c ****  * address.
+ 195:rtthread/src/kservice.c ****  *
+ 196:rtthread/src/kservice.c ****  * @param dst the address of destination memory
+ 197:rtthread/src/kservice.c ****  * @param src  the address of source memory
+ 198:rtthread/src/kservice.c ****  * @param count the copied length
+ 199:rtthread/src/kservice.c ****  *
+ 200:rtthread/src/kservice.c ****  * @return the address of destination memory
+ 201:rtthread/src/kservice.c ****  */
+ 202:rtthread/src/kservice.c **** void *rt_memcpy(void *dst, const void *src, rt_ubase_t count)
+ 203:rtthread/src/kservice.c **** {
+ 204:rtthread/src/kservice.c **** #ifdef RT_USING_TINY_SIZE
+ 205:rtthread/src/kservice.c ****     char *tmp = (char *)dst, *s = (char *)src;
+ARM GAS  /tmp/ccJocHtA.s 			page 5
+
+
+ 206:rtthread/src/kservice.c ****     rt_ubase_t len;
+ 207:rtthread/src/kservice.c **** 
+ 208:rtthread/src/kservice.c ****     if (tmp <= s || tmp > (s + count))
+ 209:rtthread/src/kservice.c ****     {
+ 210:rtthread/src/kservice.c ****         while (count--)
+ 211:rtthread/src/kservice.c ****             *tmp ++ = *s ++;
+ 212:rtthread/src/kservice.c ****     }
+ 213:rtthread/src/kservice.c ****     else
+ 214:rtthread/src/kservice.c ****     {
+ 215:rtthread/src/kservice.c ****         for (len = count; len > 0; len --)
+ 216:rtthread/src/kservice.c ****             tmp[len - 1] = s[len - 1];
+ 217:rtthread/src/kservice.c ****     }
+ 218:rtthread/src/kservice.c **** 
+ 219:rtthread/src/kservice.c ****     return dst;
+ 220:rtthread/src/kservice.c **** #else
+ 221:rtthread/src/kservice.c **** 
+ 222:rtthread/src/kservice.c **** #define UNALIGNED(X, Y) \
+ 223:rtthread/src/kservice.c ****     (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
+ 224:rtthread/src/kservice.c **** #define BIGBLOCKSIZE    (sizeof (long) << 2)
+ 225:rtthread/src/kservice.c **** #define LITTLEBLOCKSIZE (sizeof (long))
+ 226:rtthread/src/kservice.c **** #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
+ 227:rtthread/src/kservice.c **** 
+ 228:rtthread/src/kservice.c ****     char *dst_ptr = (char *)dst;
+ 229:rtthread/src/kservice.c ****     char *src_ptr = (char *)src;
+ 230:rtthread/src/kservice.c ****     long *aligned_dst;
+ 231:rtthread/src/kservice.c ****     long *aligned_src;
+ 232:rtthread/src/kservice.c ****     int len = count;
+ 233:rtthread/src/kservice.c **** 
+ 234:rtthread/src/kservice.c ****     /* If the size is small, or either SRC or DST is unaligned,
+ 235:rtthread/src/kservice.c ****     then punt into the byte copy loop.  This should be rare. */
+ 236:rtthread/src/kservice.c ****     if (!TOO_SMALL(len) && !UNALIGNED(src_ptr, dst_ptr))
+ 237:rtthread/src/kservice.c ****     {
+ 238:rtthread/src/kservice.c ****         aligned_dst = (long *)dst_ptr;
+ 239:rtthread/src/kservice.c ****         aligned_src = (long *)src_ptr;
+ 240:rtthread/src/kservice.c **** 
+ 241:rtthread/src/kservice.c ****         /* Copy 4X long words at a time if possible. */
+ 242:rtthread/src/kservice.c ****         while (len >= BIGBLOCKSIZE)
+ 243:rtthread/src/kservice.c ****         {
+ 244:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 245:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 246:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 247:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 248:rtthread/src/kservice.c ****             len -= BIGBLOCKSIZE;
+ 249:rtthread/src/kservice.c ****         }
+ 250:rtthread/src/kservice.c **** 
+ 251:rtthread/src/kservice.c ****         /* Copy one long word at a time if possible. */
+ 252:rtthread/src/kservice.c ****         while (len >= LITTLEBLOCKSIZE)
+ 253:rtthread/src/kservice.c ****         {
+ 254:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 255:rtthread/src/kservice.c ****             len -= LITTLEBLOCKSIZE;
+ 256:rtthread/src/kservice.c ****         }
+ 257:rtthread/src/kservice.c **** 
+ 258:rtthread/src/kservice.c ****         /* Pick up any residual with a byte copier. */
+ 259:rtthread/src/kservice.c ****         dst_ptr = (char *)aligned_dst;
+ 260:rtthread/src/kservice.c ****         src_ptr = (char *)aligned_src;
+ 261:rtthread/src/kservice.c ****     }
+ 262:rtthread/src/kservice.c **** 
+ARM GAS  /tmp/ccJocHtA.s 			page 6
+
+
+ 263:rtthread/src/kservice.c ****     while (len--)
+ 264:rtthread/src/kservice.c ****         *dst_ptr++ = *src_ptr++;
+ 265:rtthread/src/kservice.c **** 
+ 266:rtthread/src/kservice.c ****     return dst;
+ 267:rtthread/src/kservice.c **** #undef UNALIGNED
+ 268:rtthread/src/kservice.c **** #undef BIGBLOCKSIZE
+ 269:rtthread/src/kservice.c **** #undef LITTLEBLOCKSIZE
+ 270:rtthread/src/kservice.c **** #undef TOO_SMALL
+ 271:rtthread/src/kservice.c **** #endif
+ 272:rtthread/src/kservice.c **** }
+ 273:rtthread/src/kservice.c **** 
+ 274:rtthread/src/kservice.c **** /**
+ 275:rtthread/src/kservice.c ****  * This function will move memory content from source address to destination
+ 276:rtthread/src/kservice.c ****  * address.
+ 277:rtthread/src/kservice.c ****  *
+ 278:rtthread/src/kservice.c ****  * @param dest the address of destination memory
+ 279:rtthread/src/kservice.c ****  * @param src  the address of source memory
+ 280:rtthread/src/kservice.c ****  * @param n the copied length
+ 281:rtthread/src/kservice.c ****  *
+ 282:rtthread/src/kservice.c ****  * @return the address of destination memory
+ 283:rtthread/src/kservice.c ****  */
+ 284:rtthread/src/kservice.c **** void *rt_memmove(void *dest, const void *src, rt_ubase_t n)
+ 285:rtthread/src/kservice.c **** {
+ 286:rtthread/src/kservice.c ****     char *tmp = (char *)dest, *s = (char *)src;
+ 287:rtthread/src/kservice.c **** 
+ 288:rtthread/src/kservice.c ****     if (s < tmp && tmp < s + n)
+ 289:rtthread/src/kservice.c ****     {
+ 290:rtthread/src/kservice.c ****         tmp += n;
+ 291:rtthread/src/kservice.c ****         s += n;
+ 292:rtthread/src/kservice.c **** 
+ 293:rtthread/src/kservice.c ****         while (n--)
+ 294:rtthread/src/kservice.c ****             *(--tmp) = *(--s);
+ 295:rtthread/src/kservice.c ****     }
+ 296:rtthread/src/kservice.c ****     else
+ 297:rtthread/src/kservice.c ****     {
+ 298:rtthread/src/kservice.c ****         while (n--)
+ 299:rtthread/src/kservice.c ****             *tmp++ = *s++;
+ 300:rtthread/src/kservice.c ****     }
+ 301:rtthread/src/kservice.c **** 
+ 302:rtthread/src/kservice.c ****     return dest;
+ 303:rtthread/src/kservice.c **** }
+ 304:rtthread/src/kservice.c **** 
+ 305:rtthread/src/kservice.c **** /**
+ 306:rtthread/src/kservice.c ****  * This function will compare two areas of memory
+ 307:rtthread/src/kservice.c ****  *
+ 308:rtthread/src/kservice.c ****  * @param cs one area of memory
+ 309:rtthread/src/kservice.c ****  * @param ct another area of memory
+ 310:rtthread/src/kservice.c ****  * @param count the size of the area
+ 311:rtthread/src/kservice.c ****  *
+ 312:rtthread/src/kservice.c ****  * @return the result
+ 313:rtthread/src/kservice.c ****  */
+ 314:rtthread/src/kservice.c **** rt_int32_t rt_memcmp(const void *cs, const void *ct, rt_ubase_t count)
+ 315:rtthread/src/kservice.c **** {
+ 316:rtthread/src/kservice.c ****     const unsigned char *su1, *su2;
+ 317:rtthread/src/kservice.c ****     int res = 0;
+ 318:rtthread/src/kservice.c **** 
+ 319:rtthread/src/kservice.c ****     for (su1 = (const unsigned char *)cs, su2 = (const unsigned char *)ct; 0 < count; ++su1, ++su2,
+ARM GAS  /tmp/ccJocHtA.s 			page 7
+
+
+ 320:rtthread/src/kservice.c ****         if ((res = *su1 - *su2) != 0)
+ 321:rtthread/src/kservice.c ****             break;
+ 322:rtthread/src/kservice.c **** 
+ 323:rtthread/src/kservice.c ****     return res;
+ 324:rtthread/src/kservice.c **** }
+ 325:rtthread/src/kservice.c **** 
+ 326:rtthread/src/kservice.c **** /**
+ 327:rtthread/src/kservice.c ****  * This function will return the first occurrence of a string.
+ 328:rtthread/src/kservice.c ****  *
+ 329:rtthread/src/kservice.c ****  * @param s1 the source string
+ 330:rtthread/src/kservice.c ****  * @param s2 the find string
+ 331:rtthread/src/kservice.c ****  *
+ 332:rtthread/src/kservice.c ****  * @return the first occurrence of a s2 in s1, or RT_NULL if no found.
+ 333:rtthread/src/kservice.c ****  */
+ 334:rtthread/src/kservice.c **** char *rt_strstr(const char *s1, const char *s2)
+ 335:rtthread/src/kservice.c **** {
+ 336:rtthread/src/kservice.c ****     int l1, l2;
+ 337:rtthread/src/kservice.c **** 
+ 338:rtthread/src/kservice.c ****     l2 = rt_strlen(s2);
+ 339:rtthread/src/kservice.c ****     if (!l2)
+ 340:rtthread/src/kservice.c ****         return (char *)s1;
+ 341:rtthread/src/kservice.c ****     l1 = rt_strlen(s1);
+ 342:rtthread/src/kservice.c ****     while (l1 >= l2)
+ 343:rtthread/src/kservice.c ****     {
+ 344:rtthread/src/kservice.c ****         l1 --;
+ 345:rtthread/src/kservice.c ****         if (!rt_memcmp(s1, s2, l2))
+ 346:rtthread/src/kservice.c ****             return (char *)s1;
+ 347:rtthread/src/kservice.c ****         s1 ++;
+ 348:rtthread/src/kservice.c ****     }
+ 349:rtthread/src/kservice.c **** 
+ 350:rtthread/src/kservice.c ****     return RT_NULL;
+ 351:rtthread/src/kservice.c **** }
+ 352:rtthread/src/kservice.c **** 
+ 353:rtthread/src/kservice.c **** /**
+ 354:rtthread/src/kservice.c ****  * This function will compare two strings while ignoring differences in case
+ 355:rtthread/src/kservice.c ****  *
+ 356:rtthread/src/kservice.c ****  * @param a the string to be compared
+ 357:rtthread/src/kservice.c ****  * @param b the string to be compared
+ 358:rtthread/src/kservice.c ****  *
+ 359:rtthread/src/kservice.c ****  * @return the result
+ 360:rtthread/src/kservice.c ****  */
+ 361:rtthread/src/kservice.c **** rt_int32_t rt_strcasecmp(const char *a, const char *b)
+ 362:rtthread/src/kservice.c **** {
+ 363:rtthread/src/kservice.c ****     int ca, cb;
+ 364:rtthread/src/kservice.c **** 
+ 365:rtthread/src/kservice.c ****     do
+ 366:rtthread/src/kservice.c ****     {
+ 367:rtthread/src/kservice.c ****         ca = *a++ & 0xff;
+ 368:rtthread/src/kservice.c ****         cb = *b++ & 0xff;
+ 369:rtthread/src/kservice.c ****         if (ca >= 'A' && ca <= 'Z')
+ 370:rtthread/src/kservice.c ****             ca += 'a' - 'A';
+ 371:rtthread/src/kservice.c ****         if (cb >= 'A' && cb <= 'Z')
+ 372:rtthread/src/kservice.c ****             cb += 'a' - 'A';
+ 373:rtthread/src/kservice.c ****     }
+ 374:rtthread/src/kservice.c ****     while (ca == cb && ca != '\0');
+ 375:rtthread/src/kservice.c **** 
+ 376:rtthread/src/kservice.c ****     return ca - cb;
+ARM GAS  /tmp/ccJocHtA.s 			page 8
+
+
+ 377:rtthread/src/kservice.c **** }
+ 378:rtthread/src/kservice.c **** 
+ 379:rtthread/src/kservice.c **** /**
+ 380:rtthread/src/kservice.c ****  * This function will copy string no more than n bytes.
+ 381:rtthread/src/kservice.c ****  *
+ 382:rtthread/src/kservice.c ****  * @param dst the string to copy
+ 383:rtthread/src/kservice.c ****  * @param src the string to be copied
+ 384:rtthread/src/kservice.c ****  * @param n the maximum copied length
+ 385:rtthread/src/kservice.c ****  *
+ 386:rtthread/src/kservice.c ****  * @return the result
+ 387:rtthread/src/kservice.c ****  */
+ 388:rtthread/src/kservice.c **** char *rt_strncpy(char *dst, const char *src, rt_ubase_t n)
+ 389:rtthread/src/kservice.c **** {
+ 390:rtthread/src/kservice.c ****     if (n != 0)
+ 391:rtthread/src/kservice.c ****     {
+ 392:rtthread/src/kservice.c ****         char *d = dst;
+ 393:rtthread/src/kservice.c ****         const char *s = src;
+ 394:rtthread/src/kservice.c **** 
+ 395:rtthread/src/kservice.c ****         do
+ 396:rtthread/src/kservice.c ****         {
+ 397:rtthread/src/kservice.c ****             if ((*d++ = *s++) == 0)
+ 398:rtthread/src/kservice.c ****             {
+ 399:rtthread/src/kservice.c ****                 /* NUL pad the remaining n-1 bytes */
+ 400:rtthread/src/kservice.c ****                 while (--n != 0)
+ 401:rtthread/src/kservice.c ****                     *d++ = 0;
+ 402:rtthread/src/kservice.c ****                 break;
+ 403:rtthread/src/kservice.c ****             }
+ 404:rtthread/src/kservice.c ****         } while (--n != 0);
+ 405:rtthread/src/kservice.c ****     }
+ 406:rtthread/src/kservice.c **** 
+ 407:rtthread/src/kservice.c ****     return (dst);
+ 408:rtthread/src/kservice.c **** }
+ 409:rtthread/src/kservice.c **** 
+ 410:rtthread/src/kservice.c **** /**
+ 411:rtthread/src/kservice.c ****  * This function will compare two strings with specified maximum length
+ 412:rtthread/src/kservice.c ****  *
+ 413:rtthread/src/kservice.c ****  * @param cs the string to be compared
+ 414:rtthread/src/kservice.c ****  * @param ct the string to be compared
+ 415:rtthread/src/kservice.c ****  * @param count the maximum compare length
+ 416:rtthread/src/kservice.c ****  *
+ 417:rtthread/src/kservice.c ****  * @return the result
+ 418:rtthread/src/kservice.c ****  */
+ 419:rtthread/src/kservice.c **** rt_int32_t rt_strncmp(const char *cs, const char *ct, rt_ubase_t count)
+ 420:rtthread/src/kservice.c **** {
+ 421:rtthread/src/kservice.c ****     register signed char __res = 0;
+ 422:rtthread/src/kservice.c **** 
+ 423:rtthread/src/kservice.c ****     while (count)
+ 424:rtthread/src/kservice.c ****     {
+ 425:rtthread/src/kservice.c ****         if ((__res = *cs - *ct++) != 0 || !*cs++)
+ 426:rtthread/src/kservice.c ****             break;
+ 427:rtthread/src/kservice.c ****         count --;
+ 428:rtthread/src/kservice.c ****     }
+ 429:rtthread/src/kservice.c **** 
+ 430:rtthread/src/kservice.c ****     return __res;
+ 431:rtthread/src/kservice.c **** }
+ 432:rtthread/src/kservice.c **** 
+ 433:rtthread/src/kservice.c **** /**
+ARM GAS  /tmp/ccJocHtA.s 			page 9
+
+
+ 434:rtthread/src/kservice.c ****  * This function will compare two strings without specified length
+ 435:rtthread/src/kservice.c ****  *
+ 436:rtthread/src/kservice.c ****  * @param cs the string to be compared
+ 437:rtthread/src/kservice.c ****  * @param ct the string to be compared
+ 438:rtthread/src/kservice.c ****  *
+ 439:rtthread/src/kservice.c ****  * @return the result
+ 440:rtthread/src/kservice.c ****  */
+ 441:rtthread/src/kservice.c **** rt_int32_t rt_strcmp(const char *cs, const char *ct)
+ 442:rtthread/src/kservice.c **** {
+ 443:rtthread/src/kservice.c ****     while (*cs && *cs == *ct)
+ 444:rtthread/src/kservice.c ****     {
+ 445:rtthread/src/kservice.c ****         cs++;
+ 446:rtthread/src/kservice.c ****         ct++;
+ 447:rtthread/src/kservice.c ****     }
+ 448:rtthread/src/kservice.c **** 
+ 449:rtthread/src/kservice.c ****     return (*cs - *ct);
+ 450:rtthread/src/kservice.c **** }
+ 451:rtthread/src/kservice.c **** 
+ 452:rtthread/src/kservice.c **** /**
+ 453:rtthread/src/kservice.c ****  * The  strnlen()  function  returns the number of characters in the
+ 454:rtthread/src/kservice.c ****  * string pointed to by s, excluding the terminating null byte ('\0'),
+ 455:rtthread/src/kservice.c ****  * but at most maxlen.  In doing this, strnlen() looks only at the
+ 456:rtthread/src/kservice.c ****  * first maxlen characters in the string pointed to by s and never
+ 457:rtthread/src/kservice.c ****  * beyond s+maxlen.
+ 458:rtthread/src/kservice.c ****  *
+ 459:rtthread/src/kservice.c ****  * @param s the string
+ 460:rtthread/src/kservice.c ****  * @param maxlen the max size
+ 461:rtthread/src/kservice.c ****  * @return the length of string
+ 462:rtthread/src/kservice.c ****  */
+ 463:rtthread/src/kservice.c **** rt_size_t rt_strnlen(const char *s, rt_ubase_t maxlen)
+ 464:rtthread/src/kservice.c **** {
+ 465:rtthread/src/kservice.c ****     const char *sc;
+ 466:rtthread/src/kservice.c **** 
+ 467:rtthread/src/kservice.c ****     for (sc = s; *sc != '\0' && (rt_ubase_t)(sc - s) < maxlen; ++sc) /* nothing */
+ 468:rtthread/src/kservice.c ****         ;
+ 469:rtthread/src/kservice.c **** 
+ 470:rtthread/src/kservice.c ****     return sc - s;
+ 471:rtthread/src/kservice.c **** }
+ 472:rtthread/src/kservice.c **** 
+ 473:rtthread/src/kservice.c **** /**
+ 474:rtthread/src/kservice.c ****  * This function will return the length of a string, which terminate will
+ 475:rtthread/src/kservice.c ****  * null character.
+ 476:rtthread/src/kservice.c ****  *
+ 477:rtthread/src/kservice.c ****  * @param s the string
+ 478:rtthread/src/kservice.c ****  *
+ 479:rtthread/src/kservice.c ****  * @return the length of string
+ 480:rtthread/src/kservice.c ****  */
+ 481:rtthread/src/kservice.c **** rt_size_t rt_strlen(const char *s)
+ 482:rtthread/src/kservice.c **** {
+ 483:rtthread/src/kservice.c ****     const char *sc;
+ 484:rtthread/src/kservice.c **** 
+ 485:rtthread/src/kservice.c ****     for (sc = s; *sc != '\0'; ++sc) /* nothing */
+ 486:rtthread/src/kservice.c ****         ;
+ 487:rtthread/src/kservice.c **** 
+ 488:rtthread/src/kservice.c ****     return sc - s;
+ 489:rtthread/src/kservice.c **** }
+ 490:rtthread/src/kservice.c **** 
+ARM GAS  /tmp/ccJocHtA.s 			page 10
+
+
+ 491:rtthread/src/kservice.c **** #ifdef RT_USING_HEAP
+ 492:rtthread/src/kservice.c **** /**
+ 493:rtthread/src/kservice.c ****  * This function will duplicate a string.
+ 494:rtthread/src/kservice.c ****  *
+ 495:rtthread/src/kservice.c ****  * @param s the string to be duplicated
+ 496:rtthread/src/kservice.c ****  *
+ 497:rtthread/src/kservice.c ****  * @return the duplicated string pointer
+ 498:rtthread/src/kservice.c ****  */
+ 499:rtthread/src/kservice.c **** char *rt_strdup(const char *s)
+ 500:rtthread/src/kservice.c **** {
+ 501:rtthread/src/kservice.c ****     rt_size_t len = rt_strlen(s) + 1;
+ 502:rtthread/src/kservice.c ****     char *tmp = (char *)rt_malloc(len);
+ 503:rtthread/src/kservice.c **** 
+ 504:rtthread/src/kservice.c ****     if (!tmp)
+ 505:rtthread/src/kservice.c ****         return RT_NULL;
+ 506:rtthread/src/kservice.c **** 
+ 507:rtthread/src/kservice.c ****     rt_memcpy(tmp, s, len);
+ 508:rtthread/src/kservice.c **** 
+ 509:rtthread/src/kservice.c ****     return tmp;
+ 510:rtthread/src/kservice.c **** }
+ 511:rtthread/src/kservice.c **** 
+ 512:rtthread/src/kservice.c **** #if defined(__CC_ARM) || defined(__CLANG_ARM)
+ 513:rtthread/src/kservice.c **** char *strdup(const char *s) __attribute__((alias("rt_strdup")));
+ 514:rtthread/src/kservice.c **** #endif
+ 515:rtthread/src/kservice.c **** #endif
+ 516:rtthread/src/kservice.c **** 
+ 517:rtthread/src/kservice.c **** /**
+ 518:rtthread/src/kservice.c ****  * This function will show the version of rt-thread rtos
+ 519:rtthread/src/kservice.c ****  */
+ 520:rtthread/src/kservice.c **** void rt_show_version(void)
+ 521:rtthread/src/kservice.c **** {
+ 522:rtthread/src/kservice.c ****     rt_kprintf("\n \\ | /\n");
+ 523:rtthread/src/kservice.c ****     rt_kprintf("- RT -     Thread Operating System\n");
+ 524:rtthread/src/kservice.c ****     rt_kprintf(" / | \\     %d.%d.%d build %s\n",
+ 525:rtthread/src/kservice.c ****                RT_VERSION, RT_SUBVERSION, RT_REVISION, __DATE__);
+ 526:rtthread/src/kservice.c ****     rt_kprintf(" 2006 - 2020 Copyright by rt-thread team\n");
+ 527:rtthread/src/kservice.c **** }
+ 528:rtthread/src/kservice.c **** 
+ 529:rtthread/src/kservice.c **** /* private function */
+ 530:rtthread/src/kservice.c **** #define _ISDIGIT(c)  ((unsigned)((c) - '0') < 10)
+ 531:rtthread/src/kservice.c **** 
+ 532:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 533:rtthread/src/kservice.c **** rt_inline int divide(long long *n, int base)
+ 534:rtthread/src/kservice.c **** {
+ 535:rtthread/src/kservice.c ****     int res;
+ 536:rtthread/src/kservice.c **** 
+ 537:rtthread/src/kservice.c ****     /* optimized for processor which does not support divide instructions. */
+ 538:rtthread/src/kservice.c ****     if (base == 10)
+ 539:rtthread/src/kservice.c ****     {
+ 540:rtthread/src/kservice.c ****         res = (int)(((unsigned long long)*n) % 10U);
+ 541:rtthread/src/kservice.c ****         *n = (long long)(((unsigned long long)*n) / 10U);
+ 542:rtthread/src/kservice.c ****     }
+ 543:rtthread/src/kservice.c ****     else
+ 544:rtthread/src/kservice.c ****     {
+ 545:rtthread/src/kservice.c ****         res = (int)(((unsigned long long)*n) % 16U);
+ 546:rtthread/src/kservice.c ****         *n = (long long)(((unsigned long long)*n) / 16U);
+ 547:rtthread/src/kservice.c ****     }
+ARM GAS  /tmp/ccJocHtA.s 			page 11
+
+
+ 548:rtthread/src/kservice.c **** 
+ 549:rtthread/src/kservice.c ****     return res;
+ 550:rtthread/src/kservice.c **** }
+ 551:rtthread/src/kservice.c **** #else
+ 552:rtthread/src/kservice.c **** rt_inline int divide(long *n, int base)
+ 553:rtthread/src/kservice.c **** {
+ 554:rtthread/src/kservice.c ****     int res;
+ 555:rtthread/src/kservice.c **** 
+ 556:rtthread/src/kservice.c ****     /* optimized for processor which does not support divide instructions. */
+ 557:rtthread/src/kservice.c ****     if (base == 10)
+ 558:rtthread/src/kservice.c ****     {
+ 559:rtthread/src/kservice.c ****         res = (int)(((unsigned long)*n) % 10U);
+ 560:rtthread/src/kservice.c ****         *n = (long)(((unsigned long)*n) / 10U);
+ 561:rtthread/src/kservice.c ****     }
+ 562:rtthread/src/kservice.c ****     else
+ 563:rtthread/src/kservice.c ****     {
+ 564:rtthread/src/kservice.c ****         res = (int)(((unsigned long)*n) % 16U);
+ 565:rtthread/src/kservice.c ****         *n = (long)(((unsigned long)*n) / 16U);
+ 566:rtthread/src/kservice.c ****     }
+ 567:rtthread/src/kservice.c **** 
+ 568:rtthread/src/kservice.c ****     return res;
+ 569:rtthread/src/kservice.c **** }
+ 570:rtthread/src/kservice.c **** #endif
+ 571:rtthread/src/kservice.c **** 
+ 572:rtthread/src/kservice.c **** rt_inline int skip_atoi(const char **s)
+ 573:rtthread/src/kservice.c **** {
+ 574:rtthread/src/kservice.c ****     register int i = 0;
+ 575:rtthread/src/kservice.c ****     while (_ISDIGIT(**s))
+ 576:rtthread/src/kservice.c ****         i = i * 10 + *((*s)++) - '0';
+ 577:rtthread/src/kservice.c **** 
+ 578:rtthread/src/kservice.c ****     return i;
+ 579:rtthread/src/kservice.c **** }
+ 580:rtthread/src/kservice.c **** 
+ 581:rtthread/src/kservice.c **** #define ZEROPAD     (1 << 0)    /* pad with zero */
+ 582:rtthread/src/kservice.c **** #define SIGN        (1 << 1)    /* unsigned/signed long */
+ 583:rtthread/src/kservice.c **** #define PLUS        (1 << 2)    /* show plus */
+ 584:rtthread/src/kservice.c **** #define SPACE       (1 << 3)    /* space if plus */
+ 585:rtthread/src/kservice.c **** #define LEFT        (1 << 4)    /* left justified */
+ 586:rtthread/src/kservice.c **** #define SPECIAL     (1 << 5)    /* 0x */
+ 587:rtthread/src/kservice.c **** #define LARGE       (1 << 6)    /* use 'ABCDEF' instead of 'abcdef' */
+ 588:rtthread/src/kservice.c **** 
+ 589:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 590:rtthread/src/kservice.c **** static char *print_number(char *buf,
+ 591:rtthread/src/kservice.c ****                           char *end,
+ 592:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 593:rtthread/src/kservice.c ****                           long long  num,
+ 594:rtthread/src/kservice.c **** #else
+ 595:rtthread/src/kservice.c ****                           long  num,
+ 596:rtthread/src/kservice.c **** #endif
+ 597:rtthread/src/kservice.c ****                           int   base,
+ 598:rtthread/src/kservice.c ****                           int   s,
+ 599:rtthread/src/kservice.c ****                           int   precision,
+ 600:rtthread/src/kservice.c ****                           int   type)
+ 601:rtthread/src/kservice.c **** #else
+ 602:rtthread/src/kservice.c **** static char *print_number(char *buf,
+ 603:rtthread/src/kservice.c ****                           char *end,
+ 604:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ARM GAS  /tmp/ccJocHtA.s 			page 12
+
+
+ 605:rtthread/src/kservice.c ****                           long long  num,
+ 606:rtthread/src/kservice.c **** #else
+ 607:rtthread/src/kservice.c ****                           long  num,
+ 608:rtthread/src/kservice.c **** #endif
+ 609:rtthread/src/kservice.c ****                           int   base,
+ 610:rtthread/src/kservice.c ****                           int   s,
+ 611:rtthread/src/kservice.c ****                           int   type)
+ 612:rtthread/src/kservice.c **** #endif
+ 613:rtthread/src/kservice.c **** {
+  25              		.loc 1 613 0
+  26              		.cfi_startproc
+  27              		@ args = 12, pretend = 0, frame = 16
+  28              		@ frame_needed = 0, uses_anonymous_args = 0
+  29              	.LVL0:
+  30 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 32
+  33              		.cfi_offset 4, -32
+  34              		.cfi_offset 5, -28
+  35              		.cfi_offset 6, -24
+  36              		.cfi_offset 7, -20
+  37              		.cfi_offset 8, -16
+  38              		.cfi_offset 9, -12
+  39              		.cfi_offset 10, -8
+  40              		.cfi_offset 14, -4
+  41 0004 84B0     		sub	sp, sp, #16
+  42              	.LCFI1:
+  43              		.cfi_def_cfa_offset 48
+  44 0006 0D9E     		ldr	r6, [sp, #52]
+  45 0008 0E9F     		ldr	r7, [sp, #56]
+  46              	.LVL1:
+ 614:rtthread/src/kservice.c ****     char c, sign;
+ 615:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 616:rtthread/src/kservice.c ****     char tmp[32];
+ 617:rtthread/src/kservice.c **** #else
+ 618:rtthread/src/kservice.c ****     char tmp[16];
+ 619:rtthread/src/kservice.c **** #endif
+ 620:rtthread/src/kservice.c ****     int precision_bak = precision;
+ 621:rtthread/src/kservice.c ****     const char *digits;
+ 622:rtthread/src/kservice.c ****     static const char small_digits[] = "0123456789abcdef";
+ 623:rtthread/src/kservice.c ****     static const char large_digits[] = "0123456789ABCDEF";
+ 624:rtthread/src/kservice.c ****     register int i;
+ 625:rtthread/src/kservice.c ****     register int size;
+ 626:rtthread/src/kservice.c **** 
+ 627:rtthread/src/kservice.c ****     size = s;
+ 628:rtthread/src/kservice.c **** 
+ 629:rtthread/src/kservice.c ****     digits = (type & LARGE) ? large_digits : small_digits;
+  47              		.loc 1 629 0
+  48 000a 17F0400F 		tst	r7, #64
+  49 000e 19D0     		beq	.L34
+  50 0010 DFF85081 		ldr	r8, .L45+4
+  51              	.L2:
+  52              	.LVL2:
+ 630:rtthread/src/kservice.c ****     if (type & LEFT)
+  53              		.loc 1 630 0 discriminator 4
+  54 0014 17F0100F 		tst	r7, #16
+  55 0018 01D0     		beq	.L3
+ARM GAS  /tmp/ccJocHtA.s 			page 13
+
+
+ 631:rtthread/src/kservice.c ****         type &= ~ZEROPAD;
+  56              		.loc 1 631 0
+  57 001a 27F00107 		bic	r7, r7, #1
+  58              	.LVL3:
+  59              	.L3:
+ 632:rtthread/src/kservice.c **** 
+ 633:rtthread/src/kservice.c ****     c = (type & ZEROPAD) ? '0' : ' ';
+  60              		.loc 1 633 0
+  61 001e 17F0010F 		tst	r7, #1
+  62 0022 12D0     		beq	.L35
+  63 0024 4FF0300C 		mov	ip, #48
+  64              	.L4:
+  65              	.LVL4:
+ 634:rtthread/src/kservice.c **** 
+ 635:rtthread/src/kservice.c ****     /* get sign */
+ 636:rtthread/src/kservice.c ****     sign = 0;
+ 637:rtthread/src/kservice.c ****     if (type & SIGN)
+  66              		.loc 1 637 0 discriminator 4
+  67 0028 17F0020F 		tst	r7, #2
+  68 002c 14D0     		beq	.L36
+ 638:rtthread/src/kservice.c ****     {
+ 639:rtthread/src/kservice.c ****         if (num < 0)
+  69              		.loc 1 639 0
+  70 002e 002A     		cmp	r2, #0
+  71 0030 0EDB     		blt	.L42
+ 640:rtthread/src/kservice.c ****         {
+ 641:rtthread/src/kservice.c ****             sign = '-';
+ 642:rtthread/src/kservice.c ****             num = -num;
+ 643:rtthread/src/kservice.c ****         }
+ 644:rtthread/src/kservice.c ****         else if (type & PLUS)
+  72              		.loc 1 644 0
+  73 0032 17F0040F 		tst	r7, #4
+  74 0036 26D1     		bne	.L37
+ 645:rtthread/src/kservice.c ****             sign = '+';
+ 646:rtthread/src/kservice.c ****         else if (type & SPACE)
+  75              		.loc 1 646 0
+  76 0038 17F0080F 		tst	r7, #8
+  77 003c 26D1     		bne	.L38
+ 636:rtthread/src/kservice.c ****     if (type & SIGN)
+  78              		.loc 1 636 0
+  79 003e 4FF0000E 		mov	lr, #0
+  80 0042 0BE0     		b	.L5
+  81              	.LVL5:
+  82              	.L34:
+ 629:rtthread/src/kservice.c ****     if (type & LEFT)
+  83              		.loc 1 629 0
+  84 0044 DFF82081 		ldr	r8, .L45+8
+  85 0048 E4E7     		b	.L2
+  86              	.LVL6:
+  87              	.L35:
+ 633:rtthread/src/kservice.c **** 
+  88              		.loc 1 633 0
+  89 004a 4FF0200C 		mov	ip, #32
+  90 004e EBE7     		b	.L4
+  91              	.LVL7:
+  92              	.L42:
+ 642:rtthread/src/kservice.c ****         }
+ARM GAS  /tmp/ccJocHtA.s 			page 14
+
+
+  93              		.loc 1 642 0
+  94 0050 5242     		negs	r2, r2
+  95              	.LVL8:
+ 641:rtthread/src/kservice.c ****             num = -num;
+  96              		.loc 1 641 0
+  97 0052 4FF02D0E 		mov	lr, #45
+  98 0056 01E0     		b	.L5
+  99              	.LVL9:
+ 100              	.L36:
+ 636:rtthread/src/kservice.c ****     if (type & SIGN)
+ 101              		.loc 1 636 0
+ 102 0058 4FF0000E 		mov	lr, #0
+ 103              	.LVL10:
+ 104              	.L5:
+ 647:rtthread/src/kservice.c ****             sign = ' ';
+ 648:rtthread/src/kservice.c ****     }
+ 649:rtthread/src/kservice.c **** 
+ 650:rtthread/src/kservice.c **** #ifdef RT_PRINTF_SPECIAL
+ 651:rtthread/src/kservice.c ****     if (type & SPECIAL)
+ 652:rtthread/src/kservice.c ****     {
+ 653:rtthread/src/kservice.c ****         if (base == 16)
+ 654:rtthread/src/kservice.c ****             size -= 2;
+ 655:rtthread/src/kservice.c ****         else if (base == 8)
+ 656:rtthread/src/kservice.c ****             size--;
+ 657:rtthread/src/kservice.c ****     }
+ 658:rtthread/src/kservice.c **** #endif
+ 659:rtthread/src/kservice.c **** 
+ 660:rtthread/src/kservice.c ****     i = 0;
+ 661:rtthread/src/kservice.c ****     if (num == 0)
+ 105              		.loc 1 661 0
+ 106 005c A2BB     		cbnz	r2, .L39
+ 107              	.LVL11:
+ 662:rtthread/src/kservice.c ****         tmp[i++] = '0';
+ 108              		.loc 1 662 0
+ 109 005e 3023     		movs	r3, #48
+ 110              	.LVL12:
+ 111 0060 8DF80030 		strb	r3, [sp]
+ 112 0064 0124     		movs	r4, #1
+ 113              	.LVL13:
+ 114              	.L8:
+ 663:rtthread/src/kservice.c ****     else
+ 664:rtthread/src/kservice.c ****     {
+ 665:rtthread/src/kservice.c ****         while (num != 0)
+ 666:rtthread/src/kservice.c ****             tmp[i++] = digits[divide(&num, base)];
+ 667:rtthread/src/kservice.c ****     }
+ 668:rtthread/src/kservice.c **** 
+ 669:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 670:rtthread/src/kservice.c ****     if (i > precision)
+ 115              		.loc 1 670 0
+ 116 0066 B442     		cmp	r4, r6
+ 117 0068 30DC     		bgt	.L40
+ 118 006a 3546     		mov	r5, r6
+ 119              	.L12:
+ 120              	.LVL14:
+ 671:rtthread/src/kservice.c ****         precision = i;
+ 672:rtthread/src/kservice.c ****     size -= precision;
+ 121              		.loc 1 672 0
+ARM GAS  /tmp/ccJocHtA.s 			page 15
+
+
+ 122 006c 0C9A     		ldr	r2, [sp, #48]
+ 123              	.LVL15:
+ 124 006e 521B     		subs	r2, r2, r5
+ 125              	.LVL16:
+ 673:rtthread/src/kservice.c **** #else
+ 674:rtthread/src/kservice.c ****     size -= i;
+ 675:rtthread/src/kservice.c **** #endif
+ 676:rtthread/src/kservice.c **** 
+ 677:rtthread/src/kservice.c ****     if (!(type & (ZEROPAD | LEFT)))
+ 126              		.loc 1 677 0
+ 127 0070 17F0110F 		tst	r7, #17
+ 128 0074 36D1     		bne	.L13
+ 678:rtthread/src/kservice.c ****     {
+ 679:rtthread/src/kservice.c ****         if ((sign) && (size > 0))
+ 129              		.loc 1 679 0
+ 130 0076 BEF1000F 		cmp	lr, #0
+ 131 007a 02D0     		beq	.L14
+ 132              		.loc 1 679 0 is_stmt 0 discriminator 1
+ 133 007c 002A     		cmp	r2, #0
+ 134 007e 00DD     		ble	.L14
+ 680:rtthread/src/kservice.c ****             size--;
+ 135              		.loc 1 680 0 is_stmt 1
+ 136 0080 013A     		subs	r2, r2, #1
+ 137              	.LVL17:
+ 138              	.L14:
+ 671:rtthread/src/kservice.c ****     size -= precision;
+ 139              		.loc 1 671 0
+ 140 0082 1346     		mov	r3, r2
+ 141 0084 26E0     		b	.L16
+ 142              	.LVL18:
+ 143              	.L37:
+ 645:rtthread/src/kservice.c ****         else if (type & SPACE)
+ 144              		.loc 1 645 0
+ 145 0086 4FF02B0E 		mov	lr, #43
+ 146 008a E7E7     		b	.L5
+ 147              	.L38:
+ 647:rtthread/src/kservice.c ****     }
+ 148              		.loc 1 647 0
+ 149 008c 4FF0200E 		mov	lr, #32
+ 150 0090 E4E7     		b	.L5
+ 151              	.LVL19:
+ 152              	.L43:
+ 153              	.LBB8:
+ 154              	.LBB9:
+ 559:rtthread/src/kservice.c ****         *n = (long)(((unsigned long)*n) / 10U);
+ 155              		.loc 1 559 0
+ 156 0092 334D     		ldr	r5, .L45
+ 157 0094 A5FB0295 		umull	r9, r5, r5, r2
+ 158 0098 ED08     		lsrs	r5, r5, #3
+ 159 009a AA46     		mov	r10, r5
+ 160 009c 05EB8505 		add	r5, r5, r5, lsl #2
+ 161 00a0 4FEA4509 		lsl	r9, r5, #1
+ 162 00a4 A2EB0909 		sub	r9, r2, r9
+ 163              	.LVL20:
+ 560:rtthread/src/kservice.c ****     }
+ 164              		.loc 1 560 0
+ 165 00a8 5246     		mov	r2, r10
+ARM GAS  /tmp/ccJocHtA.s 			page 16
+
+
+ 166              	.LVL21:
+ 167              	.L10:
+ 168              	.LBE9:
+ 169              	.LBE8:
+ 666:rtthread/src/kservice.c ****     }
+ 170              		.loc 1 666 0
+ 171 00aa 18F80990 		ldrb	r9, [r8, r9]	@ zero_extendqisi2
+ 172 00ae 04AD     		add	r5, sp, #16
+ 173 00b0 2544     		add	r5, r5, r4
+ 174 00b2 05F8109C 		strb	r9, [r5, #-16]
+ 175 00b6 0134     		adds	r4, r4, #1
+ 176              	.LVL22:
+ 177              	.L7:
+ 665:rtthread/src/kservice.c ****             tmp[i++] = digits[divide(&num, base)];
+ 178              		.loc 1 665 0
+ 179 00b8 002A     		cmp	r2, #0
+ 180 00ba D4D0     		beq	.L8
+ 181              	.LVL23:
+ 182              	.LBB11:
+ 183              	.LBB10:
+ 557:rtthread/src/kservice.c ****     {
+ 184              		.loc 1 557 0
+ 185 00bc 0A2B     		cmp	r3, #10
+ 186 00be E8D0     		beq	.L43
+ 564:rtthread/src/kservice.c ****         *n = (long)(((unsigned long)*n) / 16U);
+ 187              		.loc 1 564 0
+ 188 00c0 02F00F09 		and	r9, r2, #15
+ 189              	.LVL24:
+ 565:rtthread/src/kservice.c ****     }
+ 190              		.loc 1 565 0
+ 191 00c4 1209     		lsrs	r2, r2, #4
+ 192              	.LVL25:
+ 193 00c6 F0E7     		b	.L10
+ 194              	.LVL26:
+ 195              	.L39:
+ 196              	.LBE10:
+ 197              	.LBE11:
+ 660:rtthread/src/kservice.c ****     if (num == 0)
+ 198              		.loc 1 660 0
+ 199 00c8 0024     		movs	r4, #0
+ 200 00ca F5E7     		b	.L7
+ 201              	.LVL27:
+ 202              	.L40:
+ 671:rtthread/src/kservice.c ****     size -= precision;
+ 203              		.loc 1 671 0
+ 204 00cc 2546     		mov	r5, r4
+ 205 00ce CDE7     		b	.L12
+ 206              	.LVL28:
+ 207              	.L15:
+ 681:rtthread/src/kservice.c **** 
+ 682:rtthread/src/kservice.c ****         while (size-- > 0)
+ 683:rtthread/src/kservice.c ****         {
+ 684:rtthread/src/kservice.c ****             if (buf < end)
+ 685:rtthread/src/kservice.c ****                 *buf = ' ';
+ 686:rtthread/src/kservice.c ****             ++ buf;
+ 208              		.loc 1 686 0
+ 209 00d0 0130     		adds	r0, r0, #1
+ARM GAS  /tmp/ccJocHtA.s 			page 17
+
+
+ 210              	.LVL29:
+ 682:rtthread/src/kservice.c ****         {
+ 211              		.loc 1 682 0
+ 212 00d2 1346     		mov	r3, r2
+ 213              	.L16:
+ 214 00d4 5A1E     		subs	r2, r3, #1
+ 215              	.LVL30:
+ 216 00d6 002B     		cmp	r3, #0
+ 217 00d8 04DD     		ble	.L13
+ 684:rtthread/src/kservice.c ****                 *buf = ' ';
+ 218              		.loc 1 684 0
+ 219 00da 8842     		cmp	r0, r1
+ 220 00dc F8D2     		bcs	.L15
+ 685:rtthread/src/kservice.c ****             ++ buf;
+ 221              		.loc 1 685 0
+ 222 00de 2023     		movs	r3, #32
+ 223 00e0 0370     		strb	r3, [r0]
+ 224 00e2 F5E7     		b	.L15
+ 225              	.L13:
+ 687:rtthread/src/kservice.c ****         }
+ 688:rtthread/src/kservice.c ****     }
+ 689:rtthread/src/kservice.c **** 
+ 690:rtthread/src/kservice.c ****     if (sign)
+ 226              		.loc 1 690 0
+ 227 00e4 BEF1000F 		cmp	lr, #0
+ 228 00e8 05D0     		beq	.L18
+ 691:rtthread/src/kservice.c ****     {
+ 692:rtthread/src/kservice.c ****         if (buf < end)
+ 229              		.loc 1 692 0
+ 230 00ea 8842     		cmp	r0, r1
+ 231 00ec 01D2     		bcs	.L19
+ 693:rtthread/src/kservice.c ****         {
+ 694:rtthread/src/kservice.c ****             *buf = sign;
+ 232              		.loc 1 694 0
+ 233 00ee 80F800E0 		strb	lr, [r0]
+ 234              	.L19:
+ 695:rtthread/src/kservice.c ****         }
+ 696:rtthread/src/kservice.c ****         -- size;
+ 235              		.loc 1 696 0
+ 236 00f2 013A     		subs	r2, r2, #1
+ 237              	.LVL31:
+ 697:rtthread/src/kservice.c ****         ++ buf;
+ 238              		.loc 1 697 0
+ 239 00f4 0130     		adds	r0, r0, #1
+ 240              	.LVL32:
+ 241              	.L18:
+ 698:rtthread/src/kservice.c ****     }
+ 699:rtthread/src/kservice.c **** 
+ 700:rtthread/src/kservice.c **** #ifdef RT_PRINTF_SPECIAL
+ 701:rtthread/src/kservice.c ****     if (type & SPECIAL)
+ 702:rtthread/src/kservice.c ****     {
+ 703:rtthread/src/kservice.c ****         if (base == 8)
+ 704:rtthread/src/kservice.c ****         {
+ 705:rtthread/src/kservice.c ****             if (buf < end)
+ 706:rtthread/src/kservice.c ****                 *buf = '0';
+ 707:rtthread/src/kservice.c ****             ++ buf;
+ 708:rtthread/src/kservice.c ****         }
+ARM GAS  /tmp/ccJocHtA.s 			page 18
+
+
+ 709:rtthread/src/kservice.c ****         else if (base == 16)
+ 710:rtthread/src/kservice.c ****         {
+ 711:rtthread/src/kservice.c ****             if (buf < end)
+ 712:rtthread/src/kservice.c ****                 *buf = '0';
+ 713:rtthread/src/kservice.c ****             ++ buf;
+ 714:rtthread/src/kservice.c ****             if (buf < end)
+ 715:rtthread/src/kservice.c ****             {
+ 716:rtthread/src/kservice.c ****                 *buf = type & LARGE ? 'X' : 'x';
+ 717:rtthread/src/kservice.c ****             }
+ 718:rtthread/src/kservice.c ****             ++ buf;
+ 719:rtthread/src/kservice.c ****         }
+ 720:rtthread/src/kservice.c ****     }
+ 721:rtthread/src/kservice.c **** #endif
+ 722:rtthread/src/kservice.c **** 
+ 723:rtthread/src/kservice.c ****     /* no align to the left */
+ 724:rtthread/src/kservice.c ****     if (!(type & LEFT))
+ 242              		.loc 1 724 0
+ 243 00f6 17F0100F 		tst	r7, #16
+ 244 00fa 03D0     		beq	.L20
+ 245 00fc 1346     		mov	r3, r2
+ 246 00fe 0BE0     		b	.L25
+ 247              	.LVL33:
+ 248              	.L22:
+ 725:rtthread/src/kservice.c ****     {
+ 726:rtthread/src/kservice.c ****         while (size-- > 0)
+ 727:rtthread/src/kservice.c ****         {
+ 728:rtthread/src/kservice.c ****             if (buf < end)
+ 729:rtthread/src/kservice.c ****                 *buf = c;
+ 730:rtthread/src/kservice.c ****             ++ buf;
+ 249              		.loc 1 730 0
+ 250 0100 0130     		adds	r0, r0, #1
+ 251              	.LVL34:
+ 726:rtthread/src/kservice.c ****         {
+ 252              		.loc 1 726 0
+ 253 0102 1A46     		mov	r2, r3
+ 254              	.LVL35:
+ 255              	.L20:
+ 256 0104 531E     		subs	r3, r2, #1
+ 257              	.LVL36:
+ 258 0106 002A     		cmp	r2, #0
+ 259 0108 06DD     		ble	.L25
+ 728:rtthread/src/kservice.c ****                 *buf = c;
+ 260              		.loc 1 728 0
+ 261 010a 8842     		cmp	r0, r1
+ 262 010c F8D2     		bcs	.L22
+ 729:rtthread/src/kservice.c ****             ++ buf;
+ 263              		.loc 1 729 0
+ 264 010e 80F800C0 		strb	ip, [r0]
+ 265 0112 F5E7     		b	.L22
+ 266              	.LVL37:
+ 267              	.L24:
+ 731:rtthread/src/kservice.c ****         }
+ 732:rtthread/src/kservice.c ****     }
+ 733:rtthread/src/kservice.c **** 
+ 734:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 735:rtthread/src/kservice.c ****     while (i < precision--)
+ 736:rtthread/src/kservice.c ****     {
+ARM GAS  /tmp/ccJocHtA.s 			page 19
+
+
+ 737:rtthread/src/kservice.c ****         if (buf < end)
+ 738:rtthread/src/kservice.c ****             *buf = '0';
+ 739:rtthread/src/kservice.c ****         ++ buf;
+ 268              		.loc 1 739 0
+ 269 0114 0130     		adds	r0, r0, #1
+ 270              	.LVL38:
+ 735:rtthread/src/kservice.c ****     {
+ 271              		.loc 1 735 0
+ 272 0116 1546     		mov	r5, r2
+ 273              	.LVL39:
+ 274              	.L25:
+ 275 0118 6A1E     		subs	r2, r5, #1
+ 276              	.LVL40:
+ 277 011a A542     		cmp	r5, r4
+ 278 011c 06DD     		ble	.L27
+ 737:rtthread/src/kservice.c ****             *buf = '0';
+ 279              		.loc 1 737 0
+ 280 011e 8842     		cmp	r0, r1
+ 281 0120 F8D2     		bcs	.L24
+ 738:rtthread/src/kservice.c ****         ++ buf;
+ 282              		.loc 1 738 0
+ 283 0122 3025     		movs	r5, #48
+ 284 0124 0570     		strb	r5, [r0]
+ 285 0126 F5E7     		b	.L24
+ 286              	.LVL41:
+ 287              	.L28:
+ 740:rtthread/src/kservice.c ****     }
+ 741:rtthread/src/kservice.c **** #endif
+ 742:rtthread/src/kservice.c **** 
+ 743:rtthread/src/kservice.c ****     /* put number in the temporary buffer */
+ 744:rtthread/src/kservice.c ****     while (i-- > 0 && (precision_bak != 0))
+ 745:rtthread/src/kservice.c ****     {
+ 746:rtthread/src/kservice.c ****         if (buf < end)
+ 747:rtthread/src/kservice.c ****             *buf = tmp[i];
+ 748:rtthread/src/kservice.c ****         ++ buf;
+ 288              		.loc 1 748 0
+ 289 0128 0130     		adds	r0, r0, #1
+ 290              	.LVL42:
+ 744:rtthread/src/kservice.c ****     {
+ 291              		.loc 1 744 0
+ 292 012a 1446     		mov	r4, r2
+ 293              	.LVL43:
+ 294              	.L27:
+ 295 012c 621E     		subs	r2, r4, #1
+ 296              	.LVL44:
+ 297 012e 002C     		cmp	r4, #0
+ 298 0130 0ADD     		ble	.L32
+ 744:rtthread/src/kservice.c ****     {
+ 299              		.loc 1 744 0 is_stmt 0 discriminator 1
+ 300 0132 4EB1     		cbz	r6, .L32
+ 746:rtthread/src/kservice.c ****             *buf = tmp[i];
+ 301              		.loc 1 746 0 is_stmt 1
+ 302 0134 8842     		cmp	r0, r1
+ 303 0136 F7D2     		bcs	.L28
+ 747:rtthread/src/kservice.c ****         ++ buf;
+ 304              		.loc 1 747 0
+ 305 0138 04AC     		add	r4, sp, #16
+ARM GAS  /tmp/ccJocHtA.s 			page 20
+
+
+ 306 013a 1444     		add	r4, r4, r2
+ 307 013c 14F8104C 		ldrb	r4, [r4, #-16]	@ zero_extendqisi2
+ 308 0140 0470     		strb	r4, [r0]
+ 309 0142 F1E7     		b	.L28
+ 310              	.LVL45:
+ 311              	.L31:
+ 749:rtthread/src/kservice.c ****     }
+ 750:rtthread/src/kservice.c **** 
+ 751:rtthread/src/kservice.c ****     while (size-- > 0)
+ 752:rtthread/src/kservice.c ****     {
+ 753:rtthread/src/kservice.c ****         if (buf < end)
+ 754:rtthread/src/kservice.c ****             *buf = ' ';
+ 755:rtthread/src/kservice.c ****         ++ buf;
+ 312              		.loc 1 755 0
+ 313 0144 0130     		adds	r0, r0, #1
+ 314              	.LVL46:
+ 751:rtthread/src/kservice.c ****     {
+ 315              		.loc 1 751 0
+ 316 0146 1346     		mov	r3, r2
+ 317              	.LVL47:
+ 318              	.L32:
+ 319 0148 5A1E     		subs	r2, r3, #1
+ 320              	.LVL48:
+ 321 014a 002B     		cmp	r3, #0
+ 322 014c 04DD     		ble	.L44
+ 753:rtthread/src/kservice.c ****             *buf = ' ';
+ 323              		.loc 1 753 0
+ 324 014e 8842     		cmp	r0, r1
+ 325 0150 F8D2     		bcs	.L31
+ 754:rtthread/src/kservice.c ****         ++ buf;
+ 326              		.loc 1 754 0
+ 327 0152 2023     		movs	r3, #32
+ 328 0154 0370     		strb	r3, [r0]
+ 329 0156 F5E7     		b	.L31
+ 330              	.L44:
+ 756:rtthread/src/kservice.c ****     }
+ 757:rtthread/src/kservice.c **** 
+ 758:rtthread/src/kservice.c ****     return buf;
+ 759:rtthread/src/kservice.c **** }
+ 331              		.loc 1 759 0
+ 332 0158 04B0     		add	sp, sp, #16
+ 333              	.LCFI2:
+ 334              		.cfi_def_cfa_offset 32
+ 335              		@ sp needed
+ 336 015a BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 337              	.LVL49:
+ 338              	.L46:
+ 339 015e 00BF     		.align	2
+ 340              	.L45:
+ 341 0160 CDCCCCCC 		.word	-858993459
+ 342 0164 00000000 		.word	.LANCHOR0
+ 343 0168 00000000 		.word	.LANCHOR1
+ 344              		.cfi_endproc
+ 345              	.LFE32:
+ 347              		.section	.text.rt_get_errno,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	rt_get_errno
+ARM GAS  /tmp/ccJocHtA.s 			page 21
+
+
+ 350              		.syntax unified
+ 351              		.thumb
+ 352              		.thumb_func
+ 353              		.fpu softvfp
+ 355              	rt_get_errno:
+ 356              	.LFB15:
+  47:rtthread/src/kservice.c ****     rt_thread_t tid;
+ 357              		.loc 1 47 0
+ 358              		.cfi_startproc
+ 359              		@ args = 0, pretend = 0, frame = 0
+ 360              		@ frame_needed = 0, uses_anonymous_args = 0
+ 361 0000 08B5     		push	{r3, lr}
+ 362              	.LCFI3:
+ 363              		.cfi_def_cfa_offset 8
+ 364              		.cfi_offset 3, -8
+ 365              		.cfi_offset 14, -4
+  50:rtthread/src/kservice.c ****     {
+ 366              		.loc 1 50 0
+ 367 0002 FFF7FEFF 		bl	rt_interrupt_get_nest
+ 368              	.LVL50:
+ 369 0006 10B1     		cbz	r0, .L48
+  53:rtthread/src/kservice.c ****     }
+ 370              		.loc 1 53 0
+ 371 0008 054B     		ldr	r3, .L53
+ 372 000a 1868     		ldr	r0, [r3]
+ 373              	.L47:
+  61:rtthread/src/kservice.c **** 
+ 374              		.loc 1 61 0
+ 375 000c 08BD     		pop	{r3, pc}
+ 376              	.L48:
+  56:rtthread/src/kservice.c ****     if (tid == RT_NULL)
+ 377              		.loc 1 56 0
+ 378 000e FFF7FEFF 		bl	rt_thread_self
+ 379              	.LVL51:
+  57:rtthread/src/kservice.c ****         return __rt_errno;
+ 380              		.loc 1 57 0
+ 381 0012 08B1     		cbz	r0, .L52
+  60:rtthread/src/kservice.c **** }
+ 382              		.loc 1 60 0
+ 383 0014 006B     		ldr	r0, [r0, #48]
+ 384              	.LVL52:
+ 385 0016 F9E7     		b	.L47
+ 386              	.LVL53:
+ 387              	.L52:
+  58:rtthread/src/kservice.c **** 
+ 388              		.loc 1 58 0
+ 389 0018 014B     		ldr	r3, .L53
+ 390 001a 1868     		ldr	r0, [r3]
+ 391              	.LVL54:
+ 392 001c F6E7     		b	.L47
+ 393              	.L54:
+ 394 001e 00BF     		.align	2
+ 395              	.L53:
+ 396 0020 00000000 		.word	.LANCHOR2
+ 397              		.cfi_endproc
+ 398              	.LFE15:
+ 400              		.section	.text.rt_set_errno,"ax",%progbits
+ARM GAS  /tmp/ccJocHtA.s 			page 22
+
+
+ 401              		.align	1
+ 402              		.global	rt_set_errno
+ 403              		.syntax unified
+ 404              		.thumb
+ 405              		.thumb_func
+ 406              		.fpu softvfp
+ 408              	rt_set_errno:
+ 409              	.LFB16:
+  69:rtthread/src/kservice.c ****     rt_thread_t tid;
+ 410              		.loc 1 69 0
+ 411              		.cfi_startproc
+ 412              		@ args = 0, pretend = 0, frame = 0
+ 413              		@ frame_needed = 0, uses_anonymous_args = 0
+ 414              	.LVL55:
+ 415 0000 10B5     		push	{r4, lr}
+ 416              	.LCFI4:
+ 417              		.cfi_def_cfa_offset 8
+ 418              		.cfi_offset 4, -8
+ 419              		.cfi_offset 14, -4
+ 420 0002 0446     		mov	r4, r0
+  72:rtthread/src/kservice.c ****     {
+ 421              		.loc 1 72 0
+ 422 0004 FFF7FEFF 		bl	rt_interrupt_get_nest
+ 423              	.LVL56:
+ 424 0008 10B1     		cbz	r0, .L56
+  75:rtthread/src/kservice.c **** 
+ 425              		.loc 1 75 0
+ 426 000a 054B     		ldr	r3, .L61
+ 427 000c 1C60     		str	r4, [r3]
+ 428              	.L55:
+  89:rtthread/src/kservice.c **** 
+ 429              		.loc 1 89 0
+ 430 000e 10BD     		pop	{r4, pc}
+ 431              	.LVL57:
+ 432              	.L56:
+  80:rtthread/src/kservice.c ****     if (tid == RT_NULL)
+ 433              		.loc 1 80 0
+ 434 0010 FFF7FEFF 		bl	rt_thread_self
+ 435              	.LVL58:
+  81:rtthread/src/kservice.c ****     {
+ 436              		.loc 1 81 0
+ 437 0014 08B1     		cbz	r0, .L60
+  88:rtthread/src/kservice.c **** }
+ 438              		.loc 1 88 0
+ 439 0016 0463     		str	r4, [r0, #48]
+ 440 0018 F9E7     		b	.L55
+ 441              	.L60:
+  83:rtthread/src/kservice.c **** 
+ 442              		.loc 1 83 0
+ 443 001a 014B     		ldr	r3, .L61
+ 444 001c 1C60     		str	r4, [r3]
+  85:rtthread/src/kservice.c ****     }
+ 445              		.loc 1 85 0
+ 446 001e F6E7     		b	.L55
+ 447              	.L62:
+ 448              		.align	2
+ 449              	.L61:
+ARM GAS  /tmp/ccJocHtA.s 			page 23
+
+
+ 450 0020 00000000 		.word	.LANCHOR2
+ 451              		.cfi_endproc
+ 452              	.LFE16:
+ 454              		.section	.text._rt_errno,"ax",%progbits
+ 455              		.align	1
+ 456              		.global	_rt_errno
+ 457              		.syntax unified
+ 458              		.thumb
+ 459              		.thumb_func
+ 460              		.fpu softvfp
+ 462              	_rt_errno:
+ 463              	.LFB17:
+  97:rtthread/src/kservice.c ****     rt_thread_t tid;
+ 464              		.loc 1 97 0
+ 465              		.cfi_startproc
+ 466              		@ args = 0, pretend = 0, frame = 0
+ 467              		@ frame_needed = 0, uses_anonymous_args = 0
+ 468 0000 08B5     		push	{r3, lr}
+ 469              	.LCFI5:
+ 470              		.cfi_def_cfa_offset 8
+ 471              		.cfi_offset 3, -8
+ 472              		.cfi_offset 14, -4
+ 100:rtthread/src/kservice.c ****         return (int *)&__rt_errno;
+ 473              		.loc 1 100 0
+ 474 0002 FFF7FEFF 		bl	rt_interrupt_get_nest
+ 475              	.LVL59:
+ 476 0006 08B1     		cbz	r0, .L68
+ 101:rtthread/src/kservice.c **** 
+ 477              		.loc 1 101 0
+ 478 0008 0448     		ldr	r0, .L69
+ 479              	.L63:
+ 108:rtthread/src/kservice.c **** 
+ 480              		.loc 1 108 0
+ 481 000a 08BD     		pop	{r3, pc}
+ 482              	.L68:
+ 103:rtthread/src/kservice.c ****     if (tid != RT_NULL)
+ 483              		.loc 1 103 0
+ 484 000c FFF7FEFF 		bl	rt_thread_self
+ 485              	.LVL60:
+ 104:rtthread/src/kservice.c ****         return (int *) & (tid->error);
+ 486              		.loc 1 104 0
+ 487 0010 08B1     		cbz	r0, .L66
+ 105:rtthread/src/kservice.c **** 
+ 488              		.loc 1 105 0
+ 489 0012 3030     		adds	r0, r0, #48
+ 490              	.LVL61:
+ 491 0014 F9E7     		b	.L63
+ 492              	.LVL62:
+ 493              	.L66:
+ 107:rtthread/src/kservice.c **** }
+ 494              		.loc 1 107 0
+ 495 0016 0148     		ldr	r0, .L69
+ 496              	.LVL63:
+ 497 0018 F7E7     		b	.L63
+ 498              	.L70:
+ 499 001a 00BF     		.align	2
+ 500              	.L69:
+ARM GAS  /tmp/ccJocHtA.s 			page 24
+
+
+ 501 001c 00000000 		.word	.LANCHOR2
+ 502              		.cfi_endproc
+ 503              	.LFE17:
+ 505              		.section	.text.rt_memset,"ax",%progbits
+ 506              		.align	1
+ 507              		.global	rt_memset
+ 508              		.syntax unified
+ 509              		.thumb
+ 510              		.thumb_func
+ 511              		.fpu softvfp
+ 513              	rt_memset:
+ 514              	.LFB18:
+ 120:rtthread/src/kservice.c **** #ifdef RT_USING_TINY_SIZE
+ 515              		.loc 1 120 0
+ 516              		.cfi_startproc
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 519              		@ link register save eliminated.
+ 520              	.LVL64:
+ 521 0000 10B4     		push	{r4}
+ 522              	.LCFI6:
+ 523              		.cfi_def_cfa_offset 4
+ 524              		.cfi_offset 4, -4
+ 525              	.LVL65:
+ 140:rtthread/src/kservice.c ****     {
+ 526              		.loc 1 140 0
+ 527 0002 032A     		cmp	r2, #3
+ 528 0004 20D9     		bls	.L79
+ 529 0006 CCB2     		uxtb	r4, r1
+ 530              	.LVL66:
+ 140:rtthread/src/kservice.c ****     {
+ 531              		.loc 1 140 0 is_stmt 0 discriminator 1
+ 532 0008 10F0030F 		tst	r0, #3
+ 533 000c 1ED1     		bne	.L80
+ 534              	.LVL67:
+ 150:rtthread/src/kservice.c ****             buffer |= (buffer << 16);
+ 535              		.loc 1 150 0 is_stmt 1
+ 536 000e 44EA0424 		orr	r4, r4, r4, lsl #8
+ 537              	.LVL68:
+ 151:rtthread/src/kservice.c ****         }
+ 538              		.loc 1 151 0
+ 539 0012 44EA0444 		orr	r4, r4, r4, lsl #16
+ 540              	.LVL69:
+ 143:rtthread/src/kservice.c **** 
+ 541              		.loc 1 143 0
+ 542 0016 0346     		mov	r3, r0
+ 543 0018 05E0     		b	.L73
+ 544              	.LVL70:
+ 545              	.L74:
+ 162:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 546              		.loc 1 162 0
+ 547 001a 1C60     		str	r4, [r3]
+ 548              	.LVL71:
+ 163:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 549              		.loc 1 163 0
+ 550 001c 5C60     		str	r4, [r3, #4]
+ 551              	.LVL72:
+ARM GAS  /tmp/ccJocHtA.s 			page 25
+
+
+ 164:rtthread/src/kservice.c ****             *aligned_addr++ = buffer;
+ 552              		.loc 1 164 0
+ 553 001e 9C60     		str	r4, [r3, #8]
+ 554              	.LVL73:
+ 165:rtthread/src/kservice.c ****             count -= 4 * LBLOCKSIZE;
+ 555              		.loc 1 165 0
+ 556 0020 DC60     		str	r4, [r3, #12]
+ 166:rtthread/src/kservice.c ****         }
+ 557              		.loc 1 166 0
+ 558 0022 103A     		subs	r2, r2, #16
+ 559              	.LVL74:
+ 165:rtthread/src/kservice.c ****             count -= 4 * LBLOCKSIZE;
+ 560              		.loc 1 165 0
+ 561 0024 1033     		adds	r3, r3, #16
+ 562              	.LVL75:
+ 563              	.L73:
+ 160:rtthread/src/kservice.c ****         {
+ 564              		.loc 1 160 0
+ 565 0026 0F2A     		cmp	r2, #15
+ 566 0028 F7D8     		bhi	.L74
+ 567 002a 02E0     		b	.L75
+ 568              	.L76:
+ 569              	.LVL76:
+ 171:rtthread/src/kservice.c ****             count -= LBLOCKSIZE;
+ 570              		.loc 1 171 0
+ 571 002c 1C60     		str	r4, [r3]
+ 172:rtthread/src/kservice.c ****         }
+ 572              		.loc 1 172 0
+ 573 002e 043A     		subs	r2, r2, #4
+ 574              	.LVL77:
+ 171:rtthread/src/kservice.c ****             count -= LBLOCKSIZE;
+ 575              		.loc 1 171 0
+ 576 0030 0433     		adds	r3, r3, #4
+ 577              	.LVL78:
+ 578              	.L75:
+ 169:rtthread/src/kservice.c ****         {
+ 579              		.loc 1 169 0
+ 580 0032 032A     		cmp	r2, #3
+ 581 0034 FAD8     		bhi	.L76
+ 582 0036 02E0     		b	.L77
+ 583              	.LVL79:
+ 584              	.L78:
+ 181:rtthread/src/kservice.c ****     }
+ 585              		.loc 1 181 0
+ 586 0038 1970     		strb	r1, [r3]
+ 587 003a 0133     		adds	r3, r3, #1
+ 588              	.LVL80:
+ 179:rtthread/src/kservice.c ****     {
+ 589              		.loc 1 179 0
+ 590 003c 2246     		mov	r2, r4
+ 591              	.LVL81:
+ 592              	.L77:
+ 593 003e 541E     		subs	r4, r2, #1
+ 594              	.LVL82:
+ 595 0040 002A     		cmp	r2, #0
+ 596 0042 F9D1     		bne	.L78
+ 190:rtthread/src/kservice.c **** 
+ARM GAS  /tmp/ccJocHtA.s 			page 26
+
+
+ 597              		.loc 1 190 0
+ 598 0044 10BC     		pop	{r4}
+ 599              	.LCFI7:
+ 600              		.cfi_remember_state
+ 601              		.cfi_restore 4
+ 602              		.cfi_def_cfa_offset 0
+ 603              	.LVL83:
+ 604 0046 7047     		bx	lr
+ 605              	.LVL84:
+ 606              	.L79:
+ 607              	.LCFI8:
+ 608              		.cfi_restore_state
+ 134:rtthread/src/kservice.c ****     unsigned long buffer;
+ 609              		.loc 1 134 0
+ 610 0048 0346     		mov	r3, r0
+ 611 004a F8E7     		b	.L77
+ 612              	.LVL85:
+ 613              	.L80:
+ 614 004c 0346     		mov	r3, r0
+ 615 004e F6E7     		b	.L77
+ 616              		.cfi_endproc
+ 617              	.LFE18:
+ 619              		.section	.text.rt_memcpy,"ax",%progbits
+ 620              		.align	1
+ 621              		.global	rt_memcpy
+ 622              		.syntax unified
+ 623              		.thumb
+ 624              		.thumb_func
+ 625              		.fpu softvfp
+ 627              	rt_memcpy:
+ 628              	.LFB19:
+ 203:rtthread/src/kservice.c **** #ifdef RT_USING_TINY_SIZE
+ 629              		.loc 1 203 0
+ 630              		.cfi_startproc
+ 631              		@ args = 0, pretend = 0, frame = 0
+ 632              		@ frame_needed = 0, uses_anonymous_args = 0
+ 633              		@ link register save eliminated.
+ 634              	.LVL86:
+ 635 0000 10B4     		push	{r4}
+ 636              	.LCFI9:
+ 637              		.cfi_def_cfa_offset 4
+ 638              		.cfi_offset 4, -4
+ 639              	.LVL87:
+ 236:rtthread/src/kservice.c ****     {
+ 640              		.loc 1 236 0
+ 641 0002 0F2A     		cmp	r2, #15
+ 642 0004 28D9     		bls	.L90
+ 236:rtthread/src/kservice.c ****     {
+ 643              		.loc 1 236 0 is_stmt 0 discriminator 1
+ 644 0006 41EA0003 		orr	r3, r1, r0
+ 645 000a 13F0030F 		tst	r3, #3
+ 646 000e 0FD0     		beq	.L91
+ 228:rtthread/src/kservice.c ****     char *src_ptr = (char *)src;
+ 647              		.loc 1 228 0 is_stmt 1
+ 648 0010 0346     		mov	r3, r0
+ 649 0012 1CE0     		b	.L88
+ 650              	.LVL88:
+ARM GAS  /tmp/ccJocHtA.s 			page 27
+
+
+ 651              	.L85:
+ 244:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 652              		.loc 1 244 0
+ 653 0014 0C68     		ldr	r4, [r1]
+ 654 0016 1C60     		str	r4, [r3]
+ 655              	.LVL89:
+ 245:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 656              		.loc 1 245 0
+ 657 0018 4C68     		ldr	r4, [r1, #4]
+ 658 001a 5C60     		str	r4, [r3, #4]
+ 659              	.LVL90:
+ 246:rtthread/src/kservice.c ****             *aligned_dst++ = *aligned_src++;
+ 660              		.loc 1 246 0
+ 661 001c 8C68     		ldr	r4, [r1, #8]
+ 662 001e 9C60     		str	r4, [r3, #8]
+ 663              	.LVL91:
+ 247:rtthread/src/kservice.c ****             len -= BIGBLOCKSIZE;
+ 664              		.loc 1 247 0
+ 665 0020 CC68     		ldr	r4, [r1, #12]
+ 666 0022 DC60     		str	r4, [r3, #12]
+ 248:rtthread/src/kservice.c ****         }
+ 667              		.loc 1 248 0
+ 668 0024 103A     		subs	r2, r2, #16
+ 669              	.LVL92:
+ 247:rtthread/src/kservice.c ****             len -= BIGBLOCKSIZE;
+ 670              		.loc 1 247 0
+ 671 0026 1031     		adds	r1, r1, #16
+ 672              	.LVL93:
+ 673 0028 1033     		adds	r3, r3, #16
+ 674              	.LVL94:
+ 675              	.L84:
+ 242:rtthread/src/kservice.c ****         {
+ 676              		.loc 1 242 0
+ 677 002a 0F2A     		cmp	r2, #15
+ 678 002c F2D8     		bhi	.L85
+ 679 002e 06E0     		b	.L86
+ 680              	.LVL95:
+ 681              	.L91:
+ 238:rtthread/src/kservice.c ****         aligned_src = (long *)src_ptr;
+ 682              		.loc 1 238 0
+ 683 0030 0346     		mov	r3, r0
+ 684 0032 FAE7     		b	.L84
+ 685              	.LVL96:
+ 686              	.L87:
+ 254:rtthread/src/kservice.c ****             len -= LITTLEBLOCKSIZE;
+ 687              		.loc 1 254 0
+ 688 0034 0C68     		ldr	r4, [r1]
+ 689 0036 1C60     		str	r4, [r3]
+ 255:rtthread/src/kservice.c ****         }
+ 690              		.loc 1 255 0
+ 691 0038 043A     		subs	r2, r2, #4
+ 692              	.LVL97:
+ 254:rtthread/src/kservice.c ****             len -= LITTLEBLOCKSIZE;
+ 693              		.loc 1 254 0
+ 694 003a 0431     		adds	r1, r1, #4
+ 695              	.LVL98:
+ 696 003c 0433     		adds	r3, r3, #4
+ARM GAS  /tmp/ccJocHtA.s 			page 28
+
+
+ 697              	.LVL99:
+ 698              	.L86:
+ 252:rtthread/src/kservice.c ****         {
+ 699              		.loc 1 252 0
+ 700 003e 032A     		cmp	r2, #3
+ 701 0040 F8D8     		bhi	.L87
+ 702 0042 04E0     		b	.L88
+ 703              	.LVL100:
+ 704              	.L89:
+ 264:rtthread/src/kservice.c **** 
+ 705              		.loc 1 264 0
+ 706 0044 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 707 0046 1A70     		strb	r2, [r3]
+ 263:rtthread/src/kservice.c ****         *dst_ptr++ = *src_ptr++;
+ 708              		.loc 1 263 0
+ 709 0048 2246     		mov	r2, r4
+ 264:rtthread/src/kservice.c **** 
+ 710              		.loc 1 264 0
+ 711 004a 0131     		adds	r1, r1, #1
+ 712              	.LVL101:
+ 713 004c 0133     		adds	r3, r3, #1
+ 714              	.LVL102:
+ 715              	.L88:
+ 263:rtthread/src/kservice.c ****         *dst_ptr++ = *src_ptr++;
+ 716              		.loc 1 263 0
+ 717 004e 541E     		subs	r4, r2, #1
+ 718              	.LVL103:
+ 719 0050 002A     		cmp	r2, #0
+ 720 0052 F7D1     		bne	.L89
+ 272:rtthread/src/kservice.c **** 
+ 721              		.loc 1 272 0
+ 722 0054 10BC     		pop	{r4}
+ 723              	.LCFI10:
+ 724              		.cfi_remember_state
+ 725              		.cfi_restore 4
+ 726              		.cfi_def_cfa_offset 0
+ 727              	.LVL104:
+ 728 0056 7047     		bx	lr
+ 729              	.LVL105:
+ 730              	.L90:
+ 731              	.LCFI11:
+ 732              		.cfi_restore_state
+ 228:rtthread/src/kservice.c ****     char *src_ptr = (char *)src;
+ 733              		.loc 1 228 0
+ 734 0058 0346     		mov	r3, r0
+ 735 005a F8E7     		b	.L88
+ 736              		.cfi_endproc
+ 737              	.LFE19:
+ 739              		.section	.text.rt_memmove,"ax",%progbits
+ 740              		.align	1
+ 741              		.global	rt_memmove
+ 742              		.syntax unified
+ 743              		.thumb
+ 744              		.thumb_func
+ 745              		.fpu softvfp
+ 747              	rt_memmove:
+ 748              	.LFB20:
+ARM GAS  /tmp/ccJocHtA.s 			page 29
+
+
+ 285:rtthread/src/kservice.c ****     char *tmp = (char *)dest, *s = (char *)src;
+ 749              		.loc 1 285 0
+ 750              		.cfi_startproc
+ 751              		@ args = 0, pretend = 0, frame = 0
+ 752              		@ frame_needed = 0, uses_anonymous_args = 0
+ 753              		@ link register save eliminated.
+ 754              	.LVL106:
+ 755 0000 10B4     		push	{r4}
+ 756              	.LCFI12:
+ 757              		.cfi_def_cfa_offset 4
+ 758              		.cfi_offset 4, -4
+ 759              	.LVL107:
+ 288:rtthread/src/kservice.c ****     {
+ 760              		.loc 1 288 0
+ 761 0002 8842     		cmp	r0, r1
+ 762 0004 17D9     		bls	.L100
+ 288:rtthread/src/kservice.c ****     {
+ 763              		.loc 1 288 0 is_stmt 0 discriminator 1
+ 764 0006 8B18     		adds	r3, r1, r2
+ 765 0008 8342     		cmp	r3, r0
+ 766 000a 16D9     		bls	.L101
+ 290:rtthread/src/kservice.c ****         s += n;
+ 767              		.loc 1 290 0 is_stmt 1
+ 768 000c 8118     		adds	r1, r0, r2
+ 769              	.LVL108:
+ 293:rtthread/src/kservice.c ****             *(--tmp) = *(--s);
+ 770              		.loc 1 293 0
+ 771 000e 04E0     		b	.L95
+ 772              	.LVL109:
+ 773              	.L96:
+ 294:rtthread/src/kservice.c ****     }
+ 774              		.loc 1 294 0
+ 775 0010 13F8012D 		ldrb	r2, [r3, #-1]!	@ zero_extendqisi2
+ 776              	.LVL110:
+ 777 0014 01F8012D 		strb	r2, [r1, #-1]!
+ 778              	.LVL111:
+ 293:rtthread/src/kservice.c ****             *(--tmp) = *(--s);
+ 779              		.loc 1 293 0
+ 780 0018 2246     		mov	r2, r4
+ 781              	.LVL112:
+ 782              	.L95:
+ 783 001a 541E     		subs	r4, r2, #1
+ 784              	.LVL113:
+ 785 001c 002A     		cmp	r2, #0
+ 786 001e F7D1     		bne	.L96
+ 787 0020 07E0     		b	.L97
+ 788              	.LVL114:
+ 789              	.L99:
+ 299:rtthread/src/kservice.c ****     }
+ 790              		.loc 1 299 0
+ 791 0022 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 792 0024 1A70     		strb	r2, [r3]
+ 793 0026 0131     		adds	r1, r1, #1
+ 794              	.LVL115:
+ 795 0028 0133     		adds	r3, r3, #1
+ 796              	.LVL116:
+ 298:rtthread/src/kservice.c ****             *tmp++ = *s++;
+ARM GAS  /tmp/ccJocHtA.s 			page 30
+
+
+ 797              		.loc 1 298 0
+ 798 002a 2246     		mov	r2, r4
+ 799              	.LVL117:
+ 800              	.L98:
+ 801 002c 541E     		subs	r4, r2, #1
+ 802              	.LVL118:
+ 803 002e 002A     		cmp	r2, #0
+ 804 0030 F7D1     		bne	.L99
+ 805              	.LVL119:
+ 806              	.L97:
+ 303:rtthread/src/kservice.c **** 
+ 807              		.loc 1 303 0
+ 808 0032 10BC     		pop	{r4}
+ 809              	.LCFI13:
+ 810              		.cfi_remember_state
+ 811              		.cfi_restore 4
+ 812              		.cfi_def_cfa_offset 0
+ 813              	.LVL120:
+ 814 0034 7047     		bx	lr
+ 815              	.LVL121:
+ 816              	.L100:
+ 817              	.LCFI14:
+ 818              		.cfi_restore_state
+ 819 0036 0346     		mov	r3, r0
+ 820 0038 F8E7     		b	.L98
+ 821              	.L101:
+ 822 003a 0346     		mov	r3, r0
+ 823 003c F6E7     		b	.L98
+ 824              		.cfi_endproc
+ 825              	.LFE20:
+ 827              		.section	.text.rt_memcmp,"ax",%progbits
+ 828              		.align	1
+ 829              		.global	rt_memcmp
+ 830              		.syntax unified
+ 831              		.thumb
+ 832              		.thumb_func
+ 833              		.fpu softvfp
+ 835              	rt_memcmp:
+ 836              	.LFB21:
+ 315:rtthread/src/kservice.c ****     const unsigned char *su1, *su2;
+ 837              		.loc 1 315 0
+ 838              		.cfi_startproc
+ 839              		@ args = 0, pretend = 0, frame = 0
+ 840              		@ frame_needed = 0, uses_anonymous_args = 0
+ 841              		@ link register save eliminated.
+ 842              	.LVL122:
+ 317:rtthread/src/kservice.c **** 
+ 843              		.loc 1 317 0
+ 844 0000 0023     		movs	r3, #0
+ 845              	.LVL123:
+ 319:rtthread/src/kservice.c ****         if ((res = *su1 - *su2) != 0)
+ 846              		.loc 1 319 0
+ 847 0002 62B1     		cbz	r2, .L111
+ 315:rtthread/src/kservice.c ****     const unsigned char *su1, *su2;
+ 848              		.loc 1 315 0
+ 849 0004 10B4     		push	{r4}
+ 850              	.LCFI15:
+ARM GAS  /tmp/ccJocHtA.s 			page 31
+
+
+ 851              		.cfi_def_cfa_offset 4
+ 852              		.cfi_offset 4, -4
+ 853              	.LVL124:
+ 854              	.L106:
+ 320:rtthread/src/kservice.c ****             break;
+ 855              		.loc 1 320 0
+ 856 0006 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 857              	.LVL125:
+ 858 0008 0C78     		ldrb	r4, [r1]	@ zero_extendqisi2
+ 859              	.LVL126:
+ 860 000a 1B1B     		subs	r3, r3, r4
+ 861              	.LVL127:
+ 862 000c 04D1     		bne	.L103
+ 319:rtthread/src/kservice.c ****         if ((res = *su1 - *su2) != 0)
+ 863              		.loc 1 319 0 discriminator 2
+ 864 000e 0130     		adds	r0, r0, #1
+ 865              	.LVL128:
+ 866 0010 0131     		adds	r1, r1, #1
+ 867              	.LVL129:
+ 868 0012 013A     		subs	r2, r2, #1
+ 869              	.LVL130:
+ 870 0014 002A     		cmp	r2, #0
+ 871 0016 F6D1     		bne	.L106
+ 872              	.LVL131:
+ 873              	.L103:
+ 324:rtthread/src/kservice.c **** 
+ 874              		.loc 1 324 0
+ 875 0018 1846     		mov	r0, r3
+ 876              	.LVL132:
+ 877 001a 10BC     		pop	{r4}
+ 878              	.LCFI16:
+ 879              		.cfi_restore 4
+ 880              		.cfi_def_cfa_offset 0
+ 881 001c 7047     		bx	lr
+ 882              	.LVL133:
+ 883              	.L111:
+ 884 001e 1846     		mov	r0, r3
+ 885              	.LVL134:
+ 886 0020 7047     		bx	lr
+ 887              		.cfi_endproc
+ 888              	.LFE21:
+ 890              		.section	.text.rt_strcasecmp,"ax",%progbits
+ 891              		.align	1
+ 892              		.global	rt_strcasecmp
+ 893              		.syntax unified
+ 894              		.thumb
+ 895              		.thumb_func
+ 896              		.fpu softvfp
+ 898              	rt_strcasecmp:
+ 899              	.LFB23:
+ 362:rtthread/src/kservice.c ****     int ca, cb;
+ 900              		.loc 1 362 0
+ 901              		.cfi_startproc
+ 902              		@ args = 0, pretend = 0, frame = 0
+ 903              		@ frame_needed = 0, uses_anonymous_args = 0
+ 904              		@ link register save eliminated.
+ 905              	.LVL135:
+ARM GAS  /tmp/ccJocHtA.s 			page 32
+
+
+ 906 0000 70B4     		push	{r4, r5, r6}
+ 907              	.LCFI17:
+ 908              		.cfi_def_cfa_offset 12
+ 909              		.cfi_offset 4, -12
+ 910              		.cfi_offset 5, -8
+ 911              		.cfi_offset 6, -4
+ 912 0002 04E0     		b	.L116
+ 913              	.LVL136:
+ 914              	.L114:
+ 374:rtthread/src/kservice.c **** 
+ 915              		.loc 1 374 0
+ 916 0004 A342     		cmp	r3, r4
+ 917 0006 13D1     		bne	.L115
+ 367:rtthread/src/kservice.c ****         cb = *b++ & 0xff;
+ 918              		.loc 1 367 0 discriminator 1
+ 919 0008 3046     		mov	r0, r6
+ 368:rtthread/src/kservice.c ****         if (ca >= 'A' && ca <= 'Z')
+ 920              		.loc 1 368 0 discriminator 1
+ 921 000a 2946     		mov	r1, r5
+ 374:rtthread/src/kservice.c **** 
+ 922              		.loc 1 374 0 discriminator 1
+ 923 000c 83B1     		cbz	r3, .L115
+ 924              	.LVL137:
+ 925              	.L116:
+ 367:rtthread/src/kservice.c ****         cb = *b++ & 0xff;
+ 926              		.loc 1 367 0
+ 927 000e 461C     		adds	r6, r0, #1
+ 928              	.LVL138:
+ 929 0010 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 930              	.LVL139:
+ 368:rtthread/src/kservice.c ****         if (ca >= 'A' && ca <= 'Z')
+ 931              		.loc 1 368 0
+ 932 0012 4D1C     		adds	r5, r1, #1
+ 933              	.LVL140:
+ 934 0014 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 935 0016 1446     		mov	r4, r2
+ 936              	.LVL141:
+ 369:rtthread/src/kservice.c ****             ca += 'a' - 'A';
+ 937              		.loc 1 369 0
+ 938 0018 A3F14101 		sub	r1, r3, #65
+ 939 001c 1929     		cmp	r1, #25
+ 940 001e 00D8     		bhi	.L113
+ 370:rtthread/src/kservice.c ****         if (cb >= 'A' && cb <= 'Z')
+ 941              		.loc 1 370 0
+ 942 0020 2033     		adds	r3, r3, #32
+ 943              	.LVL142:
+ 944              	.L113:
+ 371:rtthread/src/kservice.c ****             cb += 'a' - 'A';
+ 945              		.loc 1 371 0
+ 946 0022 A2F14101 		sub	r1, r2, #65
+ 947 0026 1929     		cmp	r1, #25
+ 948 0028 ECD8     		bhi	.L114
+ 372:rtthread/src/kservice.c ****     }
+ 949              		.loc 1 372 0
+ 950 002a 02F12004 		add	r4, r2, #32
+ 951              	.LVL143:
+ 952 002e E9E7     		b	.L114
+ARM GAS  /tmp/ccJocHtA.s 			page 33
+
+
+ 953              	.L115:
+ 377:rtthread/src/kservice.c **** 
+ 954              		.loc 1 377 0
+ 955 0030 181B     		subs	r0, r3, r4
+ 956 0032 70BC     		pop	{r4, r5, r6}
+ 957              	.LCFI18:
+ 958              		.cfi_restore 6
+ 959              		.cfi_restore 5
+ 960              		.cfi_restore 4
+ 961              		.cfi_def_cfa_offset 0
+ 962              	.LVL144:
+ 963 0034 7047     		bx	lr
+ 964              		.cfi_endproc
+ 965              	.LFE23:
+ 967              		.section	.text.rt_strncpy,"ax",%progbits
+ 968              		.align	1
+ 969              		.global	rt_strncpy
+ 970              		.syntax unified
+ 971              		.thumb
+ 972              		.thumb_func
+ 973              		.fpu softvfp
+ 975              	rt_strncpy:
+ 976              	.LFB24:
+ 389:rtthread/src/kservice.c ****     if (n != 0)
+ 977              		.loc 1 389 0
+ 978              		.cfi_startproc
+ 979              		@ args = 0, pretend = 0, frame = 0
+ 980              		@ frame_needed = 0, uses_anonymous_args = 0
+ 981              		@ link register save eliminated.
+ 982              	.LVL145:
+ 390:rtthread/src/kservice.c ****     {
+ 983              		.loc 1 390 0
+ 984 0000 9AB1     		cbz	r2, .L126
+ 389:rtthread/src/kservice.c ****     if (n != 0)
+ 985              		.loc 1 389 0
+ 986 0002 30B4     		push	{r4, r5}
+ 987              	.LCFI19:
+ 988              		.cfi_def_cfa_offset 8
+ 989              		.cfi_offset 4, -8
+ 990              		.cfi_offset 5, -4
+ 991 0004 1346     		mov	r3, r2
+ 992              	.LBB12:
+ 392:rtthread/src/kservice.c ****         const char *s = src;
+ 993              		.loc 1 392 0
+ 994 0006 0446     		mov	r4, r0
+ 995              	.LVL146:
+ 996              	.L123:
+ 397:rtthread/src/kservice.c ****             {
+ 997              		.loc 1 397 0
+ 998 0008 4D1C     		adds	r5, r1, #1
+ 999              	.LVL147:
+ 1000 000a 621C     		adds	r2, r4, #1
+ 1001              	.LVL148:
+ 1002 000c 0978     		ldrb	r1, [r1]	@ zero_extendqisi2
+ 1003 000e 2170     		strb	r1, [r4]
+ 1004 0010 39B1     		cbz	r1, .L120
+ 1005              	.LVL149:
+ARM GAS  /tmp/ccJocHtA.s 			page 34
+
+
+ 1006 0012 1446     		mov	r4, r2
+ 1007 0014 2946     		mov	r1, r5
+ 404:rtthread/src/kservice.c ****     }
+ 1008              		.loc 1 404 0
+ 1009 0016 013B     		subs	r3, r3, #1
+ 1010              	.LVL150:
+ 1011 0018 F6D1     		bne	.L123
+ 1012 001a 04E0     		b	.L119
+ 1013              	.L122:
+ 1014              	.LVL151:
+ 401:rtthread/src/kservice.c ****                 break;
+ 1015              		.loc 1 401 0
+ 1016 001c 0021     		movs	r1, #0
+ 1017 001e 1170     		strb	r1, [r2]
+ 1018 0020 0132     		adds	r2, r2, #1
+ 1019              	.LVL152:
+ 1020              	.L120:
+ 400:rtthread/src/kservice.c ****                     *d++ = 0;
+ 1021              		.loc 1 400 0
+ 1022 0022 013B     		subs	r3, r3, #1
+ 1023              	.LVL153:
+ 1024 0024 FAD1     		bne	.L122
+ 1025              	.L119:
+ 1026              	.LBE12:
+ 408:rtthread/src/kservice.c **** 
+ 1027              		.loc 1 408 0
+ 1028 0026 30BC     		pop	{r4, r5}
+ 1029              	.LCFI20:
+ 1030              		.cfi_restore 5
+ 1031              		.cfi_restore 4
+ 1032              		.cfi_def_cfa_offset 0
+ 1033              	.LVL154:
+ 1034 0028 7047     		bx	lr
+ 1035              	.LVL155:
+ 1036              	.L126:
+ 1037 002a 7047     		bx	lr
+ 1038              		.cfi_endproc
+ 1039              	.LFE24:
+ 1041              		.section	.text.rt_strncmp,"ax",%progbits
+ 1042              		.align	1
+ 1043              		.global	rt_strncmp
+ 1044              		.syntax unified
+ 1045              		.thumb
+ 1046              		.thumb_func
+ 1047              		.fpu softvfp
+ 1049              	rt_strncmp:
+ 1050              	.LFB25:
+ 420:rtthread/src/kservice.c ****     register signed char __res = 0;
+ 1051              		.loc 1 420 0
+ 1052              		.cfi_startproc
+ 1053              		@ args = 0, pretend = 0, frame = 0
+ 1054              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1055              		@ link register save eliminated.
+ 1056              	.LVL156:
+ 421:rtthread/src/kservice.c **** 
+ 1057              		.loc 1 421 0
+ 1058 0000 0023     		movs	r3, #0
+ARM GAS  /tmp/ccJocHtA.s 			page 35
+
+
+ 1059              	.LVL157:
+ 423:rtthread/src/kservice.c ****     {
+ 1060              		.loc 1 423 0
+ 1061 0002 7AB1     		cbz	r2, .L137
+ 420:rtthread/src/kservice.c ****     register signed char __res = 0;
+ 1062              		.loc 1 420 0
+ 1063 0004 30B4     		push	{r4, r5}
+ 1064              	.LCFI21:
+ 1065              		.cfi_def_cfa_offset 8
+ 1066              		.cfi_offset 4, -8
+ 1067              		.cfi_offset 5, -4
+ 1068              	.L132:
+ 425:rtthread/src/kservice.c ****             break;
+ 1069              		.loc 1 425 0
+ 1070 0006 0478     		ldrb	r4, [r0]	@ zero_extendqisi2
+ 1071 0008 4D1C     		adds	r5, r1, #1
+ 1072              	.LVL158:
+ 1073 000a 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 1074              	.LVL159:
+ 1075 000c E31A     		subs	r3, r4, r3
+ 1076 000e 5BB2     		sxtb	r3, r3
+ 1077              	.LVL160:
+ 1078 0010 2BB9     		cbnz	r3, .L131
+ 425:rtthread/src/kservice.c ****             break;
+ 1079              		.loc 1 425 0 is_stmt 0 discriminator 1
+ 1080 0012 0130     		adds	r0, r0, #1
+ 1081              	.LVL161:
+ 1082 0014 1CB1     		cbz	r4, .L131
+ 427:rtthread/src/kservice.c ****     }
+ 1083              		.loc 1 427 0 is_stmt 1
+ 1084 0016 013A     		subs	r2, r2, #1
+ 1085              	.LVL162:
+ 425:rtthread/src/kservice.c ****             break;
+ 1086              		.loc 1 425 0
+ 1087 0018 2946     		mov	r1, r5
+ 423:rtthread/src/kservice.c ****     {
+ 1088              		.loc 1 423 0
+ 1089 001a 002A     		cmp	r2, #0
+ 1090 001c F3D1     		bne	.L132
+ 1091              	.L131:
+ 431:rtthread/src/kservice.c **** 
+ 1092              		.loc 1 431 0
+ 1093 001e 1846     		mov	r0, r3
+ 1094              	.LVL163:
+ 1095 0020 30BC     		pop	{r4, r5}
+ 1096              	.LCFI22:
+ 1097              		.cfi_restore 5
+ 1098              		.cfi_restore 4
+ 1099              		.cfi_def_cfa_offset 0
+ 1100              	.LVL164:
+ 1101 0022 7047     		bx	lr
+ 1102              	.LVL165:
+ 1103              	.L137:
+ 1104 0024 1846     		mov	r0, r3
+ 1105              	.LVL166:
+ 1106 0026 7047     		bx	lr
+ 1107              		.cfi_endproc
+ARM GAS  /tmp/ccJocHtA.s 			page 36
+
+
+ 1108              	.LFE25:
+ 1110              		.section	.text.rt_strcmp,"ax",%progbits
+ 1111              		.align	1
+ 1112              		.global	rt_strcmp
+ 1113              		.syntax unified
+ 1114              		.thumb
+ 1115              		.thumb_func
+ 1116              		.fpu softvfp
+ 1118              	rt_strcmp:
+ 1119              	.LFB26:
+ 442:rtthread/src/kservice.c ****     while (*cs && *cs == *ct)
+ 1120              		.loc 1 442 0
+ 1121              		.cfi_startproc
+ 1122              		@ args = 0, pretend = 0, frame = 0
+ 1123              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1124              		@ link register save eliminated.
+ 1125              	.LVL167:
+ 443:rtthread/src/kservice.c ****     {
+ 1126              		.loc 1 443 0
+ 1127 0000 01E0     		b	.L139
+ 1128              	.L141:
+ 445:rtthread/src/kservice.c ****         ct++;
+ 1129              		.loc 1 445 0
+ 1130 0002 0130     		adds	r0, r0, #1
+ 1131              	.LVL168:
+ 446:rtthread/src/kservice.c ****     }
+ 1132              		.loc 1 446 0
+ 1133 0004 0131     		adds	r1, r1, #1
+ 1134              	.LVL169:
+ 1135              	.L139:
+ 443:rtthread/src/kservice.c ****     {
+ 1136              		.loc 1 443 0
+ 1137 0006 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 1138 0008 13B1     		cbz	r3, .L140
+ 443:rtthread/src/kservice.c ****     {
+ 1139              		.loc 1 443 0 is_stmt 0 discriminator 1
+ 1140 000a 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 1141 000c 9342     		cmp	r3, r2
+ 1142 000e F8D0     		beq	.L141
+ 1143              	.L140:
+ 449:rtthread/src/kservice.c **** }
+ 1144              		.loc 1 449 0 is_stmt 1
+ 1145 0010 0878     		ldrb	r0, [r1]	@ zero_extendqisi2
+ 1146              	.LVL170:
+ 450:rtthread/src/kservice.c **** 
+ 1147              		.loc 1 450 0
+ 1148 0012 181A     		subs	r0, r3, r0
+ 1149 0014 7047     		bx	lr
+ 1150              		.cfi_endproc
+ 1151              	.LFE26:
+ 1153              		.section	.text.rt_strnlen,"ax",%progbits
+ 1154              		.align	1
+ 1155              		.global	rt_strnlen
+ 1156              		.syntax unified
+ 1157              		.thumb
+ 1158              		.thumb_func
+ 1159              		.fpu softvfp
+ARM GAS  /tmp/ccJocHtA.s 			page 37
+
+
+ 1161              	rt_strnlen:
+ 1162              	.LFB27:
+ 464:rtthread/src/kservice.c ****     const char *sc;
+ 1163              		.loc 1 464 0
+ 1164              		.cfi_startproc
+ 1165              		@ args = 0, pretend = 0, frame = 0
+ 1166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1167              		@ link register save eliminated.
+ 1168              	.LVL171:
+ 467:rtthread/src/kservice.c ****         ;
+ 1169              		.loc 1 467 0
+ 1170 0000 0346     		mov	r3, r0
+ 1171 0002 00E0     		b	.L143
+ 1172              	.LVL172:
+ 1173              	.L145:
+ 467:rtthread/src/kservice.c ****         ;
+ 1174              		.loc 1 467 0 is_stmt 0 discriminator 4
+ 1175 0004 0133     		adds	r3, r3, #1
+ 1176              	.LVL173:
+ 1177              	.L143:
+ 467:rtthread/src/kservice.c ****         ;
+ 1178              		.loc 1 467 0 discriminator 1
+ 1179 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 1180 0008 12B1     		cbz	r2, .L144
+ 467:rtthread/src/kservice.c ****         ;
+ 1181              		.loc 1 467 0 discriminator 3
+ 1182 000a 1A1A     		subs	r2, r3, r0
+ 1183 000c 8A42     		cmp	r2, r1
+ 1184 000e F9D3     		bcc	.L145
+ 1185              	.L144:
+ 471:rtthread/src/kservice.c **** 
+ 1186              		.loc 1 471 0 is_stmt 1
+ 1187 0010 181A     		subs	r0, r3, r0
+ 1188              	.LVL174:
+ 1189 0012 7047     		bx	lr
+ 1190              		.cfi_endproc
+ 1191              	.LFE27:
+ 1193              		.section	.text.rt_strlen,"ax",%progbits
+ 1194              		.align	1
+ 1195              		.global	rt_strlen
+ 1196              		.syntax unified
+ 1197              		.thumb
+ 1198              		.thumb_func
+ 1199              		.fpu softvfp
+ 1201              	rt_strlen:
+ 1202              	.LFB28:
+ 482:rtthread/src/kservice.c ****     const char *sc;
+ 1203              		.loc 1 482 0
+ 1204              		.cfi_startproc
+ 1205              		@ args = 0, pretend = 0, frame = 0
+ 1206              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1207              		@ link register save eliminated.
+ 1208              	.LVL175:
+ 485:rtthread/src/kservice.c ****         ;
+ 1209              		.loc 1 485 0
+ 1210 0000 0346     		mov	r3, r0
+ 1211 0002 00E0     		b	.L147
+ARM GAS  /tmp/ccJocHtA.s 			page 38
+
+
+ 1212              	.LVL176:
+ 1213              	.L148:
+ 485:rtthread/src/kservice.c ****         ;
+ 1214              		.loc 1 485 0 is_stmt 0 discriminator 3
+ 1215 0004 0133     		adds	r3, r3, #1
+ 1216              	.LVL177:
+ 1217              	.L147:
+ 485:rtthread/src/kservice.c ****         ;
+ 1218              		.loc 1 485 0 discriminator 1
+ 1219 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 1220 0008 002A     		cmp	r2, #0
+ 1221 000a FBD1     		bne	.L148
+ 489:rtthread/src/kservice.c **** 
+ 1222              		.loc 1 489 0 is_stmt 1
+ 1223 000c 181A     		subs	r0, r3, r0
+ 1224              	.LVL178:
+ 1225 000e 7047     		bx	lr
+ 1226              		.cfi_endproc
+ 1227              	.LFE28:
+ 1229              		.section	.text.rt_strstr,"ax",%progbits
+ 1230              		.align	1
+ 1231              		.global	rt_strstr
+ 1232              		.syntax unified
+ 1233              		.thumb
+ 1234              		.thumb_func
+ 1235              		.fpu softvfp
+ 1237              	rt_strstr:
+ 1238              	.LFB22:
+ 335:rtthread/src/kservice.c ****     int l1, l2;
+ 1239              		.loc 1 335 0
+ 1240              		.cfi_startproc
+ 1241              		@ args = 0, pretend = 0, frame = 0
+ 1242              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1243              	.LVL179:
+ 1244 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1245              	.LCFI23:
+ 1246              		.cfi_def_cfa_offset 24
+ 1247              		.cfi_offset 4, -24
+ 1248              		.cfi_offset 5, -20
+ 1249              		.cfi_offset 6, -16
+ 1250              		.cfi_offset 7, -12
+ 1251              		.cfi_offset 8, -8
+ 1252              		.cfi_offset 14, -4
+ 1253 0004 0446     		mov	r4, r0
+ 1254 0006 0F46     		mov	r7, r1
+ 338:rtthread/src/kservice.c ****     if (!l2)
+ 1255              		.loc 1 338 0
+ 1256 0008 0846     		mov	r0, r1
+ 1257              	.LVL180:
+ 1258 000a FFF7FEFF 		bl	rt_strlen
+ 1259              	.LVL181:
+ 339:rtthread/src/kservice.c ****         return (char *)s1;
+ 1260              		.loc 1 339 0
+ 1261 000e 10B9     		cbnz	r0, .L154
+ 1262              	.LVL182:
+ 1263              	.L150:
+ 351:rtthread/src/kservice.c **** 
+ARM GAS  /tmp/ccJocHtA.s 			page 39
+
+
+ 1264              		.loc 1 351 0
+ 1265 0010 2046     		mov	r0, r4
+ 1266 0012 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1267              	.LVL183:
+ 1268              	.L154:
+ 1269 0016 0646     		mov	r6, r0
+ 1270 0018 8046     		mov	r8, r0
+ 341:rtthread/src/kservice.c ****     while (l1 >= l2)
+ 1271              		.loc 1 341 0
+ 1272 001a 2046     		mov	r0, r4
+ 1273              	.LVL184:
+ 1274 001c FFF7FEFF 		bl	rt_strlen
+ 1275              	.LVL185:
+ 1276 0020 0546     		mov	r5, r0
+ 1277              	.LVL186:
+ 1278              	.L151:
+ 342:rtthread/src/kservice.c ****     {
+ 1279              		.loc 1 342 0
+ 1280 0022 4545     		cmp	r5, r8
+ 1281 0024 09DB     		blt	.L155
+ 344:rtthread/src/kservice.c ****         if (!rt_memcmp(s1, s2, l2))
+ 1282              		.loc 1 344 0
+ 1283 0026 013D     		subs	r5, r5, #1
+ 1284              	.LVL187:
+ 345:rtthread/src/kservice.c ****             return (char *)s1;
+ 1285              		.loc 1 345 0
+ 1286 0028 3246     		mov	r2, r6
+ 1287 002a 3946     		mov	r1, r7
+ 1288 002c 2046     		mov	r0, r4
+ 1289 002e FFF7FEFF 		bl	rt_memcmp
+ 1290              	.LVL188:
+ 1291 0032 0028     		cmp	r0, #0
+ 1292 0034 ECD0     		beq	.L150
+ 347:rtthread/src/kservice.c ****     }
+ 1293              		.loc 1 347 0
+ 1294 0036 0134     		adds	r4, r4, #1
+ 1295              	.LVL189:
+ 1296 0038 F3E7     		b	.L151
+ 1297              	.L155:
+ 350:rtthread/src/kservice.c **** }
+ 1298              		.loc 1 350 0
+ 1299 003a 0024     		movs	r4, #0
+ 1300              	.LVL190:
+ 1301 003c E8E7     		b	.L150
+ 1302              		.cfi_endproc
+ 1303              	.LFE22:
+ 1305              		.section	.text.rt_vsnprintf,"ax",%progbits
+ 1306              		.align	1
+ 1307              		.global	rt_vsnprintf
+ 1308              		.syntax unified
+ 1309              		.thumb
+ 1310              		.thumb_func
+ 1311              		.fpu softvfp
+ 1313              	rt_vsnprintf:
+ 1314              	.LFB33:
+ 760:rtthread/src/kservice.c **** 
+ 761:rtthread/src/kservice.c **** rt_int32_t rt_vsnprintf(char       *buf,
+ARM GAS  /tmp/ccJocHtA.s 			page 40
+
+
+ 762:rtthread/src/kservice.c ****                         rt_size_t   size,
+ 763:rtthread/src/kservice.c ****                         const char *fmt,
+ 764:rtthread/src/kservice.c ****                         va_list     args)
+ 765:rtthread/src/kservice.c **** {
+ 1315              		.loc 1 765 0
+ 1316              		.cfi_startproc
+ 1317              		@ args = 0, pretend = 0, frame = 8
+ 1318              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1319              	.LVL191:
+ 1320 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 1321              	.LCFI24:
+ 1322              		.cfi_def_cfa_offset 24
+ 1323              		.cfi_offset 4, -24
+ 1324              		.cfi_offset 5, -20
+ 1325              		.cfi_offset 6, -16
+ 1326              		.cfi_offset 7, -12
+ 1327              		.cfi_offset 8, -8
+ 1328              		.cfi_offset 14, -4
+ 1329 0004 86B0     		sub	sp, sp, #24
+ 1330              	.LCFI25:
+ 1331              		.cfi_def_cfa_offset 48
+ 1332 0006 0746     		mov	r7, r0
+ 1333 0008 8846     		mov	r8, r1
+ 1334 000a 1446     		mov	r4, r2
+ 1335 000c 0593     		str	r3, [sp, #20]
+ 1336              	.LVL192:
+ 766:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 767:rtthread/src/kservice.c ****     unsigned long long num;
+ 768:rtthread/src/kservice.c **** #else
+ 769:rtthread/src/kservice.c ****     rt_uint32_t num;
+ 770:rtthread/src/kservice.c **** #endif
+ 771:rtthread/src/kservice.c ****     int i, len;
+ 772:rtthread/src/kservice.c ****     char *str, *end, c;
+ 773:rtthread/src/kservice.c ****     const char *s;
+ 774:rtthread/src/kservice.c **** 
+ 775:rtthread/src/kservice.c ****     rt_uint8_t base;            /* the base of number */
+ 776:rtthread/src/kservice.c ****     rt_uint8_t flags;           /* flags to print number */
+ 777:rtthread/src/kservice.c ****     rt_uint8_t qualifier;       /* 'h', 'l', or 'L' for integer fields */
+ 778:rtthread/src/kservice.c ****     rt_int32_t field_width;     /* width of output field */
+ 779:rtthread/src/kservice.c **** 
+ 780:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 781:rtthread/src/kservice.c ****     int precision;      /* min. # of digits for integers and max for a string */
+ 782:rtthread/src/kservice.c **** #endif
+ 783:rtthread/src/kservice.c **** 
+ 784:rtthread/src/kservice.c ****     str = buf;
+ 785:rtthread/src/kservice.c ****     end = buf + size;
+ 786:rtthread/src/kservice.c **** 
+ 787:rtthread/src/kservice.c ****     /* Make sure end is always >= buf */
+ 788:rtthread/src/kservice.c ****     if (end < buf)
+ 1337              		.loc 1 788 0
+ 1338 000e 4618     		adds	r6, r0, r1
+ 1339              	.LVL193:
+ 1340 0010 03D3     		bcc	.L157
+ 1341              	.LVL194:
+ 789:rtthread/src/kservice.c ****     {
+ 790:rtthread/src/kservice.c ****         end  = ((char *) - 1);
+ 791:rtthread/src/kservice.c ****         size = end - buf;
+ARM GAS  /tmp/ccJocHtA.s 			page 41
+
+
+ 1342              		.loc 1 791 0
+ 1343 0012 6FEA0008 		mvn	r8, r0
+ 1344              	.LVL195:
+ 790:rtthread/src/kservice.c ****         size = end - buf;
+ 1345              		.loc 1 790 0
+ 1346 0016 4FF0FF36 		mov	r6, #-1
+ 1347              	.LVL196:
+ 1348              	.L157:
+ 790:rtthread/src/kservice.c ****         size = end - buf;
+ 1349              		.loc 1 790 0 is_stmt 0 discriminator 1
+ 1350 001a 3846     		mov	r0, r7
+ 1351              	.LVL197:
+ 1352 001c 01E0     		b	.L221
+ 1353              	.LVL198:
+ 1354              	.L159:
+ 792:rtthread/src/kservice.c ****     }
+ 793:rtthread/src/kservice.c **** 
+ 794:rtthread/src/kservice.c ****     for (; *fmt ; ++fmt)
+ 795:rtthread/src/kservice.c ****     {
+ 796:rtthread/src/kservice.c ****         if (*fmt != '%')
+ 797:rtthread/src/kservice.c ****         {
+ 798:rtthread/src/kservice.c ****             if (str < end)
+ 799:rtthread/src/kservice.c ****                 *str = *fmt;
+ 800:rtthread/src/kservice.c ****             ++ str;
+ 1355              		.loc 1 800 0 is_stmt 1
+ 1356 001e 0130     		adds	r0, r0, #1
+ 1357              	.LVL199:
+ 1358              	.L160:
+ 794:rtthread/src/kservice.c ****     {
+ 1359              		.loc 1 794 0
+ 1360 0020 0134     		adds	r4, r4, #1
+ 1361              	.LVL200:
+ 1362              	.L221:
+ 794:rtthread/src/kservice.c ****     {
+ 1363              		.loc 1 794 0 is_stmt 0 discriminator 1
+ 1364 0022 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 1365 0024 002B     		cmp	r3, #0
+ 1366 0026 00F07181 		beq	.L239
+ 796:rtthread/src/kservice.c ****         {
+ 1367              		.loc 1 796 0 is_stmt 1
+ 1368 002a 252B     		cmp	r3, #37
+ 1369 002c 03D0     		beq	.L225
+ 798:rtthread/src/kservice.c ****                 *str = *fmt;
+ 1370              		.loc 1 798 0
+ 1371 002e B042     		cmp	r0, r6
+ 1372 0030 F5D2     		bcs	.L159
+ 799:rtthread/src/kservice.c ****             ++ str;
+ 1373              		.loc 1 799 0
+ 1374 0032 0370     		strb	r3, [r0]
+ 1375 0034 F3E7     		b	.L159
+ 1376              	.L225:
+ 801:rtthread/src/kservice.c ****             continue;
+ 802:rtthread/src/kservice.c ****         }
+ 803:rtthread/src/kservice.c **** 
+ 804:rtthread/src/kservice.c ****         /* process flags */
+ 805:rtthread/src/kservice.c ****         flags = 0;
+ 1377              		.loc 1 805 0
+ARM GAS  /tmp/ccJocHtA.s 			page 42
+
+
+ 1378 0036 0021     		movs	r1, #0
+ 1379 0038 02E0     		b	.L158
+ 1380              	.LVL201:
+ 1381              	.L240:
+ 806:rtthread/src/kservice.c **** 
+ 807:rtthread/src/kservice.c ****         while (1)
+ 808:rtthread/src/kservice.c ****         {
+ 809:rtthread/src/kservice.c ****             /* skips the first '%' also */
+ 810:rtthread/src/kservice.c ****             ++ fmt;
+ 811:rtthread/src/kservice.c ****             if (*fmt == '-') flags |= LEFT;
+ 1382              		.loc 1 811 0 discriminator 1
+ 1383 003a 41F01001 		orr	r1, r1, #16
+ 1384              	.LVL202:
+ 1385              	.L162:
+ 765:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 1386              		.loc 1 765 0
+ 1387 003e 1446     		mov	r4, r2
+ 1388              	.LVL203:
+ 1389              	.L158:
+ 810:rtthread/src/kservice.c ****             if (*fmt == '-') flags |= LEFT;
+ 1390              		.loc 1 810 0
+ 1391 0040 621C     		adds	r2, r4, #1
+ 1392              	.LVL204:
+ 1393              		.loc 1 811 0
+ 1394 0042 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+ 1395 0044 2D2B     		cmp	r3, #45
+ 1396 0046 F8D0     		beq	.L240
+ 812:rtthread/src/kservice.c ****             else if (*fmt == '+') flags |= PLUS;
+ 1397              		.loc 1 812 0
+ 1398 0048 2B2B     		cmp	r3, #43
+ 1399 004a 08D0     		beq	.L241
+ 813:rtthread/src/kservice.c ****             else if (*fmt == ' ') flags |= SPACE;
+ 1400              		.loc 1 813 0
+ 1401 004c 202B     		cmp	r3, #32
+ 1402 004e 09D0     		beq	.L242
+ 814:rtthread/src/kservice.c ****             else if (*fmt == '#') flags |= SPECIAL;
+ 1403              		.loc 1 814 0
+ 1404 0050 232B     		cmp	r3, #35
+ 1405 0052 0AD0     		beq	.L243
+ 815:rtthread/src/kservice.c ****             else if (*fmt == '0') flags |= ZEROPAD;
+ 1406              		.loc 1 815 0
+ 1407 0054 302B     		cmp	r3, #48
+ 1408 0056 0BD1     		bne	.L166
+ 1409              		.loc 1 815 0 is_stmt 0 discriminator 1
+ 1410 0058 41F00101 		orr	r1, r1, #1
+ 1411              	.LVL205:
+ 1412 005c EFE7     		b	.L162
+ 1413              	.L241:
+ 812:rtthread/src/kservice.c ****             else if (*fmt == ' ') flags |= SPACE;
+ 1414              		.loc 1 812 0 is_stmt 1 discriminator 1
+ 1415 005e 41F00401 		orr	r1, r1, #4
+ 1416              	.LVL206:
+ 1417 0062 ECE7     		b	.L162
+ 1418              	.L242:
+ 813:rtthread/src/kservice.c ****             else if (*fmt == '#') flags |= SPECIAL;
+ 1419              		.loc 1 813 0 discriminator 1
+ 1420 0064 41F00801 		orr	r1, r1, #8
+ARM GAS  /tmp/ccJocHtA.s 			page 43
+
+
+ 1421              	.LVL207:
+ 1422 0068 E9E7     		b	.L162
+ 1423              	.L243:
+ 814:rtthread/src/kservice.c ****             else if (*fmt == '0') flags |= ZEROPAD;
+ 1424              		.loc 1 814 0 discriminator 1
+ 1425 006a 41F02001 		orr	r1, r1, #32
+ 1426              	.LVL208:
+ 1427 006e E6E7     		b	.L162
+ 1428              	.L166:
+ 1429              	.LVL209:
+ 816:rtthread/src/kservice.c ****             else break;
+ 817:rtthread/src/kservice.c ****         }
+ 818:rtthread/src/kservice.c **** 
+ 819:rtthread/src/kservice.c ****         /* get field width */
+ 820:rtthread/src/kservice.c ****         field_width = -1;
+ 821:rtthread/src/kservice.c ****         if (_ISDIGIT(*fmt)) field_width = skip_atoi(&fmt);
+ 1430              		.loc 1 821 0
+ 1431 0070 A3F13005 		sub	r5, r3, #48
+ 1432 0074 092D     		cmp	r5, #9
+ 1433 0076 20D9     		bls	.L244
+ 822:rtthread/src/kservice.c ****         else if (*fmt == '*')
+ 1434              		.loc 1 822 0
+ 1435 0078 2A2B     		cmp	r3, #42
+ 1436 007a 20D0     		beq	.L245
+ 820:rtthread/src/kservice.c ****         if (_ISDIGIT(*fmt)) field_width = skip_atoi(&fmt);
+ 1437              		.loc 1 820 0
+ 1438 007c 4FF0FF35 		mov	r5, #-1
+ 1439              	.LVL210:
+ 1440              	.L170:
+ 823:rtthread/src/kservice.c ****         {
+ 824:rtthread/src/kservice.c ****             ++ fmt;
+ 825:rtthread/src/kservice.c ****             /* it's the next argument */
+ 826:rtthread/src/kservice.c ****             field_width = va_arg(args, int);
+ 827:rtthread/src/kservice.c ****             if (field_width < 0)
+ 828:rtthread/src/kservice.c ****             {
+ 829:rtthread/src/kservice.c ****                 field_width = -field_width;
+ 830:rtthread/src/kservice.c ****                 flags |= LEFT;
+ 831:rtthread/src/kservice.c ****             }
+ 832:rtthread/src/kservice.c ****         }
+ 833:rtthread/src/kservice.c **** 
+ 834:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 835:rtthread/src/kservice.c ****         /* get the precision */
+ 836:rtthread/src/kservice.c ****         precision = -1;
+ 837:rtthread/src/kservice.c ****         if (*fmt == '.')
+ 1441              		.loc 1 837 0
+ 1442 0080 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 1443 0082 2E2B     		cmp	r3, #46
+ 1444 0084 26D0     		beq	.L246
+ 836:rtthread/src/kservice.c ****         if (*fmt == '.')
+ 1445              		.loc 1 836 0
+ 1446 0086 4FF0FF3C 		mov	ip, #-1
+ 1447              	.LVL211:
+ 1448              	.L171:
+ 838:rtthread/src/kservice.c ****         {
+ 839:rtthread/src/kservice.c ****             ++ fmt;
+ 840:rtthread/src/kservice.c ****             if (_ISDIGIT(*fmt)) precision = skip_atoi(&fmt);
+ 841:rtthread/src/kservice.c ****             else if (*fmt == '*')
+ARM GAS  /tmp/ccJocHtA.s 			page 44
+
+
+ 842:rtthread/src/kservice.c ****             {
+ 843:rtthread/src/kservice.c ****                 ++ fmt;
+ 844:rtthread/src/kservice.c ****                 /* it's the next argument */
+ 845:rtthread/src/kservice.c ****                 precision = va_arg(args, int);
+ 846:rtthread/src/kservice.c ****             }
+ 847:rtthread/src/kservice.c ****             if (precision < 0) precision = 0;
+ 848:rtthread/src/kservice.c ****         }
+ 849:rtthread/src/kservice.c **** #endif
+ 850:rtthread/src/kservice.c ****         /* get the conversion qualifier */
+ 851:rtthread/src/kservice.c ****         qualifier = 0;
+ 852:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 853:rtthread/src/kservice.c ****         if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L')
+ 854:rtthread/src/kservice.c **** #else
+ 855:rtthread/src/kservice.c ****         if (*fmt == 'h' || *fmt == 'l')
+ 1449              		.loc 1 855 0
+ 1450 008a 92F800E0 		ldrb	lr, [r2]	@ zero_extendqisi2
+ 1451 008e BEF1680F 		cmp	lr, #104
+ 1452 0092 4BD0     		beq	.L176
+ 1453              		.loc 1 855 0 is_stmt 0 discriminator 1
+ 1454 0094 BEF16C0F 		cmp	lr, #108
+ 1455 0098 48D0     		beq	.L176
+ 1456 009a 1446     		mov	r4, r2
+ 851:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 1457              		.loc 1 851 0 is_stmt 1
+ 1458 009c 4FF0000E 		mov	lr, #0
+ 1459 00a0 45E0     		b	.L177
+ 1460              	.LVL212:
+ 1461              	.L169:
+ 1462              	.LBB13:
+ 1463              	.LBB14:
+ 576:rtthread/src/kservice.c **** 
+ 1464              		.loc 1 576 0
+ 1465 00a2 05EB8505 		add	r5, r5, r5, lsl #2
+ 1466              	.LVL213:
+ 1467 00a6 6B00     		lsls	r3, r5, #1
+ 1468 00a8 0132     		adds	r2, r2, #1
+ 1469              	.LVL214:
+ 1470 00aa 1D19     		adds	r5, r3, r4
+ 1471 00ac 303D     		subs	r5, r5, #48
+ 1472              	.LVL215:
+ 1473              	.L167:
+ 575:rtthread/src/kservice.c ****         i = i * 10 + *((*s)++) - '0';
+ 1474              		.loc 1 575 0
+ 1475 00ae 1478     		ldrb	r4, [r2]	@ zero_extendqisi2
+ 1476 00b0 A4F13003 		sub	r3, r4, #48
+ 1477 00b4 092B     		cmp	r3, #9
+ 1478 00b6 F4D9     		bls	.L169
+ 1479 00b8 E2E7     		b	.L170
+ 1480              	.LVL216:
+ 1481              	.L244:
+ 574:rtthread/src/kservice.c ****     while (_ISDIGIT(**s))
+ 1482              		.loc 1 574 0
+ 1483 00ba 0025     		movs	r5, #0
+ 1484 00bc F7E7     		b	.L167
+ 1485              	.L245:
+ 1486              	.LBE14:
+ 1487              	.LBE13:
+ARM GAS  /tmp/ccJocHtA.s 			page 45
+
+
+ 824:rtthread/src/kservice.c ****             /* it's the next argument */
+ 1488              		.loc 1 824 0
+ 1489 00be A21C     		adds	r2, r4, #2
+ 1490              	.LVL217:
+ 826:rtthread/src/kservice.c ****             if (field_width < 0)
+ 1491              		.loc 1 826 0
+ 1492 00c0 059B     		ldr	r3, [sp, #20]
+ 1493 00c2 1C1D     		adds	r4, r3, #4
+ 1494 00c4 0594     		str	r4, [sp, #20]
+ 1495 00c6 1D68     		ldr	r5, [r3]
+ 1496              	.LVL218:
+ 827:rtthread/src/kservice.c ****             {
+ 1497              		.loc 1 827 0
+ 1498 00c8 002D     		cmp	r5, #0
+ 1499 00ca D9DA     		bge	.L170
+ 829:rtthread/src/kservice.c ****                 flags |= LEFT;
+ 1500              		.loc 1 829 0
+ 1501 00cc 6D42     		negs	r5, r5
+ 1502              	.LVL219:
+ 830:rtthread/src/kservice.c ****             }
+ 1503              		.loc 1 830 0
+ 1504 00ce 41F01001 		orr	r1, r1, #16
+ 1505              	.LVL220:
+ 1506 00d2 D5E7     		b	.L170
+ 1507              	.LVL221:
+ 1508              	.L246:
+ 839:rtthread/src/kservice.c ****             if (_ISDIGIT(*fmt)) precision = skip_atoi(&fmt);
+ 1509              		.loc 1 839 0
+ 1510 00d4 541C     		adds	r4, r2, #1
+ 1511              	.LVL222:
+ 840:rtthread/src/kservice.c ****             else if (*fmt == '*')
+ 1512              		.loc 1 840 0
+ 1513 00d6 5378     		ldrb	r3, [r2, #1]	@ zero_extendqisi2
+ 1514 00d8 A3F1300C 		sub	ip, r3, #48
+ 1515 00dc BCF1090F 		cmp	ip, #9
+ 1516 00e0 1AD9     		bls	.L247
+ 841:rtthread/src/kservice.c ****             {
+ 1517              		.loc 1 841 0
+ 1518 00e2 2A2B     		cmp	r3, #42
+ 1519 00e4 1BD0     		beq	.L248
+ 839:rtthread/src/kservice.c ****             if (_ISDIGIT(*fmt)) precision = skip_atoi(&fmt);
+ 1520              		.loc 1 839 0
+ 1521 00e6 2246     		mov	r2, r4
+ 847:rtthread/src/kservice.c ****         }
+ 1522              		.loc 1 847 0
+ 1523 00e8 4FF0000C 		mov	ip, #0
+ 1524 00ec CDE7     		b	.L171
+ 1525              	.LVL223:
+ 1526              	.L174:
+ 1527              	.LBB15:
+ 1528              	.LBB16:
+ 576:rtthread/src/kservice.c **** 
+ 1529              		.loc 1 576 0
+ 1530 00ee 0CEB8C0C 		add	ip, ip, ip, lsl #2
+ 1531              	.LVL224:
+ 1532 00f2 4FEA4C03 		lsl	r3, ip, #1
+ 1533 00f6 0134     		adds	r4, r4, #1
+ARM GAS  /tmp/ccJocHtA.s 			page 46
+
+
+ 1534              	.LVL225:
+ 1535 00f8 03EB020C 		add	ip, r3, r2
+ 1536 00fc ACF1300C 		sub	ip, ip, #48
+ 1537              	.LVL226:
+ 1538              	.L172:
+ 575:rtthread/src/kservice.c ****         i = i * 10 + *((*s)++) - '0';
+ 1539              		.loc 1 575 0
+ 1540 0100 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 1541 0102 A2F13003 		sub	r3, r2, #48
+ 1542 0106 092B     		cmp	r3, #9
+ 1543 0108 F1D9     		bls	.L174
+ 1544 010a 2246     		mov	r2, r4
+ 1545              	.LVL227:
+ 1546              	.L175:
+ 1547              	.LBE16:
+ 1548              	.LBE15:
+ 847:rtthread/src/kservice.c ****         }
+ 1549              		.loc 1 847 0
+ 1550 010c BCF1000F 		cmp	ip, #0
+ 1551 0110 BBDA     		bge	.L171
+ 1552 0112 4FF0000C 		mov	ip, #0
+ 1553              	.LVL228:
+ 1554 0116 B8E7     		b	.L171
+ 1555              	.LVL229:
+ 1556              	.L247:
+ 1557              	.LBB18:
+ 1558              	.LBB17:
+ 574:rtthread/src/kservice.c ****     while (_ISDIGIT(**s))
+ 1559              		.loc 1 574 0
+ 1560 0118 4FF0000C 		mov	ip, #0
+ 1561 011c F0E7     		b	.L172
+ 1562              	.L248:
+ 1563              	.LBE17:
+ 1564              	.LBE18:
+ 843:rtthread/src/kservice.c ****                 /* it's the next argument */
+ 1565              		.loc 1 843 0
+ 1566 011e 0232     		adds	r2, r2, #2
+ 1567              	.LVL230:
+ 845:rtthread/src/kservice.c ****             }
+ 1568              		.loc 1 845 0
+ 1569 0120 059B     		ldr	r3, [sp, #20]
+ 1570 0122 1C1D     		adds	r4, r3, #4
+ 1571 0124 0594     		str	r4, [sp, #20]
+ 1572 0126 D3F800C0 		ldr	ip, [r3]
+ 1573 012a EFE7     		b	.L175
+ 1574              	.LVL231:
+ 1575              	.L176:
+ 856:rtthread/src/kservice.c **** #endif
+ 857:rtthread/src/kservice.c ****         {
+ 858:rtthread/src/kservice.c ****             qualifier = *fmt;
+ 859:rtthread/src/kservice.c ****             ++ fmt;
+ 1576              		.loc 1 859 0
+ 1577 012c 541C     		adds	r4, r2, #1
+ 1578              	.LVL232:
+ 1579              	.L177:
+ 860:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 861:rtthread/src/kservice.c ****             if (qualifier == 'l' && *fmt == 'l')
+ARM GAS  /tmp/ccJocHtA.s 			page 47
+
+
+ 862:rtthread/src/kservice.c ****             {
+ 863:rtthread/src/kservice.c ****                 qualifier = 'L';
+ 864:rtthread/src/kservice.c ****                 ++ fmt;
+ 865:rtthread/src/kservice.c ****             }
+ 866:rtthread/src/kservice.c **** #endif
+ 867:rtthread/src/kservice.c ****         }
+ 868:rtthread/src/kservice.c **** 
+ 869:rtthread/src/kservice.c ****         /* the default base */
+ 870:rtthread/src/kservice.c ****         base = 10;
+ 871:rtthread/src/kservice.c **** 
+ 872:rtthread/src/kservice.c ****         switch (*fmt)
+ 1580              		.loc 1 872 0
+ 1581 012e 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 1582 0130 253B     		subs	r3, r3, #37
+ 1583 0132 532B     		cmp	r3, #83
+ 1584 0134 00F2AE80 		bhi	.L178
+ 1585 0138 DFE803F0 		tbb	[pc, r3]
+ 1586              	.L180:
+ 1587 013c 9C       		.byte	(.L179-.L180)/2
+ 1588 013d AC       		.byte	(.L178-.L180)/2
+ 1589 013e AC       		.byte	(.L178-.L180)/2
+ 1590 013f AC       		.byte	(.L178-.L180)/2
+ 1591 0140 AC       		.byte	(.L178-.L180)/2
+ 1592 0141 AC       		.byte	(.L178-.L180)/2
+ 1593 0142 AC       		.byte	(.L178-.L180)/2
+ 1594 0143 AC       		.byte	(.L178-.L180)/2
+ 1595 0144 AC       		.byte	(.L178-.L180)/2
+ 1596 0145 AC       		.byte	(.L178-.L180)/2
+ 1597 0146 AC       		.byte	(.L178-.L180)/2
+ 1598 0147 AC       		.byte	(.L178-.L180)/2
+ 1599 0148 AC       		.byte	(.L178-.L180)/2
+ 1600 0149 AC       		.byte	(.L178-.L180)/2
+ 1601 014a AC       		.byte	(.L178-.L180)/2
+ 1602 014b AC       		.byte	(.L178-.L180)/2
+ 1603 014c AC       		.byte	(.L178-.L180)/2
+ 1604 014d AC       		.byte	(.L178-.L180)/2
+ 1605 014e AC       		.byte	(.L178-.L180)/2
+ 1606 014f AC       		.byte	(.L178-.L180)/2
+ 1607 0150 AC       		.byte	(.L178-.L180)/2
+ 1608 0151 AC       		.byte	(.L178-.L180)/2
+ 1609 0152 AC       		.byte	(.L178-.L180)/2
+ 1610 0153 AC       		.byte	(.L178-.L180)/2
+ 1611 0154 AC       		.byte	(.L178-.L180)/2
+ 1612 0155 AC       		.byte	(.L178-.L180)/2
+ 1613 0156 AC       		.byte	(.L178-.L180)/2
+ 1614 0157 AC       		.byte	(.L178-.L180)/2
+ 1615 0158 AC       		.byte	(.L178-.L180)/2
+ 1616 0159 AC       		.byte	(.L178-.L180)/2
+ 1617 015a AC       		.byte	(.L178-.L180)/2
+ 1618 015b AC       		.byte	(.L178-.L180)/2
+ 1619 015c AC       		.byte	(.L178-.L180)/2
+ 1620 015d AC       		.byte	(.L178-.L180)/2
+ 1621 015e AC       		.byte	(.L178-.L180)/2
+ 1622 015f AC       		.byte	(.L178-.L180)/2
+ 1623 0160 AC       		.byte	(.L178-.L180)/2
+ 1624 0161 AC       		.byte	(.L178-.L180)/2
+ 1625 0162 AC       		.byte	(.L178-.L180)/2
+ARM GAS  /tmp/ccJocHtA.s 			page 48
+
+
+ 1626 0163 AC       		.byte	(.L178-.L180)/2
+ 1627 0164 AC       		.byte	(.L178-.L180)/2
+ 1628 0165 AC       		.byte	(.L178-.L180)/2
+ 1629 0166 AC       		.byte	(.L178-.L180)/2
+ 1630 0167 AC       		.byte	(.L178-.L180)/2
+ 1631 0168 AC       		.byte	(.L178-.L180)/2
+ 1632 0169 AC       		.byte	(.L178-.L180)/2
+ 1633 016a AC       		.byte	(.L178-.L180)/2
+ 1634 016b AC       		.byte	(.L178-.L180)/2
+ 1635 016c AC       		.byte	(.L178-.L180)/2
+ 1636 016d AC       		.byte	(.L178-.L180)/2
+ 1637 016e AC       		.byte	(.L178-.L180)/2
+ 1638 016f A4       		.byte	(.L181-.L180)/2
+ 1639 0170 AC       		.byte	(.L178-.L180)/2
+ 1640 0171 AC       		.byte	(.L178-.L180)/2
+ 1641 0172 AC       		.byte	(.L178-.L180)/2
+ 1642 0173 AC       		.byte	(.L178-.L180)/2
+ 1643 0174 AC       		.byte	(.L178-.L180)/2
+ 1644 0175 AC       		.byte	(.L178-.L180)/2
+ 1645 0176 AC       		.byte	(.L178-.L180)/2
+ 1646 0177 AC       		.byte	(.L178-.L180)/2
+ 1647 0178 AC       		.byte	(.L178-.L180)/2
+ 1648 0179 AC       		.byte	(.L178-.L180)/2
+ 1649 017a 2A       		.byte	(.L182-.L180)/2
+ 1650 017b A8       		.byte	(.L183-.L180)/2
+ 1651 017c AC       		.byte	(.L178-.L180)/2
+ 1652 017d AC       		.byte	(.L178-.L180)/2
+ 1653 017e AC       		.byte	(.L178-.L180)/2
+ 1654 017f AC       		.byte	(.L178-.L180)/2
+ 1655 0180 A8       		.byte	(.L183-.L180)/2
+ 1656 0181 AC       		.byte	(.L178-.L180)/2
+ 1657 0182 AC       		.byte	(.L178-.L180)/2
+ 1658 0183 AC       		.byte	(.L178-.L180)/2
+ 1659 0184 AC       		.byte	(.L178-.L180)/2
+ 1660 0185 AC       		.byte	(.L178-.L180)/2
+ 1661 0186 A2       		.byte	(.L184-.L180)/2
+ 1662 0187 88       		.byte	(.L185-.L180)/2
+ 1663 0188 AC       		.byte	(.L178-.L180)/2
+ 1664 0189 AC       		.byte	(.L178-.L180)/2
+ 1665 018a 49       		.byte	(.L186-.L180)/2
+ 1666 018b AC       		.byte	(.L178-.L180)/2
+ 1667 018c BB       		.byte	(.L187-.L180)/2
+ 1668 018d AC       		.byte	(.L178-.L180)/2
+ 1669 018e AC       		.byte	(.L178-.L180)/2
+ 1670 018f BD       		.byte	(.L233-.L180)/2
+ 1671              		.p2align 1
+ 1672              	.L182:
+ 873:rtthread/src/kservice.c ****         {
+ 874:rtthread/src/kservice.c ****         case 'c':
+ 875:rtthread/src/kservice.c ****             if (!(flags & LEFT))
+ 1673              		.loc 1 875 0
+ 1674 0190 11F0100F 		tst	r1, #16
+ 1675 0194 09D0     		beq	.L189
+ 1676              	.L190:
+ 876:rtthread/src/kservice.c ****             {
+ 877:rtthread/src/kservice.c ****                 while (--field_width > 0)
+ 878:rtthread/src/kservice.c ****                 {
+ARM GAS  /tmp/ccJocHtA.s 			page 49
+
+
+ 879:rtthread/src/kservice.c ****                     if (str < end) *str = ' ';
+ 880:rtthread/src/kservice.c ****                     ++ str;
+ 881:rtthread/src/kservice.c ****                 }
+ 882:rtthread/src/kservice.c ****             }
+ 883:rtthread/src/kservice.c **** 
+ 884:rtthread/src/kservice.c ****             /* get character */
+ 885:rtthread/src/kservice.c ****             c = (rt_uint8_t)va_arg(args, int);
+ 1677              		.loc 1 885 0
+ 1678 0196 059B     		ldr	r3, [sp, #20]
+ 1679 0198 1A1D     		adds	r2, r3, #4
+ 1680 019a 0592     		str	r2, [sp, #20]
+ 1681 019c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1682              	.LVL233:
+ 886:rtthread/src/kservice.c ****             if (str < end) *str = c;
+ 1683              		.loc 1 886 0
+ 1684 019e B042     		cmp	r0, r6
+ 1685 01a0 00D2     		bcs	.L193
+ 1686              		.loc 1 886 0 is_stmt 0 discriminator 1
+ 1687 01a2 0370     		strb	r3, [r0]
+ 1688              	.L193:
+ 887:rtthread/src/kservice.c ****             ++ str;
+ 1689              		.loc 1 887 0 is_stmt 1
+ 1690 01a4 0130     		adds	r0, r0, #1
+ 1691              	.LVL234:
+ 888:rtthread/src/kservice.c **** 
+ 889:rtthread/src/kservice.c ****             /* put width */
+ 890:rtthread/src/kservice.c ****             while (--field_width > 0)
+ 1692              		.loc 1 890 0
+ 1693 01a6 09E0     		b	.L194
+ 1694              	.LVL235:
+ 1695              	.L191:
+ 880:rtthread/src/kservice.c ****                 }
+ 1696              		.loc 1 880 0
+ 1697 01a8 0130     		adds	r0, r0, #1
+ 1698              	.LVL236:
+ 1699              	.L189:
+ 877:rtthread/src/kservice.c ****                 {
+ 1700              		.loc 1 877 0
+ 1701 01aa 013D     		subs	r5, r5, #1
+ 1702              	.LVL237:
+ 1703 01ac 002D     		cmp	r5, #0
+ 1704 01ae F2DD     		ble	.L190
+ 879:rtthread/src/kservice.c ****                     ++ str;
+ 1705              		.loc 1 879 0
+ 1706 01b0 B042     		cmp	r0, r6
+ 1707 01b2 F9D2     		bcs	.L191
+ 879:rtthread/src/kservice.c ****                     ++ str;
+ 1708              		.loc 1 879 0 is_stmt 0 discriminator 1
+ 1709 01b4 2023     		movs	r3, #32
+ 1710 01b6 0370     		strb	r3, [r0]
+ 1711 01b8 F6E7     		b	.L191
+ 1712              	.L195:
+ 891:rtthread/src/kservice.c ****             {
+ 892:rtthread/src/kservice.c ****                 if (str < end) *str = ' ';
+ 893:rtthread/src/kservice.c ****                 ++ str;
+ 1713              		.loc 1 893 0 is_stmt 1
+ 1714 01ba 0130     		adds	r0, r0, #1
+ARM GAS  /tmp/ccJocHtA.s 			page 50
+
+
+ 1715              	.LVL238:
+ 1716              	.L194:
+ 890:rtthread/src/kservice.c ****             {
+ 1717              		.loc 1 890 0
+ 1718 01bc 013D     		subs	r5, r5, #1
+ 1719              	.LVL239:
+ 1720 01be 002D     		cmp	r5, #0
+ 1721 01c0 7FF72EAF 		ble	.L160
+ 892:rtthread/src/kservice.c ****                 ++ str;
+ 1722              		.loc 1 892 0
+ 1723 01c4 B042     		cmp	r0, r6
+ 1724 01c6 F8D2     		bcs	.L195
+ 892:rtthread/src/kservice.c ****                 ++ str;
+ 1725              		.loc 1 892 0 is_stmt 0 discriminator 1
+ 1726 01c8 2023     		movs	r3, #32
+ 1727 01ca 0370     		strb	r3, [r0]
+ 1728 01cc F5E7     		b	.L195
+ 1729              	.L186:
+ 894:rtthread/src/kservice.c ****             }
+ 895:rtthread/src/kservice.c ****             continue;
+ 896:rtthread/src/kservice.c **** 
+ 897:rtthread/src/kservice.c ****         case 's':
+ 898:rtthread/src/kservice.c ****             s = va_arg(args, char *);
+ 1730              		.loc 1 898 0 is_stmt 1
+ 1731 01ce 059B     		ldr	r3, [sp, #20]
+ 1732 01d0 1A1D     		adds	r2, r3, #4
+ 1733 01d2 0592     		str	r2, [sp, #20]
+ 1734 01d4 1A68     		ldr	r2, [r3]
+ 899:rtthread/src/kservice.c ****             if (!s) s = "(NULL)";
+ 1735              		.loc 1 899 0
+ 1736 01d6 0AB1     		cbz	r2, .L249
+ 1737              	.L197:
+ 1738              	.LVL240:
+ 900:rtthread/src/kservice.c **** 
+ 901:rtthread/src/kservice.c ****             for (len = 0; (len != field_width) && (s[len] != '\0'); len++);
+ 1739              		.loc 1 901 0
+ 1740 01d8 0023     		movs	r3, #0
+ 1741 01da 02E0     		b	.L198
+ 1742              	.LVL241:
+ 1743              	.L249:
+ 899:rtthread/src/kservice.c ****             if (!s) s = "(NULL)";
+ 1744              		.loc 1 899 0
+ 1745 01dc 524A     		ldr	r2, .L255
+ 1746 01de FBE7     		b	.L197
+ 1747              	.LVL242:
+ 1748              	.L200:
+ 1749              		.loc 1 901 0 discriminator 4
+ 1750 01e0 0133     		adds	r3, r3, #1
+ 1751              	.LVL243:
+ 1752              	.L198:
+ 1753              		.loc 1 901 0 is_stmt 0 discriminator 1
+ 1754 01e2 AB42     		cmp	r3, r5
+ 1755 01e4 04D0     		beq	.L199
+ 1756              		.loc 1 901 0 discriminator 3
+ 1757 01e6 12F803E0 		ldrb	lr, [r2, r3]	@ zero_extendqisi2
+ 1758 01ea BEF1000F 		cmp	lr, #0
+ 1759 01ee F7D1     		bne	.L200
+ARM GAS  /tmp/ccJocHtA.s 			page 51
+
+
+ 1760              	.L199:
+ 902:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 903:rtthread/src/kservice.c ****             if (precision > 0 && len > precision) len = precision;
+ 1761              		.loc 1 903 0 is_stmt 1
+ 1762 01f0 BCF1000F 		cmp	ip, #0
+ 1763 01f4 02DD     		ble	.L201
+ 1764              		.loc 1 903 0 is_stmt 0 discriminator 1
+ 1765 01f6 6345     		cmp	r3, ip
+ 1766 01f8 00DD     		ble	.L201
+ 1767              		.loc 1 903 0
+ 1768 01fa 6346     		mov	r3, ip
+ 1769              	.LVL244:
+ 1770              	.L201:
+ 904:rtthread/src/kservice.c **** #endif
+ 905:rtthread/src/kservice.c **** 
+ 906:rtthread/src/kservice.c ****             if (!(flags & LEFT))
+ 1771              		.loc 1 906 0 is_stmt 1
+ 1772 01fc 11F0100F 		tst	r1, #16
+ 1773 0200 03D0     		beq	.L202
+ 1774              	.LVL245:
+ 1775              	.L203:
+ 907:rtthread/src/kservice.c ****             {
+ 908:rtthread/src/kservice.c ****                 while (len < field_width--)
+ 909:rtthread/src/kservice.c ****                 {
+ 910:rtthread/src/kservice.c ****                     if (str < end) *str = ' ';
+ 911:rtthread/src/kservice.c ****                     ++ str;
+ 912:rtthread/src/kservice.c ****                 }
+ 913:rtthread/src/kservice.c ****             }
+ 914:rtthread/src/kservice.c **** 
+ 915:rtthread/src/kservice.c ****             for (i = 0; i < len; ++i)
+ 1776              		.loc 1 915 0
+ 1777 0202 0021     		movs	r1, #0
+ 1778 0204 0EE0     		b	.L206
+ 1779              	.LVL246:
+ 1780              	.L204:
+ 911:rtthread/src/kservice.c ****                 }
+ 1781              		.loc 1 911 0
+ 1782 0206 0130     		adds	r0, r0, #1
+ 1783              	.LVL247:
+ 908:rtthread/src/kservice.c ****                 {
+ 1784              		.loc 1 908 0
+ 1785 0208 0D46     		mov	r5, r1
+ 1786              	.LVL248:
+ 1787              	.L202:
+ 1788 020a 691E     		subs	r1, r5, #1
+ 1789              	.LVL249:
+ 1790 020c AB42     		cmp	r3, r5
+ 1791 020e 04DA     		bge	.L250
+ 910:rtthread/src/kservice.c ****                     ++ str;
+ 1792              		.loc 1 910 0
+ 1793 0210 B042     		cmp	r0, r6
+ 1794 0212 F8D2     		bcs	.L204
+ 910:rtthread/src/kservice.c ****                     ++ str;
+ 1795              		.loc 1 910 0 is_stmt 0 discriminator 1
+ 1796 0214 2025     		movs	r5, #32
+ 1797 0216 0570     		strb	r5, [r0]
+ 1798 0218 F5E7     		b	.L204
+ARM GAS  /tmp/ccJocHtA.s 			page 52
+
+
+ 1799              	.L250:
+ 908:rtthread/src/kservice.c ****                 {
+ 1800              		.loc 1 908 0 is_stmt 1
+ 1801 021a 0D46     		mov	r5, r1
+ 1802 021c F1E7     		b	.L203
+ 1803              	.LVL250:
+ 1804              	.L207:
+ 916:rtthread/src/kservice.c ****             {
+ 917:rtthread/src/kservice.c ****                 if (str < end) *str = *s;
+ 918:rtthread/src/kservice.c ****                 ++ str;
+ 1805              		.loc 1 918 0 discriminator 2
+ 1806 021e 0130     		adds	r0, r0, #1
+ 1807              	.LVL251:
+ 919:rtthread/src/kservice.c ****                 ++ s;
+ 1808              		.loc 1 919 0 discriminator 2
+ 1809 0220 0132     		adds	r2, r2, #1
+ 1810              	.LVL252:
+ 915:rtthread/src/kservice.c ****             {
+ 1811              		.loc 1 915 0 discriminator 2
+ 1812 0222 0131     		adds	r1, r1, #1
+ 1813              	.LVL253:
+ 1814              	.L206:
+ 915:rtthread/src/kservice.c ****             {
+ 1815              		.loc 1 915 0 is_stmt 0 discriminator 1
+ 1816 0224 9942     		cmp	r1, r3
+ 1817 0226 08DA     		bge	.L209
+ 917:rtthread/src/kservice.c ****                 ++ str;
+ 1818              		.loc 1 917 0 is_stmt 1
+ 1819 0228 B042     		cmp	r0, r6
+ 1820 022a F8D2     		bcs	.L207
+ 917:rtthread/src/kservice.c ****                 ++ str;
+ 1821              		.loc 1 917 0 is_stmt 0 discriminator 1
+ 1822 022c 92F800C0 		ldrb	ip, [r2]	@ zero_extendqisi2
+ 1823 0230 80F800C0 		strb	ip, [r0]
+ 1824 0234 F3E7     		b	.L207
+ 1825              	.LVL254:
+ 1826              	.L210:
+ 920:rtthread/src/kservice.c ****             }
+ 921:rtthread/src/kservice.c **** 
+ 922:rtthread/src/kservice.c ****             while (len < field_width--)
+ 923:rtthread/src/kservice.c ****             {
+ 924:rtthread/src/kservice.c ****                 if (str < end) *str = ' ';
+ 925:rtthread/src/kservice.c ****                 ++ str;
+ 1827              		.loc 1 925 0 is_stmt 1
+ 1828 0236 0130     		adds	r0, r0, #1
+ 1829              	.LVL255:
+ 922:rtthread/src/kservice.c ****             {
+ 1830              		.loc 1 922 0
+ 1831 0238 1546     		mov	r5, r2
+ 1832              	.LVL256:
+ 1833              	.L209:
+ 1834 023a 6A1E     		subs	r2, r5, #1
+ 1835              	.LVL257:
+ 1836 023c AB42     		cmp	r3, r5
+ 1837 023e BFF6EFAE 		bge	.L160
+ 924:rtthread/src/kservice.c ****                 ++ str;
+ 1838              		.loc 1 924 0
+ARM GAS  /tmp/ccJocHtA.s 			page 53
+
+
+ 1839 0242 B042     		cmp	r0, r6
+ 1840 0244 F7D2     		bcs	.L210
+ 924:rtthread/src/kservice.c ****                 ++ str;
+ 1841              		.loc 1 924 0 is_stmt 0 discriminator 1
+ 1842 0246 2021     		movs	r1, #32
+ 1843 0248 0170     		strb	r1, [r0]
+ 1844 024a F4E7     		b	.L210
+ 1845              	.LVL258:
+ 1846              	.L185:
+ 926:rtthread/src/kservice.c ****             }
+ 927:rtthread/src/kservice.c ****             continue;
+ 928:rtthread/src/kservice.c **** 
+ 929:rtthread/src/kservice.c ****         case 'p':
+ 930:rtthread/src/kservice.c ****             if (field_width == -1)
+ 1847              		.loc 1 930 0 is_stmt 1
+ 1848 024c B5F1FF3F 		cmp	r5, #-1
+ 1849 0250 0CD0     		beq	.L251
+ 1850              	.LVL259:
+ 1851              	.L212:
+ 931:rtthread/src/kservice.c ****             {
+ 932:rtthread/src/kservice.c ****                 field_width = sizeof(void *) << 1;
+ 933:rtthread/src/kservice.c ****                 flags |= ZEROPAD;
+ 934:rtthread/src/kservice.c ****             }
+ 935:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+ 936:rtthread/src/kservice.c ****             str = print_number(str, end,
+ 937:rtthread/src/kservice.c ****                                (long)va_arg(args, void *),
+ 1852              		.loc 1 937 0
+ 1853 0252 059B     		ldr	r3, [sp, #20]
+ 1854 0254 1A1D     		adds	r2, r3, #4
+ 1855 0256 0592     		str	r2, [sp, #20]
+ 1856 0258 1A68     		ldr	r2, [r3]
+ 936:rtthread/src/kservice.c ****                                (long)va_arg(args, void *),
+ 1857              		.loc 1 936 0
+ 1858 025a 0291     		str	r1, [sp, #8]
+ 1859 025c CDF804C0 		str	ip, [sp, #4]
+ 1860 0260 0095     		str	r5, [sp]
+ 1861 0262 1023     		movs	r3, #16
+ 1862 0264 3146     		mov	r1, r6
+ 1863              	.LVL260:
+ 1864 0266 FFF7FEFF 		bl	print_number
+ 1865              	.LVL261:
+ 938:rtthread/src/kservice.c ****                                16, field_width, precision, flags);
+ 939:rtthread/src/kservice.c **** #else
+ 940:rtthread/src/kservice.c ****             str = print_number(str, end,
+ 941:rtthread/src/kservice.c ****                                (long)va_arg(args, void *),
+ 942:rtthread/src/kservice.c ****                                16, field_width, flags);
+ 943:rtthread/src/kservice.c **** #endif
+ 944:rtthread/src/kservice.c ****             continue;
+ 1866              		.loc 1 944 0
+ 1867 026a D9E6     		b	.L160
+ 1868              	.LVL262:
+ 1869              	.L251:
+ 933:rtthread/src/kservice.c ****             }
+ 1870              		.loc 1 933 0
+ 1871 026c 41F00101 		orr	r1, r1, #1
+ 1872              	.LVL263:
+ 932:rtthread/src/kservice.c ****                 flags |= ZEROPAD;
+ARM GAS  /tmp/ccJocHtA.s 			page 54
+
+
+ 1873              		.loc 1 932 0
+ 1874 0270 0825     		movs	r5, #8
+ 1875 0272 EEE7     		b	.L212
+ 1876              	.LVL264:
+ 1877              	.L179:
+ 945:rtthread/src/kservice.c **** 
+ 946:rtthread/src/kservice.c ****         case '%':
+ 947:rtthread/src/kservice.c ****             if (str < end) *str = '%';
+ 1878              		.loc 1 947 0
+ 1879 0274 B042     		cmp	r0, r6
+ 1880 0276 01D2     		bcs	.L213
+ 1881              		.loc 1 947 0 is_stmt 0 discriminator 1
+ 1882 0278 2523     		movs	r3, #37
+ 1883 027a 0370     		strb	r3, [r0]
+ 1884              	.L213:
+ 948:rtthread/src/kservice.c ****             ++ str;
+ 1885              		.loc 1 948 0 is_stmt 1
+ 1886 027c 0130     		adds	r0, r0, #1
+ 1887              	.LVL265:
+ 949:rtthread/src/kservice.c ****             continue;
+ 1888              		.loc 1 949 0
+ 1889 027e CFE6     		b	.L160
+ 1890              	.L184:
+ 1891              	.LVL266:
+ 950:rtthread/src/kservice.c **** 
+ 951:rtthread/src/kservice.c ****         /* integer number formats - set up the flags and "break" */
+ 952:rtthread/src/kservice.c ****         case 'o':
+ 953:rtthread/src/kservice.c ****             base = 8;
+ 1892              		.loc 1 953 0
+ 1893 0280 0823     		movs	r3, #8
+ 954:rtthread/src/kservice.c ****             break;
+ 1894              		.loc 1 954 0
+ 1895 0282 19E0     		b	.L188
+ 1896              	.LVL267:
+ 1897              	.L181:
+ 955:rtthread/src/kservice.c **** 
+ 956:rtthread/src/kservice.c ****         case 'X':
+ 957:rtthread/src/kservice.c ****             flags |= LARGE;
+ 1898              		.loc 1 957 0
+ 1899 0284 41F04001 		orr	r1, r1, #64
+ 1900              	.LVL268:
+ 958:rtthread/src/kservice.c ****         case 'x':
+ 959:rtthread/src/kservice.c ****             base = 16;
+ 1901              		.loc 1 959 0
+ 1902 0288 1023     		movs	r3, #16
+ 1903 028a 15E0     		b	.L188
+ 1904              	.L183:
+ 960:rtthread/src/kservice.c ****             break;
+ 961:rtthread/src/kservice.c **** 
+ 962:rtthread/src/kservice.c ****         case 'd':
+ 963:rtthread/src/kservice.c ****         case 'i':
+ 964:rtthread/src/kservice.c ****             flags |= SIGN;
+ 1905              		.loc 1 964 0
+ 1906 028c 41F00201 		orr	r1, r1, #2
+ 1907              	.LVL269:
+ 870:rtthread/src/kservice.c **** 
+ 1908              		.loc 1 870 0
+ARM GAS  /tmp/ccJocHtA.s 			page 55
+
+
+ 1909 0290 0A23     		movs	r3, #10
+ 1910 0292 11E0     		b	.L188
+ 1911              	.L178:
+ 965:rtthread/src/kservice.c ****         case 'u':
+ 966:rtthread/src/kservice.c ****             break;
+ 967:rtthread/src/kservice.c **** 
+ 968:rtthread/src/kservice.c ****         default:
+ 969:rtthread/src/kservice.c ****             if (str < end) *str = '%';
+ 1912              		.loc 1 969 0
+ 1913 0294 B042     		cmp	r0, r6
+ 1914 0296 01D2     		bcs	.L214
+ 1915              		.loc 1 969 0 is_stmt 0 discriminator 1
+ 1916 0298 2523     		movs	r3, #37
+ 1917 029a 0370     		strb	r3, [r0]
+ 1918              	.L214:
+ 970:rtthread/src/kservice.c ****             ++ str;
+ 1919              		.loc 1 970 0 is_stmt 1
+ 1920 029c 421C     		adds	r2, r0, #1
+ 1921              	.LVL270:
+ 971:rtthread/src/kservice.c **** 
+ 972:rtthread/src/kservice.c ****             if (*fmt)
+ 1922              		.loc 1 972 0
+ 1923 029e 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 1924 02a0 23B1     		cbz	r3, .L215
+ 973:rtthread/src/kservice.c ****             {
+ 974:rtthread/src/kservice.c ****                 if (str < end) *str = *fmt;
+ 1925              		.loc 1 974 0
+ 1926 02a2 B242     		cmp	r2, r6
+ 1927 02a4 00D2     		bcs	.L216
+ 1928              		.loc 1 974 0 is_stmt 0 discriminator 1
+ 1929 02a6 4370     		strb	r3, [r0, #1]
+ 1930              	.L216:
+ 975:rtthread/src/kservice.c ****                 ++ str;
+ 1931              		.loc 1 975 0 is_stmt 1
+ 1932 02a8 0230     		adds	r0, r0, #2
+ 1933              	.LVL271:
+ 1934 02aa B9E6     		b	.L160
+ 1935              	.LVL272:
+ 1936              	.L215:
+ 976:rtthread/src/kservice.c ****             }
+ 977:rtthread/src/kservice.c ****             else
+ 978:rtthread/src/kservice.c ****             {
+ 979:rtthread/src/kservice.c ****                 -- fmt;
+ 1937              		.loc 1 979 0
+ 1938 02ac 013C     		subs	r4, r4, #1
+ 1939              	.LVL273:
+ 970:rtthread/src/kservice.c **** 
+ 1940              		.loc 1 970 0
+ 1941 02ae 1046     		mov	r0, r2
+ 1942              	.LVL274:
+ 980:rtthread/src/kservice.c ****             }
+ 981:rtthread/src/kservice.c ****             continue;
+ 1943              		.loc 1 981 0
+ 1944 02b0 B6E6     		b	.L160
+ 1945              	.L187:
+ 870:rtthread/src/kservice.c **** 
+ 1946              		.loc 1 870 0
+ARM GAS  /tmp/ccJocHtA.s 			page 56
+
+
+ 1947 02b2 0A23     		movs	r3, #10
+ 1948 02b4 00E0     		b	.L188
+ 1949              	.L233:
+ 959:rtthread/src/kservice.c ****             break;
+ 1950              		.loc 1 959 0
+ 1951 02b6 1023     		movs	r3, #16
+ 1952              	.LVL275:
+ 1953              	.L188:
+ 982:rtthread/src/kservice.c ****         }
+ 983:rtthread/src/kservice.c **** 
+ 984:rtthread/src/kservice.c **** #ifdef RT_PRINTF_LONGLONG
+ 985:rtthread/src/kservice.c ****         if (qualifier == 'L') num = va_arg(args, long long);
+ 986:rtthread/src/kservice.c ****         else if (qualifier == 'l')
+ 987:rtthread/src/kservice.c **** #else
+ 988:rtthread/src/kservice.c ****         if (qualifier == 'l')
+ 1954              		.loc 1 988 0
+ 1955 02b8 BEF16C0F 		cmp	lr, #108
+ 1956 02bc 10D0     		beq	.L252
+ 989:rtthread/src/kservice.c **** #endif
+ 990:rtthread/src/kservice.c ****         {
+ 991:rtthread/src/kservice.c ****             num = va_arg(args, rt_uint32_t);
+ 992:rtthread/src/kservice.c ****             if (flags & SIGN) num = (rt_int32_t)num;
+ 993:rtthread/src/kservice.c ****         }
+ 994:rtthread/src/kservice.c ****         else if (qualifier == 'h')
+ 1957              		.loc 1 994 0
+ 1958 02be BEF1680F 		cmp	lr, #104
+ 1959 02c2 14D0     		beq	.L253
+ 995:rtthread/src/kservice.c ****         {
+ 996:rtthread/src/kservice.c ****             num = (rt_uint16_t)va_arg(args, rt_int32_t);
+ 997:rtthread/src/kservice.c ****             if (flags & SIGN) num = (rt_int16_t)num;
+ 998:rtthread/src/kservice.c ****         }
+ 999:rtthread/src/kservice.c ****         else
+1000:rtthread/src/kservice.c ****         {
+1001:rtthread/src/kservice.c ****             num = va_arg(args, rt_uint32_t);
+ 1960              		.loc 1 1001 0
+ 1961 02c4 059A     		ldr	r2, [sp, #20]
+ 1962 02c6 02F1040E 		add	lr, r2, #4
+ 1963              	.LVL276:
+ 1964 02ca CDF814E0 		str	lr, [sp, #20]
+ 1965 02ce 1268     		ldr	r2, [r2]
+ 1966              	.L219:
+ 1967              	.LVL277:
+1002:rtthread/src/kservice.c ****             if (flags & SIGN) num = (rt_int32_t)num;
+1003:rtthread/src/kservice.c ****         }
+1004:rtthread/src/kservice.c **** #ifdef RT_PRINTF_PRECISION
+1005:rtthread/src/kservice.c ****         str = print_number(str, end, num, base, field_width, precision, flags);
+ 1968              		.loc 1 1005 0
+ 1969 02d0 0291     		str	r1, [sp, #8]
+ 1970 02d2 CDF804C0 		str	ip, [sp, #4]
+ 1971 02d6 0095     		str	r5, [sp]
+ 1972 02d8 3146     		mov	r1, r6
+ 1973              	.LVL278:
+ 1974 02da FFF7FEFF 		bl	print_number
+ 1975              	.LVL279:
+ 1976 02de 9FE6     		b	.L160
+ 1977              	.LVL280:
+ 1978              	.L252:
+ARM GAS  /tmp/ccJocHtA.s 			page 57
+
+
+ 991:rtthread/src/kservice.c ****             if (flags & SIGN) num = (rt_int32_t)num;
+ 1979              		.loc 1 991 0
+ 1980 02e0 059A     		ldr	r2, [sp, #20]
+ 1981 02e2 02F1040E 		add	lr, r2, #4
+ 1982              	.LVL281:
+ 1983 02e6 CDF814E0 		str	lr, [sp, #20]
+ 1984 02ea 1268     		ldr	r2, [r2]
+ 1985 02ec F0E7     		b	.L219
+ 1986              	.LVL282:
+ 1987              	.L253:
+ 996:rtthread/src/kservice.c ****             if (flags & SIGN) num = (rt_int16_t)num;
+ 1988              		.loc 1 996 0
+ 1989 02ee 059A     		ldr	r2, [sp, #20]
+ 1990 02f0 02F1040E 		add	lr, r2, #4
+ 1991              	.LVL283:
+ 1992 02f4 CDF814E0 		str	lr, [sp, #20]
+ 1993 02f8 D2F800E0 		ldr	lr, [r2]
+ 1994 02fc 1FFA8EF2 		uxth	r2, lr
+ 1995              	.LVL284:
+ 997:rtthread/src/kservice.c ****         }
+ 1996              		.loc 1 997 0
+ 1997 0300 11F0020F 		tst	r1, #2
+ 1998 0304 E4D0     		beq	.L219
+ 997:rtthread/src/kservice.c ****         }
+ 1999              		.loc 1 997 0 is_stmt 0 discriminator 1
+ 2000 0306 0FFA8EF2 		sxth	r2, lr
+ 2001              	.LVL285:
+ 2002 030a E1E7     		b	.L219
+ 2003              	.LVL286:
+ 2004              	.L239:
+1006:rtthread/src/kservice.c **** #else
+1007:rtthread/src/kservice.c ****         str = print_number(str, end, num, base, field_width, flags);
+1008:rtthread/src/kservice.c **** #endif
+1009:rtthread/src/kservice.c ****     }
+1010:rtthread/src/kservice.c **** 
+1011:rtthread/src/kservice.c ****     if (size > 0)
+ 2005              		.loc 1 1011 0 is_stmt 1
+ 2006 030c B8F1000F 		cmp	r8, #0
+ 2007 0310 04D0     		beq	.L223
+1012:rtthread/src/kservice.c ****     {
+1013:rtthread/src/kservice.c ****         if (str < end) *str = '\0';
+ 2008              		.loc 1 1013 0
+ 2009 0312 B042     		cmp	r0, r6
+ 2010 0314 06D3     		bcc	.L254
+1014:rtthread/src/kservice.c ****         else
+1015:rtthread/src/kservice.c ****         {
+1016:rtthread/src/kservice.c ****             end[-1] = '\0';
+ 2011              		.loc 1 1016 0
+ 2012 0316 0023     		movs	r3, #0
+ 2013 0318 06F8013C 		strb	r3, [r6, #-1]
+ 2014              	.L223:
+1017:rtthread/src/kservice.c ****         }
+1018:rtthread/src/kservice.c ****     }
+1019:rtthread/src/kservice.c **** 
+1020:rtthread/src/kservice.c ****     /* the trailing null byte doesn't count towards the total
+1021:rtthread/src/kservice.c ****     * ++str;
+1022:rtthread/src/kservice.c ****     */
+ARM GAS  /tmp/ccJocHtA.s 			page 58
+
+
+1023:rtthread/src/kservice.c ****     return str - buf;
+1024:rtthread/src/kservice.c **** }
+ 2015              		.loc 1 1024 0
+ 2016 031c C01B     		subs	r0, r0, r7
+ 2017              	.LVL287:
+ 2018 031e 06B0     		add	sp, sp, #24
+ 2019              	.LCFI26:
+ 2020              		.cfi_remember_state
+ 2021              		.cfi_def_cfa_offset 24
+ 2022              		@ sp needed
+ 2023 0320 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 2024              	.LVL288:
+ 2025              	.L254:
+ 2026              	.LCFI27:
+ 2027              		.cfi_restore_state
+1013:rtthread/src/kservice.c ****         else
+ 2028              		.loc 1 1013 0 discriminator 1
+ 2029 0324 0370     		strb	r3, [r0]
+ 2030 0326 F9E7     		b	.L223
+ 2031              	.L256:
+ 2032              		.align	2
+ 2033              	.L255:
+ 2034 0328 00000000 		.word	.LC0
+ 2035              		.cfi_endproc
+ 2036              	.LFE33:
+ 2038              		.section	.text.rt_snprintf,"ax",%progbits
+ 2039              		.align	1
+ 2040              		.global	rt_snprintf
+ 2041              		.syntax unified
+ 2042              		.thumb
+ 2043              		.thumb_func
+ 2044              		.fpu softvfp
+ 2046              	rt_snprintf:
+ 2047              	.LFB34:
+1025:rtthread/src/kservice.c **** 
+1026:rtthread/src/kservice.c **** /**
+1027:rtthread/src/kservice.c ****  * This function will fill a formatted string to buffer
+1028:rtthread/src/kservice.c ****  *
+1029:rtthread/src/kservice.c ****  * @param buf the buffer to save formatted string
+1030:rtthread/src/kservice.c ****  * @param size the size of buffer
+1031:rtthread/src/kservice.c ****  * @param fmt the format
+1032:rtthread/src/kservice.c ****  */
+1033:rtthread/src/kservice.c **** rt_int32_t rt_snprintf(char *buf, rt_size_t size, const char *fmt, ...)
+1034:rtthread/src/kservice.c **** {
+ 2048              		.loc 1 1034 0
+ 2049              		.cfi_startproc
+ 2050              		@ args = 4, pretend = 8, frame = 8
+ 2051              		@ frame_needed = 0, uses_anonymous_args = 1
+ 2052              	.LVL289:
+ 2053 0000 0CB4     		push	{r2, r3}
+ 2054              	.LCFI28:
+ 2055              		.cfi_def_cfa_offset 8
+ 2056              		.cfi_offset 2, -8
+ 2057              		.cfi_offset 3, -4
+ 2058 0002 00B5     		push	{lr}
+ 2059              	.LCFI29:
+ 2060              		.cfi_def_cfa_offset 12
+ARM GAS  /tmp/ccJocHtA.s 			page 59
+
+
+ 2061              		.cfi_offset 14, -12
+ 2062 0004 83B0     		sub	sp, sp, #12
+ 2063              	.LCFI30:
+ 2064              		.cfi_def_cfa_offset 24
+ 2065 0006 04AB     		add	r3, sp, #16
+ 2066 0008 53F8042B 		ldr	r2, [r3], #4
+1035:rtthread/src/kservice.c ****     rt_int32_t n;
+1036:rtthread/src/kservice.c ****     va_list args;
+1037:rtthread/src/kservice.c **** 
+1038:rtthread/src/kservice.c ****     va_start(args, fmt);
+ 2067              		.loc 1 1038 0
+ 2068 000c 0193     		str	r3, [sp, #4]
+1039:rtthread/src/kservice.c ****     n = rt_vsnprintf(buf, size, fmt, args);
+ 2069              		.loc 1 1039 0
+ 2070 000e FFF7FEFF 		bl	rt_vsnprintf
+ 2071              	.LVL290:
+1040:rtthread/src/kservice.c ****     va_end(args);
+1041:rtthread/src/kservice.c **** 
+1042:rtthread/src/kservice.c ****     return n;
+1043:rtthread/src/kservice.c **** }
+ 2072              		.loc 1 1043 0
+ 2073 0012 03B0     		add	sp, sp, #12
+ 2074              	.LCFI31:
+ 2075              		.cfi_def_cfa_offset 12
+ 2076              		@ sp needed
+ 2077 0014 5DF804EB 		ldr	lr, [sp], #4
+ 2078              	.LCFI32:
+ 2079              		.cfi_restore 14
+ 2080              		.cfi_def_cfa_offset 8
+ 2081 0018 02B0     		add	sp, sp, #8
+ 2082              	.LCFI33:
+ 2083              		.cfi_restore 3
+ 2084              		.cfi_restore 2
+ 2085              		.cfi_def_cfa_offset 0
+ 2086 001a 7047     		bx	lr
+ 2087              		.cfi_endproc
+ 2088              	.LFE34:
+ 2090              		.section	.text.rt_vsprintf,"ax",%progbits
+ 2091              		.align	1
+ 2092              		.global	rt_vsprintf
+ 2093              		.syntax unified
+ 2094              		.thumb
+ 2095              		.thumb_func
+ 2096              		.fpu softvfp
+ 2098              	rt_vsprintf:
+ 2099              	.LFB35:
+1044:rtthread/src/kservice.c **** 
+1045:rtthread/src/kservice.c **** /**
+1046:rtthread/src/kservice.c ****  * This function will fill a formatted string to buffer
+1047:rtthread/src/kservice.c ****  *
+1048:rtthread/src/kservice.c ****  * @param buf the buffer to save formatted string
+1049:rtthread/src/kservice.c ****  * @param arg_ptr the arg_ptr
+1050:rtthread/src/kservice.c ****  * @param format the format
+1051:rtthread/src/kservice.c ****  */
+1052:rtthread/src/kservice.c **** rt_int32_t rt_vsprintf(char *buf, const char *format, va_list arg_ptr)
+1053:rtthread/src/kservice.c **** {
+ 2100              		.loc 1 1053 0
+ARM GAS  /tmp/ccJocHtA.s 			page 60
+
+
+ 2101              		.cfi_startproc
+ 2102              		@ args = 0, pretend = 0, frame = 0
+ 2103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2104              	.LVL291:
+ 2105 0000 08B5     		push	{r3, lr}
+ 2106              	.LCFI34:
+ 2107              		.cfi_def_cfa_offset 8
+ 2108              		.cfi_offset 3, -8
+ 2109              		.cfi_offset 14, -4
+1054:rtthread/src/kservice.c ****     return rt_vsnprintf(buf, (rt_size_t) - 1, format, arg_ptr);
+ 2110              		.loc 1 1054 0
+ 2111 0002 1346     		mov	r3, r2
+ 2112 0004 0A46     		mov	r2, r1
+ 2113              	.LVL292:
+ 2114 0006 4FF0FF31 		mov	r1, #-1
+ 2115              	.LVL293:
+ 2116 000a FFF7FEFF 		bl	rt_vsnprintf
+ 2117              	.LVL294:
+1055:rtthread/src/kservice.c **** }
+ 2118              		.loc 1 1055 0
+ 2119 000e 08BD     		pop	{r3, pc}
+ 2120              		.cfi_endproc
+ 2121              	.LFE35:
+ 2123              		.section	.text.rt_sprintf,"ax",%progbits
+ 2124              		.align	1
+ 2125              		.global	rt_sprintf
+ 2126              		.syntax unified
+ 2127              		.thumb
+ 2128              		.thumb_func
+ 2129              		.fpu softvfp
+ 2131              	rt_sprintf:
+ 2132              	.LFB36:
+1056:rtthread/src/kservice.c **** 
+1057:rtthread/src/kservice.c **** /**
+1058:rtthread/src/kservice.c ****  * This function will fill a formatted string to buffer
+1059:rtthread/src/kservice.c ****  *
+1060:rtthread/src/kservice.c ****  * @param buf the buffer to save formatted string
+1061:rtthread/src/kservice.c ****  * @param format the format
+1062:rtthread/src/kservice.c ****  */
+1063:rtthread/src/kservice.c **** rt_int32_t rt_sprintf(char *buf, const char *format, ...)
+1064:rtthread/src/kservice.c **** {
+ 2133              		.loc 1 1064 0
+ 2134              		.cfi_startproc
+ 2135              		@ args = 4, pretend = 12, frame = 8
+ 2136              		@ frame_needed = 0, uses_anonymous_args = 1
+ 2137              	.LVL295:
+ 2138 0000 0EB4     		push	{r1, r2, r3}
+ 2139              	.LCFI35:
+ 2140              		.cfi_def_cfa_offset 12
+ 2141              		.cfi_offset 1, -12
+ 2142              		.cfi_offset 2, -8
+ 2143              		.cfi_offset 3, -4
+ 2144 0002 00B5     		push	{lr}
+ 2145              	.LCFI36:
+ 2146              		.cfi_def_cfa_offset 16
+ 2147              		.cfi_offset 14, -16
+ 2148 0004 82B0     		sub	sp, sp, #8
+ARM GAS  /tmp/ccJocHtA.s 			page 61
+
+
+ 2149              	.LCFI37:
+ 2150              		.cfi_def_cfa_offset 24
+ 2151 0006 03AA     		add	r2, sp, #12
+ 2152 0008 52F8041B 		ldr	r1, [r2], #4
+1065:rtthread/src/kservice.c ****     rt_int32_t n;
+1066:rtthread/src/kservice.c ****     va_list arg_ptr;
+1067:rtthread/src/kservice.c **** 
+1068:rtthread/src/kservice.c ****     va_start(arg_ptr, format);
+ 2153              		.loc 1 1068 0
+ 2154 000c 0192     		str	r2, [sp, #4]
+1069:rtthread/src/kservice.c ****     n = rt_vsprintf(buf, format, arg_ptr);
+ 2155              		.loc 1 1069 0
+ 2156 000e FFF7FEFF 		bl	rt_vsprintf
+ 2157              	.LVL296:
+1070:rtthread/src/kservice.c ****     va_end(arg_ptr);
+1071:rtthread/src/kservice.c **** 
+1072:rtthread/src/kservice.c ****     return n;
+1073:rtthread/src/kservice.c **** }
+ 2158              		.loc 1 1073 0
+ 2159 0012 02B0     		add	sp, sp, #8
+ 2160              	.LCFI38:
+ 2161              		.cfi_def_cfa_offset 16
+ 2162              		@ sp needed
+ 2163 0014 5DF804EB 		ldr	lr, [sp], #4
+ 2164              	.LCFI39:
+ 2165              		.cfi_restore 14
+ 2166              		.cfi_def_cfa_offset 12
+ 2167 0018 03B0     		add	sp, sp, #12
+ 2168              	.LCFI40:
+ 2169              		.cfi_restore 3
+ 2170              		.cfi_restore 2
+ 2171              		.cfi_restore 1
+ 2172              		.cfi_def_cfa_offset 0
+ 2173 001a 7047     		bx	lr
+ 2174              		.cfi_endproc
+ 2175              	.LFE36:
+ 2177              		.section	.text.rt_hw_console_output,"ax",%progbits
+ 2178              		.align	1
+ 2179              		.weak	rt_hw_console_output
+ 2180              		.syntax unified
+ 2181              		.thumb
+ 2182              		.thumb_func
+ 2183              		.fpu softvfp
+ 2185              	rt_hw_console_output:
+ 2186              	.LFB37:
+1074:rtthread/src/kservice.c **** 
+1075:rtthread/src/kservice.c **** #ifdef RT_USING_CONSOLE
+1076:rtthread/src/kservice.c **** 
+1077:rtthread/src/kservice.c **** #ifdef RT_USING_DEVICE
+1078:rtthread/src/kservice.c **** /**
+1079:rtthread/src/kservice.c ****  * This function returns the device using in console.
+1080:rtthread/src/kservice.c ****  *
+1081:rtthread/src/kservice.c ****  * @return the device using in console or RT_NULL
+1082:rtthread/src/kservice.c ****  */
+1083:rtthread/src/kservice.c **** rt_device_t rt_console_get_device(void)
+1084:rtthread/src/kservice.c **** {
+1085:rtthread/src/kservice.c ****     return _console_device;
+ARM GAS  /tmp/ccJocHtA.s 			page 62
+
+
+1086:rtthread/src/kservice.c **** }
+1087:rtthread/src/kservice.c **** 
+1088:rtthread/src/kservice.c **** /**
+1089:rtthread/src/kservice.c ****  * This function will set a device as console device.
+1090:rtthread/src/kservice.c ****  * After set a device to console, all output of rt_kprintf will be
+1091:rtthread/src/kservice.c ****  * redirected to this new device.
+1092:rtthread/src/kservice.c ****  *
+1093:rtthread/src/kservice.c ****  * @param name the name of new console device
+1094:rtthread/src/kservice.c ****  *
+1095:rtthread/src/kservice.c ****  * @return the old console device handler on successful, or RT_NULL on failure.
+1096:rtthread/src/kservice.c ****  */
+1097:rtthread/src/kservice.c **** rt_device_t rt_console_set_device(const char *name)
+1098:rtthread/src/kservice.c **** {
+1099:rtthread/src/kservice.c ****     rt_device_t new_device, old_device;
+1100:rtthread/src/kservice.c **** 
+1101:rtthread/src/kservice.c ****     /* save old device */
+1102:rtthread/src/kservice.c ****     old_device = _console_device;
+1103:rtthread/src/kservice.c **** 
+1104:rtthread/src/kservice.c ****     /* find new console device */
+1105:rtthread/src/kservice.c ****     new_device = rt_device_find(name);
+1106:rtthread/src/kservice.c **** 
+1107:rtthread/src/kservice.c ****     /* check whether it's a same device */
+1108:rtthread/src/kservice.c ****     if (new_device == old_device) return RT_NULL;
+1109:rtthread/src/kservice.c **** 
+1110:rtthread/src/kservice.c ****     if (new_device != RT_NULL)
+1111:rtthread/src/kservice.c ****     {
+1112:rtthread/src/kservice.c ****         if (_console_device != RT_NULL)
+1113:rtthread/src/kservice.c ****         {
+1114:rtthread/src/kservice.c ****             /* close old console device */
+1115:rtthread/src/kservice.c ****             rt_device_close(_console_device);
+1116:rtthread/src/kservice.c ****         }
+1117:rtthread/src/kservice.c **** 
+1118:rtthread/src/kservice.c ****         /* set new console device */
+1119:rtthread/src/kservice.c ****         rt_device_open(new_device, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_STREAM);
+1120:rtthread/src/kservice.c ****         _console_device = new_device;
+1121:rtthread/src/kservice.c ****     }
+1122:rtthread/src/kservice.c **** 
+1123:rtthread/src/kservice.c ****     return old_device;
+1124:rtthread/src/kservice.c **** }
+1125:rtthread/src/kservice.c **** #endif
+1126:rtthread/src/kservice.c **** 
+1127:rtthread/src/kservice.c **** RT_WEAK void rt_hw_console_output(const char *str)
+1128:rtthread/src/kservice.c **** {
+ 2187              		.loc 1 1128 0
+ 2188              		.cfi_startproc
+ 2189              		@ args = 0, pretend = 0, frame = 0
+ 2190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2191              		@ link register save eliminated.
+ 2192              	.LVL297:
+1129:rtthread/src/kservice.c ****     /* empty console output */
+1130:rtthread/src/kservice.c **** }
+ 2193              		.loc 1 1130 0
+ 2194 0000 7047     		bx	lr
+ 2195              		.cfi_endproc
+ 2196              	.LFE37:
+ 2198              		.section	.text.rt_kputs,"ax",%progbits
+ 2199              		.align	1
+ARM GAS  /tmp/ccJocHtA.s 			page 63
+
+
+ 2200              		.global	rt_kputs
+ 2201              		.syntax unified
+ 2202              		.thumb
+ 2203              		.thumb_func
+ 2204              		.fpu softvfp
+ 2206              	rt_kputs:
+ 2207              	.LFB38:
+1131:rtthread/src/kservice.c **** 
+1132:rtthread/src/kservice.c **** /**
+1133:rtthread/src/kservice.c ****  * This function will put string to the console.
+1134:rtthread/src/kservice.c ****  *
+1135:rtthread/src/kservice.c ****  * @param str the string output to the console.
+1136:rtthread/src/kservice.c ****  */
+1137:rtthread/src/kservice.c **** void rt_kputs(const char *str)
+1138:rtthread/src/kservice.c **** {
+ 2208              		.loc 1 1138 0
+ 2209              		.cfi_startproc
+ 2210              		@ args = 0, pretend = 0, frame = 0
+ 2211              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2212              	.LVL298:
+1139:rtthread/src/kservice.c ****     if (!str) return;
+ 2213              		.loc 1 1139 0
+ 2214 0000 18B1     		cbz	r0, .L267
+1138:rtthread/src/kservice.c ****     if (!str) return;
+ 2215              		.loc 1 1138 0
+ 2216 0002 08B5     		push	{r3, lr}
+ 2217              	.LCFI41:
+ 2218              		.cfi_def_cfa_offset 8
+ 2219              		.cfi_offset 3, -8
+ 2220              		.cfi_offset 14, -4
+1140:rtthread/src/kservice.c **** 
+1141:rtthread/src/kservice.c **** #ifdef RT_USING_DEVICE
+1142:rtthread/src/kservice.c ****     if (_console_device == RT_NULL)
+1143:rtthread/src/kservice.c ****     {
+1144:rtthread/src/kservice.c ****         rt_hw_console_output(str);
+1145:rtthread/src/kservice.c ****     }
+1146:rtthread/src/kservice.c ****     else
+1147:rtthread/src/kservice.c ****     {
+1148:rtthread/src/kservice.c ****         rt_uint16_t old_flag = _console_device->open_flag;
+1149:rtthread/src/kservice.c **** 
+1150:rtthread/src/kservice.c ****         _console_device->open_flag |= RT_DEVICE_FLAG_STREAM;
+1151:rtthread/src/kservice.c ****         rt_device_write(_console_device, 0, str, rt_strlen(str));
+1152:rtthread/src/kservice.c ****         _console_device->open_flag = old_flag;
+1153:rtthread/src/kservice.c ****     }
+1154:rtthread/src/kservice.c **** #else
+1155:rtthread/src/kservice.c ****     rt_hw_console_output(str);
+ 2221              		.loc 1 1155 0
+ 2222 0004 FFF7FEFF 		bl	rt_hw_console_output
+ 2223              	.LVL299:
+1156:rtthread/src/kservice.c **** #endif
+1157:rtthread/src/kservice.c **** }
+ 2224              		.loc 1 1157 0
+ 2225 0008 08BD     		pop	{r3, pc}
+ 2226              	.LVL300:
+ 2227              	.L267:
+ 2228              	.LCFI42:
+ 2229              		.cfi_def_cfa_offset 0
+ARM GAS  /tmp/ccJocHtA.s 			page 64
+
+
+ 2230              		.cfi_restore 3
+ 2231              		.cfi_restore 14
+ 2232 000a 7047     		bx	lr
+ 2233              		.cfi_endproc
+ 2234              	.LFE38:
+ 2236              		.section	.text.rt_kprintf,"ax",%progbits
+ 2237              		.align	1
+ 2238              		.global	rt_kprintf
+ 2239              		.syntax unified
+ 2240              		.thumb
+ 2241              		.thumb_func
+ 2242              		.fpu softvfp
+ 2244              	rt_kprintf:
+ 2245              	.LFB39:
+1158:rtthread/src/kservice.c **** 
+1159:rtthread/src/kservice.c **** /**
+1160:rtthread/src/kservice.c ****  * This function will print a formatted string on system console
+1161:rtthread/src/kservice.c ****  *
+1162:rtthread/src/kservice.c ****  * @param fmt the format
+1163:rtthread/src/kservice.c ****  */
+1164:rtthread/src/kservice.c **** void rt_kprintf(const char *fmt, ...)
+1165:rtthread/src/kservice.c **** {
+ 2246              		.loc 1 1165 0
+ 2247              		.cfi_startproc
+ 2248              		@ args = 4, pretend = 16, frame = 8
+ 2249              		@ frame_needed = 0, uses_anonymous_args = 1
+ 2250              	.LVL301:
+ 2251 0000 0FB4     		push	{r0, r1, r2, r3}
+ 2252              	.LCFI43:
+ 2253              		.cfi_def_cfa_offset 16
+ 2254              		.cfi_offset 0, -16
+ 2255              		.cfi_offset 1, -12
+ 2256              		.cfi_offset 2, -8
+ 2257              		.cfi_offset 3, -4
+ 2258 0002 10B5     		push	{r4, lr}
+ 2259              	.LCFI44:
+ 2260              		.cfi_def_cfa_offset 24
+ 2261              		.cfi_offset 4, -24
+ 2262              		.cfi_offset 14, -20
+ 2263 0004 82B0     		sub	sp, sp, #8
+ 2264              	.LCFI45:
+ 2265              		.cfi_def_cfa_offset 32
+ 2266 0006 04AB     		add	r3, sp, #16
+ 2267 0008 53F8042B 		ldr	r2, [r3], #4
+1166:rtthread/src/kservice.c ****     va_list args;
+1167:rtthread/src/kservice.c ****     rt_size_t length;
+1168:rtthread/src/kservice.c ****     static char rt_log_buf[RT_CONSOLEBUF_SIZE];
+1169:rtthread/src/kservice.c **** 
+1170:rtthread/src/kservice.c ****     va_start(args, fmt);
+ 2268              		.loc 1 1170 0
+ 2269 000c 0193     		str	r3, [sp, #4]
+1171:rtthread/src/kservice.c ****     /* the return value of vsnprintf is the number of bytes that would be
+1172:rtthread/src/kservice.c ****      * written to buffer had if the size of the buffer been sufficiently
+1173:rtthread/src/kservice.c ****      * large excluding the terminating null byte. If the output string
+1174:rtthread/src/kservice.c ****      * would be larger than the rt_log_buf, we have to adjust the output
+1175:rtthread/src/kservice.c ****      * length. */
+1176:rtthread/src/kservice.c ****     length = rt_vsnprintf(rt_log_buf, sizeof(rt_log_buf) - 1, fmt, args);
+ARM GAS  /tmp/ccJocHtA.s 			page 65
+
+
+ 2270              		.loc 1 1176 0
+ 2271 000e 064C     		ldr	r4, .L272
+ 2272 0010 7F21     		movs	r1, #127
+ 2273 0012 2046     		mov	r0, r4
+ 2274 0014 FFF7FEFF 		bl	rt_vsnprintf
+ 2275              	.LVL302:
+1177:rtthread/src/kservice.c ****     if (length > RT_CONSOLEBUF_SIZE - 1)
+1178:rtthread/src/kservice.c ****         length = RT_CONSOLEBUF_SIZE - 1;
+1179:rtthread/src/kservice.c **** #ifdef RT_USING_DEVICE
+1180:rtthread/src/kservice.c ****     if (_console_device == RT_NULL)
+1181:rtthread/src/kservice.c ****     {
+1182:rtthread/src/kservice.c ****         rt_hw_console_output(rt_log_buf);
+1183:rtthread/src/kservice.c ****     }
+1184:rtthread/src/kservice.c ****     else
+1185:rtthread/src/kservice.c ****     {
+1186:rtthread/src/kservice.c ****         rt_uint16_t old_flag = _console_device->open_flag;
+1187:rtthread/src/kservice.c **** 
+1188:rtthread/src/kservice.c ****         _console_device->open_flag |= RT_DEVICE_FLAG_STREAM;
+1189:rtthread/src/kservice.c ****         rt_device_write(_console_device, 0, rt_log_buf, length);
+1190:rtthread/src/kservice.c ****         _console_device->open_flag = old_flag;
+1191:rtthread/src/kservice.c ****     }
+1192:rtthread/src/kservice.c **** #else
+1193:rtthread/src/kservice.c ****     rt_hw_console_output(rt_log_buf);
+ 2276              		.loc 1 1193 0
+ 2277 0018 2046     		mov	r0, r4
+ 2278 001a FFF7FEFF 		bl	rt_hw_console_output
+ 2279              	.LVL303:
+1194:rtthread/src/kservice.c **** #endif
+1195:rtthread/src/kservice.c ****     va_end(args);
+1196:rtthread/src/kservice.c **** }
+ 2280              		.loc 1 1196 0
+ 2281 001e 02B0     		add	sp, sp, #8
+ 2282              	.LCFI46:
+ 2283              		.cfi_def_cfa_offset 24
+ 2284              		@ sp needed
+ 2285 0020 BDE81040 		pop	{r4, lr}
+ 2286              	.LCFI47:
+ 2287              		.cfi_restore 14
+ 2288              		.cfi_restore 4
+ 2289              		.cfi_def_cfa_offset 16
+ 2290 0024 04B0     		add	sp, sp, #16
+ 2291              	.LCFI48:
+ 2292              		.cfi_restore 3
+ 2293              		.cfi_restore 2
+ 2294              		.cfi_restore 1
+ 2295              		.cfi_restore 0
+ 2296              		.cfi_def_cfa_offset 0
+ 2297 0026 7047     		bx	lr
+ 2298              	.L273:
+ 2299              		.align	2
+ 2300              	.L272:
+ 2301 0028 00000000 		.word	.LANCHOR3
+ 2302              		.cfi_endproc
+ 2303              	.LFE39:
+ 2305              		.section	.text.rt_show_version,"ax",%progbits
+ 2306              		.align	1
+ 2307              		.global	rt_show_version
+ARM GAS  /tmp/ccJocHtA.s 			page 66
+
+
+ 2308              		.syntax unified
+ 2309              		.thumb
+ 2310              		.thumb_func
+ 2311              		.fpu softvfp
+ 2313              	rt_show_version:
+ 2314              	.LFB29:
+ 521:rtthread/src/kservice.c ****     rt_kprintf("\n \\ | /\n");
+ 2315              		.loc 1 521 0
+ 2316              		.cfi_startproc
+ 2317              		@ args = 0, pretend = 0, frame = 0
+ 2318              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2319 0000 00B5     		push	{lr}
+ 2320              	.LCFI49:
+ 2321              		.cfi_def_cfa_offset 4
+ 2322              		.cfi_offset 14, -4
+ 2323 0002 83B0     		sub	sp, sp, #12
+ 2324              	.LCFI50:
+ 2325              		.cfi_def_cfa_offset 16
+ 522:rtthread/src/kservice.c ****     rt_kprintf("- RT -     Thread Operating System\n");
+ 2326              		.loc 1 522 0
+ 2327 0004 0948     		ldr	r0, .L276
+ 2328 0006 FFF7FEFF 		bl	rt_kprintf
+ 2329              	.LVL304:
+ 523:rtthread/src/kservice.c ****     rt_kprintf(" / | \\     %d.%d.%d build %s\n",
+ 2330              		.loc 1 523 0
+ 2331 000a 0948     		ldr	r0, .L276+4
+ 2332 000c FFF7FEFF 		bl	rt_kprintf
+ 2333              	.LVL305:
+ 524:rtthread/src/kservice.c ****                RT_VERSION, RT_SUBVERSION, RT_REVISION, __DATE__);
+ 2334              		.loc 1 524 0
+ 2335 0010 084B     		ldr	r3, .L276+8
+ 2336 0012 0093     		str	r3, [sp]
+ 2337 0014 0523     		movs	r3, #5
+ 2338 0016 0122     		movs	r2, #1
+ 2339 0018 0321     		movs	r1, #3
+ 2340 001a 0748     		ldr	r0, .L276+12
+ 2341 001c FFF7FEFF 		bl	rt_kprintf
+ 2342              	.LVL306:
+ 526:rtthread/src/kservice.c **** }
+ 2343              		.loc 1 526 0
+ 2344 0020 0648     		ldr	r0, .L276+16
+ 2345 0022 FFF7FEFF 		bl	rt_kprintf
+ 2346              	.LVL307:
+ 527:rtthread/src/kservice.c **** 
+ 2347              		.loc 1 527 0
+ 2348 0026 03B0     		add	sp, sp, #12
+ 2349              	.LCFI51:
+ 2350              		.cfi_def_cfa_offset 4
+ 2351              		@ sp needed
+ 2352 0028 5DF804FB 		ldr	pc, [sp], #4
+ 2353              	.L277:
+ 2354              		.align	2
+ 2355              	.L276:
+ 2356 002c 00000000 		.word	.LC1
+ 2357 0030 0C000000 		.word	.LC2
+ 2358 0034 50000000 		.word	.LC4
+ 2359 0038 30000000 		.word	.LC3
+ARM GAS  /tmp/ccJocHtA.s 			page 67
+
+
+ 2360 003c 5C000000 		.word	.LC5
+ 2361              		.cfi_endproc
+ 2362              	.LFE29:
+ 2364              		.section	.text.__rt_ffs,"ax",%progbits
+ 2365              		.align	1
+ 2366              		.global	__rt_ffs
+ 2367              		.syntax unified
+ 2368              		.thumb
+ 2369              		.thumb_func
+ 2370              		.fpu softvfp
+ 2372              	__rt_ffs:
+ 2373              	.LFB40:
+1197:rtthread/src/kservice.c **** #endif
+1198:rtthread/src/kservice.c **** 
+1199:rtthread/src/kservice.c **** #ifdef RT_USING_HEAP
+1200:rtthread/src/kservice.c **** /**
+1201:rtthread/src/kservice.c ****  * This function allocates a memory block, which address is aligned to the
+1202:rtthread/src/kservice.c ****  * specified alignment size.
+1203:rtthread/src/kservice.c ****  *
+1204:rtthread/src/kservice.c ****  * @param size the allocated memory block size
+1205:rtthread/src/kservice.c ****  * @param align the alignment size
+1206:rtthread/src/kservice.c ****  *
+1207:rtthread/src/kservice.c ****  * @return the allocated memory block on successful, otherwise returns RT_NULL
+1208:rtthread/src/kservice.c ****  */
+1209:rtthread/src/kservice.c **** void *rt_malloc_align(rt_size_t size, rt_size_t align)
+1210:rtthread/src/kservice.c **** {
+1211:rtthread/src/kservice.c ****     void *ptr;
+1212:rtthread/src/kservice.c ****     void *align_ptr;
+1213:rtthread/src/kservice.c ****     int uintptr_size;
+1214:rtthread/src/kservice.c ****     rt_size_t align_size;
+1215:rtthread/src/kservice.c **** 
+1216:rtthread/src/kservice.c ****     /* sizeof pointer */
+1217:rtthread/src/kservice.c ****     uintptr_size = sizeof(void*);
+1218:rtthread/src/kservice.c ****     uintptr_size -= 1;
+1219:rtthread/src/kservice.c **** 
+1220:rtthread/src/kservice.c ****     /* align the alignment size to uintptr size byte */
+1221:rtthread/src/kservice.c ****     align = ((align + uintptr_size) & ~uintptr_size);
+1222:rtthread/src/kservice.c **** 
+1223:rtthread/src/kservice.c ****     /* get total aligned size */
+1224:rtthread/src/kservice.c ****     align_size = ((size + uintptr_size) & ~uintptr_size) + align;
+1225:rtthread/src/kservice.c ****     /* allocate memory block from heap */
+1226:rtthread/src/kservice.c ****     ptr = rt_malloc(align_size);
+1227:rtthread/src/kservice.c ****     if (ptr != RT_NULL)
+1228:rtthread/src/kservice.c ****     {
+1229:rtthread/src/kservice.c ****         /* the allocated memory block is aligned */
+1230:rtthread/src/kservice.c ****         if (((rt_ubase_t)ptr & (align - 1)) == 0)
+1231:rtthread/src/kservice.c ****         {
+1232:rtthread/src/kservice.c ****             align_ptr = (void *)((rt_ubase_t)ptr + align);
+1233:rtthread/src/kservice.c ****         }
+1234:rtthread/src/kservice.c ****         else
+1235:rtthread/src/kservice.c ****         {
+1236:rtthread/src/kservice.c ****             align_ptr = (void *)(((rt_ubase_t)ptr + (align - 1)) & ~(align - 1));
+1237:rtthread/src/kservice.c ****         }
+1238:rtthread/src/kservice.c **** 
+1239:rtthread/src/kservice.c ****         /* set the pointer before alignment pointer to the real pointer */
+1240:rtthread/src/kservice.c ****         *((rt_ubase_t *)((rt_ubase_t)align_ptr - sizeof(void *))) = (rt_ubase_t)ptr;
+1241:rtthread/src/kservice.c **** 
+ARM GAS  /tmp/ccJocHtA.s 			page 68
+
+
+1242:rtthread/src/kservice.c ****         ptr = align_ptr;
+1243:rtthread/src/kservice.c ****     }
+1244:rtthread/src/kservice.c **** 
+1245:rtthread/src/kservice.c ****     return ptr;
+1246:rtthread/src/kservice.c **** }
+1247:rtthread/src/kservice.c **** 
+1248:rtthread/src/kservice.c **** /**
+1249:rtthread/src/kservice.c ****  * This function release the memory block, which is allocated by
+1250:rtthread/src/kservice.c ****  * rt_malloc_align function and address is aligned.
+1251:rtthread/src/kservice.c ****  *
+1252:rtthread/src/kservice.c ****  * @param ptr the memory block pointer
+1253:rtthread/src/kservice.c ****  */
+1254:rtthread/src/kservice.c **** void rt_free_align(void *ptr)
+1255:rtthread/src/kservice.c **** {
+1256:rtthread/src/kservice.c ****     void *real_ptr;
+1257:rtthread/src/kservice.c **** 
+1258:rtthread/src/kservice.c ****     real_ptr = (void *) * (rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
+1259:rtthread/src/kservice.c ****     rt_free(real_ptr);
+1260:rtthread/src/kservice.c **** }
+1261:rtthread/src/kservice.c **** #endif
+1262:rtthread/src/kservice.c **** 
+1263:rtthread/src/kservice.c **** #ifndef RT_USING_CPU_FFS
+1264:rtthread/src/kservice.c **** const rt_uint8_t __lowest_bit_bitmap[] =
+1265:rtthread/src/kservice.c **** {
+1266:rtthread/src/kservice.c ****     /* 00 */ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1267:rtthread/src/kservice.c ****     /* 10 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1268:rtthread/src/kservice.c ****     /* 20 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1269:rtthread/src/kservice.c ****     /* 30 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1270:rtthread/src/kservice.c ****     /* 40 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1271:rtthread/src/kservice.c ****     /* 50 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1272:rtthread/src/kservice.c ****     /* 60 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1273:rtthread/src/kservice.c ****     /* 70 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1274:rtthread/src/kservice.c ****     /* 80 */ 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1275:rtthread/src/kservice.c ****     /* 90 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1276:rtthread/src/kservice.c ****     /* A0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1277:rtthread/src/kservice.c ****     /* B0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1278:rtthread/src/kservice.c ****     /* C0 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1279:rtthread/src/kservice.c ****     /* D0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1280:rtthread/src/kservice.c ****     /* E0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+1281:rtthread/src/kservice.c ****     /* F0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
+1282:rtthread/src/kservice.c **** };
+1283:rtthread/src/kservice.c **** 
+1284:rtthread/src/kservice.c **** /**
+1285:rtthread/src/kservice.c ****  * This function finds the first bit set (beginning with the least significant bit)
+1286:rtthread/src/kservice.c ****  * in value and return the index of that bit.
+1287:rtthread/src/kservice.c ****  *
+1288:rtthread/src/kservice.c ****  * Bits are numbered starting at 1 (the least significant bit).  A return value of
+1289:rtthread/src/kservice.c ****  * zero from any of these functions means that the argument was zero.
+1290:rtthread/src/kservice.c ****  *
+1291:rtthread/src/kservice.c ****  * @return return the index of the first bit set. If value is 0, then this function
+1292:rtthread/src/kservice.c ****  * shall return 0.
+1293:rtthread/src/kservice.c ****  */
+1294:rtthread/src/kservice.c **** int __rt_ffs(int value)
+1295:rtthread/src/kservice.c **** {
+ 2374              		.loc 1 1295 0
+ 2375              		.cfi_startproc
+ 2376              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/ccJocHtA.s 			page 69
+
+
+ 2377              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2378              		@ link register save eliminated.
+ 2379              	.LVL308:
+1296:rtthread/src/kservice.c ****     if (value == 0) return 0;
+ 2380              		.loc 1 1296 0
+ 2381 0000 E8B1     		cbz	r0, .L283
+1297:rtthread/src/kservice.c **** 
+1298:rtthread/src/kservice.c ****     if (value & 0xff)
+ 2382              		.loc 1 1298 0
+ 2383 0002 10F0FF02 		ands	r2, r0, #255
+ 2384 0006 0AD1     		bne	.L284
+1299:rtthread/src/kservice.c ****         return __lowest_bit_bitmap[value & 0xff] + 1;
+1300:rtthread/src/kservice.c **** 
+1301:rtthread/src/kservice.c ****     if (value & 0xff00)
+ 2385              		.loc 1 1301 0
+ 2386 0008 10F47F4F 		tst	r0, #65280
+ 2387 000c 0BD1     		bne	.L285
+1302:rtthread/src/kservice.c ****         return __lowest_bit_bitmap[(value & 0xff00) >> 8] + 9;
+1303:rtthread/src/kservice.c **** 
+1304:rtthread/src/kservice.c ****     if (value & 0xff0000)
+ 2388              		.loc 1 1304 0
+ 2389 000e 10F47F0F 		tst	r0, #16711680
+ 2390 0012 0ED1     		bne	.L286
+1305:rtthread/src/kservice.c ****         return __lowest_bit_bitmap[(value & 0xff0000) >> 16] + 17;
+1306:rtthread/src/kservice.c **** 
+1307:rtthread/src/kservice.c ****     return __lowest_bit_bitmap[(value & 0xff000000) >> 24] + 25;
+ 2391              		.loc 1 1307 0
+ 2392 0014 030E     		lsrs	r3, r0, #24
+ 2393 0016 0A4A     		ldr	r2, .L287
+ 2394 0018 D05C     		ldrb	r0, [r2, r3]	@ zero_extendqisi2
+ 2395              	.LVL309:
+ 2396 001a 1930     		adds	r0, r0, #25
+ 2397 001c 7047     		bx	lr
+ 2398              	.LVL310:
+ 2399              	.L284:
+1299:rtthread/src/kservice.c **** 
+ 2400              		.loc 1 1299 0
+ 2401 001e 084B     		ldr	r3, .L287
+ 2402 0020 985C     		ldrb	r0, [r3, r2]	@ zero_extendqisi2
+ 2403              	.LVL311:
+ 2404 0022 0130     		adds	r0, r0, #1
+ 2405 0024 7047     		bx	lr
+ 2406              	.LVL312:
+ 2407              	.L285:
+1302:rtthread/src/kservice.c ****         return __lowest_bit_bitmap[(value & 0xff00) >> 8] + 9;
+ 2408              		.loc 1 1302 0
+ 2409 0026 C0F30723 		ubfx	r3, r0, #8, #8
+ 2410 002a 054A     		ldr	r2, .L287
+ 2411 002c D05C     		ldrb	r0, [r2, r3]	@ zero_extendqisi2
+ 2412              	.LVL313:
+ 2413 002e 0930     		adds	r0, r0, #9
+ 2414 0030 7047     		bx	lr
+ 2415              	.LVL314:
+ 2416              	.L286:
+1305:rtthread/src/kservice.c ****         return __lowest_bit_bitmap[(value & 0xff0000) >> 16] + 17;
+ 2417              		.loc 1 1305 0
+ 2418 0032 C0F30743 		ubfx	r3, r0, #16, #8
+ARM GAS  /tmp/ccJocHtA.s 			page 70
+
+
+ 2419 0036 024A     		ldr	r2, .L287
+ 2420 0038 D05C     		ldrb	r0, [r2, r3]	@ zero_extendqisi2
+ 2421              	.LVL315:
+ 2422 003a 1130     		adds	r0, r0, #17
+ 2423 003c 7047     		bx	lr
+ 2424              	.LVL316:
+ 2425              	.L283:
+1308:rtthread/src/kservice.c **** }
+ 2426              		.loc 1 1308 0
+ 2427 003e 7047     		bx	lr
+ 2428              	.L288:
+ 2429              		.align	2
+ 2430              	.L287:
+ 2431 0040 00000000 		.word	.LANCHOR4
+ 2432              		.cfi_endproc
+ 2433              	.LFE40:
+ 2435              		.global	__lowest_bit_bitmap
+ 2436              		.section	.bss.__rt_errno,"aw",%nobits
+ 2437              		.align	2
+ 2438              		.set	.LANCHOR2,. + 0
+ 2441              	__rt_errno:
+ 2442 0000 00000000 		.space	4
+ 2443              		.section	.bss.rt_log_buf.4895,"aw",%nobits
+ 2444              		.align	2
+ 2445              		.set	.LANCHOR3,. + 0
+ 2448              	rt_log_buf.4895:
+ 2449 0000 00000000 		.space	128
+ 2449      00000000 
+ 2449      00000000 
+ 2449      00000000 
+ 2449      00000000 
+ 2450              		.section	.rodata.__lowest_bit_bitmap,"a",%progbits
+ 2451              		.align	2
+ 2452              		.set	.LANCHOR4,. + 0
+ 2455              	__lowest_bit_bitmap:
+ 2456 0000 00       		.byte	0
+ 2457 0001 00       		.byte	0
+ 2458 0002 01       		.byte	1
+ 2459 0003 00       		.byte	0
+ 2460 0004 02       		.byte	2
+ 2461 0005 00       		.byte	0
+ 2462 0006 01       		.byte	1
+ 2463 0007 00       		.byte	0
+ 2464 0008 03       		.byte	3
+ 2465 0009 00       		.byte	0
+ 2466 000a 01       		.byte	1
+ 2467 000b 00       		.byte	0
+ 2468 000c 02       		.byte	2
+ 2469 000d 00       		.byte	0
+ 2470 000e 01       		.byte	1
+ 2471 000f 00       		.byte	0
+ 2472 0010 04       		.byte	4
+ 2473 0011 00       		.byte	0
+ 2474 0012 01       		.byte	1
+ 2475 0013 00       		.byte	0
+ 2476 0014 02       		.byte	2
+ 2477 0015 00       		.byte	0
+ARM GAS  /tmp/ccJocHtA.s 			page 71
+
+
+ 2478 0016 01       		.byte	1
+ 2479 0017 00       		.byte	0
+ 2480 0018 03       		.byte	3
+ 2481 0019 00       		.byte	0
+ 2482 001a 01       		.byte	1
+ 2483 001b 00       		.byte	0
+ 2484 001c 02       		.byte	2
+ 2485 001d 00       		.byte	0
+ 2486 001e 01       		.byte	1
+ 2487 001f 00       		.byte	0
+ 2488 0020 05       		.byte	5
+ 2489 0021 00       		.byte	0
+ 2490 0022 01       		.byte	1
+ 2491 0023 00       		.byte	0
+ 2492 0024 02       		.byte	2
+ 2493 0025 00       		.byte	0
+ 2494 0026 01       		.byte	1
+ 2495 0027 00       		.byte	0
+ 2496 0028 03       		.byte	3
+ 2497 0029 00       		.byte	0
+ 2498 002a 01       		.byte	1
+ 2499 002b 00       		.byte	0
+ 2500 002c 02       		.byte	2
+ 2501 002d 00       		.byte	0
+ 2502 002e 01       		.byte	1
+ 2503 002f 00       		.byte	0
+ 2504 0030 04       		.byte	4
+ 2505 0031 00       		.byte	0
+ 2506 0032 01       		.byte	1
+ 2507 0033 00       		.byte	0
+ 2508 0034 02       		.byte	2
+ 2509 0035 00       		.byte	0
+ 2510 0036 01       		.byte	1
+ 2511 0037 00       		.byte	0
+ 2512 0038 03       		.byte	3
+ 2513 0039 00       		.byte	0
+ 2514 003a 01       		.byte	1
+ 2515 003b 00       		.byte	0
+ 2516 003c 02       		.byte	2
+ 2517 003d 00       		.byte	0
+ 2518 003e 01       		.byte	1
+ 2519 003f 00       		.byte	0
+ 2520 0040 06       		.byte	6
+ 2521 0041 00       		.byte	0
+ 2522 0042 01       		.byte	1
+ 2523 0043 00       		.byte	0
+ 2524 0044 02       		.byte	2
+ 2525 0045 00       		.byte	0
+ 2526 0046 01       		.byte	1
+ 2527 0047 00       		.byte	0
+ 2528 0048 03       		.byte	3
+ 2529 0049 00       		.byte	0
+ 2530 004a 01       		.byte	1
+ 2531 004b 00       		.byte	0
+ 2532 004c 02       		.byte	2
+ 2533 004d 00       		.byte	0
+ 2534 004e 01       		.byte	1
+ARM GAS  /tmp/ccJocHtA.s 			page 72
+
+
+ 2535 004f 00       		.byte	0
+ 2536 0050 04       		.byte	4
+ 2537 0051 00       		.byte	0
+ 2538 0052 01       		.byte	1
+ 2539 0053 00       		.byte	0
+ 2540 0054 02       		.byte	2
+ 2541 0055 00       		.byte	0
+ 2542 0056 01       		.byte	1
+ 2543 0057 00       		.byte	0
+ 2544 0058 03       		.byte	3
+ 2545 0059 00       		.byte	0
+ 2546 005a 01       		.byte	1
+ 2547 005b 00       		.byte	0
+ 2548 005c 02       		.byte	2
+ 2549 005d 00       		.byte	0
+ 2550 005e 01       		.byte	1
+ 2551 005f 00       		.byte	0
+ 2552 0060 05       		.byte	5
+ 2553 0061 00       		.byte	0
+ 2554 0062 01       		.byte	1
+ 2555 0063 00       		.byte	0
+ 2556 0064 02       		.byte	2
+ 2557 0065 00       		.byte	0
+ 2558 0066 01       		.byte	1
+ 2559 0067 00       		.byte	0
+ 2560 0068 03       		.byte	3
+ 2561 0069 00       		.byte	0
+ 2562 006a 01       		.byte	1
+ 2563 006b 00       		.byte	0
+ 2564 006c 02       		.byte	2
+ 2565 006d 00       		.byte	0
+ 2566 006e 01       		.byte	1
+ 2567 006f 00       		.byte	0
+ 2568 0070 04       		.byte	4
+ 2569 0071 00       		.byte	0
+ 2570 0072 01       		.byte	1
+ 2571 0073 00       		.byte	0
+ 2572 0074 02       		.byte	2
+ 2573 0075 00       		.byte	0
+ 2574 0076 01       		.byte	1
+ 2575 0077 00       		.byte	0
+ 2576 0078 03       		.byte	3
+ 2577 0079 00       		.byte	0
+ 2578 007a 01       		.byte	1
+ 2579 007b 00       		.byte	0
+ 2580 007c 02       		.byte	2
+ 2581 007d 00       		.byte	0
+ 2582 007e 01       		.byte	1
+ 2583 007f 00       		.byte	0
+ 2584 0080 07       		.byte	7
+ 2585 0081 00       		.byte	0
+ 2586 0082 01       		.byte	1
+ 2587 0083 00       		.byte	0
+ 2588 0084 02       		.byte	2
+ 2589 0085 00       		.byte	0
+ 2590 0086 01       		.byte	1
+ 2591 0087 00       		.byte	0
+ARM GAS  /tmp/ccJocHtA.s 			page 73
+
+
+ 2592 0088 03       		.byte	3
+ 2593 0089 00       		.byte	0
+ 2594 008a 01       		.byte	1
+ 2595 008b 00       		.byte	0
+ 2596 008c 02       		.byte	2
+ 2597 008d 00       		.byte	0
+ 2598 008e 01       		.byte	1
+ 2599 008f 00       		.byte	0
+ 2600 0090 04       		.byte	4
+ 2601 0091 00       		.byte	0
+ 2602 0092 01       		.byte	1
+ 2603 0093 00       		.byte	0
+ 2604 0094 02       		.byte	2
+ 2605 0095 00       		.byte	0
+ 2606 0096 01       		.byte	1
+ 2607 0097 00       		.byte	0
+ 2608 0098 03       		.byte	3
+ 2609 0099 00       		.byte	0
+ 2610 009a 01       		.byte	1
+ 2611 009b 00       		.byte	0
+ 2612 009c 02       		.byte	2
+ 2613 009d 00       		.byte	0
+ 2614 009e 01       		.byte	1
+ 2615 009f 00       		.byte	0
+ 2616 00a0 05       		.byte	5
+ 2617 00a1 00       		.byte	0
+ 2618 00a2 01       		.byte	1
+ 2619 00a3 00       		.byte	0
+ 2620 00a4 02       		.byte	2
+ 2621 00a5 00       		.byte	0
+ 2622 00a6 01       		.byte	1
+ 2623 00a7 00       		.byte	0
+ 2624 00a8 03       		.byte	3
+ 2625 00a9 00       		.byte	0
+ 2626 00aa 01       		.byte	1
+ 2627 00ab 00       		.byte	0
+ 2628 00ac 02       		.byte	2
+ 2629 00ad 00       		.byte	0
+ 2630 00ae 01       		.byte	1
+ 2631 00af 00       		.byte	0
+ 2632 00b0 04       		.byte	4
+ 2633 00b1 00       		.byte	0
+ 2634 00b2 01       		.byte	1
+ 2635 00b3 00       		.byte	0
+ 2636 00b4 02       		.byte	2
+ 2637 00b5 00       		.byte	0
+ 2638 00b6 01       		.byte	1
+ 2639 00b7 00       		.byte	0
+ 2640 00b8 03       		.byte	3
+ 2641 00b9 00       		.byte	0
+ 2642 00ba 01       		.byte	1
+ 2643 00bb 00       		.byte	0
+ 2644 00bc 02       		.byte	2
+ 2645 00bd 00       		.byte	0
+ 2646 00be 01       		.byte	1
+ 2647 00bf 00       		.byte	0
+ 2648 00c0 06       		.byte	6
+ARM GAS  /tmp/ccJocHtA.s 			page 74
+
+
+ 2649 00c1 00       		.byte	0
+ 2650 00c2 01       		.byte	1
+ 2651 00c3 00       		.byte	0
+ 2652 00c4 02       		.byte	2
+ 2653 00c5 00       		.byte	0
+ 2654 00c6 01       		.byte	1
+ 2655 00c7 00       		.byte	0
+ 2656 00c8 03       		.byte	3
+ 2657 00c9 00       		.byte	0
+ 2658 00ca 01       		.byte	1
+ 2659 00cb 00       		.byte	0
+ 2660 00cc 02       		.byte	2
+ 2661 00cd 00       		.byte	0
+ 2662 00ce 01       		.byte	1
+ 2663 00cf 00       		.byte	0
+ 2664 00d0 04       		.byte	4
+ 2665 00d1 00       		.byte	0
+ 2666 00d2 01       		.byte	1
+ 2667 00d3 00       		.byte	0
+ 2668 00d4 02       		.byte	2
+ 2669 00d5 00       		.byte	0
+ 2670 00d6 01       		.byte	1
+ 2671 00d7 00       		.byte	0
+ 2672 00d8 03       		.byte	3
+ 2673 00d9 00       		.byte	0
+ 2674 00da 01       		.byte	1
+ 2675 00db 00       		.byte	0
+ 2676 00dc 02       		.byte	2
+ 2677 00dd 00       		.byte	0
+ 2678 00de 01       		.byte	1
+ 2679 00df 00       		.byte	0
+ 2680 00e0 05       		.byte	5
+ 2681 00e1 00       		.byte	0
+ 2682 00e2 01       		.byte	1
+ 2683 00e3 00       		.byte	0
+ 2684 00e4 02       		.byte	2
+ 2685 00e5 00       		.byte	0
+ 2686 00e6 01       		.byte	1
+ 2687 00e7 00       		.byte	0
+ 2688 00e8 03       		.byte	3
+ 2689 00e9 00       		.byte	0
+ 2690 00ea 01       		.byte	1
+ 2691 00eb 00       		.byte	0
+ 2692 00ec 02       		.byte	2
+ 2693 00ed 00       		.byte	0
+ 2694 00ee 01       		.byte	1
+ 2695 00ef 00       		.byte	0
+ 2696 00f0 04       		.byte	4
+ 2697 00f1 00       		.byte	0
+ 2698 00f2 01       		.byte	1
+ 2699 00f3 00       		.byte	0
+ 2700 00f4 02       		.byte	2
+ 2701 00f5 00       		.byte	0
+ 2702 00f6 01       		.byte	1
+ 2703 00f7 00       		.byte	0
+ 2704 00f8 03       		.byte	3
+ 2705 00f9 00       		.byte	0
+ARM GAS  /tmp/ccJocHtA.s 			page 75
+
+
+ 2706 00fa 01       		.byte	1
+ 2707 00fb 00       		.byte	0
+ 2708 00fc 02       		.byte	2
+ 2709 00fd 00       		.byte	0
+ 2710 00fe 01       		.byte	1
+ 2711 00ff 00       		.byte	0
+ 2712              		.section	.rodata.large_digits.4791,"a",%progbits
+ 2713              		.align	2
+ 2714              		.set	.LANCHOR0,. + 0
+ 2717              	large_digits.4791:
+ 2718 0000 30313233 		.ascii	"0123456789ABCDEF\000"
+ 2718      34353637 
+ 2718      38394142 
+ 2718      43444546 
+ 2718      00
+ 2719              		.section	.rodata.rt_show_version.str1.4,"aMS",%progbits,1
+ 2720              		.align	2
+ 2721              	.LC1:
+ 2722 0000 0A205C20 		.ascii	"\012 \\ | /\012\000"
+ 2722      7C202F0A 
+ 2722      00
+ 2723 0009 000000   		.space	3
+ 2724              	.LC2:
+ 2725 000c 2D205254 		.ascii	"- RT -     Thread Operating System\012\000"
+ 2725      202D2020 
+ 2725      20202054 
+ 2725      68726561 
+ 2725      64204F70 
+ 2726              	.LC3:
+ 2727 0030 202F207C 		.ascii	" / | \\     %d.%d.%d build %s\012\000"
+ 2727      205C2020 
+ 2727      20202025 
+ 2727      642E2564 
+ 2727      2E256420 
+ 2728 004e 0000     		.space	2
+ 2729              	.LC4:
+ 2730 0050 4A756C20 		.ascii	"Jul 12 2022\000"
+ 2730      31322032 
+ 2730      30323200 
+ 2731              	.LC5:
+ 2732 005c 20323030 		.ascii	" 2006 - 2020 Copyright by rt-thread team\012\000"
+ 2732      36202D20 
+ 2732      32303230 
+ 2732      20436F70 
+ 2732      79726967 
+ 2733              		.section	.rodata.rt_vsnprintf.str1.4,"aMS",%progbits,1
+ 2734              		.align	2
+ 2735              	.LC0:
+ 2736 0000 284E554C 		.ascii	"(NULL)\000"
+ 2736      4C2900
+ 2737              		.section	.rodata.small_digits.4790,"a",%progbits
+ 2738              		.align	2
+ 2739              		.set	.LANCHOR1,. + 0
+ 2742              	small_digits.4790:
+ 2743 0000 30313233 		.ascii	"0123456789abcdef\000"
+ 2743      34353637 
+ 2743      38396162 
+ARM GAS  /tmp/ccJocHtA.s 			page 76
+
+
+ 2743      63646566 
+ 2743      00
+ 2744              		.text
+ 2745              	.Letext0:
+ 2746              		.file 2 "rtthread/include/rtdef.h"
+ 2747              		.file 3 "<built-in>"
+ 2748              		.file 4 "rtthread/include/rtthread.h"
+ARM GAS  /tmp/ccJocHtA.s 			page 77
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 kservice.c
+     /tmp/ccJocHtA.s:16     .text.print_number:0000000000000000 $t
+     /tmp/ccJocHtA.s:22     .text.print_number:0000000000000000 print_number
+     /tmp/ccJocHtA.s:341    .text.print_number:0000000000000160 $d
+     /tmp/ccJocHtA.s:348    .text.rt_get_errno:0000000000000000 $t
+     /tmp/ccJocHtA.s:355    .text.rt_get_errno:0000000000000000 rt_get_errno
+     /tmp/ccJocHtA.s:396    .text.rt_get_errno:0000000000000020 $d
+     /tmp/ccJocHtA.s:401    .text.rt_set_errno:0000000000000000 $t
+     /tmp/ccJocHtA.s:408    .text.rt_set_errno:0000000000000000 rt_set_errno
+     /tmp/ccJocHtA.s:450    .text.rt_set_errno:0000000000000020 $d
+     /tmp/ccJocHtA.s:455    .text._rt_errno:0000000000000000 $t
+     /tmp/ccJocHtA.s:462    .text._rt_errno:0000000000000000 _rt_errno
+     /tmp/ccJocHtA.s:501    .text._rt_errno:000000000000001c $d
+     /tmp/ccJocHtA.s:506    .text.rt_memset:0000000000000000 $t
+     /tmp/ccJocHtA.s:513    .text.rt_memset:0000000000000000 rt_memset
+     /tmp/ccJocHtA.s:620    .text.rt_memcpy:0000000000000000 $t
+     /tmp/ccJocHtA.s:627    .text.rt_memcpy:0000000000000000 rt_memcpy
+     /tmp/ccJocHtA.s:740    .text.rt_memmove:0000000000000000 $t
+     /tmp/ccJocHtA.s:747    .text.rt_memmove:0000000000000000 rt_memmove
+     /tmp/ccJocHtA.s:828    .text.rt_memcmp:0000000000000000 $t
+     /tmp/ccJocHtA.s:835    .text.rt_memcmp:0000000000000000 rt_memcmp
+     /tmp/ccJocHtA.s:891    .text.rt_strcasecmp:0000000000000000 $t
+     /tmp/ccJocHtA.s:898    .text.rt_strcasecmp:0000000000000000 rt_strcasecmp
+     /tmp/ccJocHtA.s:968    .text.rt_strncpy:0000000000000000 $t
+     /tmp/ccJocHtA.s:975    .text.rt_strncpy:0000000000000000 rt_strncpy
+     /tmp/ccJocHtA.s:1042   .text.rt_strncmp:0000000000000000 $t
+     /tmp/ccJocHtA.s:1049   .text.rt_strncmp:0000000000000000 rt_strncmp
+     /tmp/ccJocHtA.s:1111   .text.rt_strcmp:0000000000000000 $t
+     /tmp/ccJocHtA.s:1118   .text.rt_strcmp:0000000000000000 rt_strcmp
+     /tmp/ccJocHtA.s:1154   .text.rt_strnlen:0000000000000000 $t
+     /tmp/ccJocHtA.s:1161   .text.rt_strnlen:0000000000000000 rt_strnlen
+     /tmp/ccJocHtA.s:1194   .text.rt_strlen:0000000000000000 $t
+     /tmp/ccJocHtA.s:1201   .text.rt_strlen:0000000000000000 rt_strlen
+     /tmp/ccJocHtA.s:1230   .text.rt_strstr:0000000000000000 $t
+     /tmp/ccJocHtA.s:1237   .text.rt_strstr:0000000000000000 rt_strstr
+     /tmp/ccJocHtA.s:1306   .text.rt_vsnprintf:0000000000000000 $t
+     /tmp/ccJocHtA.s:1313   .text.rt_vsnprintf:0000000000000000 rt_vsnprintf
+     /tmp/ccJocHtA.s:1587   .text.rt_vsnprintf:000000000000013c $d
+     /tmp/ccJocHtA.s:1671   .text.rt_vsnprintf:0000000000000190 $t
+     /tmp/ccJocHtA.s:2034   .text.rt_vsnprintf:0000000000000328 $d
+     /tmp/ccJocHtA.s:2039   .text.rt_snprintf:0000000000000000 $t
+     /tmp/ccJocHtA.s:2046   .text.rt_snprintf:0000000000000000 rt_snprintf
+     /tmp/ccJocHtA.s:2091   .text.rt_vsprintf:0000000000000000 $t
+     /tmp/ccJocHtA.s:2098   .text.rt_vsprintf:0000000000000000 rt_vsprintf
+     /tmp/ccJocHtA.s:2124   .text.rt_sprintf:0000000000000000 $t
+     /tmp/ccJocHtA.s:2131   .text.rt_sprintf:0000000000000000 rt_sprintf
+     /tmp/ccJocHtA.s:2178   .text.rt_hw_console_output:0000000000000000 $t
+     /tmp/ccJocHtA.s:2185   .text.rt_hw_console_output:0000000000000000 rt_hw_console_output
+     /tmp/ccJocHtA.s:2199   .text.rt_kputs:0000000000000000 $t
+     /tmp/ccJocHtA.s:2206   .text.rt_kputs:0000000000000000 rt_kputs
+     /tmp/ccJocHtA.s:2237   .text.rt_kprintf:0000000000000000 $t
+     /tmp/ccJocHtA.s:2244   .text.rt_kprintf:0000000000000000 rt_kprintf
+     /tmp/ccJocHtA.s:2301   .text.rt_kprintf:0000000000000028 $d
+     /tmp/ccJocHtA.s:2306   .text.rt_show_version:0000000000000000 $t
+     /tmp/ccJocHtA.s:2313   .text.rt_show_version:0000000000000000 rt_show_version
+     /tmp/ccJocHtA.s:2356   .text.rt_show_version:000000000000002c $d
+ARM GAS  /tmp/ccJocHtA.s 			page 78
+
+
+     /tmp/ccJocHtA.s:2365   .text.__rt_ffs:0000000000000000 $t
+     /tmp/ccJocHtA.s:2372   .text.__rt_ffs:0000000000000000 __rt_ffs
+     /tmp/ccJocHtA.s:2431   .text.__rt_ffs:0000000000000040 $d
+     /tmp/ccJocHtA.s:2455   .rodata.__lowest_bit_bitmap:0000000000000000 __lowest_bit_bitmap
+     /tmp/ccJocHtA.s:2437   .bss.__rt_errno:0000000000000000 $d
+     /tmp/ccJocHtA.s:2441   .bss.__rt_errno:0000000000000000 __rt_errno
+     /tmp/ccJocHtA.s:2444   .bss.rt_log_buf.4895:0000000000000000 $d
+     /tmp/ccJocHtA.s:2448   .bss.rt_log_buf.4895:0000000000000000 rt_log_buf.4895
+     /tmp/ccJocHtA.s:2451   .rodata.__lowest_bit_bitmap:0000000000000000 $d
+     /tmp/ccJocHtA.s:2713   .rodata.large_digits.4791:0000000000000000 $d
+     /tmp/ccJocHtA.s:2717   .rodata.large_digits.4791:0000000000000000 large_digits.4791
+     /tmp/ccJocHtA.s:2720   .rodata.rt_show_version.str1.4:0000000000000000 $d
+     /tmp/ccJocHtA.s:2734   .rodata.rt_vsnprintf.str1.4:0000000000000000 $d
+     /tmp/ccJocHtA.s:2738   .rodata.small_digits.4790:0000000000000000 $d
+     /tmp/ccJocHtA.s:2742   .rodata.small_digits.4790:0000000000000000 small_digits.4790
+
+UNDEFINED SYMBOLS
+rt_interrupt_get_nest
+rt_thread_self

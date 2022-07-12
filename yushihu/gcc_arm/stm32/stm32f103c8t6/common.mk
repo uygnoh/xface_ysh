@@ -4,7 +4,7 @@
 PREFIX          ?= arm-none-eabi
 #PREFIX         ?= arm-elf
 CC              := $(PREFIX)-gcc
-LD              := $(PREFIX)-ld -v
+LD              := $(PREFIX)-gcc
 AR              := $(PREFIX)-ar
 AS              := $(PREFIX)-as
 OBJCOPY         := $(PREFIX)-objcopy
@@ -24,14 +24,12 @@ INCLUDE	        += -I$(YUSHIHU)/cmsis
 INCLUDE	        += -I$(YUSHIHU)/library
 INCLUDE	        += -I$(YUSHIHU)/library/inc
 
-PROGRAM=main
-
+PROGRAM         := main
 #Adjust TYPE_OF_CPU in use, see CMSIS file "stm32f10x.h"
 #STM32F103RBT (128KB FLASH, 20KB RAM) --> STM32F10X_MD
 TYPE_OF_CPU     := STM32F10X_MD
 #STM32F103RET (512KB FLASH, 64KB RAM) --> STM32F10X_HD
 #TYPE_OF_CPU=STM32F10X_HD
-
 COMMONFLAGS     := -g -mcpu=cortex-m3 -mthumb
 COMMONFLAGSLIB  := $(COMMONFLAGS)
 
@@ -76,7 +74,7 @@ else
  	CFLAGS  += -D RELEASE_PUBLIC
  	INFO_TEXT_USER=user (full optimize and readout protected, -O4)
 endif
-CFLAGS          := $(COMMONFLAGS) -Wall -Werror $(INCLUDE)
+CFLAGS          += $(COMMONFLAGS) -Wall -Werror $(INCLUDE)
 CFLAGS          += -D $(TYPE_OF_CPU)
 CFLAGS          += -D VECT_TAB_FLASH
 CFLAGS          += -D USE_STDPERIPH_DRIVER
@@ -98,7 +96,7 @@ else
  	COMMONFLAGSLIB+=-O3
  	INFO_TEXT_LIB=library (full optimize, -O3)
 endif	
-CFLAGSLIB       := $(COMMONFLAGSLIB) -Wall -Werror $(INCLUDE)
+CFLAGSLIB       += $(COMMONFLAGSLIB) -Wall -Werror $(INCLUDE)
 CFLAGSLIB       += -D $(TYPE_OF_CPU)
 CFLAGSLIB       += -D VECT_TAB_FLASH
-CFLAGSLIB       +=-D USE_STDPERIPH_DRIVER
+CFLAGSLIB       += -D USE_STDPERIPH_DRIVER
