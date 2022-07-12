@@ -1,0 +1,53 @@
+/*******************************************************************************
+        => vscode 用户配置文件 
+*******************************************************************************/
+“Ctrl+Shift+P”              //vscode调出命令面板
+“Ctrl+Alt+T”                //运行任务
+
+
+
+//用户配置文件位置(/home/ysh/.config/Code/User/settings.json)
+___________________________________________________________
+{
+        "workbench.colorTheme": "Default Dark+"
+        
+	//控制字体家族
+	"editor.fontFamily": "Monaco",
+	"window.zoomLevel": 1,
+	"editor.fontWeight": "normal",
+	//控制字体大小
+	"editor.fontSize":14,
+
+	//显示空格和“tab”符
+	//"editor.renderControlCharacters": true,
+	//"editor.renderWhitespace":"all",
+
+	//一个制表符等于的空格数
+	"editor.tabSize": 8,
+	//必须指定!!!(否则指定的tab大小将不起效果)
+	"editor.detectIndentation":false,
+
+	//颜色主题设置
+	"workbench.colorTheme": "Monokai",
+
+	//按 “Tab” 禁止插入“空格”
+	"editor.insertSpaces": false,
+
+	//自动换行打开(默认: 关闭状态)
+	//"editor.wordWrap": "on"
+}
+
+
+
+/*******************************************************************************
+        => vscode 插件
+*******************************************************************************/
+1 C/C++
+//C/C++ IntelliSense, debugging, and code browsing.
+2 Cortex-Debug
+//ARM Cortex-M GDB Debugger support for VSCode
+3 PlatformIO IDE
+//Profesional development enviroment for Embedded,
+//IoT, Arduino, CMSIS, ESP-IDF, FreeTROS, libOpen...
+4 CMake Tools
+// Extended CMake supprot in Microsoft

@@ -68,8 +68,8 @@ C_INCLUDES =                    \
 -Icmsis                         \
 -Iconfig                        \
 -Ilibrary/inc                   \
--Irtthread/include         \
--Irtthread/include/libc    \
+-Irtthread/include              \
+-Irtthread/include/libc         \
 
 
 
