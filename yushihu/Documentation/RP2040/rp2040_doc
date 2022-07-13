@@ -1,0 +1,177 @@
+/*******************************************************************************
+        => Raspberry-Pico
+*******************************************************************************/
+https://www.digikey.com/en/maker/projects/raspberry-pi-pico-and-rp2040-cc-part-2-debugging-with-vs-code/470abc7efb07432b82c95f6f67f184c0
+        pico-sdk                        // rp2040 软件开发工具包
+        pico-examples                   // rp2040 例程
+        pico-project-generator          // rp2040 自动生成例程工具
+
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico 相关文件下载
+*******************************************************************************/
+        mkdir rp2040_pico
+        cd    rp2040_pico
+        git   clone -b master https://github.com/raspberrypi/pico-sdk.git
+        cd    pico-sdk
+        git   submodule update --init
+        cd    rp2040_pico
+        git   clone -b master https://github.com/raspberrypi/pico-examples.git
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico 安装工具链 （toolchain - 工具链）
+*******************************************************************************/
+// 编译器安装
+// ____________________________________________________________
+        sudo apt install gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libssl-dev tk python3-tk
+
+
+
+// 安装CMake
+// ____________________________________________________________
+        cd   $HOME
+        wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4.tar.gz
+        tar  -zxvf cmake-3.19.4.tar.gz
+        cd   cmake-3.19.4
+        ./bootstrap
+
+
+
+/*******************************************************************************
+        => 配置RP2040环境变量
+*******************************************************************************/
+// vim .bashrc
+// ____________________________________________________________
+        # PICO-RP2040 SDK
+        export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
+        
+        # PICO-RP2040 GCC
+        export PICO_TOOLCHAIN_PATH="编译器路径"
+        
+        
+        
+/*******************************************************************************
+        => pico-project-generator 自动生成工程文件
+*******************************************************************************/
+// 自动生成Demo
+// ____________________________________________________________
+        cd  $HOME/rp2040_pico
+        git clone https://github.com/raspberrypi/pico-project-generator.git
+        cd $HOME/rp2040_pico/pico-project-generator
+        export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
+        export DISPLAY=:0
+
+
+
+// 生成源码文件
+// ____________________________________________________________
+        cd $HOME/rp2040_pico/pico-project-generator
+        ./pico_project.py --gui
+        
+        
+        
+// 编译源码 
+// ____________________________________________________________
+        【1】     进入自动生的工程文件夹
+        【2】     cd build
+        【3】     cmake ..
+        【4】     make
+
+
+
+/*******************************************************************************
+        => Raspberry-Pico vscode 开发
+*******************************************************************************/
+https://blog.csdn.net/tianizimark/article/details/125017394
+// VSCODE -> Manage
+//_____________________________________________________________
+Settings => User => 选择Extentions-->CMake Tools
+        // 找到Cmake: Configure Environment，设置PICO_SDK_PATH变量值
+        PICO_SDK_PATH           /home/ysh/rp2040_pico/pico-sdk
+        // 找到Cmake: Generator，设置成Unix Makefiles，然后关闭Settings
+        Cmake: Generator
+                Unix Makefiles
+
+
+
+// 在pico-examples目录下新建.vscode目录
+        mkdir .vscode
+// 将pico-examples/ide内的文件拷贝至.vscode目录并进行修改
+//_____________________________________________________________
+        cp ide/vscode/launch-raspberrypi-swd.json .vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Pico Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "${command:cmake.launchTargetPath}",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            // This may need to be arm-none-eabi-gdb depending on your system
+            "gdbPath" : "gdb-multiarch",
+            "device": "RP2040",
+            "searchDir":        ["/home/raspberry_pi_pico/openocd/tcl"],
+            "configFiles": [
+                "interface/picoprobe.cfg",
+                "target/rp2040.cfg"
+            ],
+            "svdFile": "${env:PICO_SDK_PATH}/src/rp2040/hardware_regs/rp2040.svd",
+            "runToMain": true,
+            // Work around for stopping at main on restart
+            "postRestartCommands": [
+                "break main",
+                "continue"
+            ]
+        }
+    ]
+}
+// 特别注意searchDir需要填写自己的目录
+// configFiles里面"interface/raspberrypi-swd.cfg",必须改成interface/picoprobe.cfg
+// （因为我们用的picoprobe固件作为调试器固件）
+// searchDir要设置为下载在本地的openocd/tcl对应的路径，然后保存关闭
+
+
+
+// 通过组合键shift+ctrl+p，然后输入 CMake: Edit User-Local CMake Kits
+// 这一步是设置交叉编译工具链,  在原有的基础上增加如下内容，然后保存
+// 其中C字段设置gcc编译器，CXX字段设置g++编译器
+//_____________________________________________________________
+{
+        "name": "gcc-arm-none-eabi-7.3.1 20180622",
+        "compilers": {
+                "C":   "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-gcc",
+                "CXX": "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-g++"
+        }
+}
+
+
+
+// 设置Cortex-Debug配置项，找到Openocd Path并编辑
+//_____________________________________________________________
+{
+        "cmake.configureEvironment": {
+                "PICO_SDK_PATH": "/home/ysh/rp2040_pico/pico-sdk"
+        },
+        "cmake.generator": "Unix Makefiles",
+        "cortex-debug.openocdPath": "/usr/bin/openocd /usr/share/openocd"
+}
+// 添加cortex-debug.openocdPath为我们自己的openocd路径
+// 至此，我们已经准备好软件环境，重启一下Visual Studio Code
+
+
+
+
+
+
+
+
+
+
+
+
