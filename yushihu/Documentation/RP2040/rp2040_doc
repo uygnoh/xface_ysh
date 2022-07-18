@@ -46,10 +46,13 @@ https://www.digikey.com/en/maker/projects/raspberry-pi-pico-and-rp2040-cc-part-2
 *******************************************************************************/
 // vim .bashrc
 // ____________________________________________________________
-        # PICO-RP2040 SDK
+        #// PICO-RP2040 SDK
         export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
         
-        # PICO-RP2040 GCC
+        #// CMake
+        export PATH=$PATH:/home/ysh/rp2040_pico/CMake/cmake-3.19.4/bin
+        
+        #// PICO-RP2040 GCC
         export PICO_TOOLCHAIN_PATH="编译器路径"
         
         
@@ -84,7 +87,7 @@ https://www.digikey.com/en/maker/projects/raspberry-pi-pico-and-rp2040-cc-part-2
 
 
 /*******************************************************************************
-        => Raspberry-Pico vscode 开发
+        => Raspberry-Pico vscode Debug
 *******************************************************************************/
 https://blog.csdn.net/tianizimark/article/details/125017394
 // VSCODE -> Manage
@@ -167,11 +170,109 @@ Settings => User => 选择Extentions-->CMake Tools
 
 
 
+/*******************************************************************************
+        => Raspberry-Pico vscode 开发教程
+*******************************************************************************/
+// 创建工程文件
+//_____________________________________________________________
+        mkdir   pico-projects
+        cd      pico-projects
+        cp      pico_sdk_import.cmake   ./
+        mkdir   CMakeLists.txt
+
+
+
+// 编辑文件:   /home/ysh/.config/Code/User/settings.json
+//_____________________________________________________________
+{   
+	// 控制字体家族
+        "editor.fontFamily": "Monaco",
+	"editor.fontWeight": "normal",
+	// 控制字体大小
+	"editor.fontSize":18,
+
+	// 显示空格和“tab”符
+	//"editor.renderControlCharacters": true,
+	//"editor.renderWhitespace":"all",
+
+	// 一个制表符等于的空格数
+	"editor.tabSize": 8,
+	// 必须指定!!!(否则指定的tab大小将不起效果)
+	"editor.detectIndentation":false,
+
+	// 颜色主题设置
+        "workbench.colorTheme": "Monokai",
+        "C_Cpp.updateChannel": "Insiders",
+        "cmake.configureOnOpen": true,
+        "cmake.generator": "Unix Makefiles",
+        "cmake.configureEnvironment": {
+                "PICO_SDK_PATH": "/home/ysh/rp2040_pico/pico-sdk"
+        },
+
+	// “Tab”禁止插入“空格”
+	//"editor.insertSpaces": false,
+
+	// 自动换行打开(默认: 关闭状态)
+	//"editor.wordWrap": "on"
+}
+
+
+
+// 编辑文件:   pico-projects/CMakeLists.txt
+//_____________________________________________________________
+# Set minimum required version of CMake
+cmake_minimum_required(VERSION 3.12)
+
+include(pico_sdk_import.cmake)
+
+project(pico-projects)
+
+pico_sdk_init()
+
+add_executable(blink_led
+        blink_led.c
+)
+
+target_link_libraries(blink_led pico_stdlib)
+
+pico_add_extra_outputs(blink_led)
 
 
 
 
+// 通过组合键 shift+ctrl+p
+// 然后输入  CMake: Edit User-Local CMake Kits
+// 这一步是设置交叉编译工具链,  在原有的基础上增加如下内容，然后保存
+// 其中C字段设置gcc编译器， CXX字段设置g++编译器
+//_____________________________________________________________
+{
+        "name": "gcc-arm-none-eabi-7.3.1 20180622",
+        "compilers": {
+                "C":   "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-gcc",
+                "CXX": "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-g++"
+        }
+}
 
 
 
+// 初始化这个配置
+//_____________________________________________________________
+VSCODE  ->Terminal  -> Configure Tasks ...
 
+
+
+// 编辑文件:   pico-projects/main.c
+//_____________________________________________________________
+#include "pico/stdlib.h"
+int main(void)
+{
+        gpio_init(25);
+        gpio_set_dir(25, GPIO_OUT);
+        
+        while (1) {
+                gpio_put(25, 1);
+                sleep_ms(500);
+                gpio_put(25, 0);
+                sleep_ms(500);
+        }
+}

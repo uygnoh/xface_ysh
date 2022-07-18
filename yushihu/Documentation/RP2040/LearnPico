@@ -1,0 +1,64 @@
+//______________________________________________________________________________
+//      => RP2040-VSCODE
+//______________________________________________________________________________
+// 设置 rp2040-pico sdk 环境变量
+//_____________________________________________________________
+export PICO_SDK_PATH="/home/ysh/rp2040_pico/pico-sdk"
+
+
+
+// 安装工具 CMake Tools ，并配置它
+// Settings -> User -> Extensions -> Cmake tool
+//_____________________________________________________________
+        Cmake: Configure Environment
+        // Add Item
+        PICO_SDK_PATH           /home/ysh/rp2040_pico/pico-sdk
+        
+        
+        // Cmake: Preferred Generator
+        // The preferred CMake generator(s) to use when configuring (tried in order of listing).
+        Edit in settings.json
+{   
+        ...
+        // 配置CMake
+        "cmake.configureOnOpen": true,
+        "cmake.generator": "Unix Makefiles",
+        "cmake.configureEnvironment": {
+                "PICO_SDK_PATH": "/home/ysh/rp2040_pico/pico-sdk"
+        },
+}
+
+
+
+//      选择编译器
+//_____________________________________________________________
+//  /home/ysh/.local/share/CMakeTools/cmake-tools-kits.json
+// 通过组合键shift+ctrl+p，然后输入 >CMake: Edit User-Local CMake Kits
+// 这一步是设置交叉编译工具链,  在原有的基础上增加如下内容，然后保存
+// 其中C字段设置gcc编译器，CXX字段设置g++编译器
+{       ...
+        "name": "gcc-arm-none-eabi-7.3.1 20180622",
+        "compilers": {
+                "C":   "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-gcc",
+                "CXX": "/home/ysh/ARM_GCC/gcc-arm-none-eabi-7-2018-q2-update/bin/arm-none-eabi-g++"
+        }
+}
+
+
+
+//______________________________________________________________________________
+//      => LearnEmbeddedSystems
+//______________________________________________________________________________
+// USB 串吕打印
+https://learnembeddedsystems.co.uk/pico-usb-serial-code
+
+
+// RP2040-FreeRTOS
+https://learnembeddedsystems.co.uk/
+https://learnembeddedsystems.co.uk/freertos-on-rp2040-boards-pi-pico-etc-using-vscode
+git clone --recurse-submodules https://github.com/LearnEmbeddedSystems/rp2040-freertos-project
+
+
+// RP2040-学习
+https://www.taterli.com/7491/
+

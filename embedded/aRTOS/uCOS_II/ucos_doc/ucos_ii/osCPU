@@ -2,16 +2,16 @@
         => uCOS-II 临界区的第3种方法实现
 *******************************************************************************/
 // 通过“cpu_sr”保存CPU的中断状态
+//_____________________________________________________________
 #if OS_CRITICAL_METHOD = 3u
         OS_CPU_SR cpu_sr = 0u;
 #endif
-//_____________________________________________________________
+
 #define OS_ENTER_CRITICAL()     { cpu_sr = OS_CPU_SR_Save(); }
-#deifne OS_EXIT_CRITICAL()      { OS_CPU_SR_Restore(cpu_sr); }
-//_____________________________________________________________
+#define OS_EXIT_CRITICAL()      { OS_CPU_SR_Restore(cpu_sr); }
 
 
-//_____________________________________________________________
+
 // ARM-CM3 ( C程序和汇编程序相互调用_参数传递规则 )
 // R0~R3 可以用于传递参数
 // Set prio int mask to mask all (except faults)
@@ -30,14 +30,14 @@ OS_CPU_SR_Restore
 /*******************************************************************************
         => OSCtxSw || OSIntCtxSw
 *******************************************************************************/
-// 在任务中进行上下文切换
+// 在任务中进行上下文切换，引发PendSV异常
 OSCtxSw
         LDR     R0, =NVIC_INT_CTRL
         LDR     R1, =NVIC_PENDSVSET
         STR     R1, [R0]
         BX      LR
 
-// 在中断中进行上下文切换
+// 在中断中进行上下文切换，引发PendSV异常
 OSIntCtSw
         LDR     R0, =NVIC_INT_CTRL
         LDR     R1, =NVIC_PENDSVSET
@@ -75,33 +75,34 @@ OSIntCtSw
 */
 
 OS_CPU_PendSVHandler
-; //进入PendSV异常前CPU自动保存( xPSR, PC, LR, R12, R3, R2, R1, R0 )
-; //___________________________________________________________
+        ; // 进入PendSV异常前CPU自动保存( xPSR, PC, LR, R12, R3, R2, R1, R0 )
+        ; //_______________________________________________________________
 
          
-        CPSID   I                  ; //进入PendSV异常，先把中断关闭，准备上下文切换
-        MRS     R0, PSP            ; //PSP is process stack pointer
+        CPSID   I                  ; // 进入PendSV异常，先把中断关闭，准备上下文切换
+        MRS     R0, PSP            ; // PSP is process stack pointer
         
         ; //如果PSP寄存器为“0”，则跳转 (表示这是任务的第一次切换)
         ; //CBZ（先比较）， 如果结果为“0”， 则跳转
         CBZ     R0, OS_CPU_PendSVHandler_nosave
         
-        SUBS    R0, R0, #0x20      ; //R0 = (R0 - 32)
-        STM     R0, {R4-R11}       ; //手动保存R4-R11到进程堆栈
+        SUBS    R0, R0, #0x20      ; // R0 = (R0 - 32)
+        STM     R0, {R4-R11}       ; // 手动保存R4-R11到进程堆栈
         
-        LDR     R1, =OSTCBCur      ; //(OSTCBCur->OSTCBStkPtr) = PSP
+        LDR     R1, =OSTCBCur      ; // (OSTCBCur->OSTCBStkPtr) = PSP
         LDR     R1, [R1]
-        STR     R0, [R1]           ; //R0 is SP of process beging switched out
+        STR     R0, [R1]           ; // R0 is SP of process beging switched out
 
 
-; //在这个点整个寄存器的内容都会被保存到当前任务的OSTCBCur->OSTCBStkPtr栈中
-; //更新当前任务栈顶指针，此时此刻上文已保存-----------------------------
+; // 在这个点整个寄存器的内容都会被保存到当前任务的OSTCBCur->OSTCBStkPtr栈中
+; // 更新当前任务栈顶指针，此时此刻上文已保存-----------------------------
 
 
 OS_CPU_PendSVHandler_nosave
 
 
-; //下面的部分进行下文环境的准备工作，并切换到系统最高优先级任务中
+
+; // 下面的部分进行下文环境的准备工作，并切换到系统最高优先级任务中
 ; //--------------------------------------------------------------
 
 
@@ -121,17 +122,18 @@ OS_CPU_PendSVHandler_nosave
         STR     R2, [R0]
         
 
-        LDR     R0, [R2]     ; //R0 is new process SP; PSP = OSTCBHighRdy->OSTCBStkPtr
-        LDM     R0, {R4-R11} ; //Restore r4-r11 form new process stack
-        ADDS    R0, R0, #0x20; // R0 = (R0 + 32)
-        MSR     PSP, R0      ; //Load PSP with new process SP
-        ORR     LR, LR, #0x04; //Ensure exception return uses process stack
+        LDR     R0, [R2]           ; // R0 is new process SP; PSP = OSTCBHighRdy->OSTCBStkPtr
+        LDM     R0, {R4-R11}       ; // Restore r4-r11 form new process stack
+        ADDS    R0, R0, #0x20      ; // R0 = (R0 + 32)
+        MSR     PSP, R0            ; // Load PSP with new process SP
+        ORR     LR, LR, #0x04      ; // 确保异常返回使用（PSP）进程堆栈
         CPSIE   I
-        BX      LR           ; //Exception return will restore remaining context
+        BX      LR                 ; // Exception return will restore remaining context
 
 
-; //进入任务处理程序这前，CPU自动恢复( xPSR, PC, LR, R12, R3-R0 )
-; //___________________________________________________________
+
+        ; // 进入任务处理程序这前，CPU自动恢复( xPSR, PC, LR, R12, R3-R0 )
+        ; //___________________________________________________________
 
 
 
@@ -185,102 +187,4 @@ OSSTartHang                             ; //should never get here
         
         
         
-/*******************************************************************************
-        => OS_CPU_SysTickHandle（）
-*******************************************************************************/
-void OS_CPU_SysTickHandle(void)
-{
-        OS_CPU_SR cpu_sr;
-        
-        //进入中断
-        OS_ENTER_CRITICAL();
-        OSIntNesting++;
-        OS_EXIT_CRITICAL();
-        
-        OSTimeTick();
-        
-        //退出中断
-        OSIntExit();
-}
 
-
-/*******************************************************************************
-        => OSTimeTick()
-*******************************************************************************/
-这个节拍服务函数是在OSTickISR函数中调用的，目的是在时钟节拍到来时，
-检查每个任务的任务控制块中的.OSTCBDly-1后是否为0，如果是，那么表明
-这个任务刚才是挂起的状态，此时应改变为就绪态
-void OSTimeTick(void)
-{
-        OS_TCB          *ptcb;
-        #if OS_TICK_STEP_EN > 0u
-        BOOLEAN         step;
-        #endif
-        
-        #if OS_CRITICAL_METHOD == 3u
-        OS_CPU_SR cpu_sr = 0;
-        #endif
-        
-        #if OS_TIME_TICK_HOOK_EN > 0u
-        OSTimeTickHook();
-        #endif
-        
-        #if OS_TIME_GET_SET_EN > 0u
-        OS_ENTER_CRITICAL();
-        OSTime++;
-        OS_EXIT_CRITICAL();
-        #endif
-        
-        if (OSRunning == OS_TRUE) {
-        #if OS_TICK_STEP_EN > 0
-                switch (OSTickStepState) {
-                case OS_TICK_STEP_DIS:
-                        step            = OS_TRUE;
-                        break;
-                case OS_TICK_STEP_WAIT:
-                        step            = OS_FALSE;
-                        break;
-                case OS_TICK_STEP_ONCE:
-                        step            = OS_TRUE;
-                        OSTickStepState = OS_TICK_STEP_WAIT;
-                        break;
-                default:
-                        step            = OS_TRUE
-                        OSTickStepState = OS_TICK_STEP_DIS;
-                        break;
-                }
-                if (step == OS_FALSE) {
-                        return;
-                }
-        #endif
-                ///时钟节拍到来时，将控制块双向链表的第一个控制块取出（并不是节拍之前运行的任务）
-                ptcb = OSTCBList;
-                //空闲任务处于控制块双向链表的最后一个，如果取出的控制块为空闲任务的控制块，
-                //那么已经取到最后一个了，就结束
-                while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {
-                        OS_ENTER_CRITICAL();
-                        if (ptcb->OSTCBDly != 0) {
-                                ptcb->OSTCBDly--;
-                                if (ptcb->OSTCBDly == 0u) {
-                                        //是不是在等待某种信号，OS_STAT_PEND_ANY，
-                                        //如果是，因为等待超时，所以不再等待某种信号， 清除标志位
-                                        if ((ptcb->OSTCBStat & OS_STAT_PEND_ANY) != OS_STAT_RDY) {
-                                                ptcb->OSTCBStat &= (INT8U)~(INT8U)OS_STAT_PEND_ANY;
-                                                ptcb->OSTCBStatPend = OS_STAT_PEND_TO;
-                                        } else {
-                                                ptcb->OSTCBStatPend = OS_STAT_PEND_OK;
-                                        }
-                                       
-                                        if ((ptcb->OSTCBStat & OS_SATA_SUSPEND) == OS_STAT_RDY) {
-                                                OSRdyGrp               |= ptcb->OSTCBBitY;
-                                                OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
-                                        }
-                                        
-                                }
-                        }
-                         //下一个任务控制块
-                        ptcb = ptcb->OSTCBNext;
-                        OS_EXIT_CRITICAL();
-                }
-        }           
-}

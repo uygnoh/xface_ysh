@@ -1,3 +1,4 @@
+// 链表节点数据结构
 struct xLIST_ITEM {   
         struct xLIST_ITEM       *pxNext;
         struct xLIST_ITEM       *pxPrevious;
@@ -7,6 +8,7 @@ struct xLIST_ITEM {
 typedef struct xLIST_ITEM ListItem_t;
 
 
+// Mini链表节点数据结构
 struct xMINI_LIST_ITEM {
         TickType_t              xItemValue;
         struct xLIST_ITEM       *pxNext;
@@ -15,6 +17,7 @@ struct xMINI_LIST_ITEM {
 typedef struct xMINI_LIST_ITEM MiniListItem_t;
 
 
+// 链表数据结构
 typedef struct xLIST {
 
         UBaseType_t             uxNumberOfItems;
@@ -25,7 +28,7 @@ typedef struct xLIST {
 
 
 
-//      =>
+//      => 
 //_____________________________________________________________
 #define listSET_LIST_ITEM_OWNER(pxListItem, pxOwner)          \
                 ((pxListItem)->pvOwner = (void *)(pxOwner))

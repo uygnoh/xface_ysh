@@ -559,24 +559,30 @@ Note:
         3) Load the context of the task pointed to by OSTCBHighRdy.
         4) Execte the task
 */
-
 void OSStart(void)
 {
         if (OSRunning == OS_FALSE) {
-                //Find highest priority's task priority number
+                // 查找最高优先级任务的（优先级号码）
                 OS_SchedNew();
                 OSPrioCur = OSPrioHighRdy;
-                //Point to highest priority task ready to run
+                // Point to highest priority task ready to run
                 OSTCBHihgRdy = OSTCBPrioTbl[OSPrioHighRdy];
                 OSTCBCur = OSTCBHighRdy;
-                //Execute target specific code to start task
+                // Execute target specific code to start task
                 OSStartHighRdy();
         }
 }
 
-//查找uCOS-II系统当前就绪表中那个优先级最高， 返回那个最高优先级的号码
-//它是一个静态函数，只能在文件内部被调用（你的应用程序不应该调用它！！！）
-//下面用的( uCOS-II 优先级判定表算法 ), 只能支持 0~63 个任务优先级
+
+
+/*******************************************************************************
+        => OS_SchedNew() 
+*******************************************************************************/
+1. 这个函数是内部函数，你的应用程序不应该调用它
+2. 在调用这个函数时，假定中断是被禁用的
+// 查找uCOS-II系统当前就绪表中那个优先级最高， 返回那个最高优先级的号码
+// 它是一个静态函数，只能在文件内部被调用（你的应用程序不应该调用它！！！）
+// 下面用的( uCOS-II 优先级判定表算法 ), 只能支持 0~63 个任务优先级
 static void OS_SchedNew(void)
 {
         INT8U y;
