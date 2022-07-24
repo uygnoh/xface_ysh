@@ -110,11 +110,11 @@ Label:  <opcode>{<cond>}{S} <Rd>, <Rn> {,<operand2>}
 
 
 /*******************************************************************************
-        => LDREX和STREX =>互斥访问指令
+        => 互斥访问指令 EX-exclusive lock
 *******************************************************************************/
-1）LDREXB和STREXB：对内存中的一个字节（Byte，8 bit）进行独占访问；
-2）LDREXH和STREXH：中的一个半字（Half Word，16 bit）进行独占访问；
-3）LDREXD和STREXD：中的一个双字（Double Word，64 bit）进行独占访问。
+        LDREXB   STREXB         //对内存中的一个字节（Byte，8 bit）进行独占访问；
+        LDREXH   STREXH         //中的一个半字（Half Word，16 bit）进行独占访问；
+        LDREXD   STREXD         //中的一个双字（Double Word，64 bit）进行独占访问。
 
 
 // LDREX用来读取内存中的值，并标记对该段内存的独占访问：
@@ -149,28 +149,31 @@ Label:  <opcode>{<cond>}{S} <Rd>, <Rn> {,<operand2>}
         SEREX   Rd, Rxf, [Rn, #offset]  // 把Rxf寄存器的内容写入到（Rn + offset）所在的存储单元中， 如果
                                         // Rd寄存器中的内容为（0写进来了， 1写被驳回了）
                                         
-                                        
+
+                 
         // 驳回规则
         //_____________________________________________________
-        // 遇到STREX时，前边仅有一条LDREX指令写成功
+        // 遇到STREX时，前边仅有一条LDREX指令，则写成功
         // 以下情况被驳回
            1 中途有STR指令
            2 中途遇到其它STREX指令
         // LDREX/STREX成对使用
 
 
+
         // 主程序
-        LDREX R2, [R0]
-        ADDR R2, #1
-        STREX R1, R2, [R0]
-        LDREX R2, [R0]
-        ADD R2, #1
-        STREX R1, R2, [R0]
+        LDREX   R2, [R0]        // r2 = [r0]
+        ADD     R2, #1          // r2 = r2 + 1
+        STREX   R1, R2, [R0]    // 如果 r1 = 0， 则写入成功
+                                // [r0] = r2
+        LDREX   R2, [R0]
+        ADD     R2, #1
+        STREX   R1, R2, [R0]
 
         // 中断服务程序
-        MOV R2, #0x11
-        STR R2, [R0]
-        BX LR
+        MOV     R2, #0x11
+        STR     R2, [R0]
+        BX      LR
 
 
 

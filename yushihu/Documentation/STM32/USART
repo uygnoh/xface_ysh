@@ -23,9 +23,9 @@
 | 15-4               | 3-0               |
 | Mantissa[11:0]     | Fraction[3:0]     |
 |____________________|___________________|
-Mantissa[15:4]          // USARTDIV整数部分
+Mantissa[15:4]          // USARTDIV 定义整数部分
                         // 这12位定义了USART分频器除法因了（USARTDIV）的整数部分
-Fraction[3:0]           // USARTDIV小数部分
+Fraction[3:0]           // USARTDIV 定义小数部分
                         // 这4位定义了USART分频器除法因了（USARTDIV）的小数部分
 
 
