@@ -30,7 +30,7 @@ typedef struct {
 |_________________________________________________________|
 |       T_high = CCR * Tpclk1                             |
 |       T_low  = CCR * Tpckk1                             |
-|       SCLK = 2 * CCR * Tpclk1 = 2 * CCR * 1/3MHZ        |
+|       SCLK = 2 * CCR * Tpclk1 = 2 * CCR * 1/36MHZ       |
 |_________________________________________________________|
 #define EE_SCL          GPIO_Pin_6      //GPIOB_PB6
 #define EE_SDA          GPIO_Pin_7      //GPIOB_PB7
