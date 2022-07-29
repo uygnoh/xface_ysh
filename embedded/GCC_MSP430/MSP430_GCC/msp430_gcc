@@ -1,57 +1,61 @@
 /*******************************************************************************
         => MSP430-GCC
 *******************************************************************************/
-//进入TI官网搜索
+// 进入TI官网搜索
 //_________________________________________________________
-MSP430-GCC-OPENSOURCE
+        MSP430-GCC-OPENSOURCE
 
 
-//GCC ALL-IN-ONE INSTALLER （下载 1）
+
+// GCC ALL-IN-ONE INSTALLER （下载 1）
 //_________________________________________________________
-1 MSPGCC工具链
-2 MSP430头文件
-3 链接脚本
-4 gdb_agent_console
+        1 MSPGCC工具链
+        2 MSP430头文件
+        3 链接脚本
+        4 gdb_agent_console
 
 
-//Header and Support Files （下载 2）
+
+// Header and Support Files （下载 2）
 //_________________________________________________________
-包含所需要的（.h）头文件和（.ld）链接脚本文件
+        包含所需要的（.h）头文件和（.ld）链接脚本文件
 
 
-//安装文件程序脚本
+
+// 安装文件程序脚本
 //_________________________________________________________
-sudo ./msp430-full-linux-x64-installer-9.3.1.2.run
+        sudo ./msp430-full-linux-x64-installer-9.3.1.2.run
+
 
 
 //配置MSP430-GCC编译器环境变量（添加MSP-GCC安装路径）
 //_________________________________________________________
-export PATH=$PATH:/opt/INSTALL/msp-gcc-full/msp430-gcc/bin
-$ msp430-elf-gcc --version
+        export PATH=$PATH:/opt/INSTALL/msp-gcc-full/msp430-gcc/bin
+        $ msp430-elf-gcc --version
 
 
 
 /*******************************************************************************
         => MSP430创建工程模板
 *******************************************************************************/
-//进入msp430f5529.h把（#include <iomacros.h>）改成（#include "iomacros.h"）
+// 进入msp430f5529.h把（#include <iomacros.h>）改成（#include "iomacros.h"）
 //_______________________________________________________________________
+        msp430f5529.h
+        in430.h
+        msp430f5529.ld
+        msp430f5529_symbols.ld
+        msp430_uart.c
+        iomacros.h
+        Makefile
+        /build
 
 
-msp430f5529.h
-in430.h
-msp430f5529.ld
-msp430f5529_symbols.ld
-msp430_uart.c
-iomacros.h
-Makefile
-/build
 
-//下载调式工具文件
+// 下载调式工具文件
 //_________________________________________________________
-gdb_agent_console
-libmsp430.so
-msp430.dat
+        gdb_agent_console
+        libmsp430.so
+        msp430.dat
 
 
 
