@@ -1,0 +1,148 @@
+// 程序组成
+        CODE            // 机器代码指令
+        RO-DATA         // 常量
+        RW-DATA         // 初始化非 0 的全局变量
+        ZI-DATA         // 初始化为 0 的全局变量
+        ZI-DATA         // 局部变量，栈空间
+        ZI-DATA         // 动态内存分配的空间，堆空间
+        
+        
+// 加载域
+        加载域的意思是代码要下载到哪里
+        这里肯定要选择下载到Flash中
+// 运行域
+        运行域的意思是代码在哪里运行
+        
+        
+
+// 程序状态区组成
+        // 我们可以指定代码在（RAM）中运行，那么在__main中，就会将相关代码
+        // 复制到（RAM）中，在程序运行时，就会去（RAM）空间取指，译码，执行
+        // 加载域和运行域的定义要以在分散加载文件中完成
+        Code + RO-data                  // 程序执行时的只读区域
+        RW-date + ZI-data               // 程序执行时的可读可写区域
+        Code + RO-data + RW-data        // 程序存储时占用的ROM区
+        
+        
+        
+// 分散加载原理
+// sct文件主要包含描述加载域及执行域的部分
+// 一个文件中可以包含多个加载域，而一个加载域可由多个部分的执行域组成，
+// 同等级别的域之间用花括号“{}”分隔开，最外层的是加载域，最二层“{}”的是执行域
+        // 普通的分散加载文件
+        // 0x08000000   FLASH的起始地址
+        // 0x20000000   RAM  的起始地址
+        // LR_IROM1     表示程序的加载域描述
+        // ER_IROM1     表示程序的运行域描述
+        LR_IROM1        0x08000000     ?0x00100000 {    // Load region size_region
+                ER_IROM1 0x08000000     0x00100000 {    // Load address = execution address
+                        *.o (RESET, +First)             // *.o匹配所有
+                        *(InRoot$$Sections)             // 内部的文件（__main）
+                        .ANY (+RO)                      // .ANY表示所
+                                                        // 表示所有的文件放入（ROM）中
+                }
+                
+                RW_IRAM1 0x20000000 0x00020000 {        // RW data
+                        .ANY (+RW +ZI)                  // 数据段放入的内容
+                }
+        }
+        
+        
+        
+        
+// RT1050-分散加载文件
+// flash配置文件起始地址为（0x60000000）
+#define m_flash_config_start    0x60000000
+// flash配置文件长度为（0x00001000）, 4Kb
+#define m_flash_config_size     0x00001000
+// ivt配置文件起始地址为（0x60001000）
+#define m_ivt_start             0x60001000
+// ivt配置文件长度为（0x60001000）, 4Kb
+#define m_ivt_size              0x00001000
+// 中断向量表起始地址为（0x60002000）
+#define m_interrupts_start      0x60002000
+// 中断向量表长度为（0x00000400），1Kb
+#define m_interrupts_size       0x00000400
+// 代码段起始地址为（0x60002400）
+#define m_text_start            0x60002400
+// 代码段长度为 0x03FFDC00 = 63.991Mb
+#define m_text_size             0x03FFDC00
+// 以上内容，存储在 FlexSPI
+0x6000 0000 0x7F7F FFFF 504MB FlexSPI/ FlexSPI chiertext
+
+
+// 数据段1起始地址为（0x20000000）
+#define m_data_start            0x20000000
+// 数据段1长度为 0x00020000, 128Kb
+#define m_data_size             0x00020000
+// 以上内容存储在（DTCM）中
+0x2000 0000     0x2007 FFFF     512KB-DTCM
+
+
+// 数据段2起始地址为（0x20200000）
+#define m_data2_start           0x20200000
+// 数据段1长度为 0x00040000, 256Kb
+#define m_data2_size            0x00040000
+// 以上内容存储在（DTCM）中
+0x2020 0000     0x2027 FFFF     512KB-OCRAM
+
+
+// 加载域   起始地址为m_flash_config_start
+LR_m_text       m_flash_config_start    m_text_start + m_text_size - m_flash_config_start {
+                // 执行域
+                RW_m_config_text m_flash_config_star   FIXED   m_flash_config_size {
+                        * (.boot_hdr.conf, +FIRST)
+                }
+                // 执行域
+                RW_m_ivt_text   m_ivt_start   FIXED   m_ivt_size {
+                        * (.boot_hdr.ivt, +FIRST)
+                        * (.boot_hdr.boot_data)
+                        * (.boot_hdr.dcd_data)
+                }
+}
+
+
+
+
+// 加载域起始地址为：m_interrupts_start  长度：m_text_size + m_interrupts_size
+LR_m_text       m_interrupts_start      m_text_start + m_text_size - m_interrupts_start {
+
+
+        // 中断向量表执行域   FIXED   固定地址   长度为：m_interrupt_size
+        // load address = execute address
+        VECTOR_ROM      m_interrupts_start  FIXED  m_interrupt_size {
+                // RESET（启动文件，段名） +FIRST第一个存储
+                * (RESET, +FIRST)
+        }
+        
+        
+        // 代码执行域  长度为：m_text_size
+        // load address = execution address
+        ER_m_text       m_text_start   FIXED   m_txet_size {
+                * (InRoot$$Sections)    // __main 等启动代码
+                .ANY (+RO)              // 其它代码 +RO
+        }
+        
+        
+        // 数据长度执行域   长度为：m_data_size - Stack_Size - Heap_Size
+        RW_m_data       m_data_start   m_data_size- Stack_Size - Heap_Size {
+                .ANY (+RW +ZI)          // 可读可写数据段，未初始化数据段
+                * (NonCacheable.init)   // 不使用缓存空间
+                * (NonCacheable)
+        }
+        
+        
+        
+        // 堆执行域（起始地址+0 == 紧挨RW_m_data）
+        // EMPTY表示空，这里空出来的Heap_Size的大小
+        // 向上增长
+        ARM_LIB_HEAP    +0  EMPTY  Heap_Size {
+        }
+        
+        
+        // 栈执行域 起始地址m_data_start + m_data_size - Stack_Size
+        // EMPTY表示空，这里空出来的Stack_Size的大小
+        // 向下增长
+        ARM_LIB_STACK   m_data_start + m_data_size  EMPTY  - Stack_Size {
+        }
+}

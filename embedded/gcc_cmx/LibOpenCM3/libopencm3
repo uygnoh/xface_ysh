@@ -1,0 +1,43 @@
+/*******************************************************************************
+        => LibOpenCM3
+*******************************************************************************/
+#define GPIOA                   GPIO_PORT_A_BASE
+#define GPIOB                   GPIO_PORT_B_BASE
+#define GPIOC                   GPIO_PORT_C_BASE
+#define GPIOD                   GPIO_PORT_D_BASE
+#define GPIOE                   GPIO_PORT_E_BASE
+#define GPIOF                   GPIO_PORT_F_BASE
+#define GPIOG                   GPIO_PORT_G_BASE
+
+
+#define GPIO_CRL(port)          MMIO32((port) + 0x00)
+#define GPIOA_CRL               GPIO_CRL(GPIOA)
+#define GPIOB_CRL               GPIO_CRL(GPIOB)
+#define GPIOC_CRL               GPIO_CRL(GPIOC)
+#define GPIOD_CRL               GPIO_CRL(GPIOD)
+#define GPIOE_CRL               GPIO_CRL(GPIOE)
+#define GPIOF_CRL               GPIO_CRL(GPIOF)
+#define GPIOG_CRL               GPIO_CRL(GPIOG)
+
+
+#define MMIO8(addr)             (*(volatile uint8_t  *)(addr))
+#define MMIO16(addr)            (*(volatile uint16_t *)(addr))
+#define MMIO32(addr)            (*(volatile uint32_t *)(addr))
+#define MMIO64(addr)            (*(volatile uint64_t *)(addr))
+
+
+
+/*******************************************************************************
+        => stm32f103
+*******************************************************************************/
+typedef struct
+{
+        __IO uint16_t CR1;
+        uint16_t  RESERVED0;
+        ......
+} TIM_TypeDef;
+#define TIM2_BASE               (APB1PERIPH_BASE + 0x0000)
+#define TIM2                    ((TIM_TypeDef *) TIM2_BASE)
+
+
+

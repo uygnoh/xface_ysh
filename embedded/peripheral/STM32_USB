@@ -1,0 +1,299 @@
+// 游戏摇杆配置描述符
+Configuration Descriptor {
+        0x09,           // 描述符的长度：      9个字节
+        0x02,           // 描述符类型：       配置描述符
+}
+
+//  Transfer传输， Transaction事务， Packet包
+//  USB传输（Transfer -> Transaction -> Packet）
+//  一个Transfer包含多一个或多个Transaction组成
+//  一个Transaction包含3个Packet（令牌包，数据包，握手包）
+//  当进行同步传输时（只有令牌包，数据包）， 没有握手包
+        Transfer_1      ......          Transfer_N
+            |\
+            | \
+            |  \
+            |   \
+            |    \_______.
+            |            |
+            |            |.
+            |              \
+            |               \
+        Transaction_1     Transaciton_2      ......     Transaciton_N
+            |\
+            | \
+            |  \ 
+            |   \_________._____________.
+            |             |             |
+            |             |             |
+            |              \             \
+            |               \             \
+          Packet          Packet        Packet
+          令牌包           数据包         握手包
+          
+          
+          
+//______________________________________________________________________________
+//      => Packet
+//______________________________________________________________________________
+// USB Packet 组成
+        SOP        SYNC        Packet Content        EOP
+        //
+        //
+        //
+        // Packet Content中的内容
+        // 根据PID的不同， Packet 分为4大类
+        //      命令(Token)          Packet
+        //      帧首(Start Of Frame) Packet
+        //      数据(DATA)           Packet
+        //      握手(Handshake)      Packet
+        // 不同类型的包，以上的组成部件有所不同
+        PID        地址        帧号        数据        CRC
+         \
+         |
+         |
+         |      Packet Identifier => PID
+         |___________________________________________________________
+         // LSB                                                  MSB   
+         // ________________________________________________________. 
+         // | PID0 | PID1 | PID2 | PID3 | PID0 | PID1 | PID2 | PID3 |
+         // |______|______|______|______|______|______|______|______|
+//     PID 类型              PID名称                  对应PACKET各类
+        Token           OUT/IN/SETUP/SOF             令牌包，SOF包
+        Data            DATA0/DATA1/DATA2/MDATA      数据包
+        Handshake       ACK/NAK/STALL/NYET           握手包
+        Special         PRE/ERR/SPLIT/PING           其它类型包
+//
+//
+//     地址
+        |
+        |
+        |————设备地址    Addr0  Addr1  Addr2  Addr3  Addr4  Addr5  Addr6
+        |
+        |
+        |————端点地址    Endp0  Endp1  Endp2  Endp3
+//
+//
+//      帧号
+        11 位
+        主机每发出一个帧，帧号都会自动加 1
+        当帧号达到 0x7FF 时， 将归零重新开始计数
+        仅在每个帧的帧首传输一次SOF包
+//
+//
+//      数据，根据传输类型的不同，数据域的数据长度从 0 到 1024 字节不等
+//      ______________._________________._______________._________________.
+        |   Cortrol   |      Bulk       |  Interrupt    |      Isoch      |
+        | HS   FS  LS | HS    FS   LS   | HS    FS   LS | HS    FS     LS | // 数据包长度
+        | 64   64  8  | 512   64   N.A  | 1024  64   8  | 1024  1023   N.A|
+        |_____________|_________________|_______________|_________________|
+//     
+// 
+//      令牌包
+//      Sync            SETUP       ADDR      ENDP     CRC      EOP
+        00000001        0xB4        3         0        0x0A     250.000 ns
+//     
+// 
+//      帧首包
+//      Sync            SOF         Frame#    CRC               EOP
+        00000001        0xA5        1611      0x11              250.000 ns
+//     
+// 
+//      数据包
+//      Sync            DATA0       Data                       CRC16  EOP
+        00000001        0xC3        80 06 00 01 00 00 12 00    0X072F 250.000 ns
+//     
+// 
+//      握手包
+//      Sync            ACK         EOP
+        00000001        0x4B        250.000 ns
+        
+        
+        
+//______________________________________________________________________________
+//      => Transaction
+//______________________________________________________________________________
+// Transaction 可以分为三类
+        Setup    transaction    // 主机用来向设备发送控制命令
+        Data IN  transaction    // 主机用来向设备读取数据
+        Data OUT transaction    // 主机用来向设备发送数据
+// Transaction 的包组成
+        Token     packet        // 总是由主机发出
+        Data      packet        // 包含此次transaction数据负载
+        Handshake packet        // 可选择的握手包
+
+
+        
+//______________________________________________________________________________
+//      => Transfer
+//______________________________________________________________________________
+// USB定义了 4 种传输类型
+        Control     Transfers   // 非周期性，突发性，用于命令和状态传输
+        Bulk        Transfers   // 非周期性，突发性，用于大容量数据通信
+        Isochronous Transfers   // 周期性
+        Interrupt   Trnasfers   // 周期性，低频率
+
+
+
+//______________________________________________________________________________
+//      => USB枚举
+//______________________________________________________________________________
+        供电
+        复位
+        获取Device Descriptr前8个字节信息
+        复位（可选）
+        分配地址
+        获取Devcie Descriptor
+        获取Configuration Descriptor
+        获取String Descriptor
+        配置
+        
+        
+// 设备描述符（Device Descriptor）
+Offset  Field               Size    Value       描述
+  0     bLength              1      数字        // 该描述字包含的字节数目，一般是 18
+  1     bDescriptorType      1      常数        // 设备描述符类型常数， 1
+  2     bcdUSB               2      BCD        // 设备符合遵循USB协议版本号
+  4     bDeviceClass         1      Class      // USB类编码
+  5     bDeviceSubClass      1      // 由 USB-IF 分配， 一般是 0
+  6     bDeviceProtocol      1
+  7     bMaxPacketSize0      1      数字       // EP0的最大包长，HS设备必须是 64
+  8     idVendor             2      ID         // USB-IF分配的（0x0483）
+  10    iProduct             2      ID         // 厂家分配的（0x5710）
+  12    bcdDevice            2      BCD        // 设备自身的版本号
+  14    iManufacturer        1      Index
+  15    iProduct             1      Index
+  16    iSerialNumber        1      Index
+  17    bNumConfigurations   1      数字       // 设备在当前速度下支持多少种配置
+Joystick_DeviceDecriptor[] = {
+        0x12,           // 整个描述符的长度： 18字节
+        0x01,           // 描述符类型：      设备描述符
+        0x00, 0x02,     // 设备描述符遵循的USB协议的版本号： 2.0
+        0x00,           // 设备所实现的类：     由每个接口描述符描述所实现
+        0x00,           // 设备所实现的子类：   由每个接口描述符描述所实现
+        0x00,           // 设备所遵循的协议类别：由每个接口描述符描述所实现
+        0x40,           // 端点0的最大数据包长度： 64字节
+        0x83, 0x04,     // IDVendor:  0x0483 (for ST)
+        0x10, 0x57,     // IDProduct: 0x5710
+        0x00, 0x02,     // bcdDevice: 2.00
+        1,              // 用于描述 生产厂商   的字符描述符的索引号
+        2,              // 用于描述 产品      的字符描述符的索引号
+        3,              // 用于描述 产品系列号 的字符描述符的索引号
+        0x01            // 所支持的配置数目： 1
+};
+
+
+// 配置描述符（Configuration Descriptor）
+Offset  Field               Size    Value       描述
+  0     bLength              1      数字        // 该描述字包含的字节数目，一般是 9
+  1     bDescriptorType      1      常数        // 配置描述符类型常数， 2
+  2     wTotalLeght          2      数字        // 包含了所有描述字的长度
+                                               //（配置，接口，端点，类相关，厂商相关）
+  4     bNumInterfaces       1      数字        // 该配置包含几个接口
+  5     bConfigurationValue  1      数字        // 选择配置时，传递给SetConfiguration()的参数
+  6     iConfiguration       1      Index      // 在众多字符串描述符中的序号
+  7     bmAttributes         1      位图        // 
+                                                // D7:    保留为 1 
+                                                // D6:    是否由总线供电
+                                                // D5:    是否支持远程唤醒
+                                                // D4-D0: 保留为 0                                  
+  8     bMaxPower            1      mA         // 该设备在该Configuration下全速
+                                               // 工作时需要从总线获取的电流
+                                               // 以（2mA）为单位
+Joystick_ConfigurationDescriptor[] = {
+        0x09,           // 描述符的长度： 9字节
+        0x02,           // 描述符的类型： 0x02 表示为配置描述符
+                        // 完整的描述符包括接口描述符，
+                        // 端点描述符和类描述符的长度
+        JOYSTICK_SIZE_CONFIG_DESC, 0x00,
+        0x01,           // 所支持的接口数目： 1
+        0x01,           // 用SetConfiguration选择此配置时所指定的配置号
+        0x00,           // 用于描述此配置的字符描述符的索引号：0
+        0xE0,           // 自供电，远程唤醒
+        0x32,           // 最大功耗（2mA * 0x32 = 100mA）
+};
+
+
+// 接口描述符（Configuration Descriptor）
+Offset  Field               Size    Value       描述
+  0     bLength              1      数字        // 该描述字包含的字节数目，一般是 9
+  1     bDescriptorType      1      常数        // 接口描述符： 4
+  2     bInterfaceNumber     1      数字        // 该接口的序号：在该配置所支持的众
+                                                // 多接口中的序号（从0开始）
+  3     bAlternateSeting     1      数字        // 用来选择该接口的某个setting
+  4     bNumEndpoints        1      数字        // 该接口支持多少个非0的EP
+  5     bInterfaceClass      1      // USB类编码，由 USB-IF 分配
+  6     bInterfaceSubClass   1      // USB类编码，由 USB-IF 分配
+  7     bInterfaceProtocol   1      // USB类编码，由 USB-IF 分配
+  8     bInterface           1      index       // 在众多字符描述符中的符号
+// 常用设备类Class分配： 
+//      AUDIO=1
+//      COMMUNICATION=2
+//      HID=3
+//      MSC=8
+// Class=3（HID的情况下），SubClass有各自的定义：
+//      SubClass=1    BOOT         // 1表示是个启动设备，一般对PC才有意义
+//      SubClass=0    (no-BOOT) 
+// Protocol
+//      Protocol=1    KeyBoard
+//      Protocol=0    Mouse
+// 
+JoyStick_InterfaceDescriptor[] = {
+        0x09,           // 描述符的长度： 9字节
+        4,              // 描述符的类型： 接口描述符（0x04）
+        0x00,           // 选择此接口的索引号，从0计算： 0
+        0x00,           // 选择此接口设置的索引号，从0计算： 0
+        0x01,           // 实现此接口需要使用的端点数目： 1
+        0x03,           // 此接口所遵循的类：  HID Class
+        0x01,           // 此接口所遵循的子类： 1=BOOT, 0=no BOOT
+        0x02,           // 此接口所支持的协议： 0自定义，1键盘，2鼠标
+        0,              // 用于描述此接口的字符描述符的索引号
+};
+
+
+// 端点描述符（Endpiint Descriptor）
+Offset  Field               Size    Value       描述
+  0     bLength              1      数字        // 该描述字包含的字节数目，一般是 7
+  1     bDescriptorType      1      常数        // 端点描述符： 5
+  2     bEndpointAddress     1      ENDP       // 端点
+                                                BIT 7    方向（0-OUT， 1-IN）  
+                                                BIT 6:4  保留为 0
+                                                BIT 3:0  端点号
+  3     bmAttributes         1      BTIMAP      // 位图   
+                                                BIT 1:0  传输类型（CTRL, ISO, BULK, INTR）
+                                                BIT 3:2  同步类型
+                                                BIT 5:4  使用类型（）
+  4     wMaxPacketSize       2      数字        // 该端点的最大包长
+  6     bInterval            1      数字        // 主机查询EP的间隔，以帧或微帧为单位
+                                                FS/HS的ISO EP：  取值 1~16 ，间隔是 2（bInterval - 1）  
+                                                FS/LS的INTR EP ：取值 1~255
+                                                HS的INTR EP：    取值 1~16 ，间隔是 2（bInterval - 1）  
+                                                HS的BULK/CTRL OUT EP: 设定了设备的最大NAK率（
+                                                           即每个微帧最多回几个NAK）取值：0~255
+Joystick_InterfaceDescriptor[] = {
+        0x07,           // 描述符的长度： 7字节
+        5,              // 描述符类型： 端点描述符
+        0x81,           // 端点的特性： B3-B0（端点号）， B6-B4（0）， B7（1-IN，0-OUT）
+                        // 0x81: Endpoint1/IN
+        0x03,           // 端点的类型： B1-B0
+                        // （00控制，01同步，10大容量，11中断）
+        0x04, 0x00,     // 此端点最大有效数据长度：4字节
+        0x20,           // 主机查询引端点数据的间隔时间：（1ms或125us单位）
+                        // 0x20: 32ms
+        
+};
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                

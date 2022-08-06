@@ -3,11 +3,14 @@
 //      fun_01() {
 //              fun_02(fun_03)
 //      }
-// 函数（fun_01）调用（fun_02），同时将（fun_03）作为参数传递给（fun_02），
-// 此时，fun_01为应用层函数，fun_02为中间层函数，fun_03为回调函数，回调函数只是一种说法。
+// 函数（fun_01）调用（fun_02），同时将（fun_03）作为参数传递给（fun_02）， 此时，
+// fun_01为应用层函数，fun_02为中间层函数，fun_03为回调函数，回调函数只是一种说法。
+// 
+//
 //      回调函数意义何在：
 //      1       利于代码结构，将代码分为（应用层，中间层，硬件驱动层），彼此独立
 //      2       结构化编程时，结构体只需要定义中间函数，减小内存开销
+
 
 
 
@@ -27,9 +30,10 @@ typedef enum {
 } LED_ENUM_T;
 
 
+
 // 声明一个结构体类型（它并没有分配存储空间）
-// HOS（它是一个函数指针） =>它指向
-// HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
+// HOS（它是一个函数指针） 
+// => 它指向 (LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
 typedef struct {
         void (*HOS)(LED_ENUM_T, void (*callback_fun)(LED_ENUM_T));
 } LED_STRUCT_T;
@@ -53,9 +57,9 @@ extern void led_off(LED_ENUM_T led_number);
         => 回调函数（中间层虚拟函数）
 *******************************************************************************/
 #include "bsp_led.h"
-// 私有函数声明
-void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T));
 
+// 私有函数声明
+void HOS(LED_ENUM_T, void (*callback_fun)(LED_ENUM_T));
 
 // 私有函数
 void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
@@ -64,9 +68,9 @@ void HOS(LED_ENUM_T led_number, void (*callback_fun)(LED_ENUM_T))
 }
 
 
+
 // 定义（LED_STRUCT_T LED）结构体，申请空间并初始化它
 LED_STRUCT_T LED = { HOS };
-
 
 // 定义（LED_STRUCT_T *）结构体指针，并没有初始化指针
 LED_STRUCT_T *BSP;
