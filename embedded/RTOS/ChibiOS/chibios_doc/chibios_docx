@@ -5,24 +5,24 @@
 
         => portable HAL
 //_____________________________________________________________
-//The portable HAL (HAL port).
+// The portable HAL (HAL port).
 ./os/hal/src/
 ./os/hal/include/
 
 
         => MCU的HAL端口层
 //_____________________________________________________________
-//The HAL port layer for your MCU(您的MCU的HAL端口层).
+// The HAL port layer for your MCU(您的MCU的HAL端口层).
 ./os/hal/ports/STM32/STM32F1xx/
 ./os/hal/ports/STM32/LLD/
 
 
         => OSAL（操作系统抽象层简介）
 //_____________________________________________________________
-//The OSAL（操作系统抽象层简介） layer for your RTOS(您的RTOS的OSAL端口层).
-//HAL使用一个名为OSAL的抽象层与底层RTOS（可选）交互。您需要在您的项目中包括用于
-//RTOS的OSAL或用于裸机（不带RTOS）的OSAL。
-//Chibios中提供了几个OSALS，在您的项目中包括以下内容之一：
+// The OSAL（操作系统抽象层简介） layer for your RTOS(您的RTOS的OSAL端口层).
+// HAL使用一个名为OSAL的抽象层与底层RTOS（可选）交互。您需要在您的项目中包括用于
+// RTOS的OSAL或用于裸机（不带RTOS）的OSAL。
+// Chibios中提供了几个OSALS，在您的项目中包括以下内容之一：
         ./os/hal/osal/rt
         ./os/hal/osal/nil
         ./os/hal/osal/os-less/
@@ -32,8 +32,8 @@
 
         => HAL框架配置文件
 //_____________________________________________________________
-//HAL框架需要一个配置文件，它通常放在项目根目录下，但是它可以放在编译器
-//可以访问的任何目录中。文件名为halconf.h，模板可从以下位置获取：
+// HAL框架需要一个配置文件，它通常放在项目根目录下，但是它可以放在编译器
+// 可以访问的任何目录中。文件名为halconf.h，模板可从以下位置获取：
         ./os/hal/templates/halconf.h
         
         

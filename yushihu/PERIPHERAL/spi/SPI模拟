@@ -1,0 +1,18 @@
+// MOSI 主机发送，从机接收
+// MISO 主机接收，从机发送
+uint8_t spi_transmit(uint8_t data)
+{
+        uint8_t i;
+        SPI_SCLK = 0;                   // CPU时钟线空闲为低电平
+        SPI_DELAY();                    // 稍作延时
+        for (i=0; i<8; i++) {           // 发送和接收数据
+                SPI_MOSI = data & 0x80; // CPU先发送高位
+                data   <<= 1;           // 要发送的数据右移一位
+                SPI_SCLK = 1;           // 制造一个上升沿
+                SPI_DELAY();            // 稍作延时
+                data    |= SPI_MISO;    // CPU读取一个位
+                SPI_SCLK = 0;           // 制造一个下降沿
+                SPI_DELAY();            // 稍作延时
+        }
+        return data;
+}
