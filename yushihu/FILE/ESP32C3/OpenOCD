@@ -1,0 +1,57 @@
+// ESP32C3 JTAG Debug by OpenOCD & GDB
+// _____________________________________________________________________________
+// 设置CPU编译环境
+idf.py  set-target esp32c3
+
+// 编译所有代码
+idf.py  all
+
+openocd -f board/esp32c3-builtin.cfg
+
+
+
+
+// GDB 连接 OpenOCD
+// _____________________________________________________________________________
+$ vim gdbinit
+set remotetimeout 100                   // 设置OpenOCD的超时时间
+target extended-remote: 3333            // 设置OpenOCD的连接端口
+set remote hardware-watchpoint-limit 2  // 设置ESP32C3的硬件断点支持数
+mon reset halt                          // 重启CPU
+flushregs                               // 更新寄存器
+thb app_main                            // 设置中断在（app_main）
+c
+
+
+// 运行GDB
+riscv32-esp-elf-gdb build/blink.elf -x gdbinit
+
+
+
+// GDB 命令
+// _____________________________________________________________________________
+                                、、  N            表示行号
+                                、、  Filename     表示文件名
+                                、、  FunctionName 表示函数名
+        break   N               // break 78 // 添加断点号（78）
+        info break              // 查看断点信息
+        disable N               // 禁止断点N
+        enable  N               // 使能断点N
+        delete  N               // 删除断点N
+        break Filename: N       // 设置文件中的断点
+        break FunctionName      // 使用函数名作为断点
+        tbreak N [FunctionName] // 设置临时断点（它只运行一次）
+
+
+        watch i                 // 通过变量名设置观察断点
+        info watch              // 查看Watch断点
+
+
+
+
+
+
+
+
+
+
