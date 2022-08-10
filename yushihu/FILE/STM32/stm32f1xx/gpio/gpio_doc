@@ -2,13 +2,14 @@
 //      => 两个32位配置寄存器(GPIOx_CRL, GPIOx_CRH)
 //______________________________________________________________________________
 //
-//      GPIOx_CRL    -> 0  1  2   3   4   5   6   7          //  0~7 管脚
-//      GPIOx_CRH    -> 8  9  10  11  12  13  14  15         // 8~16 管脚
+//      GPIOx_CRL    -> 7   6   5   4   3   2   1   0           //  0~7 管脚
+//      GPIOx_CRH    -> 15  14  13  12  11  10  9   8           // 8~16 管脚
 //
 //
 //      在输出模式下(MODE[1:0] > 00)
 //
-//              CNF    MODE
+//              配置   模式
+//              CONF   MODE
 //      ||      0 0    0 0     |  0  | 模拟输入
 //      ||      0 1    0 0     |  4  | 浮空输入(复位后的状态) 
 //      ||      1 0    0 0     |  8  | 下拉输入(如果 PxODR = 0)
@@ -67,35 +68,42 @@
 //______________________________________________________________________________
 //      => 事件控制寄存器(AFIO_EVCR)
 //______________________________________________________________________________
-EVOE[7]         // EVOE位“1”允许事件输出 (Event output enable)
-                // 该位可由软件读写。当设置该位后,Cortex的EVENTOUT将
-                // 连接到由PORT[2:0]和PIN[3:0]选定的I/O口。
+        EVOE[7]         // EVOE位“1”允许事件输出 (Event output enable)
+                        // 该位可由软件读写。当设置该位后,Cortex的EVENTOUT将
+                        // 连接到由PORT[2:0]和PIN[3:0]选定的I/O口。
 
-PORT[6:4]       // 端口选择, 选择用于输出Cortex的EVENTOUT信号的端口
-        000     选择GPIOA
-        001     选择GPIOB
-        010     选择GPIOC
-        011     选择GPIOD
-        100     选择GPIOE
+        PORT[6:4]       // 端口选择, 选择用于输出Cortex的EVENTOUT信号的端口
+                000     选择GPIOA
+                001     选择GPIOB
+                010     选择GPIOC
+                011     选择GPIOD
+                100     选择GPIOE
 
-PIN[3:0]        // 引脚选择(x=A…E), 选择用于输出Cortex的EVENTOUT信号的引脚
-        0000    选择GPIOx_PIN_0
-        0001    选择GPIOx_PIN_1
-        0010    选择GPIOx_PIN_2
-        0011    选择GPIOx_PIN_3
-        0100    选择GPIOx_PIN_4
-        0101    选择GPIOx_PIN_5
-        0110    选择GPIOx_PIN_6
-        0111    选择GPIOx_PIN_7
-        1000    选择GPIOx_PIN_8
-        1001    选择GPIOx_PIN_9
-        1010    选择GPIOx_PIN_10
-        1011    选择GPIOx_PIN_11
-        1100    选择GPIOx_PIN_12
-        1101    选择GPIOx_PIN_13
-        1110    选择GPIOx_PIN_14
-        1111    选择GPIOx_PIN_15  
-                
+        PIN[3:0]        // 引脚选择(x=A…E), 选择用于输出Cortex的EVENTOUT信号的引脚
+                0000    选择GPIOx_PIN_0
+                0001    选择GPIOx_PIN_1
+                0010    选择GPIOx_PIN_2
+                0011    选择GPIOx_PIN_3
+                0100    选择GPIOx_PIN_4
+                0101    选择GPIOx_PIN_5
+                0110    选择GPIOx_PIN_6
+                0111    选择GPIOx_PIN_7
+                1000    选择GPIOx_PIN_8
+                1001    选择GPIOx_PIN_9
+                1010    选择GPIOx_PIN_10
+                1011    选择GPIOx_PIN_11
+                1100    选择GPIOx_PIN_12
+                1101    选择GPIOx_PIN_13
+                1110    选择GPIOx_PIN_14
+                1111    选择GPIOx_PIN_15  
+
+        // 事件输出信号产生
+        // 使用SEV指令产生脉冲：通过事件输入信号将另一个MCU从低功耗模式唤醒
+        // SEV是汇编语言指令。一些C编译器可能允许通过内联汇编来使用它，
+        // 例如，__asm__ volatile ("sev");尽管确切的形式是特定于编译器的。
+        // 在实际使用中，该指令将在一个通过AFIO_EVCR寄存器配置并启用且处于备用
+        // 功能输出模式的引脚上输出一个时钟周期的脉冲（例如，具有72MHz内核时钟的14ns）。
+
                 
                 
 //______________________________________________________________________________
