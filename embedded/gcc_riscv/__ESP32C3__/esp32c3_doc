@@ -1,6 +1,40 @@
 /*******************************************************************************
+        => ESP32-IDF VSCODE
+*******************************************************************************/
+        Espressif IDF           // 找到这个插件，安装
+        
+        EXPRESS                 // 简洁设置
+        ADVANCED                // 高级设置（选择它）
+                |
+                |
+                |___ Select download server:                            // 服务器
+                |
+                |___ Select ESP-IDF version:                            // 版本
+                |
+                |___ Enter ESP-IDF container directory:                 // 目录
+                |
+                |___ Enter ESP-IDF Tools directory (IDF_TOOLS_PATH):    // 工具链
+ 
+ 
+        // Shift + Ctrl + P
+        >ESP-IDF:SHOW   ->ESP-IDF: Show Example Projects                // 下载例程
+        // 创建例程
+        // 设置开发板
+        >ESP32-C3(Built-in USB JTAG)
+                
+
+
+
+
+
+/*******************************************************************************
         => ESP32-IDF 启动流程
 *******************************************************************************/
+// esp32c3-idf 环境配置
+vim     $HOME/.bashrc
+# esp32c3-IDF
+alias get_idf='. $HOME/esp32/esp-idf/export.sh'
+
 
 
 // https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32c3/get-started/linux-macos-setup.html

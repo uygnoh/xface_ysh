@@ -8,10 +8,10 @@ typedef struct os_tcb {
         stuct os_tcb    *OSTCBPrev;     // Pointer to prev TCB in the TCB list
         
         #if (OS_EVENT_EN)
-        OS_EVENT        *OSTCBEventPtr; //Pointer to event control block
+        OS_EVENT        *OSTCBEventPtr; // Pointer to event control block
         #endif
         
-        //Pointer to multiple event control blocks
+        // Pointer to multiple event control blocks
         #if (OS_EVENT_EN) && (OS_EVENT_MULTI_EN) > 0u)
         OS_EVENT        **OSTCBEventMultiPtr; 
         #endif
@@ -23,26 +23,28 @@ typedef struct os_tcb {
         INT8U            OSTCBPrio;     // Task priortity (0 == 最高)
         
         // 任务就绪表，任务就绪组，数据结构
-        INT8U            OSTCBX;        //列号，0~7
-        INT8U            OSTCBY;        //行号，0~7
-        OS_PRIO          OSTCBBitX;     //列位号 
-        OS_PRIO          OSTCBBitY;     //行位号
+        INT8U            OSTCBX;        // 列号，0~7
+        INT8U            OSTCBY;        // 行号，0~7
+        OS_PRIO          OSTCBBitX;     // 列位号 
+        OS_PRIO          OSTCBBitY;     // 行位号
 
 } OS_TCB;
-
 //_____________________________________________________________
-        => uCOS-II 任务状态
+//              uCOS-II 任务状态
 //_____________________________________________________________
-#define OS_STAT_RDY             0x00u   //Ready to run 就绪
-#define OS_STAT_SEM             0x01u   //Pending on semaphore
-#define OS_STAT_MBOX            0x02u   //Pending on mailbox
-#define OS_STAT_Q               0x04u   //Pending on queue
-#define OS_STAT_SUSPEND         0x08u   //Task is suspended 任务挂起
-#define OS_STAT_MUTEX           0x10u   //pending on mutual exclusion semaphore
-#define OS_STAT_FLAG            0x20u   //Pending on event flag group
-#define OS_STAT_MULTI           0x80u   //Pending on multiple events 多事件
-#define OS_STAT_PEND_ANY        (OS_STAT_SEM | OS_STAT_MBOX | OS_STAT_Q |\
-                                              OS_STAT_MUTEX | OS_STAT_FLAG)
+#define OS_STAT_RDY             0x00u   // Ready to run 就绪
+#define OS_STAT_SEM             0x01u   // Pending on semaphore
+#define OS_STAT_MBOX            0x02u   // Pending on mailbox
+#define OS_STAT_Q               0x04u   // Pending on queue
+#define OS_STAT_SUSPEND         0x08u   // Task is suspended 任务挂起
+#define OS_STAT_MUTEX           0x10u   // pending on mutual exclusion semaphore
+#define OS_STAT_FLAG            0x20u   // Pending on event flag group
+#define OS_STAT_MULTI           0x80u   // Pending on multiple events 多事件
+#define OS_STAT_PEND_ANY        (            | OS_STAT_SEM              \
+                                             | OS_STAT_MBOX             \
+                                             | OS_STAT_Q                \
+                                             | OS_STAT_MUTEX            \
+                                             | OS_STAT_FLAG)
 
 
 
@@ -54,13 +56,13 @@ uCOS-II将任务控制块分成两个链表来管理，这就是空闲任务链�
 件就是系统里还有这样的空闲任务块。就绪链表则是将所有的就绪任务拴在一起，如果有新的任务就绪，就将任
 务控制块从空闲链表中取出，加入到就绪链表中。
 //_____________________________________________________________
-1 // 任务空闲链表(OSTCBFreeList) 使用单向链表
+//      任务空闲链表(OSTCBFreeList) 使用单向链表
 //_____________________________________________________________
 OS_EXT OS_TCB   *OSTCBFreeList; // Pointer to list of free TCBs
 
 
 //_____________________________________________________________
-2 // 任务就绪链表(OSTCBList) 使用双向链表
+//      任务就绪链表(OSTCBList) 使用双向链表
 //_____________________________________________________________
 OS_EXT OS_TCB   *OSTCBList      // Pointer to doubly linked list of TCBs
 
@@ -70,17 +72,21 @@ OS_EXT OS_TCB   *OSTCBList      // Pointer to doubly linked list of TCBs
 /*******************************************************************************
         => 事件控制块
 *******************************************************************************/
+        系统中所有的任务都可以关注这个事件
+        每一个事件都有一个（事件就绪组和事件就绪表）
+        
 #if OS_LOWEST_PRIO <= 63u
         typedef INT8U           OS_PRIO
 #else
         typedef INT16U          OS_PRIO
 #endif
 
-#if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
+
 typedef struct OS_EVENT {
-        INT8U    OSEventType; //表示事件控制块类型
-        void    *OSEventPtr;  //它是用来指向消息或队列的结构
-        INT16U   OSEventCnt;  //这个事件计数器只针对信号量的计数(对其它的事件类型不起作用)
+        INT8U    OSEventType; // 表示事件控制块类型
+        void    *OSEventPtr;  // 它是用来指向消息或队列的结构
+        INT16U   OSEventCnt;  // 这个事件计数器只针对信号量的计数
+                              // (对其它的事件类型不起作用)
         
         //事件就绪组，事件就绪表( 用于任务和事件之间登记 )
         //使用就绪组和就绪表这种数据结构，表示所有的任务都可以关注这个事件
@@ -94,17 +100,15 @@ typedef struct OS_EVENT {
         INT8U    *OSEventName;
         #endif
 } OS_EVENT;
-#endif
-
 //_____________________________________________________________
-        => 事件类型
+//                      事件类型
 //_____________________________________________________________
-#define OS_EVENT_TYPE_UNUSED    0u      //没有使用
-#define OS_EVENT_TYPE_MBOX      1u      //消息邮箱
-#define OS_EVENT_TYPE_Q         2u      //消息队列
-#define OS_EVENT_TYPE_SEM       3u      //信号量
-#define OS_EVENT_TYPE_MUTEX     4u      //互斥信号量
-#define OS_EVENT_TYPE_FLAG      5u      //事件标志
+        #define OS_EVENT_TYPE_UNUSED    0u      //没有使用
+        #define OS_EVENT_TYPE_MBOX      1u      //消息邮箱
+        #define OS_EVENT_TYPE_Q         2u      //消息队列
+        #define OS_EVENT_TYPE_SEM       3u      //信号量
+        #define OS_EVENT_TYPE_MUTEX     4u      //互斥信号量
+        #define OS_EVENT_TYPE_FLAG      5u      //事件标志
 
 
 
@@ -195,6 +199,9 @@ typedef struct os_q_data {
                                         //队列中消息的数目
         INT16U            OSQSize;      //Size of message queue
                                         //消息队列最大能容纳的消息数目
+        
+        // 消息队列管理（使用了队列控制块和事件控制块）
+                                        //事件就绪表
         OS_PRIO           OSEventTbl[OS_EVENT_TBL_SIZE];
         OS_PRIO           OSEventGrp;   //事件就绪组
 }

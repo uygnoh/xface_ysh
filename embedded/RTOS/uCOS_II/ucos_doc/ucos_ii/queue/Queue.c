@@ -1,15 +1,15 @@
 /*******************************************************************************
         => 创建队列
 *******************************************************************************/
-//TCB指向ECB
-//ECT指向QCB
-//QCB指向Message
+//      TCB指向ECB
+//      ECT指向QCB
+//      QCB指向Message
 //_____________________________________________________________
 OS_EVENT *OSQCreate( void **start,
                      INT16U  size)
 {
-        OS_EVENT *pevent;               //指向事件控制块的指针
-        OS_Q     *pq;                   //指向队列控制块的指针
+        OS_EVENT *pevent;               // 指向事件控制块的指针
+        OS_Q     *pq;                   // 指向队列控制块的指针
         
         #if OS_CRITICAL_METHOD == 3u
         OS_CPU_SR cpu_sr = 0u;
@@ -24,32 +24,34 @@ OS_EVENT *OSQCreate( void **start,
         }
         
         OS_ENTER_CRITICAL();
-        pevent = OSEventFreeList;       //从事件控制块的空闲链表中摘出一个链表来
+        pevent = OSEventFreeList;       // 从事件控制块的空闲链表中摘出一个事件控制块
         if (OSEventFreeList != (OS_EVENT *)0) {
                 OSEventFreeList = (OS_EVENT *)OSEVentFreeList->OSEventPtr;
         }
         OS_EXIT_CRITICAL();
         if (pevent != (OS_EVENT *)0) {
                 OS_ENTER_CRITICAL();
-                pq = OSQFreeList;       //从队列控制块的空闲链表中摘出一个链表来
-                if (pq != (OS_Q *)0) {  //拿到了队列控制块
+                pq = OSQFreeList;       // 从队列控制块的空闲链表中摘出一个链表来
+                if (pq != (OS_Q *)0) {  // 拿到了队列控制块
                         OSQFreeList         = OSQFreeList->OSQPtr;
                         OS_EXIT_CRITICAL();
-                        pq->OSQStart        = start;            //消息队列起始位置
-                        pq->OSQEnd          = &start[size];     //消息队列结束位置
-                        pq->OSQIn           = start;            //入口
-                        pq->OSQOut          = start;            //出口
-                        pq->OSQSize         = size;             //大小
-                        pq->OSEntries       = 0u;               //入口数目
-                        pevent->OSEventType = OS_EVENT_TYPE_Q;  //事件类型（Q）
-                        pevent->OSEventCnt  = 0u;               //消息队列中（不使用）
-                        pevent->OSEventPtr  = pq;               //指向消息队列
+                        pq->OSQStart        = start;            // 消息队列起始位置
+                        // &start[size] 表示最后一个元素的下一个地址
+                        // pq->OSQEnd   它不是真正消息队列结束的位置
+                        pq->OSQEnd          = &start[size];     // 消息队列结束位置
+                        pq->OSQIn           = start;            // 入口
+                        pq->OSQOut          = start;            // 出口
+                        pq->OSQSize         = size;             // 大小
+                        pq->OSEntries       = 0u;               // 入口数目
+                        pevent->OSEventType = OS_EVENT_TYPE_Q;  // 事件类型（Q）
+                        pevent->OSEventCnt  = 0u;               // 消息队列中（不使用）
+                        pevent->OSEventPtr  = pq;               // 指向消息队列
                 #if OS_EVENT_NAME_EN > 0u
                         pevent->OSEventName = (INT8U *)(void *)"?";
                 #endif
-                        OS_EventWaitListInit(pevent); //Initialize the wait list
+                        OS_EventWaitListInit(pevent); // Initialize the wait list
                 } else {
-                        //拿不到队列控制块（归还事件控制块到空闲链表中）
+                        // 拿不到队列控制块（归还事件控制块到空闲链表中）
                         pevent->OSEventPtr = (void *)OSEventFreeList;
                         OSEventFreeList = pevent;
                         OS_EXIT_CRITICAL();
@@ -58,6 +60,8 @@ OS_EVENT *OSQCreate( void **start,
         }
         return (pevent);
 }   
+
+
 
 /*******************************************************************************
         => 申请消息队列
@@ -101,8 +105,8 @@ void *OSQPend(
         }
         
         OS_ENTER_CRITICAL();
-                                                //Point at queue control block
-        pq = (OS_Q *)pevent->OSEventPtr;        //拿到队列控制块的指针
+                                                // Point at queue control block
+        pq = (OS_Q *)pevent->OSEventPtr;        // 拿到队列控制块的指针
         
         //如果消息队列中有可用的消息
         //_____________________________________________________
@@ -112,9 +116,9 @@ void *OSQPend(
                                                 //Update the number of entries int the queue
                 pq->OSQEntries--;               //把消息数量减一个
                 
-                //Wrap OUT pointer if we are at hte end of the queue
-                //pq->OSQEnd它指向消息队列的最后一个元素的（下一个），它不属于消息队列的范围了
-                //所以就把它赋值为（pq->OSQOut = pq->OSQStart;）
+                // Wrap OUT pointer if we are at hte end of the queue
+                // pq->OSQEnd它指向消息队列的最后一个元素的（下一个），它不属于消息队列的范围了
+                // 所以就把它赋值为（pq->OSQOut = pq->OSQStart;）
                 if (pq->OSQOut == pq->OSQEnd) { 
                         pq->OSQOut = pq->OSQStart;
                 }
@@ -124,7 +128,7 @@ void *OSQPend(
         }
         
         
-        //否则，消息队列中没有可以用的消息
+        // 否则，消息队列中没有可以用的消息
         //_____________________________________________________
         //Task will have to pend for a message to be posted
         OSTCBCur->OSTCBStat     |= OS_STAT_Q;
@@ -156,7 +160,7 @@ void *OSQPend(
                 break;
         }
         
-        //任务控制块和事件控制块关系解除
+        // 任务控制块和事件控制块关系解除
         OSTCBCur->OSTCBStat             = OS_STAT_RDY;
         OSTCBCur->OsTCBStatPend         = OS_STAT_PEND_OK;
         OSTCBCur->OSTCBEventPtr         = (OS_EVENT *)0;
@@ -167,6 +171,8 @@ void *OSQPend(
         OS_EXIT_CRITICAL();
         return (pmsg);
 }
+
+
 
 /*******************************************************************************
         => 消息队列释放
@@ -214,6 +220,8 @@ INT8U OSQPost( OS_EVENT *pevnet,        //事件控制块
         return (OS_ERR_NONE);
 }
 
+
+
 /*******************************************************************************
         => 释放队列 OSQPostFront
 *******************************************************************************/
@@ -259,13 +267,15 @@ INT8U OSQPostFront( OS_EVENT *pevent,
         return (OS_ERR_NONE);
 }
 
+
+
 /*******************************************************************************
         => OSQPostOpt
 *******************************************************************************/
-#define OS_POST_OPT_NONE        0x00
-#define OS_POST_OPT_BROADCAST   0x01
-#define OS_POST_OPT_FRONT       0x02
-#define OS_POST_OPT_NO_SCHED    0x04    //不要作调度
+        #define OS_POST_OPT_NONE        0x00    // 没有选项
+        #define OS_POST_OPT_BROADCAST   0x01    // 广播选项
+        #define OS_POST_OPT_FRONT       0x02    // FRONT
+        #define OS_POST_OPT_NO_SCHED    0x04    // 不要作调度
 INT8U OSQPostOpt( OS_EVENT *pevent,
                   void     *pmsg,
                   INT8U     opt)
@@ -286,13 +296,15 @@ INT8U OSQPostOpt( OS_EVENT *pevent,
         
         OS_ENTER_CRITICAL();
         if (pevent->OSEventGrp != 0x00u) {
-                //告诉所有申请（消息队列的任务）全部就绪
+                
                 if ((opt & OS_POST_OPT_BROADCAST) != 0x00u) {
+                        // 告诉所有申请（消息队列的任务）全部就绪
                         while (pevent->OSEventGrp != 0u) {
                                 (void)OS_EventTaskRdy(pevent, pmsg, 
                                                 OS_STAT_Q, OS_STAT_PEND_OK);
                         }
                 } else {
+                        // 告诉申请（消息队列的任务）优先级最高的任务就绪
                         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, 
                                                 OS_STAT_PEND_OK);
                 }
@@ -302,6 +314,8 @@ INT8U OSQPostOpt( OS_EVENT *pevent,
                 }
                 return (OS_ERR_NONE);
         }
+        
+        // 没有任务申请这个消息
         pq = (OS_Q *)pevent->OSEventPtr;
         if (pq->OSQEntries >= pq->OSQSize) {
                 OS_EXIT_CRITICAL();
@@ -323,6 +337,8 @@ INT8U OSQPostOpt( OS_EVENT *pevent,
         OS_EXIT_CRITICAL();
         return (OS_ERR_NONE);
 }
+
+
 
 /*******************************************************************************
         => 删除队列
@@ -365,14 +381,18 @@ OS_EVENT *OSQDel( OS_EVENT *pevent,
         }
         
         switch (opt) {
+        // 如果没有任务在等，我在删除
+        // ______________________
         case OS_DEL_NO_PEND:
                 if (tasks_waiting == OS_FALSE) {
                         #if OS_EVENT_NAME_EN > 0u
                         pevent->OSEventName     = (INT8U *)(void *)"?";
                         #endif
+                        // 归还队列控制块
                         pq                      = (OS_Q *)pevent->OSEventPtr;
                         pq->OSQPtr              = OSQFreeList;
                         OSQFreeList             = pq;
+                        // 归还事件控制块
                         pevent->OSEventType     = OS_EVENT_TYPE_UNUSED;
                         pevent->OSEventPtr      = OSEventFreeList;
                         pevnet->OSEventCnt      = 0u;
@@ -386,6 +406,8 @@ OS_EVENT *OSQDel( OS_EVENT *pevent,
                         pevent_return           = pevnet;
                 }
                 break;
+        // 不管有没有任务在等，都删除它
+        // ______________________
         case OS_DEL_ALWAYS:
                 while (pevent->OSEventGrp != 0) {
                                 (void *)OS_EventTaskRdy(pevent, (void *)0, 
@@ -416,6 +438,8 @@ OS_EVENT *OSQDel( OS_EVENT *pevent,
         }
         return (pevnet_return);
 }
+
+
 
 /*******************************************************************************
         => 清空消息队列
