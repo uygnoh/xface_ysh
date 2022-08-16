@@ -131,50 +131,53 @@ void OS_EventTaskRemove(OS_TCB *ptcb, OS_EVENT *pevent)
 
 /*******************************************************************************
                               OS_EventTaskRdy()
-arguments: 
-        pevent  is a pointer to the event control block coresponding to the event
+参数：
+        pevent  
+                它指向与事件相关的事件控制块的指针
         
-        pmsg    is a pointer to a message, This pointer is used by message
-                oriented services such as MAILBOXEs and QUEUEs. The pointer
-                is not used when called by other service function
+        pmsg    
+                它指向消息的指针，它是用来指向消息邮箱，消息队列的
+                如果是信号量，互斥信号量，它不需要这个指针
                 
-        msk     is a mask that is used to clear the status byte of the TCB.
-                For example:
-                OSSemPost() will pass OS_STAT_SEM, 
-                OSMBoxPost() will pass OS_STAT_MBOX etc.
+        msk     
+                这是一个掩码，它是用来清除TCB状态字节的
+                例如：
+                OSSemPost()  它会传递一个 OS_STAT_SEM  这样的参数
+                OSMBoxPost() 它会传递一个 OS_STAT_MBOX 这样的参数， 等等。。。
                 
-    pend_stat   is used to indicate the readied task's pending status:
-                OS_STAT_PEND_OK         Task ready due to a post (or delete)
-                                        not a timeout or an abort.
-                OS_STAT_PEND_ABORT      Task ready due to an abort
-                                        abort(强行终止)
+        pend_stat   
+                申请状态
+                OS_STAT_PEND_OK         申请到了
+                OS_STAT_PEND_ABORT      强行终止
 *******************************************************************************/
 // 让申请的这个事件的任务处于就绪态
 #if (OS_EVENT_EN)
 INT8U OS_EventTaskRdy(
         OS_EVENT    *pevent,
-        void        *pmsg,      //在消息邮箱，消息队列指向消息的指针
-        INT8U        msk,       //事件状态掩码，它是用来清除TCB状态字节
-        INT8U        pend_stat) //申请的事件状态
+        void        *pmsg,              // 在消息邮箱，消息队列指向消息的指针
+        INT8U        msk,               // 事件状态掩码，它是用来清除TCB状态字节
+        INT8U        pend_stat)         // 申请的事件状态
 {
         OS_TCB      *ptcb;
         INT8U        y;
         INT8U        x;
         INT8U        prio;
         
+        
         #if OS_LOWEST_PRIO <= 63
-                                        //Find HPT waiting for message
-                                        //查优先级判定表（事件就绪组和事件就绪表）
-                                        //（y对应的是优先级高3位）
-                                        //（x对应的是优先级低3位）
+                                        // Find HPT waiting for message
+                                        // 查优先级判定表（事件就绪组和事件就绪表作为索引）
+                                        // （y对应的是优先级高3位） 行号
+                                        // （x对应的是优先级低3位） 列号
         y    = OSUnMapTbl[pevent->OSEventGrp];
         x    = OSUnMapTbl[pevent->OSEvnetTbl[y]];
-                                        //Find priority of task getting the msg
+                                        // Find priority of task getting the msg
         prio = (INT8U)((y << 3u) + x);  
         #endif
         
-        ptcb            = OSTCBPrioTbl[prio];   //Point to this task's OS_TCB
-        ptcb->OSTCBDly  = 0u;       //不需要延时（清除延时字段）
+        
+        ptcb            = OSTCBPrioTbl[prio];   // Point to this task's OS_TCB
+        ptcb->OSTCBDly  = 0u;                   // 不需要延时（清除延时字段）
         
         #if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u) || (OS_MBOX_EN > 0U)
         ptcb->OSTCBMsg      = pmsg; //Send message directly to waiting task
@@ -185,24 +188,14 @@ INT8U OS_EventTaskRdy(
         ptcb->OSTCBStat    &= (INT8U)~msk; //Clear bit associated with event type
         ptcb->OSTCBStatPend = pend_stat;   //Set pend status of post or abort
         
-        //如果这个任务不是挂起态，那么就让它变成就绪态
+        // 如果这个任务不是挂起态，那么就让它变成就绪态
         if ((ptcb->OSTCBStat &  OS_STAT_SUSPEND) == OS_STAT_RDY) {
                 OSRdyGrp     |= ptcb->OSTCBBitY;
                 OSRdyTbl[y]  |= ptcb->OSTCBBitX;
         }
         
-        //Remove this task form event wait list
-        //这里只在事件控制块那个方向作了解除，单向解除
+        // Remove this task form event wait list
+        // 这里只在事件控制块那个方向作了解除，单向解除
         OS_EventTaskRemove(ptcb, pevent);
-        
-        #if (OS_EVENT_MULTI_EN > 0u)
-        //Remove this task from events' wait lists
-        if (ptcb->OSTCBEventMultiPtr |= (OS_EVENT **)0) {
-                OS_EventTaskRemoveMulti(ptcb, ptcb->OSTCBEventMultiPtr);
-                //Return this task from events' wait lists
-                ptcb->OSTCBEventPtr = (OS_EVENT *)pevent;
-        }
-        #endif
-        
 }
 #endif
