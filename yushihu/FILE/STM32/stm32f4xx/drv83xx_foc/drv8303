@@ -1,0 +1,85 @@
+// SCK          PC10
+// MISO         PC11    接收数据引脚
+// MOSI         PC12
+// CS           PD2
+void spi3Init(void)
+{
+        RCC->AHBENR     |=  (0x01 << 2  | 0x01 << 3);   // GPIOC, GPIOD 时钟打开
+                                                        // MISO, MOSI, SCL清零
+        GPIOC->MODER    &= ~(0x03 << 20 | 0x03 << 22 | 0x03 << 24);
+        GPIOD->MODER    &= ~(0x03 << 4);                // CS 清零
+        GPIOC->MODER    |=  (0x01 << 20 | 0x01 << 24);  // MOSI, SCL, CS 输出模式
+        GPIOD->MODER    |=  (0x01 << 4);
+        
+        GPIOC->OTYPER   &= ~(0x01 << 10 | 0x01 << 12);  // MOSI, SCL, CS 推挽输出
+        GPIOD->OTYPER   &= ~(0x01 << 2);
+        
+        GPIOC->OSPEEDR  &= ~(0x03 << 20 | 0x03 << 24);  // MOSI, SCL, CS 速度清零
+        GPIOD->OSPEEDR  &= ~(0x03 << 4);
+        GPIOC->OSPEEDR  |=  (0x03 << 20 | 0x03 << 24);  // MOSI, SCL, CS 100MHz
+        GPIOD->OSPEEDR  |=  (0x03 << 4);
+        
+                                                        // MISO MOSI, SCL, CS 无上下拉
+        GPIOC->PUPDR    &= ~(0x03 << 20 | 0x03 << 22 |0x03 << 24);  
+        GPIOD->PUPDR    &= ~(0x03 << 4);
+        
+        GPIOC->BSRRH    |=  (0x01 << 10 | 0x01 << 12);  // MOSI SCK 初始化为低电平
+        GPIOD->BSRRL    |=  (0x01 << 2);                // CS       初始化为高电平
+}
+
+
+// 片选控制， 0 选中， 1 释放
+void chipselect(u8 status)
+{
+        if (status) {
+                GPIOD->BSRRL |= 0x01 << 2;      // 高电平
+        } else {
+                GPIOD->BSRRH |= 0x01 << 2;      // 低电平
+        }
+}
+
+// 时钟控制， 1时钟高电平， 0时钟低电平
+void spi3clk(u8 clk)
+{
+        if (clk) {
+                GPIOC->BSRRL |= 0x01 << 10;     // 时钟高电平
+        } else {
+                GPIOC->BSRRH |= 0x01 << 10;     // 时钟低电平
+        }
+}
+
+// 写入一个字节数据
+void spiwriteword(u16 data)
+{
+        u8 i;
+        chipselect(0);                                  // 片选选中芯片
+        for (i = 0; i < 16; i++) {                      // 开始发送数据
+                spi3clk(1);                             // 时钟高电平
+                if (data & 0x8000 >> i) {               // SPI是高位数据在前（MSB）
+                        GPIOC->BSRRL |= 0x01 << 12;     // 准备数据位（1）
+                } else {
+                        GPIOC->BSRRH |= 0x01 << 12;     // 准备数据位（0）
+                }
+                spi3clk(0);                             // 时钟低电平，将数据发出去
+        }
+        GPIOC->BSRRH |= 0x01 << 12;                     // MOSI 低电平
+        chipselect(1);                                  // 片选释放芯片
+}
+
+// 读一个字节
+u16 spi3readword(void)
+{
+        u8 i;
+        u16 data = 0;
+        chipselect(0);                          // 片选选中芯片
+        for (i = 0; i < 16; i++) {              // 开始读取数据
+                spi3clk(1);                     // 时钟高电平，准备接收数据
+                spi3clk(0);                     // 时钟低电平，读取数据
+                if (GPIOC->IDR & 0x01 << 11) {  // 如果引脚上是高电平
+                } else {
+                        data |= 0x8000 >> i;    // MSB在前，先接收高位字节
+                }
+        }
+        chipselect(1);                          // 释放芯片
+        return data;                            // 返回接收到的字节
+}

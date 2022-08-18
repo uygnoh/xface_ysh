@@ -3,7 +3,7 @@
 //
 //      求theta(角):
 //                              2PI         1       2PI
-//      1庋 = 10步 => theta =  ------  X  -----  = ------- =  0.0008726646 弧度
+//      1庋 = 10步 => theta =  ------  X  -----  = ------- =  0.00174532 弧度
 //                              360        10       3600
 //
 //
@@ -14,7 +14,54 @@
 //              10步为1庋
 //              2500ms/3600 = 0.069444ms = 69.444us
 //
-//
+//      TIM7 => 84000000 
+//                      |_______PSC = (1-1)
+//                      |_______ARR = (5833)
+//                      |_______10步1度 / 120RPM
+// 使用定时器7
+void Timer7InitForSvpwm(void) 
+{
+        RCC->APB1ENR     =  (0x01 << 5);        // TIM7定时器时钟打开
+        TIM7->CR1       &= ~(0x01 << 7);        // 不进行重载缓冲
+        TIM7->CR1       &= ~(0x01 << 3);        // 连续工作模式
+        TIM7->PSC        =  (1 - 1);            // 设置为 84000000HZ
+        TIM7->ARR        =  (5833);             // 69.4us
+        TIM7->CNT        =  (0);                // 清零计数器
+        TIM7->DIER      |=  (0x01);             // 使能定时器中断
+        
+        // 设置中断分组为2， 抢占为2，响应为3
+        u32 prio = NVIC_EncodePriority(7 - 2, 3, 3);
+        NVIC_SetPriority(TIM7_IRQn, prio);
+        NVIC_EnableIRQ(TIM7_IRQn);
+        
+        TIM7->EGR       |=  0x01;       // 给UG更新事件，让定时器回到准备状态
+        TIM7->SR        &= ~0x01;       // 清零手动UG事件导致的状态寄存器置“1”
+        TIM7->CR1       |=  0x01;       // 便能定时器开始计时
+}
+// 定时器中断，在中断中实现SVPWM
+void TIM7_IRQHandler(void)
+{
+        TIM7->SR        &= ~0x01;       // 清中断标志位
+        #if 1
+        static float theta = 0;
+        
+        // Vd = 0
+        // Vq = 1
+        // theta 角度
+        // 24 = 母线电压
+        // PWM周期为（8400）
+        SvpwmAlgorithm(0, 1, theta, 24, 8400);
+        theta += 0.001745329f;
+        if (theta > 6.2831852f) {
+                theta = 0;
+        }
+        #endif
+}
+
+
+
+
+
 
 
 // 定时器6微秒延时函数
@@ -168,14 +215,14 @@ void CCRCalulate(uint8_t n, float ta, float tb, uint32_t tpwm,
 void SvpwmAlgorithm(float vd, float vq, float theta, uint32_t udc, uint32_t tpwm) {
         float valpha = 0;
         float vbeta  = 0;
-        RevParkOperate(vd, vq, theta, &valpha, &vbeta); // 计算当前Valpha和Vbeta
+        RevParkOperate(vd, vq, theta, &valpha, &vbeta);  // 计算当前Valpha和Vbeta
         uint8_t n = SectorJude(valpha, vbeta);          // 计算当前的扇区
         float ta = 0;
-        float tb = 0;   // 定义矢量作用时间
+        float tb = 0;                                   // 定义矢量作用时间
         VectorActionTime(n, valpha, vbeta, udc, tpwm, &ta, &tb);
         uint32_t ccr1 = 0;
         uint32_t ccr2 = 0;
-        uint32_t ccr3 = 0;
+        uint32_t ccr3 = 0;                              // 写CCR寄存值
         CCRCalulate(n, ta, ta, tpwm, &ccr1, &ccr2, &ccr3);
         TIM1->CCR1 = ccr1;
         TIM1->CCR2 = ccr2;
