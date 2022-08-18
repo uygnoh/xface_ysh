@@ -1,0 +1,42 @@
+// SimpleFOC for PlatformIO for Arduino
+        PIO Home
+                Libraries:
+                        Simple FOC
+
+// platformio.ini
+        [platformio]
+        default_envs = pro16MHzatmega328
+        
+        [env]
+        framework = arduino
+        monitor_speed = 115200
+        
+        lib_deps = 
+                https://github.com/simplefoc/Arduino-FOC
+                SPI
+                Wire
+        
+        
+        ### ESP32 配置
+        [env:esp32doit-devkit-v1]
+        platform = espreeif32
+        board = esp32doit-devkit-v1
+        build_flags = -D PIN_ANALIG=34
+        
+        ### AVR 配置
+        [env:pro16MHzatmega328]
+        platform = atmelavr
+        board = por16MHzatmega328
+        build_flags = -D PIN_ANALIG=A1
+        
+        
+        ### STM32
+        [env:disco_b_g431b_esc1]
+        platform = ststm32
+        board = disco_b_g431b_esc1
+        build_flags = 
+                        -D PIO_FRAMEWORK_ARDUINO_ENABLE_CDC
+                        -D PIO_FRAMEWORK_ARDUINO_NANOLIB_FLOAT_PRINTF
+                        -D PIO_FRAMEWORK_ARDUINO_USB_HIGHSPEED_FULLMODE
+
+
