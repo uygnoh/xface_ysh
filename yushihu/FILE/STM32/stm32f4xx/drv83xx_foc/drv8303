@@ -1,3 +1,6 @@
+//______________________________________________________________________________
+//      => DRV830x 模拟 SPI通信
+//______________________________________________________________________________
 // SCK          PC10
 // MISO         PC11    接收数据引脚
 // MOSI         PC12
@@ -82,4 +85,183 @@ u16 spi3readword(void)
         }
         chipselect(1);                          // 释放芯片
         return data;                            // 返回接收到的字节
+}
+
+
+
+//______________________________________________________________________________
+//      => DRV830x 
+//______________________________________________________________________________
+// PG6-ENGATE drv8303
+void enableegate(void)
+{
+        RCC->AHB1ENR    |=  (0x01 << 6);        // GPIOG 时钟打开
+        GPIOG->MODER    &= ~(0x03 << 12);       // 清零
+        GPIOG->MODER    |=  (0x01 << 12);       // 通用输出模式
+        GPIOG->OTYPER   &= ~(0x01 << 6);        // 推挽
+        GPIOG->OSPEEDR  &= ~(0x03 << 12);       // 2MHz
+        GPIOG->PUPDR    &= ~(0x03 << 12);       // 无上下拉
+        GPIOG->BSRRL    |=  (0x01 << 6);        // 输出高电平
+        
+}
+
+
+
+
+#define DRV0303WRITE            (0x00 << 15);   // Drv8303 写
+#define DRV0303READ             (0x01 << 15);   // Drv8303 读
+#define REGSTATUS1              (0x00);         // 状态寄存器1地址
+#define REGSTATUS2              (0x01);         // 状态寄存器2地址
+#define REGCTRL1                (0x02);         // 控制寄存器1地址
+#define REGCTRL2                (0x03);         // 控制寄存器2地址
+
+
+// u16 OC_TOFF
+#define CYCLEBYCYCLE            (0x0000)        // 
+#define OFFTIMECTRL             (0x0040)        // 如果检测到过流，它将检测（64us）
+                                                // 这个64us通过DRV8303设置
+
+
+// 门极驱动电路电流峰值
+#define CURRENT1_7A             (0x0000)        // 1.7  A
+#define CURRENT0_7A             (0x0001)        // o.7  A
+#define CURRENT0_25A            (0x0002)        // 0.25 A
+
+
+// 门极驱动重启模式
+#define GATE_RST_NORMAL         (0x0000)
+#define GATE_RST_LATCH          (0x0004)        // 先把这一位设置为（1）
+                                                // 再把这一位设置为（0）
+                                                // 复位门极驱动
+// 这样操作相当于（EN_GATE）这个引脚（拉高或拉低重启门极驱动）
+
+
+// PWM模式
+#define PHASE6PWM               (0x0000)        // 6路PWM
+#define PHASE3PWM               (0x0008)        // 3路PWM
+
+
+// 过流模式
+#define CURRENTLIMIT            (0x0000)        // 限流
+#define OCLATCHSTDOWN           (0x0010)        // 一旦芯片过流，就关闭芯片，并锁定
+#define REPORTONLY              (0x0020)        // 如果过流，只报告
+#define OCDIABLED               (0x0030)        // 关闭过流检测
+
+
+// OC_ADJ_SET 过流标准设置
+Rds(ON)         => 9  毫欧         => MOS管内阻
+Vgs             => 10 伏
+电机：           => 24V/5A
+        0.009 欧   *   5 A   = 0.045 伏
+如果DRV8303检测到（0.045 V）， 那么表示它过流了
+        0.0454   <===>  17
+
+
+// 过流， 过温报告模式
+// nOCTW => 这个引脚报告（过温，过流）
+#define OCOTBOTH                (0x0000)        // 过流，过温报告
+#define OTONLY                  (0x0001)        // 仅过温报告
+#define OCONLY                  (0x0002)        // 仅过流报告
+#define OCONLYRSVD              (0x0003)        // 默认过流报告
+
+
+// 分流放大器增益设置
+#define GAIN10                  (0x0000)
+#define GAIN20                  (0x0004)
+#define GAIN40                  (0x0008)
+#define GAIN80                  (0x0008)
+
+
+// 
+DC_CAL_CH1      (0x00 << 4)     // 正常工作：连接起来
+DC_CAL_CH2      (0x00 << 5)     // 正常工作：连接起来
+#define CONNECTLOADPH1          (0x0000)        // 连接
+#define SHORTINPUTPH1           (0x0020)        // 断开
+#define CONNECTLOADPH2          (0x0000)        // 连接
+#define SHORTINPUTPH1           (0x0040)        // 断开
+
+
+// drv8303 配置结构体
+typedef struct DRV8303CFG {
+        uint16_t GATE_CURRENT;  // 门极驱动电流大小
+        uint16_t GATE_RESET;    // 门极驱动重启状态
+        uint16_t PWM_MODE;      // 3相或6相PWM
+        uint16_t OCP_MODE;      // 过流动作模式
+        uint16_t OC_ADJ_SET;    // 过流标准设置
+        uint16_t OCTW_MODE;     // 过流，过温报告模式
+        uint16_t GAINVALUE;     // 分流放大器增益设置
+        uint16_t DC_CAL_CH1;    // 分流放大器1 娇正设置
+        uint16_t DC_CAL_CH2;    // 分流放大器2 娇正设置
+        uint16_t OC_TOFF;       //
+} Drv8303Cfg;
+u8 drv8303init(Drv8303Cfg cfg)
+{
+        enablegate();           // 使能DRV8303-EN_GATE引脚
+        timer6delayms(500);     // 延时500毫秒，让DRV8303启动完成
+        u16 wconfig  = 0;
+        u16 rconfig  = 0;
+        u16 regvalue = 0;
+        wconfig =       DRV8303WRITE            | 
+                        REGCTRL1 << 11          | 
+                        cfg.GATE_CURRENT        | 
+                        cfg.GATE_RESET          |
+                        cfg.PWM_MODE            |
+                        cfg.OCP_MODE            |
+                        cfg.OC_ADJ_SET;
+        spi3writeword(wconfig);                         // 写控制寄存器1
+        rconfig = DRV8303READ | REGCTRL1 << 11;
+        spi3writeword(rconfig);                         // 发送读取命令
+        regvalue = spi3readword();                      // 读取状态寄存器1
+        if ((regvalue & 0x07ff) != (wconfig & 0x07ff)) {
+                return (1);                             // 返回1， 表示控制寄存器1写入失败
+        }
+        
+        wconfig = 0;    
+        wconfig =       DRV8303WRITE            |       // 写控制寄存器2
+                        REGCTRL2 << 11          |
+                        cfg.OCTW_MODE           |
+                        cfg.GAINVALUE           |
+                        cfg.DC_CAL_CH1          |
+                        cfg.DC_CAL_CH2          |
+                        cfg.OC_TOFF
+                        
+        spi3writeword(wconfig);                         // 写控制寄存器2
+        rconfig = DRV8303READ | REGCTRL2 << 11;         // 
+        spi3writeword(rconfig);                         // 发送读取命令
+        regvalue = spi3readword();                      // 读取状态寄存器2
+        if ((regvalue & 0x07ff) != (wconfig & 0x07ff)) {// 判断写入的值和读取的值是否相同
+                return (1);                             // 返回1， 表示控制寄存器2写入失败
+        }
+        return 0;
+}
+
+
+// 读取DRV8303的ID
+u16 drv8303IDread(void)
+{
+        u16 command = 0;
+        u16 regvalue = 0;
+        command = DRV8303READ | REGSTAUTS2 << 11;
+        spi3writeword(command);
+        regvalue = spi3readword();      // 读取状态寄存器2
+        return regvalue & 0x0f;
+}
+int main(void)
+{
+        Drv8303Cfg cfg = {
+                .GATE_CURRENT   = CURRENT0_7A,
+                .GATE_RESET     = GATE_RST_NORMAL,      // 门极驱动重启状态
+                .PWM_MODE       = PHASE6PWM,            // 6相PWM模式
+                .OCP_MODE       = OCLATCHSTDOWN,        // 过流动作模式
+                .OC_ADJ_SET     = 16,                   // 过流标准设置为（0.403V）
+                .OCTW_MODE      = OCOTBOTH,             // 过流，过温报告模式
+                .GAINVALUE      = GAIN80,               // 分流放大器增益设置
+                .DC_CAL_CH1     = CONNECTLOADPH1,       // 分流放大器1 娇正设置
+                .DC_CAL_CH2     = CONNECTLOADPH2,       // 分流放大器2 娇正设置
+                .OC_TOFF        = CYCLEBYCYCLE
+        };
+        spi3init();
+        u8 init = drv8301init(cfg);
+        u16 id = drv8303IDread();
+        while (1);
 }
