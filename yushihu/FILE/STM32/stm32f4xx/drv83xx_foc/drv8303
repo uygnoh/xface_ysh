@@ -90,24 +90,8 @@ u16 spi3readword(void)
 
 
 //______________________________________________________________________________
-//      => DRV830x 
+//      => DRV830x 芯片驱动
 //______________________________________________________________________________
-// PG6-ENGATE drv8303
-void enableegate(void)
-{
-        RCC->AHB1ENR    |=  (0x01 << 6);        // GPIOG 时钟打开
-        GPIOG->MODER    &= ~(0x03 << 12);       // 清零
-        GPIOG->MODER    |=  (0x01 << 12);       // 通用输出模式
-        GPIOG->OTYPER   &= ~(0x01 << 6);        // 推挽
-        GPIOG->OSPEEDR  &= ~(0x03 << 12);       // 2MHz
-        GPIOG->PUPDR    &= ~(0x03 << 12);       // 无上下拉
-        GPIOG->BSRRL    |=  (0x01 << 6);        // 输出高电平
-        
-}
-
-
-
-
 #define DRV0303WRITE            (0x00 << 15);   // Drv8303 写
 #define DRV0303READ             (0x01 << 15);   // Drv8303 读
 #define REGSTATUS1              (0x00);         // 状态寄存器1地址
@@ -172,6 +156,7 @@ Vgs             => 10 伏
 #define GAIN80                  (0x0008)
 
 
+
 // 
 DC_CAL_CH1      (0x00 << 4)     // 正常工作：连接起来
 DC_CAL_CH2      (0x00 << 5)     // 正常工作：连接起来
@@ -179,6 +164,7 @@ DC_CAL_CH2      (0x00 << 5)     // 正常工作：连接起来
 #define SHORTINPUTPH1           (0x0020)        // 断开
 #define CONNECTLOADPH2          (0x0000)        // 连接
 #define SHORTINPUTPH1           (0x0040)        // 断开
+
 
 
 // drv8303 配置结构体
@@ -194,6 +180,25 @@ typedef struct DRV8303CFG {
         uint16_t DC_CAL_CH2;    // 分流放大器2 娇正设置
         uint16_t OC_TOFF;       //
 } Drv8303Cfg;
+
+
+
+
+// PG6-ENGATE drv8303
+void enableegate(void)
+{
+        RCC->AHB1ENR    |=  (0x01 << 6);        // GPIOG 时钟打开
+        GPIOG->MODER    &= ~(0x03 << 12);       // 清零
+        GPIOG->MODER    |=  (0x01 << 12);       // 通用输出模式
+        GPIOG->OTYPER   &= ~(0x01 << 6);        // 推挽
+        GPIOG->OSPEEDR  &= ~(0x03 << 12);       // 2MHz
+        GPIOG->PUPDR    &= ~(0x03 << 12);       // 无上下拉
+        GPIOG->BSRRL    |=  (0x01 << 6);        // 输出高电平
+        
+}
+
+
+
 u8 drv8303init(Drv8303Cfg cfg)
 {
         enablegate();           // 使能DRV8303-EN_GATE引脚
@@ -207,7 +212,7 @@ u8 drv8303init(Drv8303Cfg cfg)
                         cfg.GATE_RESET          |
                         cfg.PWM_MODE            |
                         cfg.OCP_MODE            |
-                        cfg.OC_ADJ_SET;
+                        cfg.OC_ADJ_SET
         spi3writeword(wconfig);                         // 写控制寄存器1
         rconfig = DRV8303READ | REGCTRL1 << 11;
         spi3writeword(rconfig);                         // 发送读取命令
