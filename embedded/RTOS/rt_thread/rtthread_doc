@@ -1,0 +1,15 @@
+// 查看编译器路径
+ysh@debian:~$ which arm-none-eabi-gcc
+/usr/bin/arm-none-eabi-gcc
+
+// 下载
+git clone https://github.com/RT-Thread/rt-thread.git
+
+
+// 安装程序
+sudo apt install scons
+sudo apt install libncurses5-dev
+
+
+
+// https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/application-note/setup/qemu/ubuntu/an0005-qemu-ubuntu

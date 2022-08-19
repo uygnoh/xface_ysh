@@ -1,0 +1,127 @@
+        private         // 私有的，它只允许本类调用
+        public          // 公有的，它允许本类，子类及外部来调用
+        protected       // 受保护的， 只允许本类和子类调用
+        
+//______________________________________________________________________________
+//      => Class
+//______________________________________________________________________________
+// 类的声明
+class People {
+        protected:
+                String  __name;
+        public:
+                void set_name(String);
+                String get_name();
+};
+//      类的方法
+// ::   表示域操作符， 表示set_name方法属于People类
+//      形参的个数要与声明的数据类型与个数保持一致
+// this 这里就是“本对象的成员属性__name”
+void People::set_name(String name)
+{
+        if (name.length() > 3) {
+                this->__name = name;
+        } else {
+                this->__name = " ";
+        }
+        
+}
+String People::get_name()
+{
+        return (this->__name);
+}
+
+
+
+//              类的声明
+//              继承
+// :            表示这个（Man）这个类继承自People类
+// public       这个访问修饰符代表子类继承了父类元素的最高可见上限
+class Man: public People {
+        private:
+                char sex;
+        public:
+                String intro_self();
+};
+String Man::intro_self()
+{
+        return "my name is " + this->__name;
+        return "my name is " + People::get_name();
+}
+
+
+
+// 程序在实例化对象的时候，为每个对象分配自己独立的内存空间
+// 每个对象空间都有自己的成员属性，也就是这个__name
+// 对象在内存空间中是没有成员方法的，这个方法是由单独的内存空间维护
+People  xh;     // 实例化对象
+Man     xb;     // 实例化对象
+
+
+
+void setup() {
+        xh.set_name("xiao hong");
+        xb.set_name("xiao bai");
+        Serial.begin(9600);
+        Serail.pirntln(xh.get_name());
+}
+
+void loop() {
+}
+
+
+
+//______________________________________________________________________________
+//      => 构造
+//______________________________________________________________________________
+// 构造
+class People {
+        private:
+                int __age;
+        public:
+                People(int age) {                       // 构造方法
+                        this->__age = age;
+                }
+                
+                int get_age() {
+                        return (this->__age);
+                }
+                
+};
+
+
+People xh(10);
+
+void setup() {
+        Serial.begin(9600);
+        Serial.println(xh.get_age());
+}
+
+
+//______________________________________________________________________________
+//      => 重载
+//______________________________________________________________________________
+// 重载
+// 相同的函数名，不同的参数就可以实现重载
+class Father {
+        public:
+                void my_println() {
+                        Serial.println("HELLO");
+                }
+                char my_println(String s) {
+                        Serial.println(s);
+                        return ('c');
+                }
+};
+
+Father f;
+
+void setup() {
+        Serial.begin(9600);
+        //f.my_println();
+        //f.my_println("WORLD");
+        Serial.println(f.my_println("OOO"));
+}
+
+void loop() {
+}

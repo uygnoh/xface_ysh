@@ -2,7 +2,9 @@
         => ESP32-IDF VSCODE
 *******************************************************************************/
         Espressif IDF           // 找到这个插件，安装
-        
+           |
+           |
+           |
         EXPRESS                 // 简洁设置
         ADVANCED                // 高级设置（选择它）
                 |
@@ -11,17 +13,32 @@
                 |
                 |___ Select ESP-IDF version:                            // 版本
                 |
-                |___ Enter ESP-IDF container directory:                 // 目录
+                |___ Enter ESP-IDF container directory:                 // ESP-IDF目录
                 |
-                |___ Enter ESP-IDF Tools directory (IDF_TOOLS_PATH):    // 工具链
+                |___ Enter ESP-IDF Tools directory (IDF_TOOLS_PATH):    // 工具链目录
  
  
-        // Shift + Ctrl + P
-        >ESP-IDF:SHOW   ->ESP-IDF: Show Example Projects                // 下载例程
-        // 创建例程
-        // 设置开发板
-        >ESP32-C3(Built-in USB JTAG)
-                
+ 
+        //  View  
+        // ____________________________________________________
+                |
+                |
+                |___> command palette ...       Shift + Ctrl + P
+        输入命令:           >ESP-IDF: Show Examples Projects        // 点击下载例程
+        输入命令:           >Use current ESP-IDF                    // 选择当前的IDF
+        
+        
+        
+       // 基于（hello_world）创建自己的工程文件
+       // ____________________________________________________
+       Create project using example hello_world        
+                        
+                        
+                        
+        // 插入开发板，设置开发板
+        // ____________________________________________________
+        输入命令:           >ESP32-C3(Built-in USB JTAG)    // USB  JTAG
+        输入命令:           >ESP32-C3(ESP-PROG JTAG)        // UART JTAG 选择它
 
 
 
