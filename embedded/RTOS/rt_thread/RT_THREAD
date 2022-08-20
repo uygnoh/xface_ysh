@@ -1,0 +1,188 @@
+//______________________________________________________________________________
+//      => RT-THREAD
+//______________________________________________________________________________
+
+
+// 工程源码结构
+// ____________________________________________________________
+        applications            // 用户应用代码
+        drivers                 // RT-Thread的驱动，不同平台底层驱动具体实现
+        kernel-sample           // 内核例程
+        Libraries               // STM32固件库
+        rt-thread               // RT-Thread 源码结构
+             |
+             |————src           // RT-Thread内核代码文件
+             |————include       // RT-Thread内核头文件
+             |————libcpu        // 各类芯片，内核移植代码，比如STM32
+             |————components    // RT-Thread外部组件代码，比如Finsh, Lwip
+
+
+
+
+// RT-Thread 启动
+// ____________________________________________________________
+int $Sub$$main(void)
+{
+        rt_hw_interupt_disable();
+        rtthread_startup();
+        return 0;
+}
+// RT-Thread 启动顺序
+        1       SystemInit()
+        2       $Sub$$main()
+        3       rtthread_startup()
+        4       rt_application_init()
+        5       main_thread_entry
+        6       $Super$$main()
+        7       main()
+
+
+
+
+                
+                
+                
+//______________________________________________________________________________
+//      => rtthread-nano 移植教程
+//______________________________________________________________________________
+
+
+
+// rtthread-nano 内核文件
+// ____________________________________________________________
+        include         // RT-Thread 内核头文件
+        src             // RT-Thread 内核源文件
+        libcpu          // RT-Thread 的 libcpu 抽象层向下提供了一套统一的 CPU 架构
+                        // 移植接口，这部分接口包含了全局中断开关函数、线程上下文切换函
+                        // 数、时钟节拍的配置和中断函数、Cache 等等内容，RT-Thread 支
+                        // 持的 cpu 架构在源码的 libcpu 文件夹下。
+                        
+                        
+        startup_xx.s    // 启动文件由芯片厂商提供，位于芯片固件库中。 每款芯片都有相对
+                        // 应的启动文件，在不同开发环境下启动文件也不相同
+                        // startup_xx.s：主要完成初始化时钟、配置中断向量表；
+                        // 完成全局 / 静态变量的初始化工作；初始化堆栈；库函数的初始化；
+                        // 程序的跳转等内容
+        // 举例： stm32 在 GCC 开发环境下的启动文件，修改 GCC 启动文件，
+        // 使其跳转到 entry 函数。 以下是启动文件的代码片段：
+                        // 修改前：
+                        bl  SystemInit
+                        bl  main
+                        // 修改后：
+                        bl  SystemInit
+                        bl  entry       // 修改此处，由 main 改为 entry
+                
+                
+        // RT-Thread 在 entry 函数中实现了 GCC 环境下的 RT-Thread 启动
+        // 最终调用 main() 函数进入用户 main()。
+        int entry(void)
+        {
+                rtthread_startup();
+                return 0;
+        }
+
+
+
+// rtthread-nano 配置文件
+// ____________________________________________________________
+user/board.c
+config/rtconfig.h
+
+    
+        
+
+// rtthread_nano/src/components.c
+// ____________________________________________________________
+extern void hardware_initialization(void);
+int rtthread_startup(void)
+{
+        hardware_initialization();      // 加入这条语句
+        rt_hw_interrupt_disable();
+
+        /* board level initialization
+        * NOTE: please initialize heap inside board initialization.
+        */
+        rt_hw_board_init();
+
+        /* show RT-Thread version */
+        rt_show_version();
+
+        /* timer system initialization */
+        rt_system_timer_init();
+
+        /* scheduler system initialization */
+        rt_system_scheduler_init();
+
+        /* create init_thread */
+        rt_application_init();
+
+        /* timer thread initialization */
+        rt_system_timer_thread_init();
+
+        /* idle thread initialization */
+        rt_thread_idle_init();
+
+        /* start scheduler */
+        rt_system_scheduler_start();
+
+        /* never reach here */
+        return 0;
+}
+
+
+
+// user/main.c
+// ____________________________________________________________
+int main(void)
+{
+        while (1) {
+        }
+}
+
+
+void hardware_initialization(void)
+{
+        HAL_Init();
+        SystemClock_Config();
+        MX_GPIO_Init();
+}
+
+
+
+//______________________________________________________________________________
+//      => RT-THREAD 标准版本教程
+//______________________________________________________________________________
+
+
+// 查看编译器路径
+// ____________________________________________________________
+        which   arm-none-eabi-gcc                       
+        /usr/bin/arm-none-eabi-gcc
+        
+        
+// 下载 RT-THREAD 标准版本
+// ____________________________________________________________
+        git clone https://github.com/RT-Thread/rt-thread.git
+
+
+// 安装程序依赖环境
+// ____________________________________________________________
+        sudo apt install scons
+        sudo apt install libncurses5-dev
+
+
+// 修改编译器路径
+// cd   /home/ysh/rt-thread/rt-thread-master/bsp/stm32/stm32f103-100ask-mini
+// vim  rtconfig.py
+// ____________________________________________________________
+# cross_tool provides the cross compiler
+# EXEC_PATH is the compiler execute path, for example, CodeSourcery, Keil MDK, IAR
+if  CROSS_TOOL == 'gcc':
+    PLATFORM    = 'gcc'
+    EXEC_PATH   = r'/usr/bin'           #// 修改后
+    
+    
+// 进入BSP目录， 编译例程
+// ____________________________________________________________
+        cd      bsp/stm32/stm32f103-100ask-mini/
+        scons

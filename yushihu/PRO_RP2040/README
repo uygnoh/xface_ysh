@@ -1,0 +1,18 @@
+// blink 点灯程序
+        cd      blink/build
+        cmake   ..
+        make
+        
+     
+        
+// blink_pio 可编程IO
+        cd      blink_pio/build
+        cmake   ..
+        make
+        
+        
+
+// pico_freertos RP2040-PICO 实时操作系统
+        cd      pico_freertos/build
+        cmake   ..
+        make
