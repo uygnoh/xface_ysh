@@ -1,0 +1,179 @@
+//
+                I/O设备驱动层
+                      |
+                      |
+                      |
+                设备驱动框架层
+                      |
+                      |
+                      |
+                STM32—HAL库驱动
+
+
+//______________________________________________________________________________
+//      => IO 设备模型
+//______________________________________________________________________________
+        // IO 设备类型
+        RT_Device_Class_Char,           // 字符设备
+        RT_Device_Class_Block,          // 块设备
+        RT_Device_Class_Netif,          // 网络接口
+        RT_Device_Class_MTD,            // 存储设备
+        RT_Device_Class_CAN,            // CAN设备
+        RT_Device_Class_RTC,            // RTC设备
+        RT_Device_Class_Sound,          // 声音设备
+        RT_Device_Class_I2CBUS,         // I2C设备
+        RT_Device_Class_USBDevie,       // USB从机设备
+        RT_Device_Class_USBHost,        // USB主机设备
+        RT_Device_Class_SPIBUS,         // SPI设备
+        RT_Device_Class_SPIDevice,      // SPI从机设备
+        RT_Device_Class_Timer,          // 定时器设备
+        RT_Device_Class_SDIO,           // SDIO设备
+        RT_Device_Class_Miscellaneous,  // misc    device
+        RT_Device_Class_Sensor,         // Sensor  device
+        RT_Device_Class_Touch,          // Touch   device
+        RT_Device_Class_Unknown,        // unknown device     
+        
+        
+// ____________________________________________________________
+// 
+// type         设备类型
+// attach_size  用户数据大小
+// return       返回设备对象
+rt_device_t     rt_device_create(int type, int attach_size)  // 创建设备
+// 它会释放内存空间
+void           rt_device_destroy(rt_device_t dev)            // 删除设备
+//
+// 
+// 设备创建后，需要实现它访问硬件的操作方法
+struct rt_device_ops {
+        // 通用设备接口
+        rt_err_t        (*init)   (rt_device_t dev);
+        rt_err_t        (*open)   (rt_device_t dev, rt_uint16_t oflag);
+        rt_err_t        (*close)  (rt_device_t dev);
+        rt_err_t        (*read)   (rt_device_t dev, rt_off_t pos, void *buffer, rt_size_t size);
+        rt_err_t        (*write)  (rt_device_t dev, rt_off_t pos, const void *buffer, rt_size_t size);
+        rt_err_t        (*control)(rt_device_t dev, int cmd, void *args);
+};
+        // 参数 cmd 的通用设备命令可取如下宏定义
+        #define RT_DEVICE_CTRL_RESUME   0x01    // 恢复设备
+        #define RT_DEVICE_CTRL_SUSPEND  0x02    // 挂起设备
+        #define RT_DEVICE_CTRL_CONFIG   0x03    // 配置设备
+        #define RT_DEVICE_CTRL_SET_INT  0x10    // 设置中断
+        #define RT_DEVICE_CTRL_CLR_INT  0x11    // 清除中断
+        #define RT_DEVICE_CTRL_GET_INT  0x12    // 获取中断状态
+
+
+
+// ____________________________________________________________
+//
+void    rt_device_register(                                  // 注册设备
+                        rt_device_t dev      // 设备对象
+                        const char *name    // 设备名称
+                        rt_uint16_t flags)   //  
+                        
+                        flags -> 设备属性
+        #define RT_DEVICE_FLAG_RDONLY       0x001   // 只读
+        #define RT_DEVICE_FLAG_WRONLY       0x002   // 只写
+        #define RT_DEVICE_FLAG_RDWR         0x003   // 读写
+        #define RT_DEVICE_FLAG_REMOVABLE    0x004   // 可移出
+        #define RT_DEVICE_FLAG_STANDALONE   0x008   // 独立
+        #define RT_DEVICE_FLAG_SUSPENDED    0x020   // 挂起
+        #define RT_DEVICE_FLAG_STREAM       0x040   // 流模式
+        #define RT_DEVICE_FLAG_INT_RX       0x100   // 中断接收
+        #define RT_DEVICE_FLAG_DMA_RX       0x200   // DMA接收
+        #define RT_DEVICE_FLAG_INT_TX       0x100   // 中断发送
+        #define RT_DEVICE_FLAG_DMA_TX       0x200   // DMA发送
+// 它不会释放设备控制块占用的内存
+rt_err_t rt_device_unregister(rt_device_t dev);    // 注销设备
+
+
+
+// ____________________________________________________________
+//
+rt_device_t rt_device_find(const char *name)    // 查找设备
+
+
+
+
+// ____________________________________________________________
+// 数据收发回调， 当硬件设备收到数据时，可以通过如下函数回调另一个
+// 函数来设置数据接收指示，通知上层应用线程有数据到达
+rt_err_t rt_device_set_rx_indicate(
+        rt_device_t dev,                   // 这个设备接收到数据后，它会回调下面的函数
+        rt_err_t (*rx_ind)(rt_device_t dev, rt_size_t size)
+rt_err_t rt_device_set_tx_complete(
+        rt_device_t dev,                   // 当这个这设备发送完成，它会回调下面的函数
+        rt_err_t (*tx_done)(rt_device_t dev, void *buffer))
+        
+        
+        
+        
+//______________________________________________________________________________
+//      => RT-THREAD 添加自己的驱动程序
+//______________________________________________________________________________
+
+///////////////////////////////
+        drv_demo.c
+///////////////////////////////
+#include <rtdevice.h>
+#include <rtdbg.h>
+
+rt_err_t demo_init(rt_device_t dev)
+{
+        rt_kprintf("demo_init ...\n");
+        return 0;
+}
+rt_err_t demo_open(rt_device_t dev, rt_uint16_t oflag)
+{
+        rt_kprintf("demo_open ...\n");
+        return 0;
+}
+rt_err_t demo_close(rt_device_t dev)
+{
+        rt_kprintf("demo_close ...\n");
+        return 0;
+}
+
+
+int rt_demo_init(void)
+{
+        // 创建设备
+        rt_device_t demo_dev;
+        demo_dev = rt_device_create(RT_Deviece_Class_Char, 32);
+        if (demo_dev == NULL) {
+                LOG_G("rt_device_create failed...\n");
+                return (-ENOMEM);
+        }
+        // 创建设备方法
+        demo_dev->init  = demo_init;
+        demo_dev->open  = demo_open;
+        demo_dev->close = demo_close;
+        
+        
+        // 注册设备
+        rt_device_register(demo_dev, "demo", RT_DEVICE_FLAG_RDWR);
+        
+        return 0;
+}
+INIT_BOARD_EXPORT(rt_demo_init);
+
+
+///////////////////////////////
+        main.c
+///////////////////////////////
+rt_device_t dev;
+int main(void)
+{
+        // 查找设备
+        dev = rt_device_find("demo");
+        if (dev == NULL) {
+                LOG_E("rt_devcie_find failed ...\n");
+                return (-EINVAL);
+        }
+        
+        // 找到了设备
+        rt_device_init(dev);
+        rt_device_open(dev, RT_DEVICE_OFLAG_RDWR);
+        rt_device_close(dev);
+}
+

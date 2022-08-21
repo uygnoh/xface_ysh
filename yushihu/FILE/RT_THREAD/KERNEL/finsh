@@ -1,0 +1,9 @@
+// board.h
+#define BSP_CLOCK_SOURCE                ("HSE")         // 外部高速时钟
+#define BSP_CLOCK_SOURCE_FREQ_MHZ       ((int32_t)8)    // 时钟源8MHz
+#define BSP_CLOCK_SYSTEM_FREQ_MHZ       ((int32_t)72)   // 配置后的时钟72MHz
+
+
+// FinSH 组件
+// rt_hw_console_getchar() 已经在 drv_uart.c 中实现
+

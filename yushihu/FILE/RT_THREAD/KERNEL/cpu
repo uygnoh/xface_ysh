@@ -1,0 +1,25 @@
+//
+0   startup_stm32f103xb.S
+1   entry()
+2   rtthread_startup()                          // RT-THREAD 入口
+        2:00    rt_hw_interrupt_disable()       // 关闭中断
+        2:01    rt_hw_board_init()            ->rt_components_board_init() ->board_init_funcitons()
+        2:02    rt_show_version()
+        2:03    rt_system_timer_init()
+        2:04    rt_system_scheduler_init()
+        2:05    rt_system_signal_init()
+        2:06    rt_application_init()         ->rt_thread_init(rt_thread_entry)
+        2:07    rt_system_timer_thread_init() ->rt_thread_init(rt_thread_timer_entry)
+        2:08    rt_thread_idle_init()         ->rt_thread_init(rt_thread_idle_entyr)
+        2:09    rt_system_scheduler_start()   ->根据调度规则执行
+                2:09:00         main_thread_entry()
+                                0 pre-initialization fuuctions
+                                1 device        init functions
+                                2 components    init function
+                                3 environment   inti function
+                                4 applications  init function
+                2:09:01         rt_thread_timer_entry()
+                2:09:02         rt_thread_idle_entry()
+                2:09:03         其它线程
+
+        
