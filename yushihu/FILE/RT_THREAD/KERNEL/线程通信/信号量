@@ -1,0 +1,248 @@
+// IPC (Internal Process Communication) 线程间通信
+
+
+// 信号量定义
+struct rt_semaphore {
+        struct rt_ipc_object parent;    // parent 它继承于 ipc_objec
+        rt_uint16_t value;              // 这个信号量有一个私有变量 value
+};
+typedef struct rt_semphore *rt_sem_t;   // 表示动态信号量
+struct rt_semaphore     static_sem;     // 定义静态信号量
+rt_sem_t                dynamic_sem;    // 定义动态信号量
+
+
+
+// 静态信号量（初始化与脱离）
+rt_err_t rt_sem_init(rt_sem_t sem, const char *name, rt_uint32_t value, rt_uint8_t flag)
+rt_err_t rt_sem_detach(rt_sem_t sem);
+// 动态信号量（创建与删除）
+rt_sem_t rt_sem_create(const char *name, rt_uint32_t value, rt_uint8_t flag)
+rt_err_t rt_sem_delete(rt_sem_t sem);
+        // flag
+        RT_IPC_FLAG_FIFO        // 等待方式（按照FIFO）
+        RT_IPC_FLAG_PRIO        // 等待方式（按照优先级）
+
+
+
+// 获取信号量
+rt_err_t rt_sem_take(rt_sem_t sem, rt_int32_t time)     // 如果time为负数，一直等待
+rt_err_t rt_sem_trytake(rt_sem_t sem)                   // 时间参数为（0）的take
+// 释放信号量
+rt_err_t rt_sem_release(rt_sem_t sem)
+
+
+
+
+//______________________________________________________________________________
+//      => 信号量使用
+//______________________________________________________________________________
+#define THREAD_PRIORITY         25
+#define THREAD_TIMSLICE         5
+static rt_sem_t dynamic_sem = RT_NULL;  // 定义一个动态信号量
+
+
+
+// 静态创建线程1
+// ____________________________________________________________
+ALIGN(RT_ALIGN_SIZE)            // 内存对齐
+static char thread1_stack[1024];
+static struct rt_thread thread1;
+static void rt_thread1_entry(void *parameter)
+{
+        static rt_uint8_t count = 0;
+        while (1) {
+                if (count <= 100) {
+                        count++;
+                } else {
+                        return;
+                }
+                // count每计数10， 就释放一次信号量
+                if (0 == (count % 10)) {
+                        rt_kprint("t1 release a dynamic semaphore.\n");
+                        rt_sem_release(dynamic_sem);
+                }
+        }
+}
+
+
+
+// 静态创建线程2
+// ____________________________________________________________
+ALGIN(RT_ALIGN_SIZE)            // 内存对齐
+static char thread2_stack[1024];
+static struct rt_thread thread2;
+static void rt_thread2_entry(void *parameter)
+{
+        static rt_err_t result;
+        static rt_uint8_t number = 0;
+        while (1) {
+                // 永久方式等待信号量，获取到信号量，则执行number自加的操作
+                result = rt_sem_take(dynamic_sem, RT_WAITING_FOREVER);
+                if (result != RT_EOK) {
+                        rt_kprintf("t2 take a dynamic semaphore, failed.\n");
+                        rt_sem_delete(dynamic_sem);
+                        return;
+                } else {
+                        number++;
+                        rt_kprint("t2 take a dynamic semaphore. number = %d\n", number);
+                }
+        }
+}
+
+
+
+// 信号量示例初始化
+// ____________________________________________________________
+int semaphore_sample()
+{
+        // 创建一个动态信量，初始值为（0）
+        dynamic_sem = rt_sem_create("dsem", 0, RT_IPC_FLAG_FIFO);
+        if (dynamic_sem == RT_NULL) {
+                rt_kprintf("create dynamic semaphore failed...\n");
+                return (-1);
+        } else {
+                rt_kprintf("create dynamic semaphore value = 0.\n");
+        }
+        
+        rt_thread_init(&thread1,
+                        "thread1",
+                        rt_thread1_entry,
+                        RT_NULL,
+                        &thread1_stack[0],
+                        sizeof(thread1_stack);
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread1);
+
+        rt_thread_init(&thread2,
+                        "thread2",
+                        rt_thread2_entry,
+                        RT_NULL,
+                        &thread2_stack[0],
+                        sizeof(thread2_stack);
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread2);
+        
+        return 0;
+}
+// 导出到 MSH 命令列表中
+MSH_CMD_EXPORT(semaphore_sample, semaphore sample);
+
+
+
+
+//______________________________________________________________________________
+//      => 生产者与消费者
+//______________________________________________________________________________
+#define MAXSEM          5               // 定义最大5个元素能够被产生
+rt_uint32_t             array[MAXSEM];  // 用于放置生产者的整数数组
+static rt_uint32_t      set, get;       // 指向生间者，消费者在array数组中的读写位置
+static rt_thread_t      producer_tid = RT_NULL;
+static rt_thread_t      consumer_tid = RT_NULL;
+struct rt_semaphoer     sem_lock;
+struct rt_semaphoer     sem_empty;
+struct rt_semaphoer     sem_full;
+
+
+
+
+// 生产者函数入口
+void producer_thread_entry(void *parameter)
+{
+        int cnt = 0;
+        
+        // 运行10次
+        while (cnt < 10) {
+                // 获取一个空位
+                rt_sem_take(&sem_empty, RT_WAITING_FOREVER);
+                
+                // 修改array内容，上锁
+                rt_sem_take(&sem_lock, RT_WAITING_FOREVER);
+                array[set % MAXSEM] = cnt + 1;
+                rt_kprintf("the producer generates a number: %d\n", arrar[set % MAXSEM]);
+                set++;
+                rt_sem_release(&sem_lock);
+                
+                // 发布一个满位
+                rt_sem_release(&sem_full);
+                cnt++;
+                
+                // 暂停一段时间
+                rt_thread_mdelay(20);
+        }
+        rt_kprintf("the producer exit!\n");
+}
+
+// 消费者函数入口
+void consumer_thread_entry(void *parameter)
+{
+        rt_uint32_t sum = 0;
+        
+        while (1) {
+                // 获取一个满位
+                rt_sem_take(&sem_full, RT_WAITING_FOREVER);
+                
+                // 临界区，上锁进行操作
+                rt_sem_take(&sem_lock, RT_WAITING_FOREVER);
+                sum += array[get % MAXSEM];
+                rt_kprintf("the consumer[%d] get a numer: %d\n", (get % MAXSIZE), array[get % MAXSEM]);
+                get++;
+                rt_sem_release(&sem_lock);
+                
+                // 释放一个空位
+                rt_sem_release(&sem_empty);
+                
+                // 生产者生产到10个数目，停止，消费者线程相应停止
+                if (get == 10) {
+                        break;
+                }
+                // 暂停一小会时间
+                rt_thread_mdelay(50);
+        }
+        rt_kprintf("the consumer sum is: %d\n", sum);
+        rt_kprintf("the consumer exit!\n");
+}
+
+
+
+int producer_consumer(void)
+{
+        set = 0;
+        get = 0;
+        
+        // 初始化3个信号量
+        rt_sem_init(&sem_lock,  "lock",  1,      RT_IPC_FLAG_FIFO);     // 线程互斥关系（二值信号量）
+        rt_sem_init(&sem_empty, "empty", MAXSEM, RT_IPC_FLAG_FIFO);     //
+        rt_sem_init(&sem_full,  "full",  1,      RT_IPC_FLAG_FIFO);     // 
+        
+        // 创建生产者线程
+        producer_tid = rt_thread_create(
+                                "producer",
+                                producer_thread_entry,
+                                RT_NULL,
+                                THREAD_STACK_SIZE,
+                                THREAD_PRIORTTY - 1,
+                                THREAD_TIMESLICE);
+        if (producer_tid != RT_NULL) {
+                rt_thread_startup(producer_tid);
+        } else {
+                rt_kprintf("create thread producer failed\n");
+                return (-1);
+        }
+        
+        // 创建消费者线程
+        consuer_tid = rt_thread_create(
+                                "consumer",
+                                consumer_thread_entry,
+                                RT_NULL,
+                                THREAD_STACK_SIZE,
+                                THREAD_PRIORTTY + 1,
+                                THREAD_TIMESLICE);
+        if (consumer_tid != RT_NULL) {
+                rt_thread_startup(consumer_tid);
+        } else {
+                rt_kprintf("create thread consumer failed\n");
+                return (-1);
+        }
+}
