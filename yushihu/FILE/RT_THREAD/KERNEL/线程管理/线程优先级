@@ -1,0 +1,76 @@
+//______________________________________________________________________________
+//      => 线程优先级
+//______________________________________________________________________________
+        // RT-Thread最大支持 256 个优先级（数值越小，优先级越高）
+        // 0 为最高优先级， 最低优先级预留给空闲线程
+        // 用户可以通过rt_config.h中的RT_THREAD_PRIORITY_MAX宏来修改最大支持的优先级
+        // 针对STM32， 默认设置最大支持 32 个优先级
+
+
+
+//______________________________________________________________________________
+//      => 线程优先级和时间片
+//______________________________________________________________________________
+        优先级和时间片是线程的2个重要参数
+        分别描述了线程竞争处理器资源的能力和持有处理器时间长短的能力
+        
+        // RT-Thread时间片只有在相同优先级的就绪态线程中起作用
+        // 系统结优先级相同的就绪态线程采用时间下轮转的调度方式进行调度时，
+        // 时间片起到约束线程单次运行时长的作用，其单位是一个系统节拍（OS—Tick）
+
+
+
+//______________________________________________________________________________
+//      => 时间片
+//______________________________________________________________________________
+static void thread_entry(void *parameter)
+{
+        rt_uint32_t value;
+        rt_uint32_t count = 0;
+        
+        value = (rt_uint32_t)parameter;
+        
+        while (1) {
+                if (0 == (count % 5)) {
+                        rt_kprintf("thread %d is running, thread %d count = %d\n", value, value, count);
+                        if (count > 200) {
+                                return;
+                        }
+                }
+                
+                count++;
+        }
+}
+
+
+// 通过输入不同的参数，区分不同的线程
+int timeslice_sample(void)
+{
+        rt_thread_t tid;
+        
+        // 创建线程1， 输入参数（1）
+        tid = rt_thread_create(
+                        "thread1",
+                        thread_entry,
+                        (void *)1,
+                        THREAD_STACK_SIZE,
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE);
+        if (tid != RT_NULL) {
+                rt_thread_startup(tid);
+        }
+        
+        // 创建线程2， 输入参数（2）
+        tid = rt_thread_create(
+                        "thread2",
+                        thread_entry,
+                        (void *)2,
+                        THREAD_STACK_SIZE,
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE - 5);
+        if (tid != RT_NULL) {
+                rt_thread_startup(tid);
+        }
+        
+        return 0;
+}

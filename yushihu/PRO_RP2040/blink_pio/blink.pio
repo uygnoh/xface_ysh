@@ -13,7 +13,8 @@
 .wrap
 
 % c-sdk {
-        void blink_program_init(PIO pio, uint sm, uint offset, uint pin, float div) {
+        void blink_program_init(PIO pio, uint sm, uint offset, uint pin, float div)
+        {
                 // generated in blink.pio.h
                 pio_sm_config c = blink_program_get_default_config(offset);
                 

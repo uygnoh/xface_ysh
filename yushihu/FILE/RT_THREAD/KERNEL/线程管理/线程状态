@@ -1,0 +1,6 @@
+// RT_THREAD 线程状态
+        RT_THREAD_INIT          // 初始状态
+        RT_THREAD_READY         // 就绪状态
+        RT_THREAD_RUNNING       // 运行状态
+        RT_THREAD_SUSPEND       // 挂起状态
+        RT_THREAD_CLOSE         // 关闭状态
