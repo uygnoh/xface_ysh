@@ -23,5 +23,130 @@ rt_thread_startup()     -> rt_system_timer_init()       // 初始化硬件定时
 
 
 //______________________________________________________________________________
-//      => 定时器工作机制
+//      => 动态创建定时器
+//      => 需自己手动释放内存空间
 //______________________________________________________________________________
+typedef struct rt_timer *rt_timer_t;
+rt_timer_t rt_timer_create(
+                const char *name,                       // 定时器名称
+                void (*timeout)(void *parameter),       // 指向定时器超时函数
+                void *parameter,                        // 传递级超时函数的参数
+                rt_tick_t  time,                        // 定时时间
+                rt_uint8_t flag);                       // 标志
+// rtdef.h
+// flag
+#define RT_TIMER_FLAG_DEACTIVATED       0x0     // timer is deactive
+#define RT_TIMER_FLAG_ACTIVATED         0x1     // timer is active
+#define RT_TIMER_FLAG_ONE_SHOT          0x0     // 一次性定时器
+#define RT_TIMER_FLAG_PERIODIC          0x2     // 周期性定时器
+#define RT_TIMER_FLAG_HARD_TIMER        0x0     // 硬件定时器
+#define RT_TIMER_FLAG_SOFT_TIMER        0x4     // 软件定时器
+
+
+
+// main.c
+// ____________________________________________________________
+rt_timer_t timer00;             // 定义结构体指针
+void timer00_callback(void *parameter)
+{
+        rt_kprintf("timer_callback runnning ...\n");
+}
+
+int main(void)
+{
+        // 创建定时器
+        timer00 = rt_timer_create(
+                        "tm_demo", 
+                        timer00_callback, 
+                        NULL, 
+                        3000, 
+                        RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
+        if (timer00 == RT_NULL) {
+                LOG_E("rt_timer_create failed ...\n");
+                return -ENOMEM;
+        }
+        LOG_D("rt_timer_create success ...\n");
+        
+        // 打开定时器
+        rt_timer_start(timer00);
+        return 0;
+}
+
+
+
+//______________________________________________________________________________
+//      => 静态创建定时器
+//      => 无需自己释放内存空间
+//______________________________________________________________________________
+typedef struct rt_timer *rt_timer_t;
+rt_timer_t rt_timer_init(
+                rt_timer_t timer,                        // 定时器结构体
+                const char *name,                       // 定时器名称
+                void (*timeout)(void *parameter),       // 指向定时器超时函数
+                void *parameter,                        // 传递级超时函数的参数
+                rt_tick_t  time,                        // 定时时间
+                rt_uint8_t flag);                       // 标志
+
+
+// main.c
+// ____________________________________________________________
+struct rt_timer timer11;                // 定义结构体变量
+void timer11_callback(void *parameter)
+{
+        rt_kprintf("timer_callback runnning ...\n");
+}
+
+int main(void)
+{
+        // 创建定时器
+        timer11 = rt_timer_create(
+                        &timer11,
+                        "tm_demo", 
+                        timer11_callback, 
+                        NULL, 
+                        3000, 
+                        RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
+        if (timer11 == RT_NULL) {
+                LOG_E("rt_timer_create failed ...\n");
+                return -ENOMEM;
+        }
+        LOG_D("rt_timer_create success ...\n");
+        
+        // 打开定时器
+        rt_timer_start(&timer11);
+        return 0;
+}
+
+
+
+//______________________________________________________________________________
+//      => 修改定时器时间，通过（arg）这个参数传递
+//______________________________________________________________________________
+rt_err_t rt_timer_control(rt_timer_t timer, int cmd, void *arg)
+// rtdef.h
+// cmd
+#define RT_TIMER_CTRL_SET_TIME          0x0     // set timer control command
+#define RT_TIMER_CTRL_GET_TIME          0x1     // get timer control command
+#define RT_TIMER_CTRL_SET_ONESHOT       0x2     // change timer to one shot
+#define RT_TIMER_CTRL_SET_PERIODIC      0x3     // change timer to periodic
+
+
+void timer11_callback(void *parameter)
+{
+        rt_tick_t timeout = 1000;
+        rt_timer_control(&timer11, RT_TIMER_CTRL_SET_TIME, (void *)&timeout);
+        rt_kprintf("timer_callback runnning ...\n");
+}
+
+
+
+//______________________________________________________________________________
+//      => 高数度延时函数
+//______________________________________________________________________________
+// 这个函数只支持低于（1个OS_TICK）的延时，
+// 否则SysTick会出现溢出而不能够获得指定的延时时间
+// us 取值范围（1 ~ 999）
+void rt_hw_us_delay(rt_uint32_t us)
+
+
+
