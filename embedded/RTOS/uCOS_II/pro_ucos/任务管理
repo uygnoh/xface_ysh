@@ -1,0 +1,94 @@
+// 任务删除
+// ____________________________________________________________
+        任务a 不能直接删除 任务b
+        任务a 想删除任务b 时， 会先调用（OSTaskDelReq(INT8U prio)）
+        OSTaskDelReq(INT8U prio);
+// 任务挂起  
+// ____________________________________________________________
+        OSTaskSuspend(任务优先级);
+        OSTaskResume(任务优先级);
+
+
+
+/*******************************************************************************
+        => UCOS 任务
+*******************************************************************************/
+// UCOS 任务定义
+// ____________________________________________________________
+// 设置任务的优先级
+#define START_TASK_PRIO         9
+#define LED01_TASK_PRIO         6
+#define LED02_TASK_PRIO         7
+#define LED03_TASK_PRIO         8
+// 设置任务堆栈大小
+#define START_STK_SIZE          64      // 64*4(Byte)
+#define LED01_STK_SIZE          64      // 64*4(Byte)
+#define LED02_STK_SIZE          64      // 64*4(Byte)
+#define LED03_STK_SIZE          64      // 64*4(Byte)
+// 创建任务堆栈空间
+OS_STK  START_TASK_STK[START_STK_SIZE];
+OS_STK  LED01_TASK_STK[LED01_STK_SIZE];
+OS_STK  LED02_TASK_STK[LED02_STK_SIZE];
+OS_STK  LED03_TASK_STK[LED03_STK_SIZE];
+
+
+// UCOS 任务函数
+// ____________________________________________________________
+void start_task(void *args)
+{
+        OS_CPU_SR cpu_sr = 0;                                           // 进入临界区所需的变量
+        args = args;                                                    // 解除编译器警告
+        OSStatInit();                                                   // 初始化统计任务
+        OS_ENTER_CRITICAL();                                            // 进入临界区
+        OSTaskCreate(   led01_task,                                     // 任务入口
+                        (void *)0,                                      // 任务参数
+                        (OS_STK *)&LED01_TASK_STK[LED01_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
+                        LED01_TASK_PRIO);                               // 任务优先级
+        OSTaskCreate(   led02_task,                                     // 任务入口
+                        (void *)0,                                      // 任务参数
+                        (OS_STK *)&LED02_TASK_STK[LED02_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
+                        LED02_TASK_PRIO);                               // 任务优先级
+        OSTaskCreate(   led03_task,                                     // 任务入口
+                        (void *)0,                                      // 任务参数
+                        (OS_STK *)&LED03_TASK_STK[LED03_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
+                        LED03_TASK_PRIO);                               // 任务优先级
+        OSTaskSupend(START_TASK_PRIO);                                  // 挂起开始任务
+        OS_EXIT_CRITICAL();                                             // 退出临界区
+}
+void led01_task(void *args)
+{
+        args = args;                                                    // 解除编译器警告
+        for (;;) {                                                      
+                if (OSTaskDelReq(OS_PRIO_SELF) == OS_ERR_TASK_DEL_REQ) {// 如果有别的任务请求删除自己，执行下面代码
+                        OSTaskDel(OS_PRIO_SELF);                        // 删除任务自己
+                }
+        }
+}
+void led02_task(void *args)
+{
+        args = args;                                                    // 解除编译器警告
+        for (;;) {
+                OSTaskDelReq(LED01_TASK_PRIO);                          // 请求删除LED01任务
+        }
+}
+void led02_task(void *args)
+{
+        args = args;                                                    // 解除编译器警告
+        for (;;) {
+        }
+}
+int main(void)
+{
+        OS_Init();                                                      // 初始化UCOS系统
+        OSTaskCreate(   start_task,                                     // 任务入口
+                        (void *)0,                                      // 任务参数
+                        (OS_STK *)&START_TASK_STK[START_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
+                        START_TASK_PRIO);                               // 任务优先级
+        OSStart();                                                      // 启动UCOS系统
+}
+void SysTick_Handler(void)
+{
+        OSIntEnter();   // 进入中断
+        OSTimeTick();   // 调用UCOS的时钟服务程序
+        OSIntExit();    // 触发任务切换软中断
+}
