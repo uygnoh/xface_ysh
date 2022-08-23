@@ -1,0 +1,27 @@
+// 晶振分类
+        无源晶振
+        有源晶振
+        
+        
+// STM8时钟源
+        HSE_片外高速时钟源（1 ~ 24 MHz）
+        HSI_片内高速时钟源（最大 16 MHz）
+        LSI_片内低速时钟源（128 KHz ）
+// STM8默认上电是（16 / 8 = 2MHz）内部高速时钟源
+
+
+void clock_setup(void)
+{
+        // 4:3  HSIDIV[1:0]高速内部时钟预分频器
+        //      00    16MHz输出，无分频
+        // 2:0  CPUDIV[2:0]CPU时钟预分频器
+        //      000   16MHz输出，无分频
+        CLK_CKDIVR      = 0x00;         // 设置为内部高速16MHz为启动时钟
+}
+
+
+int main(void)
+{
+        clock_setup();  // HSI=16MHz
+        return 0;
+}
