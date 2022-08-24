@@ -1,0 +1,79 @@
+/*******************************************************************************
+        => UCOS 信号量
+*******************************************************************************/
+// UCOS 任务定义
+// ____________________________________________________________
+// 设置任务的优先级
+#define START_TASK_PRIO         9
+#define LED01_TASK_PRIO         6
+#define LED02_TASK_PRIO         7
+// 设置任务堆栈大小
+#define START_STK_SIZE          64      // 64*4(Byte)
+#define LED01_STK_SIZE          64      // 64*4(Byte)
+#define LED02_STK_SIZE          64      // 64*4(Byte)
+// 创建任务堆栈空间
+OS_STK  START_TASK_STK[START_STK_SIZE];
+OS_STK  LED01_TASK_STK[LED01_STK_SIZE];
+OS_STK  LED02_TASK_STK[LED02_STK_SIZE];
+// 信号量
+OS_EVENT        *led03_sem;
+
+
+// UCOS 任务函数
+// ____________________________________________________________
+void start_task(void *args)
+{
+                                                // 首先执行它
+                                                // 进入任务前， 设置系统滴答定时器
+                                                // 它会调用 OS_CPU_SysTickInit(cnts)
+        OS_CPU_SysTickInitFreq(100*1000*1000);  // 设置系统时钟频率参数 (100MHz)
+        OS_CPU_SR cpu_sr = 0;                   // 进入临界区所需的变量
+        args = args;                            // 解除编译器警告
+        OSStatInit();                           // 初始化统计任务
+        OS_ENTER_CRITICAL();                    // 进入临界区
+        OSTaskCreate(   led01_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&LED01_TASK_STK[LED01_STK_SIZE - 1];
+                        LED01_TASK_PRIO);       // 任务优先级
+        OSTaskCreate(   led02_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&LED02_TASK_STK[LED02_STK_SIZE - 1];
+                        LED02_TASK_PRIO);       // 任务优先级
+        OS_EXIT_CRITICAL();                     // 退出临界区
+}
+void led01_task(void *args)
+{
+        args = args;                            // 解除编译器警告
+        for (;;) {
+                
+        }
+}
+
+void led02_task(void *args)
+{
+        INT8U err;
+        args = args;                            // 解除编译器警告
+        for (;;) {
+                // 0 表示如果信号没有来到，它一直等待
+                OSSemPend(led03_sem, 0, &err);
+                // 如果有信号到来，执行下面的操作
+        }
+}
+
+
+
+// 主程序
+// ____________________________________________________________
+int main(void)
+{
+        OS_Init();                              // 初始化UCOS系统
+        led03_sem = OSSemCreate(0);             // 创建LED03信号量
+        OSTaskCreate(   start_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&START_TASK_STK[START_STK_SIZE - 1];
+                        START_TASK_PRIO);       // 任务优先级
+        OSStart();                              // 启动UCOS系统
+}

@@ -36,63 +36,66 @@ OS_STK  LED03_TASK_STK[LED03_STK_SIZE];
 // ____________________________________________________________
 void start_task(void *args)
 {
-        OS_CPU_SR cpu_sr = 0;                                           // 进入临界区所需的变量
-        args = args;                                                    // 解除编译器警告
-        OSStatInit();                                                   // 初始化统计任务
-        OS_ENTER_CRITICAL();                                            // 进入临界区
-        OSTaskCreate(   led01_task,                                     // 任务入口
-                        (void *)0,                                      // 任务参数
-                        (OS_STK *)&LED01_TASK_STK[LED01_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
-                        LED01_TASK_PRIO);                               // 任务优先级
-        OSTaskCreate(   led02_task,                                     // 任务入口
-                        (void *)0,                                      // 任务参数
-                        (OS_STK *)&LED02_TASK_STK[LED02_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
-                        LED02_TASK_PRIO);                               // 任务优先级
-        OSTaskCreate(   led03_task,                                     // 任务入口
-                        (void *)0,                                      // 任务参数
-                        (OS_STK *)&LED03_TASK_STK[LED03_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
-                        LED03_TASK_PRIO);                               // 任务优先级
-        OSTaskSupend(START_TASK_PRIO);                                  // 挂起开始任务
-        OS_EXIT_CRITICAL();                                             // 退出临界区
+                                                // 首先执行它
+                                                // 进入任务前， 设置系统滴答定时器
+                                                // 它会调用 OS_CPU_SysTickInit(cnts)
+        OS_CPU_SysTickInitFreq(100*1000*1000);  // 设置系统时钟频率参数 (100MHz)
+        OS_CPU_SR cpu_sr = 0;                   // 进入临界区所需的变量
+        args = args;                            // 解除编译器警告
+        OSStatInit();                           // 初始化统计任务
+        OS_ENTER_CRITICAL();                    // 进入临界区
+        OSTaskCreate(   led01_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&LED01_TASK_STK[LED01_STK_SIZE - 1];
+                        LED01_TASK_PRIO);       // 任务优先级
+        OSTaskCreate(   led02_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&LED02_TASK_STK[LED02_STK_SIZE - 1];
+                        LED02_TASK_PRIO);       // 任务优先级
+        OSTaskCreate(   led03_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&LED03_TASK_STK[LED03_STK_SIZE - 1];
+                        LED03_TASK_PRIO);       // 任务优先级
+        OSTaskSupend(START_TASK_PRIO);          // 挂起开始任务
+        OS_EXIT_CRITICAL();                     // 退出临界区
 }
 void led01_task(void *args)
 {
-        args = args;                                                    // 解除编译器警告
-        for (;;) {                                                      
-                if (OSTaskDelReq(OS_PRIO_SELF) == OS_ERR_TASK_DEL_REQ) {// 如果有别的任务请求删除自己，执行下面代码
-                        OSTaskDel(OS_PRIO_SELF);                        // 删除任务自己
+        args = args;                            // 解除编译器警告
+        for (;;) {                              // 如果有别的任务请求删除自己，执行下面代码                            
+                if (OSTaskDelReq(OS_PRIO_SELF) == OS_ERR_TASK_DEL_REQ) {
+                        OSTaskDel(OS_PRIO_SELF);// 删除任务自己
                 }
         }
 }
 void led02_task(void *args)
 {
-        args = args;                                                    // 解除编译器警告
+        args = args;                            // 解除编译器警告
         for (;;) {
-                OSTaskDelReq(LED01_TASK_PRIO);                          // 请求删除LED01任务
+                OSTaskDelReq(LED01_TASK_PRIO);  // 请求删除LED01任务
         }
 }
 void led02_task(void *args)
 {
-        args = args;                                                    // 解除编译器警告
+        args = args;                            // 解除编译器警告
         for (;;) {
         }
 }
+
 
 
 // 主程序
 // ____________________________________________________________
 int main(void)
 {
-        OS_Init();                                                      // 初始化UCOS系统
-        OSTaskCreate(   start_task,                                     // 任务入口
-                        (void *)0,                                      // 任务参数
-                        (OS_STK *)&START_TASK_STK[START_STK_SIZE - 1];  // 任务堆栈（栈顶指针）
-                        START_TASK_PRIO);                               // 任务优先级
-        OSStart();                                                      // 启动UCOS系统
-}
-void SysTick_Handler(void)
-{
-        OSIntEnter();   // 进入中断
-        OSTimeTick();   // 调用UCOS的时钟服务程序
-        OSIntExit();    // 触发任务切换软中断
+        OS_Init();                              // 初始化UCOS系统
+        OSTaskCreate(   start_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&START_TASK_STK[START_STK_SIZE - 1];
+                        START_TASK_PRIO);       // 任务优先级
+        OSStart();                              // 启动UCOS系统
 }
