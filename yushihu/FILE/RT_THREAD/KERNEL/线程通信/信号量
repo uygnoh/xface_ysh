@@ -131,6 +131,54 @@ MSH_CMD_EXPORT(semaphore_sample, semaphore sample);
 
 
 
+//______________________________________________________________________________
+//      => 信号量同步
+//______________________________________________________________________________
+int flags = 0;
+
+void th1_entry(void *parameter)
+{
+        rt_sem_take(sem1, RT_WAITING_FOREVER);
+        flags++;
+        if (flags == 100) {
+                flags = 0;
+        }
+        rt_kprintf("th1_entry [%d]\n", flags);
+        rt_sem_release(sem2);
+        rt_thread_mdelay(1000);
+}
+
+void th2_entry(void *parameter)
+{
+        rt_sem_take(sem2, RT_WAITING_FOREVER);
+        if (flag > 0) {
+                flags--;
+        }
+        rt_kprintf("th2_entry [%d]\n", flags);
+        rt_sem_release(sem1);
+        rt_thread_mdelay(1000);
+}
+int main(void)
+{
+        int retval;
+        
+        // 创建信号量1， 初始值为（1）
+        sem1 = rt_sem_create("sem1", 1, RT_IPC_FLAG_FIFO);
+        if (sem1 == RT_NULL) {
+                LOG_E("sem1 rt_sem_create failed ...\n");
+                return (-ENOMEM);
+        }
+        LOG_D("sem1 rt_sem_create successed ...\n");
+        // 创建信号量2， 初始值为（0）
+        sem2 = rt_sem_create("sem2", 0, RT_IPC_FLAG_FIFO);
+        if (sem1 == RT_NULL) {
+                LOG_E("sem2 rt_sem_create failed ...\n");
+                return (-ENOMEM);
+        }
+        LOG_D("sem2 rt_sem_create successed ...\n");
+}
+
+
 
 //______________________________________________________________________________
 //      => 生产者与消费者
@@ -147,24 +195,25 @@ struct rt_semaphoer     sem_full;
 
 
 
-// 生产者函数入口
+// 生产者线程
 void producer_thread_entry(void *parameter)
 {
         int cnt = 0;
         
         // 运行10次
         while (cnt < 10) {
-                // 获取一个空位
+                // 获取一个空位(sem_empty - 1)
                 rt_sem_take(&sem_empty, RT_WAITING_FOREVER);
                 
-                // 修改array内容，上锁
+                // 修改array内容，上锁（sem_lock - 1）
                 rt_sem_take(&sem_lock, RT_WAITING_FOREVER);
                 array[set % MAXSEM] = cnt + 1;
                 rt_kprintf("the producer generates a number: %d\n", arrar[set % MAXSEM]);
                 set++;
+                // 解锁（sem_lock + 1）
                 rt_sem_release(&sem_lock);
                 
-                // 发布一个满位
+                // 发布一个满位(sem_full + 1)
                 rt_sem_release(&sem_full);
                 cnt++;
                 
@@ -174,23 +223,24 @@ void producer_thread_entry(void *parameter)
         rt_kprintf("the producer exit!\n");
 }
 
-// 消费者函数入口
+// 消费者线程
 void consumer_thread_entry(void *parameter)
 {
         rt_uint32_t sum = 0;
         
         while (1) {
-                // 获取一个满位
+                // 获取一个满位(sem_full - 1)
                 rt_sem_take(&sem_full, RT_WAITING_FOREVER);
                 
-                // 临界区，上锁进行操作
+                // 上锁操作（sem_lock - 1）
                 rt_sem_take(&sem_lock, RT_WAITING_FOREVER);
                 sum += array[get % MAXSEM];
                 rt_kprintf("the consumer[%d] get a numer: %d\n", (get % MAXSIZE), array[get % MAXSEM]);
                 get++;
+                // 解锁操作（sem_lock + 1）
                 rt_sem_release(&sem_lock);
                 
-                // 释放一个空位
+                // 释放一个空位(sem_empty + 1)
                 rt_sem_release(&sem_empty);
                 
                 // 生产者生产到10个数目，停止，消费者线程相应停止
@@ -212,9 +262,9 @@ int producer_consumer(void)
         get = 0;
         
         // 初始化3个信号量
-        rt_sem_init(&sem_lock,  "lock",  1,      RT_IPC_FLAG_FIFO);     // 线程互斥关系（二值信号量）
-        rt_sem_init(&sem_empty, "empty", MAXSEM, RT_IPC_FLAG_FIFO);     //
-        rt_sem_init(&sem_full,  "full",  1,      RT_IPC_FLAG_FIFO);     // 
+        rt_sem_init(&sem_lock,  "lock",  1,      RT_IPC_FLAG_FIFO);     // 二值信号量（初始为1）， 保证二个线程互斥操作
+        rt_sem_init(&sem_empty, "empty", MAXSEM, RT_IPC_FLAG_FIFO);     // 缓冲区空信号量（初始为缓冲区大小）
+        rt_sem_init(&sem_full,  "full",  0,      RT_IPC_FLAG_FIFO);     // 缓冲区满信号量（初始为0）
         
         // 创建生产者线程
         producer_tid = rt_thread_create(

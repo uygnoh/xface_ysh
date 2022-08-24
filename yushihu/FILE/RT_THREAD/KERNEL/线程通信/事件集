@@ -1,1 +1,123 @@
 // IPC (Internal Process Communication) 线程间通信
+
+struct rt_event {
+        struct rt_ipc_object parent;    // inherit form ipc_object
+        rt_uint32_t set;                // event set
+};
+typedef struct ret_event *rt_event_t;
+
+struct rt_event         static_evt;     // 静态事件集
+rt_event_t              dynamic_evt;    // 动态事件集
+
+// （静态事件集）初始化与脱离
+// rt_uint8_t flag 
+// RT_IPC_FLAG_FIFO  先进先出方式
+// RT_IPC_FLAG_PRIO  优先级方式
+rt_err_t rt_event_init(rt_event_t event, const char *name, rt_uint8_flag)
+rt_err_t rt_event_detach(rt_event_t event);
+
+// （动态事件集）创建与删除
+// rt_uint8_t flag 
+// RT_IPC_FLAG_FIFO  先进先出方式
+// RT_IPC_FLAG_PRIO  优先级方式
+rt_event_t rt_event_create(const char *name, rt_uint8_t flag)
+rt_err_t   rt_event_delete(rt_event_t event)
+
+// 发送事件
+rt_err_t rt_event_send(rt_event_t event, rt_uint32_t set)
+
+// 接收事件
+rt_err_t rt_event_recv(rt_evnet_t event, rt_uint32_t set,
+                       rt_uint8_t option, // RT_EVETN_FLAG_AND
+                                          // RT_EVETN_FLAG_OR
+                                          // RT_EVETN_FLAG_CLEAR
+                       rt_int32_t timeout)
+                       
+                       
+
+//______________________________________________________________________________
+//      => 事件集示例程序
+//______________________________________________________________________________
+#define THREAD_PRIORITY         9
+#define THREAD_TIMESLICE        5
+
+#define EVENT_FLAG3             (1 << 3)        // 事件3
+#define EVENT_FLAG5             (1 << 5)        // 事件5
+static struct rt_event event;                  // 事件集控制块
+
+// 接收事件
+ALIGN(RT_ALIGN_SIZE)
+static char thread1_stack[1024];
+static struct rt_thread thread1;
+static void thread1_recv_event(void *parameter)
+{
+        rt_uint32_t e;
+        
+        // 第一次接收事件
+        // 事件3或事件5任意一个都可以触发线程1， 接收完成后，清除事件
+        if (rt_event_recv(&event, (EVENT_FLAG3 | EVENT_FLAG5),
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER, &e) == RT_EOK) {
+                rt_kprintf("thread1: OR recv envet 0x%x\n", e);
+        }
+        
+        rt_kprintf("thread1: delay is to prepare the second event\n");
+        rt_thread_mdelay(1000);
+        
+        // 第二次接收事件
+        // 事件3和事件5都发生时才可以触发线程1， 接收完成后清除事件标志
+        if (rt_event_recv(&event, (EVENT_FLAG3 | EVENT_FLAG5),
+                          RT_EVENT_FLAG_AND | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER, &e) == RT_EOK) {
+                rt_kprintf("thread1: OR recv envet 0x%x\n", e);
+        }
+        
+        rt_kprintf("thread1:  leave \n");
+}
+
+// 发送事件
+ALIGN(RT_ALIGN_SIZE)
+static char thread2_stack[1024];
+static struct rt_thread thread2;
+static void thread2_send_event(void *parameter)
+{
+        rt_kprintf("thread2: send evnet3 \n");
+        rt_evnet_send(&event, EVENT_FLAG3);
+        rt_thread_mdelay(200);
+        
+        rt_kprintf("thread2: send evnet5 \n");
+        rt_evnet_send(&event, EVENT_FLAG5);
+        rt_thread_mdelay(200);
+        
+        rt_kprintf("thread2: send evnet3 \n");
+        rt_evnet_send(&event, EVENT_FLAG3);
+        rt_kprintf("thread2: leave \n");
+}
+int event_sample(void)
+{
+        rt_err_t result;
+        result = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+        if (result != RT_EOK) {
+                rt_kprintf("init event failed.\n");
+                return -1;
+        }
+        
+        rt_thread_init(&thread1,
+                        "thread1",
+                        thread1_recv_event,
+                        RT_NULL,
+                        &thread1_stack[0],
+                        sizeof(thread1_stack);
+                        THREAD_PRIORITY - 1,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread1);
+        rt_thread_init(&thread2,
+                        "thread2",
+                        thread2_send_event,
+                        RT_NULL,
+                        &thread2_stack[0],
+                        sizeof(thread2_stack);
+                        THREAD_PRIORITY - 1,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread1);
+}
