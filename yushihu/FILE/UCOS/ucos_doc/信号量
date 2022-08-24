@@ -16,7 +16,7 @@ OS_STK  START_TASK_STK[START_STK_SIZE];
 OS_STK  LED01_TASK_STK[LED01_STK_SIZE];
 OS_STK  LED02_TASK_STK[LED02_STK_SIZE];
 // 信号量
-OS_EVENT        *led03_sem;
+OS_EVENT        *led02_sem;
 
 
 // UCOS 任务函数
@@ -47,7 +47,7 @@ void led01_task(void *args)
 {
         args = args;                            // 解除编译器警告
         for (;;) {
-                
+                OSSemPost(led02_sem);           // 发送LED02信号量
         }
 }
 
@@ -57,7 +57,7 @@ void led02_task(void *args)
         args = args;                            // 解除编译器警告
         for (;;) {
                 // 0 表示如果信号没有来到，它一直等待
-                OSSemPend(led03_sem, 0, &err);
+                OSSemPend(led02_sem, 0, &err);
                 // 如果有信号到来，执行下面的操作
         }
 }
@@ -69,7 +69,8 @@ void led02_task(void *args)
 int main(void)
 {
         OS_Init();                              // 初始化UCOS系统
-        led03_sem = OSSemCreate(0);             // 创建LED03信号量
+                                                // 信号量取值（0 ~ 65535）
+        led02_sem = OSSemCreate(0);             // 创建LED02信号量
         OSTaskCreate(   start_task,             // 任务入口
                         (void *)0,              // 任务参数
                                                 // 任务堆栈（栈顶指针）

@@ -1,3 +1,48 @@
+//      信号量是一个触发信号， 也是一个计数器
+//      邮箱是信号量的扩展， 相当于一个指针定义的变量
+//      队列是多个邮箱的数组， 可以看作是个指针数组
+/*******************************************************************************
+        => UCOS 消息队列
+*******************************************************************************/
+OS_EVENT        *led01_message_queue;
+void            *message_queue[20];
+
+int main(void)
+{
+        // 创建消息队列
+        led01_queue = OSQCreate(&message_queue[0], 20);
+}
+void start_task(void *argv)
+{
+        uint8_t led01[2] = {0x00, 0x64};        // 100ms
+        uint8_t led02[2] = {0x01, 0xF4};        // 500ms
+        while (1) {
+                // 一次性发送 6 条消息
+                OSQPost(led01_message_queue, (void *)&led01[0]);
+                OSQPost(led01_message_queue, (void *)&led01[0]);
+                OSQPost(led01_message_queue, (void *)&led01[0]);
+                OSQPost(led01_message_queue, (void *)&led01[0]);
+                OSQPost(led01_message_queue, (void *)&led01[0]);
+                OSQPost(led01_message_queue, (void *)&led02[0]);
+                delay_ms(5000);
+        }
+}
+void led01_task(void *argv)
+{
+        uint8_t *msg_q;
+        while (1) {
+                // 0 表示一直等待，必须有消息来了，才执行
+                msg_q = (uint8_t *)OSQPend(led_message_queue, 0, &err);
+                if (err == OS_ERR_NONE) {
+                        led01_timer = msg[0] << 8 + msg[1];
+                        if (led01_timer > 1000) led01_timer = 1000;
+                        if (led01_timer < 1000) led01_timer = 100;
+                }
+        }
+}
+
+
+
 /*******************************************************************************
         => UCOS 消息邮箱
 *******************************************************************************/
