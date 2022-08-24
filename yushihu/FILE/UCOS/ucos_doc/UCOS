@@ -1,0 +1,136 @@
+/*******************************************************************************
+        => UCOS
+*******************************************************************************/
+// UCOS 内核文件
+// ____________________________________________________________
+        UCOS/Source
+                os_core.c
+                os_flag.c
+                os_mbox.c
+                os_mem.c
+                os_mutex.c
+                os_q.c
+                os_sem.c
+                os_task.c
+                os_time.c
+                os_tmr.c
+                os.h
+                ucos_ii.h
+                os_trace.h
+                ////////////////
+                ucos_ii.c       // 移出
+                os_dbg_r.c      // 移出
+                ////////////////
+
+// UCOS 配置文件
+// ____________________________________________________________
+        UCOS/Cfg
+                os_cfg.h
+                app_cfg.h
+                app_hooks.c
+        
+// STM32 移植文件
+// ____________________________________________________________
+        UCOS/PORT
+                os_cpu_c.c
+                os_dbg.c
+                os_cpu_a.S
+                os_cpu.h
+                
+                
+                
+/*******************************************************************************
+        => UCOS 移植
+*******************************************************************************/
+// os_cpu_a.S
+//_____________________________________________________________
+        os_cpu_PendSV_Handler 改为 PendSV_Handler
+        
+        
+// stm32f4xx_it.c
+//_____________________________________________________________
+        PendSVHandler() 函数注释掉
+
+
+// os_cpu_c.c
+//_____________________________________________________________
+        OS_SysTickHandler() 函数注释掉
+        // 时钟的配置会在工程的 stm32f4xx_it.c 
+        // 文件中通过滴答定时器中断配置
+        #include "os.h"
+        void  SysTickHandler(void)
+        {
+        #if OS_CRITICAL_METHOD == 3u
+                OS_CPU_SR  cpu_sr;
+        #endif
+                OS_ENTER_CRITICAL();
+                OSIntEnter();
+                OS_EXIT_CRITICAL();
+                OSTimeTick();
+                OSIntExit();
+        }
+
+
+// app_cfg.h
+//_____________________________________________________________
+        // 添加两句宏定义
+        // 不受内核管理的中断等级，使用 BOUNDARY寄存器设置任务切换时的中断屏蔽
+        #define CPU_CFG_KA_IPL_BOUNDARY         4u
+        // 中断优先级寄存器可用位数， ARM官方为 8bit 由厂家裁减
+        #define CPU_CFG_NVIC_PRIO_BITS          4u
+
+
+// os_cfg.h 修改文件
+//_____________________________________________________________
+        // 1 处是将钩子函数失能，可以不用钩子函数；
+        #define OS_APP_HOOKS_EN                 0u
+        // 2 处是将Debug是失能
+        #define OS_DEBUG_EN                     0u
+        // 3 处是用于修改时间频率，结合滴答定时器确定ucos的时基
+        #define OS_TICKS_PER_SEC                1000u
+
+
+// 删除文件
+//_____________________________________________________________
+        删除（os_dbg_r.c）
+        删除（ucos_ii.c）
+
+
+
+/*******************************************************************************
+        => UCOS 创建第一个任务
+*******************************************************************************/
+#include "os.h"
+
+// UCOS 任务定义
+// ____________________________________________________________
+#define START_TASK_PRIO         9               // 设置任务的优先级
+#define START_STK_SIZE          64              // 设置任务堆栈大小 64*4(Byte)
+OS_STK  START_TASK_STK[START_STK_SIZE];         // 创建任务堆栈空间
+void start_task(void *argv)
+{                                               // 首先执行它
+                                                // 进入任务前， 设置系统滴答定时器
+                                                // 它会调用 OS_CPU_SysTickInit(cnts)
+        OS_CPU_SysTickInitFreq(100*1000*1000);  // 设置系统时钟频率参数 (100MHz)
+        
+        argv = argv
+        for (;;) {
+                HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+                OSTimeDly(100);
+                HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+                OSTimeDly(100);
+        }
+}
+// 主程序
+// ____________________________________________________________
+int main(void)
+{
+        OS_Init();                              // 初始化UCOS系统
+        OSTaskCreate(   start_task,             // 任务入口
+                        (void *)0,              // 任务参数
+                                                // 任务堆栈（栈顶指针）
+                        (OS_STK *)&START_TASK_STK[START_STK_SIZE - 1];
+                        START_TASK_PRIO);       // 任务优先级
+        OSStart();                              // 启动UCOS系统
+}
+

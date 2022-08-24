@@ -1,8 +1,8 @@
 
 #include "os.h"
 
-#define TASK00_PRIO						3
-#define TASK00_STACK_SIZE                 512
+#define TASK00_PRIO                             3
+#define TASK00_STACK_SIZE                       512
 OS_STK  task00_stack[TASK00_STACK_SIZE];
 void task00(void *pdata);
 
