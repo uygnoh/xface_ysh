@@ -1,0 +1,158 @@
+// 中断发送
+HAL_StatusTypeDef       HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, 
+                                             uint8_t *pData, 
+                                             uint16_t size)
+// 发送完成回调函数
+void HAL_UART_TxCpltCallback(UaRT_HandleTypeDef *huart)
+
+
+
+// 中断接收
+HAL_StatusTypeDef       HAL_UART_Receive_IT(UART_HandleTypeDef *huart, 
+                                             uint8_t *pData, 
+                                             uint16_t size)
+// 接收完成回调函数
+void HAL_UART_RxCpltCallback(UaRT_HandleTypeDef *huart)
+// 接收错误处理回调函数
+void HAL_UART_ErrorCallback(UaRT_HandleTypeDef *huart)
+
+
+
+// UART 中断编程流程
+// ____________________________________________________________
+        1. 初始化串口
+        2. 开启中断
+        3. 实现中断响应函数
+        4. HAL_UART_Transmit_IT
+           HAL_UART_Receive_IT
+        5. 重写回调函数
+        
+        
+        
+// ____________________________________________________________    
+        1. 初始化串口
+// ____________________________________________________________
+// 配置GPIO引脚
+        a. Tx引脚配置为（复用推挽模式）
+        b. Rx引脚配置为（输入浮空 或 输入上拉）
+// 开启时钟
+        HAL_RCC_USARTx_CLK_ENABLE();
+// 设置UART参数
+        a. 数据位长度
+        b. 停止位长度
+        c. 奇偶校验
+        d. 串口波特率
+        .........
+// ____________________________________________________________
+        2. 开启中断
+// ____________________________________________________________
+// 设置中断优先级分组
+        HAL_NVIC_SetPriorityGrouping();
+// 设置中断优先级
+        HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+// 开启中断
+        HAL_NVIC_Enable(USART1_IRQn);
+// ____________________________________________________________
+        3. 实现中断响应函数
+// ____________________________________________________________
+// 找出中断响应函数
+        在 startup.s文件中找到原型， 原型为 USART1_IRQHandler
+// 中断响应函数回写代码，如下
+        void USART1_IRQHandler(void)
+        {
+                HAL_UART_IRQHandler(&huart1);
+        }
+// ____________________________________________________________
+        4. 实现中断响应函数
+// ____________________________________________________________
+// 启动UART中断发送
+        HAL_UART_Transmit_IT(&huart, tx_buffer, sizeof(tx_buffer));
+// 启动UART中断接收
+        HAL_UART_Receive_IT(&huart, rx_buffer, sizeof(rx_buffer));   
+// ____________________________________________________________
+        5 重写回调函数
+// ____________________________________________________________
+
+
+
+
+
+/*******************************************************************************
+        => 计算器例程（+ - * /）
+*******************************************************************************/
+// 中断接收出调函数
+void HAL_UART_RxCpltCallback(UART_HnadleTypeDef *huart)
+{
+        // 处理收到的数据
+        if (rx_data == '\n') {
+                int op1, op2;
+                char operator;
+                rx_buffer[rx_buffer_pos] = '\0';
+                // sscanf() 字符串格式化扫描
+                if (sscanf((const char *)rx_buffer, "%d%c%d", &op1, &operator, &op2) == 3) {
+                        printf("[Debug info] Expression receive: %d%c%d\r\n", op1, operator, op2);
+                        printf("[Debug info] Operator is %c", operator);
+                        switch(operator) {
+                        case '+':
+                                printf("=%d\r\n", op1 + op2);
+                                break;
+                        case '-':
+                                printf("=%d\r\n", op1 - op2);
+                                break;
+                        case '*':
+                                printf("=%d\r\n", op1 * op2);
+                                break;
+                        case '/';
+                                printf("=%d\r\n", op1 / op2);
+                                break;
+                        default:
+                                printf("[Debug info] Invalid operator %c\r\n", operator);
+                                break;
+                        }
+                } else {
+                        printf("[Debug info] Invalid expressino: %d%c%d\r\n", op1, operator, op2);
+                }
+                // 清除位置
+                rx_buffer_pos = 0;
+        } else {
+                if (rx_buffer_posr < 255) {
+                        rx_buffer[rx_buffer_pos++] = rx_data;
+                }
+        }
+        
+        // 循环接收数据， 每次接收（1个字节）
+        if (HAL_UART_Receive_IT(&huart, &rx_data, 1) != HAL_OK) {
+                Error_Handler();
+        }
+}
+
+
+#include <stdio.h>
+UART_HandleTypeDef huart1;
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#endif
+PUTCHAR_PROTOTYPE
+{
+        HAL_UART_Transmit(&huart, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+}
+
+int main(void)
+{
+        uint8_t rx_data;                // 定义接收到数据
+        uint8_t rx_buffer[256];         // 定义接收缓冲区
+        rx_buffer_pos = 0;              // 指向缓冲区数据的位置
+ 
+        
+        if (HAL_UART_Receive_IT(&huart, &rx_data, 1) != HAL_OK) {
+                Error_Handler();
+        }
+        
+        while (1);
+}
+
+void USART1_IRQHandler(void)
+{
+        HAL_UART_IRQHandler(&huart1);
+}
+
