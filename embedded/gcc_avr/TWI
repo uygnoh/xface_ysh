@@ -1,0 +1,36 @@
+// TWI
+// ____________________________________________________________
+TWBR（波特率寄存器）， TWBR的值不小于（10）
+TWCR（控制寄存器）
+        7 TWINT         // 中断标志位
+        6 TWEA          // 使能TWI应答
+        5 TWSTA         // STRAT信号（软件清零TWSTA）
+        4 TWSTO         // STOP信号（TWSTO自动清零）
+        3 TWWC          // 写碰撞标志
+        2 TWEN          // TWI使能
+        1 ----
+        0 TWIE          // TWI中断使能
+TWSR（状态寄存器）
+      7:3 TWS           // TWI状态位
+                $08     // START已发送
+                $10     // 重复START已发送
+                $18     // SLA+W已发送
+                        // 接收到ACK
+                $20     // SLA+W已发送
+                        // 接收到NOT ACK
+      1:0 TWPS          // 预分频位（1, 4, 16, 64）
+TWAR（从机地址寄存器）
+                        // TWAR的高7位为从机地址
+                        // 主机模式不需要此地址
+
+
+                          CPU Clock frequency
+        SCL frequency = -----------------------
+                         16 + 2(TWBR) * 4^TWPS
+                         
+                         
+//                    
+// ____________________________________________________________
+#define START           0x08
+#define RE_START        0x10
+#define MASTER_SLA

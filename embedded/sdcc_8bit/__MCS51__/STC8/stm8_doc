@@ -1,0 +1,132 @@
+#include "STCIIC.h"
+
+extern bit busy;
+
+void I2C_ISR(void) interrupt 24
+{
+        _PUSH_ (P_SW2);
+        P_SW2 |= 0x80;
+        if (I2CMSST & 0x40) {
+                I2CMSST &= ~0x40;
+                busy = 0;
+        }
+        _POP_ (P_SW2);
+}
+
+
+
+
+void start(void)
+{
+        busy    = 1;
+        I2CMSCR = 0x81;         // 打开I2C中断，发送START命令
+        while (busy);
+}
+
+void send_data(char data)
+{
+        I2CTXD  = data;
+        busy    = 1;
+        I2CMSCR = 0x82;         // 发送SEND命令
+        while (busy);
+}
+
+void recv_ack(void)
+{
+        busy    = 1;
+        I2CMCR  = 0x83;         // 发送读ACK命令
+        while (bysy);
+}
+
+// 发送一个I2C设备地址， 返回0， 则认为找到这个器件
+//______________________________________________________________________________
+int main(void)
+{
+        unsigned char ack;
+        // 设置P3，P5 为准备双向口
+        P3M0    = 0x00;
+        P3M1    = 0x00;
+        P5M0    = 0x00;
+        P5M1    = 0x00;
+        
+        P_SW2   = 0x80;         // 扩展 RAM 区特殊功能寄存器
+        I2CCFG  = 0xE0;         // 使能I2C，主机模式，MSSPEED最慢
+        I2CMSST = 0x00;         // 空闲， MSIF（中断标志位）清零，收发的ACK清零
+        EA      = 1;            // 打开总中断
+        
+        start();                // 发送起始命令
+        send_data(0xA0);        // 发送设备地址 + 写命令
+        recv_ack();             // 主机接收 ACK 信号
+        ack = I2CMSST & 0x02;   // 0-Ack; 1-NAck
+        if ((I2CMSST & 0x02) == 0) {
+                LED = 0;
+        } else {
+                LED = 1;
+        }
+        delay_ms(1000);
+        printf("ACK = %bu\r\n", ack);
+        P_SW2   = 0x00;         // 关闭扩展RAM区特殊功能寄存器
+}
+
+
+
+//______________________________________________________________________________
+int main(void)
+{
+        unsigned char ack = 1;
+        unsigned char data, data2, data3;
+        
+        // 设置P3，P5 为准备双向口
+        P3M0    = 0x00;
+        P3M1    = 0x00;
+        P5M0    = 0x00;
+        P5M1    = 0x00;
+        
+        P_SW2   = 0x80;         // 扩展 RAM 区特殊功能寄存器
+        I2CCFG  = 0xE0;         // 使能I2C，主机模式，MSSPEED最慢
+        I2CMSST = 0x00;         // 空闲， MSIF（中断标志位）清零，收发的ACK清零
+        EA      = 1;            // 打开总中断
+        
+        start();                // 发送起始命令
+        send_data(0xA0);        // 发送设备地址 + 写命令
+        recv_ack();             // 主机接收 ACK 信号
+        ack = I2CMSST & 0x02;   // 0-Ack; 1-NAck
+        if ((I2CMSST & 0x02) == 0) {
+                LED = 0;
+        } else {
+                LED = 1;
+        }
+        send_data(0x00);        // 然后发送数据， 要写入的器件地址（0x00）
+        recv_ack();             // 主机接收 ACK 信号
+        send_data(100);         // 发送数据
+        recv_ack();
+        // send_data(2);
+        // recv_ack();
+        // send_data(2);
+        // recv_ack();
+        stop();
+        delay_ms(1000);
+
+
+        // 读数据流程
+        // _________
+        start();                // 发送起始命令
+        send_data(0xA0);        // 发送设备地址 + 写命令
+        recv_ack();             // 主机接收 ACK 信号
+        send_data(0x00);        // 从器件那个地址读出数据
+        recv_ack();
+        
+        start();                // 发送起始命令
+        send_data(0xA1);        // 发送设备地址 + 读命令
+        recv_ack();             // 主机接收 ACK 信号
+        data = recv_data;       // 读数据
+        // send_ack();
+        // data2 = recv_data();
+        // send_ack();
+        // data3 = recv_data();
+        // send_ack();
+        
+        send_nack();            // 主机发NACK
+        stop();
+        delay_ms(1000);
+}

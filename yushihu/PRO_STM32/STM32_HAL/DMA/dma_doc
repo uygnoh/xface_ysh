@@ -1,0 +1,105 @@
+//______________________________________________________________________________
+//      => STM32 DMA 回调函数
+//______________________________________________________________________________
+typedef enum {
+        HAL_DMA_XFER_CPLT_CB_ID         = 0x00U,        // 传输完成标志位
+        HAL_DMA_XFER_HALFCPLT_CB_ID     = 0x01U,        // 半传输完成标志位
+        HAL_DMA_XFER_ERROR_CB_ID        = 0x02U,        // 传输出错标志位
+        HAL_DMA_XFER_ABORT_CB_ID        = 0x03U,        // Abort
+        HAL_DMA_XFER_ALL_CB_ID          = 0x04U,        // All
+} HAL_DMA_CallbackIDTypeDef;
+HAL_StatusTypeDef    HAL_DMA_RegisterCallback(          // 注册
+        DMA_HandleTypeDef               *hdma,          // DMA通道句柄指针
+        HAL_DMA_CallbackIDTypeDef       CallbackID,     // 类型
+        void (*pCallback)(DMA_HandleTypeDef  *_hdma))   // 函数指针
+HAL_StatusTypeDef    HAL_DMA_UnRegisterCallback(        // 反注册
+        DMA_HandleTypeDef               *hdma,
+        HAL_DMA_CallbackIDTypeDef       CallbackID)
+
+
+
+// ____________________________________________________________
+// 配置DMA中断   -> 初始化DMA   -> 注册回调函数   -> 启动DMA
+// ____________________________________________________________
+
+DMA_HandleTypeDef hdma_memory_to_memory; // 内存到内存传输
+uint8_t         src[1024];              // 数据源
+uint8_t         dst[1024];              // 数据目的
+uint8_t         flagDMAXferCplt;        // DMA传输完成标志
+
+
+int main(void)
+{
+        uint32_t i;
+        for (i = 0; i < 1024; i++) {
+                src[i] = (uint8_t)(i % 256);
+        }
+        
+        HAL_Init();
+        // 配置DMA1通道1的中断源
+        HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+        
+        // 初始化DMA
+        hdma_memory_to_memory.Instance = DMA1_Channel1;
+        hdma_memory_to_memory.Init.Direction = DMA_MEMORY_TO_MEMORY;
+        hdma_memory_to_memory.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+        hdma_memory_to_memory.Init.MemInc = DMA_MINC_ENABLE;
+        hdma_memory_to_memory.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+        hdma_memory_to_memory.Init.PeriphInc = DMA_PINC_ENABLE;
+        hdma_memory_to_memory.Init.Priority = DMA_PRIORITY_MEDIUM;
+        __HAL_RCC_DMA1_CLK_ENABLE();
+        HAL_DMA_Init(&hdma_memory_to_memory);
+        
+        // 注册回调函数
+        HAL_DMA_RegisterCallback(       &hdma_memory_to_memory, 
+                                        HAL_DMA_XFER_CPLT_CB_ID,
+                                        DMA_M2M_XferCpltCallback);
+        HAL_DMA_RegisterCallback(       &hdma_memory_to_memory, 
+                                        HAL_DMA_XFER_HALFCPLT_CB_ID,
+                                        DMA_M2M_XferHalfCpltCallback);
+        HAL_DMA_RegisterCallback(       &hdma_memory_to_memory, 
+                                        HAL_DMA_XFER_ERROR_CB_ID,
+                                        DMA_M2M_XferErrorCallback);
+                                        
+        // 启动DMA
+        HAL_DMA_Start_IT(       &hdma_memory_to_memory,
+                                (uint32_t)src,          // 源地址
+                                (uint32_t)dst,          // 目的地址
+                                1024);                  // 数据长度
+        
+        while (1) {
+                if (flagDMAXferCplt == 1) {
+                        break;
+                }
+        }
+        
+        while (1) {
+        }
+}
+
+
+// DMA1中断服务程序
+void DMA1_Channel1_IRQHandler(void)
+{
+        HAL_DMA_IRQHandler(&hdma_memory_to_memory);
+}
+
+// DMA1传输完成回调函数
+static void DMA_M2M_XferCpltCallback(DMA_HandleTypeDef *hdma)
+{
+        if (hdma->Instance == hdma_memory_to_memory.Instance) {
+                flagDMAXferCplt = 1;
+        }
+        
+}
+
+// DMA1传输Half完成回调函数
+static void DMA_M2M_XferHalfCpltCallback(DMA_HandleTypeDef *hdma)
+{
+}
+
+// DMA1传输Error回调函数
+static void DMA_M2M_XferErrorCallback(DMA_HandleTypeDef *hdma)
+{
+}

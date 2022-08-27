@@ -1,0 +1,89 @@
+//______________________________________________________________________________
+//      => EXTI
+//______________________________________________________________________________
+
+PA0 ---------> |------|
+PB0 ---------> |      |            |-------|            |------|
+PC0 ---------> |      | ---------> | EXTI0 | ---------> |      | ---------> EXTI0_IRQHandler
+... ---------> |      |            |-------|            |      |
+PG0 ---------> |------|                                 |      |
+                                                        | NVIC |
+PA1 ---------> |------|                                 |      |
+PB1 ---------> |      |            |-------|            |      |
+PC1 ---------> |      | ---------> | EXTI1 | ---------> |      | ---------> EXTI1_IRQHandler
+... ---------> |      |            |-------|            |------|
+PG1 ---------> |------|
+
+
+// 外部中断编程步骤
+// ____________________________________________________________
+1. // 为EXTI的一条线声明一个句柄
+        EXTI_HandleTypeDef      hexti;
+2. // 配置EXTI线的基本参数
+   EXTI_ConfigTypeDef exticonfig;
+   exticonfig.Line    = EXTI_LINE_0;            // 根据GPIO的引脚编号选择那个EXTI线
+   exticonfig.Trigger = EXTI_TRIGGER_RISING;    // 选择EXTI的触发条件（上升沿，下降沿，还是双边沿触发）
+   exticonfig.Mode    = EXTI_MODE_INTERRUPT;    // 选择EXTI的触发模式（是触发中断，还是产生事件，还是既触发中断也产生事件）
+   __HAL_RCC_AFIO_CLK_ENABLE();                 // 开启AFIO时钟
+   exticonfig.GPIOSel = EXTI_GPIOA;             // 如果是 EXTI0 ~ EXTI15 ， 需要配置GPIO的端口号
+   HAL_EXTI_SetConfigLine(&hexti, &exticonfig); // 初始化EXTI模块
+3. // 编写回调函数
+   比如： void EXTI0_CallbackFun() {}
+4. // 注册回调函数
+   HAL_EXTI_RegisterCallbcak(&hexti, ..., EXTI0_Callback);
+5. // 实现中为响应函数
+   void EXTI0_IRQHandler(void)
+   {
+        HAL_EXTI_IRQHandler(&hexti);
+   }
+   
+   
+//______________________________________________________________________________
+//      => EXTI 外部中断编程
+//______________________________________________________________________________
+
+
+EXTI_HandleTypeDef      hEXTILine0;
+
+
+int main(void)
+{
+        GPIO_InitTypeDef        gpioinit;
+        gpioinit.Pin    = GPIO_PIN_0 | GPIO_PIN_1;
+        gpioinit.Mode   = GPIO_MODE_INPUT;
+        gpioinit.Pull   = GPIO_NOPULL;
+        __HAL_GPIOA_CLK_ENABLE();
+        HAL_GPIO_Init(GPIO, &gpioinit);
+        
+        // 配置EXTI线0
+        EXTI_ConfigTypeDef exticonfig;
+        exticonfig.Line = EXTI_LINE_0;
+        exticonfig.Trigger = EXTI_TRIGGER_RISING_FALLING;
+        exticonfig.Mode = EXTI_MODE_INTERRUPT;
+        exticonfig.GPIOSel = EXTI_GPIOA;
+        __HAL_RCC_AFIO_CLK_ENABLE();    // EXTI模块需要AFIO时钟
+        HAL_EXTI_SetConfigLine(&hEXTILine0, &exticonfig);
+        
+        // 注册回用户自己编写调函数
+        HAL_EXTI_RegisterCallbcak(&hEXTILine0, HAL_EXTI_COMMON_CB_ID, EXTIO_User_Callback);
+        
+        // 打开EXTI0（线0）中断
+        HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+        
+
+}
+
+
+// 用户回调函数
+// ____________________________________________________________
+void EXTIO_User_Callback(void)
+{
+}
+
+
+// EXTI0 中断服务程序
+// ____________________________________________________________
+void EXTI0_IRQHandler(void)
+{
+        HAL_EXTI_IRQHandler(&hEXTILine0);
+}

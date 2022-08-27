@@ -1,0 +1,94 @@
+/*******************************************************************************
+        => STM32_HLAL库使用串口调式
+*******************************************************************************/
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "stdint.h"
+#include "stdbool.h"
+#include "time.h"
+#include "math.h"
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+PUTCHAR_PROTOTYPE
+{
+        // 第一个参数: 串口句柄
+        // 第二个参数: 要发送的数据
+        // 第三个参数: 数据长度
+        // 第四个参数: 超时时间
+        HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+        return ch;
+}
+
+
+
+/*******************************************************************************
+        => STM32_HLAL库使用ITM调式
+*******************************************************************************/
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "stdint.h"
+#include "stdbool.h"
+#include "time.h"
+#include "math.h"
+uint32_t _write(int file, char *ptr, int len) {
+        int DataIdx;
+        for (DataIdx = 0; DataIdx < len; DataIdx++) {
+                ITM_SendChar(*ptr++);
+        }
+        return len;
+}
+
+
+
+/*******************************************************************************
+        => 函数指针注册函数
+*******************************************************************************/
+#include <stdio.h>
+#include <string.h>
+
+
+void (*fnptr_print)(const char *);              // 声明函数指针
+
+                                                 // 注册函数指针
+void log_info_register_callback(void (*fnptr)(const char *)
+{
+        fnptr_print = fnptr;
+}
+void log_info_unregister_callback(void)         // 反注册函数指针
+{
+        fnptr_print = NULL;
+}
+
+// 输出日志信息， 并追加时间戳
+// string  = 原始的日志信息
+// ____________________________________________________________
+void log_info(const char *string)
+{
+        // sprintf(); 格式化字符串（输出到字符缓冲区）
+        char buffer[256];
+        sprintf(buffer, "[%u] %s\r\n", HAL_GetTick(), string);
+        if (fnptr_print != NULL) {
+                fnptr_print(buffer);
+        }
+}
+
+
+// USART1
+// ____________________________________________________________
+void usart1_print(const char *string)
+{
+        HAL_UART_Transmit(huart1, (uint8_t *)str, strlen(string), HA_MAX_DELAY);
+}
+
+
+int main(void)
+{
+        // 注册回调函数
+        log_info_register_callback(usart1_print);
+        // 使用回调函数
+        log_info("Program started ...");
+        log_info("Delay 1000MS ...");
+        HAL_Delay(1000);
+        log_info("Delay complete ...");
+}
