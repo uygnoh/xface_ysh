@@ -1,0 +1,252 @@
+//______________________________________________________________________________
+//      => GPIO输入—按键查询检测
+//______________________________________________________________________________
+// RST复位按键, 该按键连接至RT1052的 POR_B引脚
+当该引脚为低电平时会引起RT1052芯片的复位（复位的基本现象是程序从头开始运行）
+从按键的原理图可知，该按键在没有被按下的时候，引脚状态为高电平，当按键按下时，
+引脚状态为低电平(按键所在的电路导通，引脚接到地)。所以，平时POR_B引脚保持高电平，
+芯片正常运行，按下按键时产生复位。
+// WAUP按键, 该按键连接至RT1052的WAUP引脚，从低功耗唤醒
+当按键按下时WAUP引脚为低电平；与RST引脚不同，这个WAUP引脚具有GPIO的功能，即
+我们可以把它设置成GPIO的输入模式，然后检测引脚的输入电平，即可判断按键是否被按
+下。WAUP引脚还具有把芯片从低功耗模式唤醒的功能，以后再学习
+// MODE按键, MODE按键最为特殊
+// 它通过一系列电路连接至两个引脚BOOT_MODE[0]和BOOT_MODE[1]
+// 当该按键按下时，BOOT_MODE[0]引脚状态为高电平，BOOT_MODE[1]则相反为低电平。
+// 与WAUP引脚类似，BOOT_MODE[0]和BOOT_MODE[1]都具有GPIO的功能，即我们可以选
+// 取这二者中任意一个设置成GPIO的输入模式并检测相应的输入电平，来判断按键是否被按下。
+// MODE按键这样设计是为了方便切换芯片的启动方式，芯片复位启动后会检测这两个引脚的电平，
+// 根据BOOT_MODE[0]和BOOT_MODE[1]的电平状态来选择FLASH还是USB的启动方式。不过在本
+// 章实验中我们仅把它用于普通的按键。
+
+
+
+
+// IOMUXC_SW_MUX_CTL_PAD_XXXX 复用功能配置
+//      4       SION
+//      2:0     MUX_MODE
+//-------------------------------------------------------------
+// IOMUXC_SW_PAD_CTL_PAD_XXXX 电气属性
+//      16      HYS     // 滞回器配置: 开启 （仅输入时有效，施密特触发器，使能后可以过滤输入噪声）
+//      15:14   PUS     // 上拉/下拉选择: 22K欧姆上拉(3)
+//      13      PUE     // 拉/保持器选择: 上下拉(1)
+//      12      PKE     // 拉/保持器配置: 使能(1)
+//      11      ODE     // 开漏配置: 关闭(0)
+//      7:6     SPEED   // 速度配置: medium(100MHz)
+//      5:3     DSE     // 驱动强度: 关闭
+//      0       SRE     // 转换速率: 转换速率慢
+void button_init(void)
+{
+        gpio_pin_config_t pin_config;
+        
+        // 开启SVNS时钟--低功耗管理模块时钟，配置WAKEUP必须使能它
+        CLOCK_EnableClock(kCLOCK_IomuxcSnvs);
+        
+        // 配置PAD模式为： GPIO
+        IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0U);
+        // 配置PAD属性
+        IOMUXC_SetPinConfig(IOMUXC_SNVS_WAKEUP_GPIO5_IO00,
+                IOMUXC_SW_PAD_CTL_PAD_SRE(0)    | // 压摆率低速
+                IOMUXC_SW_PAD_CTL_PAD_DSE(0)    | // 驱动电阻关闭
+                IOMUXC_SW_PAD_CTL_PAD_SPEED(1)  | // 速率100MHz
+                IOMUXC_SW_PAD_CTL_PAD_ODE(0)    | // 开漏输出关闭
+                IOMUXC_SW_PAD_CTL_PAD_PKE(1)    | // 上下拉使能
+                IOMUXC_SW_PAD_CTL_PAD_PUE(1)    | // 选择上下拉
+                IOMUXC_SW_PAD_CTL_PAD_PUS(3)    | // 上拉电阻（22K）
+                IOMUXC_SW_PAD_CTL_PAD_HYS(1)      // 硬件消抖
+        );
+        pin_config.direction = kGPIO_DigitalInput;
+        pin_config.outputLogic = 1;
+        pin_config.interruptMode = kGPIO_NoIntmode;
+        GPIO_PinInit(GPIO5, 0, &pin_config);
+}    
+
+                                        
+                                        
+                                        
+//______________________________________________________________________________
+//      => GPIO driver
+//______________________________________________________________________________
+        fsl.gpio.c
+        fsl.gpio.h
+        fsl.iomuxc.h
+//_____________________________________________________________
+                                                // 模式配置地址， ALT模式， 0， 0， 电气属性地址
+#define IOMUXC_GPIO_EMC_00_SEMC_DA00            0x401F8014U, 0x0U, 0,           0,      0x401F8204U
+#define IOMUXC_GPIO_EMC_00_FLEXPWM4_PWM0_A      0x401F8014U, 0x1U, 0x401F8494U, 0x0U,   0x401F8204U
+#define IOMUXC_GPIO_EMC_00_LPSPI2_SCK           0x401F8014U, 0x2U, 0x401F8500U, 0x1U,   0x401F8204U
+#define IOMUXC_GPIO_EMC_00_XBAR1_IN02           0x401F8014U, 0x3U, 0x401F860CU, 0x0U,   0x401F8204U
+#define IOMUXC_GPIO_EMC_00_FLEXIO1_D00          0x401F8014U, 0x4U, 0,           0,      0x401F8204U
+#define IOMUXC_GPIO_EMC_00_GPIO4_IO00           0x401F8014U, 0x5U, 0,           0,      0x401F8204U
+/*!
+ * @brief Sets the IOMUXC pin mux mode.
+ * @param muxRegister           The pin mux register.
+ * @param muxMode               The pin mux mode.
+ * @param inputRegister         The select input register.
+ * @param inputDaisy            The input daisy.
+ * @param configRegister        The config register.
+ * @param inputOnfield          Software input on field.
+ */
+static inline void IOMUXC_SetPinMux(   uint32_t muxRegister;    // 引脚的复用功能寄存器
+                                        uint32_t muxMode;        // 引脚的工作模式
+                                        uint32_t intputRegister; // 选择的输入寄存器
+                                        uint32_t inputDaisy;     // 输入资料
+                                        uint32_t configRegister; // 配置寄存器
+                                        uint32_t inputOnfield);
+/*!
+ * @brief Sets the IOMUXC pin configuration.
+ * @param muxRegister           The pin mux register.
+ * @param muxMode               The pin mux mode.
+ * @param inputRegister         The select input register.
+ * @param inputDaisy            The input daisy.
+ * @param configRegister        The config register.
+ * @param configValue           The pin config value.
+ */
+static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
+                                       uint32_t muxMode,
+                                       uint32_t inputRegister,
+                                       uint32_t inputDaisy,
+                                       uint32_t configRegister,
+                                       uint32_t configValue)    
+
+
+
+        MIMXRT1052.h
+//_____________________________________________________________
+#define IOMUXC_SW_PAD_CTL_PAD_SRE_MASK           (0x1U)
+#define IOMUXC_SW_PAD_CTL_PAD_SRE_SHIFT          (0U)
+/*! SRE - Slew Rate Field
+ *  0b0..Slow Slew Rate
+ *  0b1..Fast Slew Rate
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_SRE(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_SRE_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK )
+                                                        
+                                                        
+#define IOMUXC_SW_PAD_CTL_PAD_DSE_MASK           (0x38U)
+#define IOMUXC_SW_PAD_CTL_PAD_DSE_SHIFT          (3U)
+/*! DSE - Drive Strength Field
+ *  0b000..HI-Z
+ *  0b001..Dual/Single voltage: 262/260 Ohm @ 1.8V, 247/157 Ohm @ 3.3V
+ *  0b010..Dual/Single voltage: 134/130 Ohm @ 1.8V, 126/78  Ohm @ 3.3V
+ *  0b011..Dual/Single voltage: 88/88   Ohm @ 1.8V, 84/53   Ohm @ 3.3V
+ *  0b100..Dual/Single voltage: 62/65   Ohm @ 1.8V, 57/39   Ohm @ 3.3V
+ *  0b101..Dual/Single voltage: 51/52   Ohm @ 1.8V, 47/32   Ohm @ 3.3V
+ *  0b110..Dual/Single voltage: 43/43   Ohm @ 1.8V, 40/26   Ohm @ 3.3V
+ *  0b111..Dual/Single voltage: 37/37   Ohm @ 1.8V, 34/23   Ohm @ 3.3V
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_DSE(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_DSE_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_DSE_MASK )
+                                            
+                                                        
+#define IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK         (0xC0U)
+#define IOMUXC_SW_PAD_CTL_PAD_SPEED_SHIFT        (6U)
+/*! SPEED - Speed Field
+ *  0b00..50MHz
+ *  0b01..100MHz - 150MHz
+ *  0b10..100MHz - 150MHz
+ *  0b11..150MHz - 200MHz
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_SPEED(x)                                          \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_SPEED_SHIFT)) &  \
+        IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK )
+                                              
+                                                        
+#define IOMUXC_SW_PAD_CTL_PAD_ODE_MASK           (0x800U)
+#define IOMUXC_SW_PAD_CTL_PAD_ODE_SHIFT          (11U)
+/*! ODE - Open Drain Enable Field
+ *  0b0..Open Drain Disabled (Output is CMOS)
+ *  0b1..Open Drain Enabled (Output is Open Drain)
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_ODE(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_ODE_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_ODE_MASK )
+
+
+#define IOMUXC_SW_PAD_CTL_PAD_PKE_MASK           (0x1000U)
+#define IOMUXC_SW_PAD_CTL_PAD_PKE_SHIFT          (12U)
+/*! PKE - Pull / Keep Enable Field
+ *  0b0..Pull/Keeper Disabled
+ *  0b1..Pull/Keeper Enabled
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_PKE(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_PKE_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_PKE_MASK )
+
+
+#define IOMUXC_SW_PAD_CTL_PAD_PUE_MASK           (0x2000U)
+#define IOMUXC_SW_PAD_CTL_PAD_PUE_SHIFT          (13U)
+/*! PUE - Pull / Keep Select Field Control signal to enable 
+                 internal pull-up/down resistors or pad keeper functionality.
+ *  0b0..Keep the previous output value when the output driver is disabled.
+ *  0b1..Pull-up or pull-down (determined by PUS field).
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_PUE(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_PUE_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_PUE_MASK )
+
+
+#define IOMUXC_SW_PAD_CTL_PAD_PUS_MASK           (0xC000U)
+#define IOMUXC_SW_PAD_CTL_PAD_PUS_SHIFT          (14U)
+/*! PUS - Pull Up / Down Config. Field Controls signals to select 
+                    pull-up or pull-down internal resistance strength.
+ *  0b00..100K Ohm Pull Down
+ *  0b01..47K  Ohm Pull Up
+ *  0b10..100K Ohm Pull Up
+ *  0b11..22K  Ohm Pull Up
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_PUS(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_PUS_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_PUS_MASK )
+
+
+#define IOMUXC_SW_PAD_CTL_PAD_HYS_MASK           (0x10000U)
+#define IOMUXC_SW_PAD_CTL_PAD_HYS_SHIFT          (16U)
+/*! HYS - Hyst. Enable Field
+ *  0b0..Hysteresis Disabled (CMOS input)
+ *  0b1..Hysteresis Enabled (Schmitt Trigger input)
+ */
+#define IOMUXC_SW_PAD_CTL_PAD_HYS(x)                                            \
+        ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_HYS_SHIFT)) &    \
+        IOMUXC_SW_PAD_CTL_PAD_HYS_MASK)
+
+
+                        
+//______________________________________________________________________________
+//      => GPIO driver 例程
+//______________________________________________________________________________
+void led_init(void)
+{
+        // 配置PAD模式为： GPIO
+        IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_09_GPIO01_IO09, 0U);
+        // 配置PAD属性：压摆率低速 驱动电阻260 速率100MHz
+        IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_09_GPIO1_IO09，
+                                IOMUXC_SW_PAD_CTL_PAD_SRE(0)    |
+                                IOMUXC_SW_PAD_CTL_PAD_DSE(1)    |
+                                IOMUXC_SW_PAD_CTL_PAD_SPEED(2)  |
+                                IOMUXC_SW_PAD_CTL_PAD_ODE(0)    |
+                                // 如下寄存器在（输入模式）可以不配置
+                                IOMUXC_SW_PAD_CTL_PAD_PKE(1)    |
+                                IOMUXC_SW_PAD_CTL_PAD_PUE(1)    |
+                                IOMUXC_SW_PAD_CTL_PAD_PUS(1)    |
+                                IOMUXC_SW_PAD_CTL_PAD_HYS(0)
+        );
+        // 配置GPIO模式： 输出 默认电平为低 无中断模式
+        gpio_pin_config_t led_gpio_pin_config;
+        led_gpio_pin_config.direction = kGPIO_DigitalOutput;
+        led_gpio_pin_config.outputLogic = 0;
+        led_gpio_pin_config.interruptMode = KGPIO_NoIntmode;
+        GPIO_PinInit(GPIO1, 9, &led_gpio_pin_config);
+}
+void led_on(void)
+{
+        GPIO_PinWrite(GPIO1, 9, 0);
+}
+void led_offvoid)
+{
+        GPIO_PinWrite(GPIO1, 9, 1);
+}
+
+                   

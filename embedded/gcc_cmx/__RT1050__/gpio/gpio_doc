@@ -1,7 +1,10 @@
 //______________________________________________________________________________
 //      => GPIO
 //______________________________________________________________________________
-                参考资料： RT正点原子.pdf 第 131 页
+10.1.1 Muxing Options   // GPIO复用选择
+
+
+
 // 整个GPIO结构主要有三个部分，分别是 IOMUXC  IOMUX  IORING  三个部分
 // RT1052 的 IO 口总共分成 5 组:   GPIO1  GPIO2  GPIO3  GPIO4  GPIO5
 // 其中:
@@ -11,93 +14,74 @@
                 GPIO3   28 个 IO
                 GPIO5    3 个 IO
                      = 127 个 IO
+// RT1052 的 IO 口可以有很多个 Block(控制块),每个 Block 其实就是一个复用功能
+// GPIO功能也属于这些 Block 里面的一个。 其他的, 比如串口、SPI、CAN、CSI、SEMC 等,
+// 这些都是控制 IO 口的 Block
 
 
 
-        IORING
+//______________________________________________________________________________
+//      => IO 功能控制块  
+//______________________________________________________________________________
+// GPIO1 端口的寄存器地址列表
+// 12.6.1 GPIO register descriptions    
+// ____________________________________________________________
+#define GPIO1_BASE              (0x401B8000U)           // GPIO1 外设基地址
+#define GPIO2_BASE              (0x401BC000U)           // GPIO2 外设基地址
+#define GPIO3_BASE              (0x401C0000U)           // GPIO3 外设基地址
+#define GPIO4_BASE              (0x401C4000U)           // GPIO4 外设基地址
+#define GPIO5_BASE              (0x400C0000U)           // GPIO5 外设基地址
+// 寄存器地址，以 GPIO1 为例
+// ____________________________________________________________
+#define GPIO1_DR                (GPIO1_BASE + 0x00)     // 数据寄存器
+#define GPIO1_GDIR              (GPIO1_BASE + 0x04)     // 数据方向寄存器
+#define GPIO1_PSR               (GPIO1_BASE + 0x08)     // 状态寄存器
+#define GPIO1_ICR1              (GPIO1_BASE + 0x0C)     // 中断配置寄存器1
+#define GPIO1_ICR2              (GPIO1_BASE + 0x10)     // 中断配置寄存器2
+#define GPIO1_IMR               (GPIO1_BASE + 0x14)     // 中断掩码寄存器
+#define GPIO1_ISR               (GPIO1_BASE + 0x18)     // 中断状态寄存器
+#define GPIO1_EDGE_SEL          (GPIO1_BASE + 0x1C)     // 边沿选择寄存器
+#define GPIO1_DR_SET            (GPIO1_BASE + 0x84)     // 位设置
+#define GPIO1_DR_CLEAR          (GPIO1_BASE + 0x88)     // 位清除
+#define GPIO1_DR_TOGGLE         (GPIO1_BASE + 0x8C)     // 位翻转
+GPIO_EDGE_SEL 边沿选择寄存器用于设置上升沿&下降沿触发中断。 
+注意: 该寄存器的设置, 会覆盖 ICR1/ICR2 的设置。 例如,我们设置 GPIO4_EDGE_SEL.1=1,
+即设置 GPIO4_IO01的中断触发条为: 上升沿或下降沿触发, 即任意边沿触发。     此时,无论 
+GPIO4_IC1.2 & GPIO4_IC1.3 设置的值是多少, 都不会生效(被覆盖了)!
+// RT1050_直接操作寄存器的方法控制IO
+#define digitalHigh(port, pin)          {port->DR_SET    |= (1U << pin);}       // 输出为高电平
+#define digitalLow(port, pin)           {port->DR_CLEAR  |= (1U << pin);}       // 输出低电平
+#define digitalToggle(port, pin)        {port->DR_TOGGLE |= (1U << pin);}       // 输出反转状态
+
+
+
+//______________________________________________________________________________
+//      => IO 复用功能选择器
+//______________________________________________________________________________
+// IO 复用功能选择器(IOMUXC)
+// IO 复用功能选择器(IOMUXC)的寄存器非常多,主要可以分为四组
+1       IOMUXC_GPR      // 寄存器组, 用于通用控制设置
+2       IOMUXC_SNVS     // 寄存器组, 主要用于 GPIO5 的控制
+3       IOMUXC_SNVS_GPR // 寄存器组, 暂时没用到
+4       IOMUXC          // 寄存器组, 用于 GPIO1~GPIO4 的复用功能选择和 IO 属性设置
+
+
+
+//      IOMUXC
 //_____________________________________________________________
-// 这个部分可以理解成为GPIO的模拟硬件部分，接收来自其他模块的控制数据以及
-// 具体通道信号。除了我们常见的方向控制、输出控制等， 具体还包括其他的各种电
-// 气属性配置，具体包括
-// 输出部分 ////////////////////////////////////////////////////
-a) DSE 驱动能力
-        // DSE 可以调整芯片内部与引脚串联电阻R0 的大小，从而改变引脚的
-        // 驱动能力。 例如，R0 的初始值为260 欧姆，在3.3V 电压下其电流
-        // 驱动能力为12.69mA，通过DSE 可以把R0 的值配置为原值的1/2、1/3…1/7 等。
-b) SRE 压摆率配置
-        // 压摆率是指电压转换速率，可理解为电压由波谷升到波峰的时间。
-        // 增大压摆率可减少输出电压的上升时间。RT1052 的引脚通过SRE 
-        // 支持低速和高速压摆率这两种配置。
-c) SPEED 带宽配置
-        // 通过SPEED 可以设置IO 的带宽，分别可设置为50MHz、100MHz 
-        // 以及200MHz。带宽的意思是能通过这个IO 口最高的信号频率，通俗点
-        // 讲就是方波不失真，如果超过这个频率方波就变正弦波。 但是这个带宽
-        // 要区别于IO 的翻转速率，IO 的翻转速率的信号来自于GPIO 这个外设，
-        // 而IO 的带宽只是限制了IO 口引脚的物理特性，IO 口的信号可以来自于
-        // 内部定时器输出的PWM信号，也可以来自于GPIO 翻转输出的信号，两者
-        // 相比之下，PWM信号的频率是远远高于GPIO 翻转输出的信号频率。
-d) ODE 开漏输出配置
-        // 通过ODE 可以设置引脚是否工作在开漏输出模式。 在该模式时引脚可
-        // 以输出高阻态和低电平，输出高阻态时可由外部上拉电阻拉至高电平。
-        // 开漏输出模式常用在一些通讯总线中，如I2C。
-// 输入部分 ////////////////////////////////////////////////////
-a) HYS 滞后使能
-        // RT1052 的输入检测可以使用普通的CMOS 检测或施密特触发器模式
-        //（滞后模式）。施密特触发器具有滞后效应，对正向和负向变化的输入
-        // 信号有不同的阈值电压，常被用于电子开关、波形变换等场合。
-b) 上下拉 、 保持器的功能
-        // 芯片内部的上拉和下拉电阻可以将不确定的信号钳位在高、低电平，
-        // 或小幅提高的电流输出能力，上拉提供输出电流，下拉提供输入电流。
-        // 注意这些上下拉配置只是弱拉，对于类似I2C 之类的总线，还是必须
-        // 使用外部上拉电阻。RT1052 芯片的电源模块中包含转换器，当转换器
-        // 停止工作时，保持器会保持输入输出电压。
-        // 上下拉、保持器可以通过如下属性配置：
-                                        PUS 上下拉配置
-        // PUS 可配置项可选为100K 欧下拉以及22K 欧、47K 欧及100K 欧上拉。
-                                         PUE 上下拉、保持器选择
-        // 上下拉功能和保持器功能是二选一的，可以通过PUE 来选择。
-                                         PKE 上下拉、保持器配置
-        // 上下拉功能和保持器还通过PKE 来控制是否使能
-
-
-
-        IOMUX
-//_____________________________________________________________
-// IOMUX是RT1050的多路复用器，它控制着每个引脚的信号通道切换。 
-// RT1052的芯片每个GPIO都通过IOMUX 支持多种功能， 例如一个IO 
-// 可用于网络外设ENET 的数据接收引脚， 也可以被配置成PWM外设的
-// 输出引脚，这样的设计大大增加了芯片的适用性， 这样可选的功能就
-// 是由IOMUX实现的。 IOMUX 相当于增加了多根内部信号线与IO 引脚
-// 相连，最多有8 根，也就是说一个IO 最多可支持8 种可选的功能。
-
-
-
-        IOMUXC
-//_____________________________________________________________
-// IOMUXC是整个IO系统的核心部分，不仅控制着IOMUX的信号通道开关，
-// 而且还控制着IORING中的各种电气属性。不同于一般MCU，一个寄存器
-// 可能控制很多IO口, 对于RT1050，每一个IO口都有两个寄存器，分别
-// 是负责配置复用功能的MUX寄存器和负责配置IO电气属性的PAD寄存器。
-// 命名规则如下：
-控制类型	        寄存器名称
-MUX Mode	IOMUXC_SW_MUX_CTL_PAD_XXXX      // 复用功能
-Pad Settings	IOMUXC_SW_PAD_CTL_PAD_XXXX      // 电气属性
-// XXXX代表具体IO的引脚名字         
-// 例如在NXP官网DEMO板中，使用引脚GPIO_AD_B0_09驱动LED灯
-IOMUXC_SW_MUX_CTL_PAD_XXXX              // 配置复用功能的 MUX寄存器
-IOMUXC_SW_PAD_CTL_PAD_XXXX              // 配置电气属性的 PAD寄存器
-
-
-
-        IOMCXC配置
-//_____________________________________________________________
-        IOMUXC_SW_MUX_CTL_PAD_ GPIO_AD_B0_09
-        // 该寄存器主要有两个可配置项，分别是SION 和 MUX_MODE，其中SION用于设置引脚在
-        // 输出模式下同时开启输入通道； MUX_MODE 可配置该引脚为ALT0~ALT7 这8 个复用功能，
-        // 其中就包括了接下来我们所用的GPIO1_IO09功能，也就是GPIO功能
-        IOMUXC_SW_PAD_CTL_PAD_ GPIO_AD_B0_09
-        // 可以看出通过配置PAD寄存器就可以配置这个IO的具体电气属性，也就是之前说到的各种属性
-        // RT-1050-GPIO 电气属性寄存器配置
+//
+//
+//      IOMUXC_SW_MUX_CTL_PAD_ GPIO_AD_B0_09
+//
+// 该寄存器主要有两个可配置项，分别是SION 和 MUX_MODE，其中SION用于设置引脚在输出模式下同
+// 时开启输入通道； MUX_MODE 可配置该引脚为ALT0~ALT7 这8 个复用功能，其中就包括了接下来我
+// 们所用的GPIO1_IO09功能，也就是GPIO功能
+//
+//
+//     IOMUXC_SW_PAD_CTL_PAD_ GPIO_AD_B0_09
+//
+// 可以看出通过配置PAD寄存器就可以配置这个IO的具体电气属性，也就是之前说
+// 到的各种属性RT-1050-GPIO 电气属性寄存器配置
                 HYS             // 滞后配置
                 PUS             // 上下拉电阻配置
                 PUE             // 选择上下拉，还是保持
@@ -106,60 +90,160 @@ IOMUXC_SW_PAD_CTL_PAD_XXXX              // 配置电气属性的 PAD寄存器
                 SPEED           // 工作速度
                 DSE             // 输出驱动能力
                 SRE             // 压摆率配置
+// 当输出缓冲区使能时，引脚被配置为输出模式
+//
+// https://doc.embedfire.com/mcu/i.mxrt/i.mxrt1052/zh/latest/doc/chapter7/chapter7.html
+DSE     // DSE驱动能力
+        // DSE可以调整芯片内部与引脚串联电阻R0的大小，从而改变引脚的驱动能力。  例如，R0 
+        // 的初始值为260 欧姆，在3.3V 电压下其电流驱动能力为12.69mA，通过DSE可以把R0的
+        // 值配置为原值的1/2, 1/3, …, 1/7 等
+SRE     // SRE压摆率配置
+        // 压摆率是指电压转换速率，可理解为电压由波谷升到波峰的时间。 增大压摆率可减少输出
+        // 电压的上升时间。 RT1052 的引脚通过SRE 支持低速和高速压摆率这两种配置
+SPEED   // SPEED带宽配置
+        // 通过SPEED可以设置IO的带宽，分别可设置为50MHz 、 100MHz以及200MHz。 带宽的意思
+        // 是能通过这个IO口最高的信号频率，通俗点讲就是方波不失真，如果超过这个频率方波就
+        // 变正弦波。 但是这个带宽要区别于IO的翻转速率，IO的翻转速率的信号来自于GPIO这个外
+        // 设，而IO的带宽只是限制了IO口引脚的物理特性，IO口的信号可以来自于内部定时器输出
+        // 的PWM信号，也可以来自于GPIO翻转输出的信号，两者相比之下，PWM信号的频率是远远高
+        // 于GPIO翻转输出的信号频率。 况且1052没有高速GPIO，GPIO的翻转率约为10M，1060系
+        // 列则有高速GPIO，GPIO翻转速率达到了逆天的150M。 但要使用1060的快速GPIO，需要
+        // 改用GPIO编号。
+ODE     // 开漏输出配置
+        // 通过ODE可以设置引脚是否工作在开漏输出模式。在该模式时引脚可以输出高阻态和低电平，
+        // 输出高阻态时可由外部上拉电阻拉至高电平。开漏输出模式常用在一些通讯总线中，如I2C。
+// 当输入缓冲区使能时，引脚被配置为输入模式
+//
+HYS     // HYS滞后使能
+        // RT1052的输入检测可以使用普通的CMOS检测或施密特触发器模式（滞后模式）。 施密特
+        // 触发器具有滞后效应，对正向和负向变化的输入信号有不同的阈值电压， 常被用于电子开关、
+        // 波形变换等场合，其转换特性和对比见图 7‑3及图 7‑4，如检测按键时，使用施密特模式
+        // 即可起到消抖的功能。
+Pull/Keeper 上下拉 、 保持器
+        // 引脚的控制逻辑中还包含了上下拉 、 保持器的功能。 芯片内部的上拉和下拉电阻可以将
+        // 不确定的信号钳位在高、低电平，或小幅提高的电流输出能力，上拉提供输出电流，下拉提
+        // 供输入电流。 注意这些上下拉配置只是弱拉，对于类似I2C之类的总线，还是必须使用外部
+        // 上拉电阻。 RT1052芯片的电源模块中包含转换器，当转换器停止工作时，保持器会保持输入输出电压。
+        // PUS上下拉配置
+                PUS可配置项可选为100K欧下拉以及22K欧、47K欧及100K欧上拉。
+        // PUE上下拉、保持器选择
+                上下拉功能和保持器功能是二选一的，可以通过PUE来选择。
+        // PKE上下拉、保持器配置
+                上下拉功能和保持器还通过PKE来控制是否使能。
+// 注意，当引脚被配置为输出模式时，不管上下拉、保持器是什么配置，它们都会被关闭。
+
+
+
+// IOMUX 复用选择器（寄存器）
+//_____________________________________________________________
+// XXXX代表具体IO的引脚名字
+// 配置复用功能的 MUX 寄存器        
+        IOMUXC_SW_MUX_CTL_PAD_XXXX
+        IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_09
+//
+//
+// 配置电气属性的 PAD 寄存器 
+        IOMUXC_SW_PAD_CTL_PAD_XXXX
+        IOMUXC_SW_PAD_CTL_PAD_GPIO_AD_B0_09
+//
+//
+//在 IOMUXC 分组下,还有一类特殊的寄存器:SELECT_INPUT 寄存器,命名规则为:
+        IOMUXC_XXXX_SELECT_INPUT
+// 其中 xxxxx 为 IO 口的某一复用功能,这个复用功能一般有多个 IO 口可以选择,
+// 例如:CSI_DATA02(摄像头接口的数据线 2),有 2 个 IO 口可以复用为这个功能,即
+// GPIO_AD_B1_15(GPIO1_IO31)和 GPIO_AD_B0_11(GPIO1_IO11),那么摄像头接口
+// 选择到底选哪个 IO 作为 CSI_DATA02 呢?
+// 就是通过 IOMUXC_CSI_DATA02_SELECT_INPUT 来决定的
+该寄存器的最低位(DAISY)设置为 0 时,选择 GPIO_AD_B1_15 的 ALT4 作为 CSI_DATA02
+该寄存器的最低位(DAISY)设置为 1 时,选择 GPIO_AD_B0_11 的 ALT4 作为 CSI_DATA02
+// !注意:如果只需要做 GPIO 功能使用, 是不需要用到 SELECT_INPUT 寄存器的
+
 
 
 
 //______________________________________________________________________________
 //      => GPIO 程序
 //______________________________________________________________________________
-// 
-// IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_09
-// SW_MUX_CTL Register MUX-复用寄存器
-// ALT5 — Select mux mode: ALT5 mux port: GPIO1_IO09 of instance: gpio1
-#define LED_MUX_CTL     *(volatile uint32_t)(0x401F80E0)
-//
-// IOMUXC_SW_PAD_CTL_PAD_GPIO_AD_B0_09
-// SW_PAD_CTL Register PAD-控制寄存器
-#define LED_PAD_CTL     *(volatile uint32_t)(0x401F82D0)
-// 
-//
-// GPIO register descriptions
-// GPIO memory map
-#define LED_GPIO_DR     *(volatile uint32_t)(0x401B8000)        // GPIO数据寄存器
-#define LED_GPIO_DIR    *(volatile uint32_t)(0x401B8000 + 0x04) // GPIO方向寄存器
-#define LED_GPIO_PSR    *(volatile uint32_t)(0x401B8000 + 0x08) // GPIO-PAD状态
-#define LED_GPIO_SET    *(volatile uint32_t)(0x401B8000 + 0x84) // GPIO设置寄存器
-#define LED_GPIO_CLEAR  *(volatile uint32_t)(0x401B8000 + 0x88) // GPIO清除寄存器
-#define LED_GPIO_TOGGLE *(volatile uint32_t)(0x401B8000 + 0x8C) // GPIO翻转寄存器
-//
-//
-// CCM Memory Map/Register Definition
-// CCM Clock Gating Register 1 (CCM_CCGR1)
-#define CCM_CCGR1       *(volatile uint32_t)(0x400FC06C)        // GPIO1时钟寄存器
-//
-// 
-void led_init(void)
+// IOMUXC 是 NXP 在 MIMXRT1052.h 里面定义的结构体,其定义如下:
+//_____________________________________________________________
+typedef struct {
+        uint8_t RESERVED_0[20];                 // 保留
+        __IO uint32_t SW_MUX_CTL_PAD[124];      // 124 个 IO 的 SW_MUX_CTL_PAD 寄存器
+        __IO uint32_t SW_PAD_CTL_PAD[124];      // 124 个 IO 的 SW_PAD_CTL_PAD 寄存器
+        __IO uint32_t SELECT_INPUT[154];        // 154 个复用功能输入选择设置寄存器
+
+} IOMUXC_Type;
+// 例程 1
+//_____________________________________________________________
+// 我们以 GPIO_SD_B1_03 为例, 假设我们要配置其为: GPIO(GPIO3_IO03)
+// 推挽输出,输出能力为 R0/6, 速率为50Mhz, 保持模式, 则具体的配置代码如下
+CCM->CCGR2      |= 3 << 26;             // 使能 GPIO3 时钟
+CCM->CCGR4      |= 3 << 2;              // 开启 IOMUXC 时钟
+IOMUXC->SW_MUX_CTL_PAD[115]  = 5;       // 设置 GPIO_SD_B1_03 复用功能为 ALT5
+IOMUXC->SW_PAD_CTL_PAD[115]  = 5 << 3;  // 设置驱动能力(DSE): R0/6
+IOMUXC->SW_PAD_CTL_PAD[115] |= 0 << 6;  // 设置 IO 速率(SPEED): 50Mhz
+IOMUXC->SW_PAD_CTL_PAD[115] |= 0 << 11; // 设置推挽输出(ODE): 非开漏,即推挽
+IOMUXC->SW_PAD_CTL_PAD[115] |= 1 << 12; // 使能: PUPD/KEEPER(KPE=1)
+IOMUXC->SW_PAD_CTL_PAD[115] |= 0 << 13; // 选择使用: 保持模式(PUE=0)
+IOMUXC->SW_PAD_CTL_PAD[115] |= 0 << 14; // 设置上下拉(PUS): 保持模式下无效
+GPIO3->GDIR     |= 1 << 3;              // GPIO3_IO03 为输出模式
+GPIO3->DR       |= 1 << 3;              // GPIO3_IO03 输出高电平
+
+
+
+
+// 例程 2
+//_____________________________________________________________
+// GPIO1时钟寄存器
+#define CCM_CCGR1       *(volatile uint32_t)(0x400FC06C)    
+// 清空控制GPIO1端口时钟的bit26、bit27
+CCM_CCGR1 &= ~(unsigned int)(3<<26);
+// 把bit26、bit27设置为0b01，即开启GPIO1时钟
+CCM_CCGR1 |= (unsigned int)(1<<26);
+
+
+int main(void)
 {
-        // 配置时钟
-        CCM_CCGR1       &= ~(uint32_t)(3 << 26);
-        CCM_CCGR1       |=  (uint32_t)(1 << 26);
-        
-        // 配置PAD，复用模式，GPIO1_IO09
-        LED_MUX_CTL      = 0x
-        // 输出配置
-        LED_PAD_CTL      = 0x08;
-        // 配置为输出
-        LED_GPIO_DIR    |= (uint32_t)(1 << 9);
+        // 开启GPIO1端口的时钟
+        // 清空控制GPIO1端口时钟的bit26、bit27
+        CCM_CCGR1 &= ~(unsigned int)(3 << 26);
+        // 把bit26、bit27设置为0b01，即开启GPIO1时钟
+        CCM_CCGR1 |= (unsigned int)(1 << 26);
+
+        // 设置MUX寄存器为0x05，表示把引脚用于普通GPIO
+        #define IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_09     *(volatile uint32_t)(0x401F80E0)
+        IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_09 = (unsigned int)0x05;
+
+        // 设置PAD寄存器控制引脚的属性
+        #define IOMUXC_SW_PAD_CTL_PAD_GPIO_AD_B0_09     *(volatile uint32_t)(0x401F82D0)
+        IOMUXC_SW_PAD_CTL_PAD_GPIO_AD_B0_09 = (unsigned int)0x070B0;
+        // 属性配置说明:
+        0x070B0 == 0b0000 0111 0000 1011 0000
+        bit0:         SRE:  0b0         // 压摆率: 慢压摆率
+        bit1~bit2:    -:    0b00        // 寄存器保留项
+        bit3~bit5:    DSE:  0b110       // 驱动强度: R0/6 （仅作为输出时有效 ）
+        bit6~bit7:    SPEED:0b10        // 带宽 : medium(100MHz)
+        bit8~bit10:   -:    0b000       // 寄存器保留项
+        bit11:        ODE:  0b0         // 开漏配置: 关闭
+                                        // （开漏高阻态常用于总线配置，如I2C ）
+        bit12:        PKE:  0b1         // 拉/保持器配置: 使能
+        bit13:        PUE:  0b1         // 拉/保持器选择: 上下拉
+        bit14~bit15:  PUS:  0b01        // 上拉/下拉选择: 47K欧上拉
+        bit16:        HYS:  0b0         // 滞回器配置: 关闭
+                                        // （仅输入时有效，施密特触发器，使能后可以过滤输入噪声）
+        bit17~bit31:  -:    0b0         // 寄存器保留项
+
+
+        // 设置GPIO1_09引脚的方向，使用输出模式
+        GPIO1_GDIR |= (unsigned int)(1 << 9);
+
+        // 控制引脚为低电平，点亮LED灯
+        GPIO1_DR &= ~(unsigned int)(1 << 9);
+
+        while (1);
+
 }
-void led_on(void)
-{
-        LED_GPIO_SET    |= (uint32_t)(1 << 9);
-}
-void led_off(void)
-{
-        LED_GPIO_CLEAR  |= (uint32_t)(1 << 9);
-}
-void led_toggle(void)
-{
-        LED_GPIO_TOGGLE |= (uint32_t)(1 << 9);
-}
+
+
+
+
