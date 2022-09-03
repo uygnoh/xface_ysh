@@ -1,0 +1,70 @@
+//______________________________________________________________________________
+//      => RT-THREAD 编写驱动框架
+//______________________________________________________________________________
+
+////////////////////////////////////////////////////////////////////////////////
+                        drv_demo.c
+////////////////////////////////////////////////////////////////////////////////
+#include <rtdevice.h>
+#include <rtdbg.h>
+
+rt_err_t demo_init(rt_device_t dev)
+{
+        rt_kprintf("demo_init ...\n");
+        return 0;
+}
+rt_err_t demo_open(rt_device_t dev, rt_uint16_t oflag)
+{
+        rt_kprintf("demo_open ...\n");
+        return 0;
+}
+rt_err_t demo_close(rt_device_t dev)
+{
+        rt_kprintf("demo_close ...\n");
+        return 0;
+}
+
+
+int rt_demo_init(void)
+{
+        // 创建设备
+        rt_device_t demo_dev;
+        demo_dev = rt_device_create(RT_Deviece_Class_Char,      // 字符设备
+                                        32);                    // 用户数据大小
+        if (demo_dev == NULL) {
+                LOG_E("rt_device_create failed...\n");
+                return (-ENOMEM);
+        }
+        // 创建设备方法
+        demo_dev->init  = demo_init;
+        demo_dev->open  = demo_open;
+        demo_dev->close = demo_close;
+        
+        
+        // 注册设备
+        rt_device_register(demo_dev, "demo", RT_DEVICE_FLAG_RDWR);
+        
+        return 0;
+}
+INIT_BOARD_EXPORT(rt_demo_init);
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+                                main.c
+////////////////////////////////////////////////////////////////////////////////
+rt_device_t     dev;
+int main(void)
+{
+        // 查找设备
+        dev = rt_device_find("demo");
+        if (dev == NULL) {
+                LOG_E("rt_devcie_find failed ...\n");
+                return (-EINVAL);
+        }
+        
+        // 找到了设备
+        rt_device_init(dev);
+        rt_device_open(dev, RT_DEVICE_OFLAG_RDWR);
+        rt_device_close(dev);
+}

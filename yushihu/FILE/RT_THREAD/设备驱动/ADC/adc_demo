@@ -1,0 +1,72 @@
+// ADC设备接口
+        rt_device_find()        // 查找ADC设备
+        rt_adc_enable()         // 打开ADC设备
+        rt_adc_read()           // 读取ADC设备
+        rt_adc_disable()        // 关闭ADC设备
+rt_err          rt_adc_enable(rt_adc_device_t dev, rt_uint32_t channel)
+rt_uint32_t     rt_adc_read (rt_adc_device_t dev, rt_uint32_t channel)
+rt_err          rt_adc_disable(rt_adc_device_t dev, rt_uint32_t channel)
+
+
+
+
+
+//______________________________________________________________________________
+// board.h
+#define BSP_USING_ADC1
+
+void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
+{
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+        if (hadc->Instance == ADC1) {
+                __HAL_RCC_ADC1_CLK_ENABLE();
+                __HAL_RCC_GPIOA_CLK_ENABLE();
+                
+                // PA5 ---> ADC1_IN5
+                GPIO_InitStruct.Pin = GPIO_PIN_5;
+                GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+                HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+        }
+}
+
+
+
+// main.c
+#include <board.h>
+
+rt_adc_device_t dev;
+rt_thread_t th1;
+rt_uint32_t adc_value;
+
+void read_adc1_entry(void *parameter)
+{
+        while (1) {
+                adc_value = rt_adc_read(dev, 5);
+                rt_kprintf("adc_value: %d\n", adc_value);
+                rt_thread_mdelay(5000);
+        }
+}
+
+int main(void)
+{
+        rt_err_t retval = 0;
+        dev = (rt_adc_device_t)rt_device_find("adc1");
+        if (dev = RT_NULL) {
+                LOG_E("rt_device_find (adc1) failed...");
+                return -EINVAL;
+        }
+        
+        retval = rt_adc_enable(dev, 5);
+        if (retval < 0) {
+                LOG_E("rt_adc_enable (adc1) failed...");
+                return retval;
+        }
+        
+        th1 = rt_thread_create("th1", , NULL, 512, 10, 5);
+        if (th1 == RT_NULL) {
+                LOG_E("rt_thread_create failed...");
+                return -ENOMEM;
+        }
+        rt_thread_startup(th1);
+        return 0;
+}

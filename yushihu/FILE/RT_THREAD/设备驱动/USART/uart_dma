@@ -1,0 +1,75 @@
+////////////////////////////////////////////////////////////////////////////////
+//              DMA接收方法
+////////////////////////////////////////////////////////////////////////////////
+// board.h
+#define BSP_USING_UART1
+#define BSP_UART1_RX_USING_DMA
+#define BSP_UART1_TX_PIN                "PA9"
+#define BSP_UART1_RX_PIN                "PA10"
+
+
+
+// main.c
+#include <rtthread.h>
+#include <rtdbg.h>
+#include <serial.h>
+
+rt_device_t     u1_dev;
+rt_thread_t     u1_th;
+rt_size_t       rx_len = 0;     // 接收数据长度
+struct rt_semaphore sem;
+struct serial_configure u1_config = RT_SERIAL_CONFIG_DEFAULT;
+
+
+rt_err_t rx_callback(rt_device_t dev, rt_size_t size)
+{
+        
+        rx_len = size;
+        rt_sem_release(&sem);   // 唤醒 -> 线程
+        return RT_EOK;
+}
+
+
+void serial_thread_entry(void *parameter)
+{
+        char buffer[512] = 0;
+        rt_size_t len = 0;      // 读到的数据字节数
+        while (1) {
+                rt_sem_take(&sem, RT_WAITING_FOREVER);
+                len = rt_device_read(u1_dev, 0, buffer, rx_len);
+                buffer[len] = '\0';
+                rt_kprintf("buffer: %s\n", buffer);
+        }
+
+}
+
+
+
+int main(void)
+{
+        rt_err_t ret = 0;
+        u1_dev = rt_device_find("uart1");
+        if (u1_dev == RT_NULL) {
+                LOG_E("rt_device_find[uart1] failed ...\n");
+                return -EINVAL;
+        }
+        // flag = DMA接收
+        ret = rt_device_open(u1_dev, RT_DEVICE_FLAG_DMA_RX);
+        if (ret < 0) {
+                 LOG_E("rt_device_open[uart1] failed ...\n");
+                 return ret;
+        }
+        
+        // 配置串口
+        rt_device_control(u1_dev, RT_DEVICE_CTRL_CONFIG, (void *)&u1_config);
+        // 配置中断接收回调函数
+        rt_device_set_rx_indicate(u1_dev, rx_callback);
+        // 创建信号量
+        rt_sem_init(&sem, "rx_sem", 0, RT_IPC_FLAG_FIFO);
+        // 创建线程
+        u1_th = rt_thread_create("u1_recv", serial_thread_entry, NULL, 1024, 10, 5);
+        // 启动线程
+        rt_thread_startup(u1_th);
+
+        return RT_EOK;
+}

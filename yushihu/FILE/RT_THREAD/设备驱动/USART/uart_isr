@@ -1,0 +1,88 @@
+//                      中断接收方法
+
+////////////////////////////////////////////////////////////////////////////////
+                        board.h
+////////////////////////////////////////////////////////////////////////////////
+#define BSP_USING_UART1
+#define BSP_UART1_TX_PIN        "PA9"
+#define BSP_UART1_RX_PIN        "PA10"
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+                        main.c
+////////////////////////////////////////////////////////////////////////////////
+#include <rtthread.h>
+#include <rtdbg.h>
+#include <serial.h>
+
+
+rt_device_t     u1_dev;         // 设备句柄
+rt_thread_t     u1_th;          // 线程句柄
+struct rt_semaphore sem;       // 串口接收数据信号量
+struct serial_configure u1_config = RT_SERIAL_CONFIG_DEFAULT;
+
+
+// 接收回调函数
+// ____________________________________________________________
+rt_err_t rx_callback(rt_device_t dev, rt_size_t size)
+{
+                                // 一旦有数据
+        rt_sem_release(&sem);   // 释放信号量，唤醒
+        return RT_EOK;
+}
+
+
+// 串口线程
+// ____________________________________________________________
+void serial_thread_entry(void *parameter)
+{
+        char buffer;
+        while (1) {
+                // 串口1读取数据（1 表示每次读取1个字节）
+                while (rt_device_read(u1_dev, 0, &buffer, 1) != 1) {
+                        // RT_WAITING_FOREVER 一直阻塞
+                        rt_sem_take(&sem, RT_WAITING_FOREVER);
+                }
+                rt_kprintf("%c", buffer);
+        }
+}
+
+
+int main(void)
+{
+        rt_err_t retval = 0;
+        
+        // 查找串口1设备
+        u1_dev = rt_device_find("uart1");
+        if (u1_dev == RT_NULL) {
+                LOG_E("rt_device_find[uart1] failed ...\n");
+                return -EINVAL;
+        }
+        
+        // 打开串口1设备
+        // u1_dev       = 串口1设备对象
+        // flag         = 读写 + 接收中断
+        ret = rt_device_open(u1_dev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_INT_RX);
+        if (retval < 0) {
+                 LOG_E("rt_device_open[uart1] failed ...\n");
+                 return retval;
+        }
+        
+        // 配置串口1
+        rt_device_control(u1_dev, RT_DEVICE_CTRL_CONFIG, (void *)&u1_config);
+        
+        // 配置中断接收回调函数
+        rt_device_set_rx_indicate(u1_dev, rx_callback);
+        
+        // 创建信号量
+        rt_sem_init(&sem, "rx_sem", 0, RT_IPC_FLAG_FIFO);
+        
+        // 创建线程
+        u1_th = rt_thread_create("u1_recv", serial_thread_entry, NULL, 1024, 10, 5);
+        
+        // 启动线程
+        rt_thread_startup(u1_th);
+
+        return RT_EOK;
+}

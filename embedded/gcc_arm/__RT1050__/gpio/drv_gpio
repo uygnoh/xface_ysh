@@ -1,33 +1,22 @@
 //______________________________________________________________________________
-//      => GPIO输入—按键查询检测
+//      => IOMUXC_SNVS_SW_MUX_CTL_PAD_WAKEUP
+//      => IOMUXC_SNVS_SW_PAD_CTL_PAD_WAKEUP
 //______________________________________________________________________________
-// RST复位按键, 该按键连接至RT1052的 POR_B引脚
-当该引脚为低电平时会引起RT1052芯片的复位（复位的基本现象是程序从头开始运行）
-从按键的原理图可知，该按键在没有被按下的时候，引脚状态为高电平，当按键按下时，
-引脚状态为低电平(按键所在的电路导通，引脚接到地)。所以，平时POR_B引脚保持高电平，
-芯片正常运行，按下按键时产生复位。
-// WAUP按键, 该按键连接至RT1052的WAUP引脚，从低功耗唤醒
-当按键按下时WAUP引脚为低电平；与RST引脚不同，这个WAUP引脚具有GPIO的功能，即
-我们可以把它设置成GPIO的输入模式，然后检测引脚的输入电平，即可判断按键是否被按
-下。WAUP引脚还具有把芯片从低功耗模式唤醒的功能，以后再学习
-// MODE按键, MODE按键最为特殊
-// 它通过一系列电路连接至两个引脚BOOT_MODE[0]和BOOT_MODE[1]
-// 当该按键按下时，BOOT_MODE[0]引脚状态为高电平，BOOT_MODE[1]则相反为低电平。
-// 与WAUP引脚类似，BOOT_MODE[0]和BOOT_MODE[1]都具有GPIO的功能，即我们可以选
-// 取这二者中任意一个设置成GPIO的输入模式并检测相应的输入电平，来判断按键是否被按下。
-// MODE按键这样设计是为了方便切换芯片的启动方式，芯片复位启动后会检测这两个引脚的电平，
-// 根据BOOT_MODE[0]和BOOT_MODE[1]的电平状态来选择FLASH还是USB的启动方式。不过在本
-// 章实验中我们仅把它用于普通的按键。
 
-
-
-
-// IOMUXC_SW_MUX_CTL_PAD_XXXX 复用功能配置
+#define IOMUXC_SNVS_WAKEUP_GPIO5_IO00 (
+                        0x400A8000U,    // SW MUX Control Register
+                        0x5U,           // MUX Mode Select Field
+                        0,              // DAISY Register
+                        0,              // DAISY Register 数据
+                        0x400A8018U )   // SW_PAD_CTL Register
+//------------------------------------------------------------------------------
+//      IOMUXC_SW_MUX_CTL_PAD_XXXX      // 复用功能寄存器
 //      4       SION
 //      2:0     MUX_MODE
-//-------------------------------------------------------------
-// IOMUXC_SW_PAD_CTL_PAD_XXXX 电气属性
-//      16      HYS     // 滞回器配置: 开启 （仅输入时有效，施密特触发器，使能后可以过滤输入噪声）
+//------------------------------------------------------------------------------
+//      IOMUXC_SW_PAD_CTL_PAD_XXXX      // 电气属性寄存器
+//      16      HYS     // 滞回器配置: 开启 
+//                      // 仅输入时有效，施密特触发器，使能后可以过滤输入噪声
 //      15:14   PUS     // 上拉/下拉选择: 22K欧姆上拉(3)
 //      13      PUE     // 拉/保持器选择: 上下拉(1)
 //      12      PKE     // 拉/保持器配置: 使能(1)
@@ -35,6 +24,26 @@
 //      7:6     SPEED   // 速度配置: medium(100MHz)
 //      5:3     DSE     // 驱动强度: 关闭
 //      0       SRE     // 转换速率: 转换速率慢
+//------------------------------------------------------------------------------
+//      IOMUXC_XXXX_SELECT_INPUT        // 管脚输入功能选择寄存器
+//        
+// IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B1_15
+        ALT4 — Select mux mode: ALT4 mux port: CSI_DATA02 of instance: csi
+        
+        
+// IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_11
+        ALT4 — Select mux mode: ALT4 mux port: CSI_DATA02 of instance: csi
+        
+        
+// IOMUXC_CSI_DATA02_SELECT_INPUT
+        DAISY[0]        // Selecting Pads Involved in Daisy Chain
+           0            GPIO_AD_B1_15_ALT4
+           1            GPIO_AD_B0_11_ALT4
+        其中 xxxxx 为 IO 口的某一复用功能, 这个复用功能一般有多个 IO 口可以选择,
+        例如: CSI_DATA02(摄像头接口的数据线 2), 有 2 个 IO 口可以复用为这个功能, 即
+        GPIO_AD_B1_15(GPIO1_IO31)和 GPIO_AD_B0_11(GPIO1_IO11)。 那么摄像头接口选择到
+        底选哪个 IO 作为 CSI_DATA02 呢?
+//------------------------------------------------------------------------------
 void button_init(void)
 {
         gpio_pin_config_t pin_config;
@@ -42,7 +51,8 @@ void button_init(void)
         // 开启SVNS时钟--低功耗管理模块时钟，配置WAKEUP必须使能它
         CLOCK_EnableClock(kCLOCK_IomuxcSnvs);
         
-        // 配置PAD模式为： GPIO
+        // 101  ALT5 — Select mux mode: ALT5 mux port: GPIO5_IO00 of instance: gpio5
+        #define IOMUXC_SNVS_WAKEUP_GPIO5_IO00 0x400A8000U, 0x5U, 0, 0, 0x400A8018U
         IOMUXC_SetPinMux(IOMUXC_SNVS_WAKEUP_GPIO5_IO00, 0U);
         // 配置PAD属性
         IOMUXC_SetPinConfig(IOMUXC_SNVS_WAKEUP_GPIO5_IO00,
@@ -61,6 +71,38 @@ void button_init(void)
         GPIO_PinInit(GPIO5, 0, &pin_config);
 }    
 
+
+
+// 配置GPIO工作模式
+// ____________________________________________________________
+static inline void IOMUXC_SetPinMux(uint32_t muxRegister,  // 引脚的复用功能寄存器
+                                    uint32_t muxMode,        // 引脚的工作模式
+                                    uint32_t inputRegister,  // 选择的输入寄存器
+                                    uint32_t inputDaisy,     // 输入资料
+                                    uint32_t configRegister, // 配置寄存器
+                                    uint32_t inputOnfield)   // SION
+{
+        *((volatile uint32_t *)muxRegister) =
+                IOMUXC_SW_MUX_CTL_PAD_MUX_MODE(muxMode) | IOMUXC_SW_MUX_CTL_PAD_SION(inputOnfield);
+
+        if (inputRegister != 0UL) {
+                *((volatile uint32_t *)inputRegister) = inputDaisy;
+        }
+}
+// 配置GPIO电气属性
+// ____________________________________________________________
+static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
+                                       uint32_t muxMode,
+                                       uint32_t inputRegister,
+                                       uint32_t inputDaisy,
+                                       uint32_t configRegister,
+                                       uint32_t configValue)
+{
+        if (configRegister != 0UL) {
+                *((volatile uint32_t *)configRegister) = configValue;
+        }
+}
+
                                         
                                         
                                         
@@ -78,40 +120,14 @@ void button_init(void)
 #define IOMUXC_GPIO_EMC_00_XBAR1_IN02           0x401F8014U, 0x3U, 0x401F860CU, 0x0U,   0x401F8204U
 #define IOMUXC_GPIO_EMC_00_FLEXIO1_D00          0x401F8014U, 0x4U, 0,           0,      0x401F8204U
 #define IOMUXC_GPIO_EMC_00_GPIO4_IO00           0x401F8014U, 0x5U, 0,           0,      0x401F8204U
-/*!
- * @brief Sets the IOMUXC pin mux mode.
- * @param muxRegister           The pin mux register.
- * @param muxMode               The pin mux mode.
- * @param inputRegister         The select input register.
- * @param inputDaisy            The input daisy.
- * @param configRegister        The config register.
- * @param inputOnfield          Software input on field.
- */
-static inline void IOMUXC_SetPinMux(   uint32_t muxRegister;    // 引脚的复用功能寄存器
-                                        uint32_t muxMode;        // 引脚的工作模式
-                                        uint32_t intputRegister; // 选择的输入寄存器
-                                        uint32_t inputDaisy;     // 输入资料
-                                        uint32_t configRegister; // 配置寄存器
-                                        uint32_t inputOnfield);
-/*!
- * @brief Sets the IOMUXC pin configuration.
- * @param muxRegister           The pin mux register.
- * @param muxMode               The pin mux mode.
- * @param inputRegister         The select input register.
- * @param inputDaisy            The input daisy.
- * @param configRegister        The config register.
- * @param configValue           The pin config value.
- */
-static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
-                                       uint32_t muxMode,
-                                       uint32_t inputRegister,
-                                       uint32_t inputDaisy,
-                                       uint32_t configRegister,
-                                       uint32_t configValue)    
 
 
 
-        MIMXRT1052.h
+//______________________________________________________________________________
+//      => MIMXRT1052.h
+//______________________________________________________________________________
+
+// 压摆率设置            
 //_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_SRE_MASK           (0x1U)
 #define IOMUXC_SW_PAD_CTL_PAD_SRE_SHIFT          (0U)
@@ -123,7 +139,8 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
         ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_SRE_SHIFT)) &    \
         IOMUXC_SW_PAD_CTL_PAD_SRE_MASK )
                                                         
-                                                        
+// 驱动强度
+//_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_DSE_MASK           (0x38U)
 #define IOMUXC_SW_PAD_CTL_PAD_DSE_SHIFT          (3U)
 /*! DSE - Drive Strength Field
@@ -139,8 +156,9 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
 #define IOMUXC_SW_PAD_CTL_PAD_DSE(x)                                            \
         ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_DSE_SHIFT)) &    \
         IOMUXC_SW_PAD_CTL_PAD_DSE_MASK )
-                                            
-                                                        
+
+// 速度                                  
+//_____________________________________________________________                            
 #define IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK         (0xC0U)
 #define IOMUXC_SW_PAD_CTL_PAD_SPEED_SHIFT        (6U)
 /*! SPEED - Speed Field
@@ -152,8 +170,10 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
 #define IOMUXC_SW_PAD_CTL_PAD_SPEED(x)                                          \
         ( ((uint32_t)(((uint32_t)(x)) << IOMUXC_SW_PAD_CTL_PAD_SPEED_SHIFT)) &  \
         IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK )
-                                              
-                                                        
+
+
+// 开漏使能                              
+//_____________________________________________________________                                                
 #define IOMUXC_SW_PAD_CTL_PAD_ODE_MASK           (0x800U)
 #define IOMUXC_SW_PAD_CTL_PAD_ODE_SHIFT          (11U)
 /*! ODE - Open Drain Enable Field
@@ -165,6 +185,8 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
         IOMUXC_SW_PAD_CTL_PAD_ODE_MASK )
 
 
+// 上下拉，保持，使能
+//_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_PKE_MASK           (0x1000U)
 #define IOMUXC_SW_PAD_CTL_PAD_PKE_SHIFT          (12U)
 /*! PKE - Pull / Keep Enable Field
@@ -176,6 +198,8 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
         IOMUXC_SW_PAD_CTL_PAD_PKE_MASK )
 
 
+// 保持 或 上下拉
+//_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_PUE_MASK           (0x2000U)
 #define IOMUXC_SW_PAD_CTL_PAD_PUE_SHIFT          (13U)
 /*! PUE - Pull / Keep Select Field Control signal to enable 
@@ -188,6 +212,8 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
         IOMUXC_SW_PAD_CTL_PAD_PUE_MASK )
 
 
+// 上下拉电阻选择
+//_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_PUS_MASK           (0xC000U)
 #define IOMUXC_SW_PAD_CTL_PAD_PUS_SHIFT          (14U)
 /*! PUS - Pull Up / Down Config. Field Controls signals to select 
@@ -202,6 +228,8 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
         IOMUXC_SW_PAD_CTL_PAD_PUS_MASK )
 
 
+// 迟滞器使能
+//_____________________________________________________________
 #define IOMUXC_SW_PAD_CTL_PAD_HYS_MASK           (0x10000U)
 #define IOMUXC_SW_PAD_CTL_PAD_HYS_SHIFT          (16U)
 /*! HYS - Hyst. Enable Field

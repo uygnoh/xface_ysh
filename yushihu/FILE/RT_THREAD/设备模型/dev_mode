@@ -13,10 +13,9 @@
 //______________________________________________________________________________
 //      => IO 设备模型
 //______________________________________________________________________________
-        // IO 设备类型
         RT_Device_Class_Char,           // 字符设备
         RT_Device_Class_Block,          // 块设备
-        RT_Device_Class_Netif,          // 网络接口
+        RT_Device_Class_Netif,          // 网络设备
         RT_Device_Class_MTD,            // 存储设备
         RT_Device_Class_CAN,            // CAN设备
         RT_Device_Class_RTC,            // RTC设备
@@ -34,21 +33,28 @@
         RT_Device_Class_Unknown,        // unknown device     
         
         
+        
+//______________________________________________________________________________
+//      => IO 创建和注册IO设备
+//      => 驱动层负责创建设备实例， 并注册到 IO 设备管理器中
+//______________________________________________________________________________
+
+// 创建设备    
 // ____________________________________________________________
 // 
-// 创建设备
 // type         设备类型
 // attach_size  用户数据大小
 // return       返回设备对象
 rt_device_t     rt_device_create(int type, int attach_size)
 //
 //
-// 删除设备
-// 它会释放内存空间
+// 删除设备（它会释放内存空间）
 void           rt_device_destroy(rt_device_t dev) 
-//
-// 
+
+
+
 // 设备创建后，需要实现它访问硬件的操作方法
+// ____________________________________________________________
 struct rt_device_ops {
         // 通用设备接口
         rt_err_t        (*init)   (rt_device_t dev);
@@ -69,8 +75,8 @@ struct rt_device_ops {
 
 
 
+// 注册设备
 // ____________________________________________________________
-//
 void    rt_device_register(                             // 注册设备
                         rt_device_t dev                 // 设备对象
                         const char *name                // 设备名称
@@ -96,17 +102,21 @@ rt_err_t rt_device_unregister(rt_device_t dev);
 
 
 
+// 查找设备
 // ____________________________________________________________
-//
-rt_device_t rt_device_find(const char *name)    // 查找设备
+rt_device_t rt_device_find(const char *name)    
 
 
 
 
+
+// 设备回调函数
 // ____________________________________________________________
-// 回调函数
-// 数据收发回调， 当硬件设备收到数据时，可以通过如下函数回调另一个
-// 函数来设置数据接收指示，通知上层应用线程有数据到达
+        // device call back [rtdef.h]
+        rt_err_t (*rx_indicate)(rt_device_t dev, rt_size_t size);
+        rt_err_t (*tx_complete)(rt_device_t dev, void *buffer);
+// 数据收发回调， 当硬件设备收到数据时
+// 可以通过如下函数回调另一个函数来设置数据接收指示，通知上层应用线程有数据到达
 rt_err_t rt_device_set_rx_indicate(
         rt_device_t dev,                   // 这个设备接收到数据后，它会回调下面的函数
         rt_err_t (*rx_ind)(rt_device_t dev, rt_size_t size)
@@ -114,75 +124,19 @@ rt_err_t rt_device_set_tx_complete(
         rt_device_t dev,                   // 当这个这设备发送完成，它会回调下面的函数
         rt_err_t (*tx_done)(rt_device_t dev, void *buffer))
         
-        
-        
-        
-//______________________________________________________________________________
-//      => RT-THREAD 添加自己的驱动程序
-//______________________________________________________________________________
-
-///////////////////////////////
-        drv_demo.c
-///////////////////////////////
-#include <rtdevice.h>
-#include <rtdbg.h>
-
-rt_err_t demo_init(rt_device_t dev)
-{
-        rt_kprintf("demo_init ...\n");
-        return 0;
-}
-rt_err_t demo_open(rt_device_t dev, rt_uint16_t oflag)
-{
-        rt_kprintf("demo_open ...\n");
-        return 0;
-}
-rt_err_t demo_close(rt_device_t dev)
-{
-        rt_kprintf("demo_close ...\n");
-        return 0;
-}
 
 
-int rt_demo_init(void)
-{
-        // 创建设备
-        rt_device_t demo_dev;
-        demo_dev = rt_device_create(RT_Deviece_Class_Char, 32);
-        if (demo_dev == NULL) {
-                LOG_G("rt_device_create failed...\n");
-                return (-ENOMEM);
-        }
-        // 创建设备方法
-        demo_dev->init  = demo_init;
-        demo_dev->open  = demo_open;
-        demo_dev->close = demo_close;
-        
-        
-        // 注册设备
-        rt_device_register(demo_dev, "demo", RT_DEVICE_FLAG_RDWR);
-        
-        return 0;
-}
-INIT_BOARD_EXPORT(rt_demo_init);
+// 读写设备
+// ____________________________________________________________
+rt_size_t rt_device_read(  rt_device_t dev,     // 设备对象
+                           rt_off_t    pos,     // 读的偏移
+                           void       *buffer, // 读的数据缓冲区
+                           rt_size_t   size)   // 读的数据大小
+rt_size_t rt_device_write( rt_device_t dev,
+                           rt_off_t    pos,
+                           void       *buffer,
+                           rt_size_t   size)
 
 
-///////////////////////////////
-        main.c
-///////////////////////////////
-rt_device_t dev;
-int main(void)
-{
-        // 查找设备
-        dev = rt_device_find("demo");
-        if (dev == NULL) {
-                LOG_E("rt_devcie_find failed ...\n");
-                return (-EINVAL);
-        }
-        
-        // 找到了设备
-        rt_device_init(dev);
-        rt_device_open(dev, RT_DEVICE_OFLAG_RDWR);
-        rt_device_close(dev);
-}
+
 

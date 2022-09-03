@@ -1,0 +1,135 @@
+//
+// ____________________________________________________________
+        rt_device_find()                // 查找设备
+        rt_device_open()                // 打开设备
+        rt_device_read()                // 读取数据
+        rt_device_write()               // 写入数据
+        rt_device_control()             // 控制设备
+        rt_device_set_rx_indicate()     // 设置接收回调函数
+        rt_device_set_tx_complete()     // 设置发送回调函数
+        rt_device_close()               // 关闭设备
+
+
+
+// 打开串口设备
+// ____________________________________________________________
+rt_err_t rt_device_open(串口收发数据模式：)                
+        // 串口收发数据模式
+        1 轮询
+        2 中断
+        3 DMA
+
+
+
+// 控制串口设备
+// ____________________________________________________________
+rt_err_t rt_device_control(rt_device_t dev, rt_uint8_t cmd, void *args)
+        cmd     // 命令控制字，可取值：   
+                RT_DEVICE_CTRL_CONFIG
+        
+        args    // 控制的参数，可取类型： 
+                struct serial_configure
+        struct serial_configure {
+                rt_uint32_t baud_rate;
+                rt_uint32_t data_bit:4;
+                rt_uint32_t stop_bit:2;
+                rt_uint32_t parity:2
+                rt_uint32_t bit_order:1;
+                rt_uint32_t invert:1;
+                rt_uint32_t bufsz:16;
+                rt_uint32_t reserved:4;
+        };
+        // 波特率可取值
+        #define BAUD_RATE_2400       2400
+        #define BAUD_RATE_4800       4800
+        #define BAUD_RATE_9600       9600
+        #define BAUD_RATE_19200      19200
+        #define BAUD_RATE_38400      38400
+        #define BAUD_RATE_115200     115200
+        // 数据位可取值
+        #define DATA_BITS_5          5
+        #define DATA_BITS_6          6
+        #define DATA_BITS_7          7
+        #define DATA_BITS_8          8
+        #define DATA_BITS_9          9
+        // 停止位可取值
+        #define STOP_BITS_1          0
+        #define STOP_BITS_2          1
+        #define STOP_BITS_3          2
+        #define STOP_BITS_4          3
+        // 极性位可取值
+        #define PARITY_NONE          0
+        #define PARITY_ODD           1
+        #define PARITY_EVEN          2
+        // 高低位顺序可取值
+        #define BIT_ORDER_LSB        0
+        #define BIT_ORDER_MSB        1
+        // 模式可取值
+        #define NRZ_NORMAL           0
+        #define NRZ_INVERTED         1
+        // 缓冲区大小
+        #define RT_SERIAL_RB_BUFSZ
+        // RT-THREAD 默认串口配置
+        #define RT_SERIAL_CONFIG_DEFAULT        \
+        {                                       \
+                BAUD_RATE_115200,               \
+                DATA_BIT_8,                     \
+                STOP_BIT_1,                     \
+                PARITY_NONE,                    \
+                BIT_ORDER_LSB,                  \
+                NRZ_NORMAL,                     \
+                RT_SERIAL_RB_BUFSZ,             \
+                0                               \
+        }
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//              串口发送
+////////////////////////////////////////////////////////////////////////////////
+// board.h
+// ____________________________________________________________
+#define BSP_USING_UART1                 // 使用串口1
+#define BSP_UART1_TX_PIN        "PA9"   // RX引脚
+#define BSP_UART1_RX_PIN        "PA10"  // TX引脚
+
+
+
+// main.c
+// ____________________________________________________________
+#include <rtthread.h>
+#include <rtdbg.h>
+#include <serial.h>
+
+rt_device_t     u1_dev; // 设备句柄
+                        // 串口配置（使用默认配置）
+struct serial_configure u1_config = RT_SERIAL_CONFIG_DEFAULT;
+
+int main(void)
+{
+        rt_err_t retval = 0;
+        
+        // 查找串口1设备
+        u1_dev = rt_device_find("uart1");
+        if (u1_dev == RT_NULL) {
+                LOG_E("rt_device_find[uart1] failed ...\n");
+                return -EINVAL;
+        }
+        
+        // 打开串口设备
+        // u1_dev       = 串口1设备对象
+        // flag         = 读写
+        retval = rt_device_open(u1_dev, RT_DEVICE_OFLAG_RDWR);
+        if (retval < 0) {
+                 LOG_E("rt_device_open[uart1] failed ...\n");
+                 return retval;
+        }
+        
+        // 配置串口设备
+        rt_device_control(u1_dev, RT_DEVICE_CTRL_CONFIG, (void *)&u1_config);
+        
+        // 向串口中写入数据
+        rt_device_write(u1_dev, 0, "Uart1 config ...\n", rt_strlen("Uart1 config ...\n"));
+        
+        return RT_EOK;
+}
