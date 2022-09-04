@@ -198,7 +198,7 @@ B       __cpp(svc_handler_main)  // 跳转到(svc_handler_main)
 int __svc(0x0)  svc_service_add(int x, int y);          // SVC 0
 int __svc(0x1)  svc_service_sub(int x, int y);          // SVC 1
 int __svc(0x2)  svc_service_incr(int x);                // SVC 2
-// 等同于 SVC 3
+// int __svc(0x3)  svc_service_incr(int x);              // SVC 3
 // ____________________________________________________________
 __asm int svc_service_deincr(int x)
 {
@@ -229,7 +229,17 @@ __asm void SVC_Handler(void)
 // 获取SVC异常（特殊号码），并处理相关代码
 // ____________________________________________________________
 void svc_handler_main(unsigned int *svc_args)
-{
+{       https://www.infineon-autoeco.com/BBS/Detail/11817#
+        // Stack frame contains:
+        // r0, r1, r2, r3, r12, r14, the return address and xPSR
+        // - Stacked R0  = svc_args[0]
+        // - Stacked R1  = svc_args[1]
+        // - Stacked R2  = svc_args[2]
+        // - Stacked R3  = svc_args[3]
+        // - Stacked R12 = svc_args[4]
+        // - Stacked LR  = svc_args[5]
+        // - Stacked PC  = svc_args[6]
+        // - Stacked xPSR= svc_args[7]
         unsigned int svc_number;
         svc_number = ((char *)svc_args[6])[-2];
         switch(svc_number) {

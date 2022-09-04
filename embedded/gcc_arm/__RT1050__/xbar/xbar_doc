@@ -1,0 +1,35 @@
+// XBARA memory map
+// Crossbar A Select Register 8 (XBARAx_SEL8)
+// Address: 403B_C000h base + 10h offset = 403B_C010h
+   14:8         // SEL17
+   6:0          // SEL16
+这是个 16 位寄存器,该寄存器的 SEL16 和 SEL17 位段(各 7 位)用于选择 XBARA_OUT16
+和 XBARA_OUT17 的输入信号源,总共有 88 个信号源可以选择,见表 16.1.1。这里的 XBARA
+就是 XBAR1, XBARA_OUT17 实际上就是对应到 XBAR1_INOUT17 上面。我们设置 SEL17 为
+39,即选择 XBARA_OUT17 的输入源为 QTMR4 的通道 3
+
+
+
+
+// 使用 XBAR1 来实现， 将 QTMR4通道3的输出， 映射到DS0（GPIO1_IO03）
+        QTMR4_CH3       连接在      XBAR1_IN39
+        GPIO01_IO03     复用成      XBAR1_INOUT17
+// 我们需要2个寄存器： XBARAx_SEL8 IOMUXC_GPR_GPR6
+
+
+
+// 本章,我们需配置 XBAR1_INOUT17 的输入源为 QTMR4 通道 3,
+// 并配置 IOMUX_XBAR_INOUT17 为输出。   具体的配置步骤如下:
+// ____________________________________________________________
+1)使能 XBAR1 的时钟
+        这里我们通过 CCGR2 的第 CG11 位(实际是 bit22, bit23)来设置 XBAR1 的时钟
+2)设置 IOMUXC_GPR_GPR6
+        通过 IOMUXC_GPR_GPR6 寄存器,我们设置 IOMUXC_XBAR_DIR_SEL_17 位为 1,设置
+        XBAR_INOUT17 为输出模式。
+3)设置 XBARA1_SEL8
+        通过 XBARA1_SEL8 寄存器,我们设置 SEL17[6:0]位为: 39,选择 XBAR_IN39,即 QTMR4
+        都通道 3 作为输入源。这样 QTMR4 通道 3 的输出就会经过 XBAR1 输出到 XBAR_INOUT17,
+        再经过 IOMUXC 的设置,最终输出到 GPIO1_IO03。
+        最后,在经过以上设置之后,QTMR4 通道 3 的输出就会经过 XBAR,从 XBAR_INOUT17
+        输出到 GPIO1_IO03 上,即 DS0 所连接的 IO 口,这样 PWM 就可以直接输出到 DS0,而不需
+        要通过杜邦线来飞线了
