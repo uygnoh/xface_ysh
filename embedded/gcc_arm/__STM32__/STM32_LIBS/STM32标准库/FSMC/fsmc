@@ -1,0 +1,242 @@
+/*******************************************************************************
+        => IS62WV51216ALL -> 55ns
+*******************************************************************************/
+// IS62WV51216ALL 它有 18 根地址线， 它可以寻址（2^18）个存储单元
+// 所以它一共能访问（512K * 16bits）的空间， 使用UB#或LB#控制数据宽度
+// ____________________________________________________________
+        A0  - A18               // 地址输入
+        IO0 - IO7               // 数据输入信号， 低字节
+        IO8 - IO15              // 数据输入信号， 高字节
+        CS2   CS1#              // 片选信号（互为相反信号）
+                                // CS2高电平有效， CS1#低电平有效
+                                // 部分芯片只有一个引脚
+        OE#                     // 输出使能， 低电平有效
+        WE#                     // 写入使能， 低电平有效
+        UB#                     // 数据掩码信号Upper Byte， 高位字节允许访问， 低电平有效
+        LB#                     // 数据掩码信号Lower Byte， 低位字节允许访问， 低电平有效
+
+// 读数据
+// ____________________________________________________________
+        tRC     // 最小为（55ns）
+        tAA     // 不能超过（55ns）， 设置（33ns）
+        tDOE    // 不能超过（25ns）， 设置（ns）
+// 写数据
+// ____________________________________________________________
+        tWC     // 最小为（55ns）
+        tSA     //
+        tPWE
+        
+        
+        
+
+/*******************************************************************************
+        => FSMC__信号__
+*******************************************************************************/
+// FSMC分为4块, 每块256M字节
+// 每块256M字节又被划分为（4*64）, 即四个片选
+//_________________________________________________________
+        1) NOR_FLASH/NOR_PSRAM  // 使用块（1）___共256M  // Bank 1
+        2) NAND_FLASH/NAND_RAM  // 使用块（2—3）_共512M  // Bank 2  Bank 3
+        3) PC_CARD              // 使用块（4）___共256M  // Bank 4
+
+
+
+
+   0x6000 0000   -   0x6FFFFFFF    NOR/PSRAM/SRAM => Bank 1
+// ____________________________________________________________
+|_________________________________________________________|
+|                                                         |
+|    FSMC_A00 ~ FSMC_A25                                  |___// 地址线
+|    FSMC_D00 ~ FSMC_D15                                  |___// 数据线
+|    FSMC_NOE                                             |___// Output enable
+|    FSMC_NWE                                             |___// Write  enable
+|    FSMC_NWAIT (PSRAM wait input signal to the FSMC)     |___//
+|_________________________________________________________|
+|    FSMC_NE1                                             |___// 片选1
+|    FSMC_NE2                                             |___// 片选2
+|    FSMC_NE3                                             |___// 片选3
+|    FSMC_NE4                                             |___// 片选4
+|                                                         |
+|    FSMC_NL(=NADV)   Address valid only for PSRAM input .
+|    FSMC_NBL[1] Upper byte enable                        |
+|    FSMC_NBL[0] Upper byte enable                        |
+|    FSMC_CLK    Clock (only for PSRAM synchronous access. 
+|                                                         |
+|_________________________________________________________|
+
+
+
+//  Bank__1__存储区表
+// （注：不论外部接8位/16位宽设备，FSMC_A[0]永远接在外部设备地址A[0]）
+// ____________________________________________________________
+|_________________________________________________________|
+|       8       HADDR[25:0]             64MB*8    =512    | // 8  位数据线
+|       16      HADDR[25:0] >> 1        64MB/2*16 =512    | // 16 位数据线
+|       32      HADDR[25:0] >> 2        64MB/4*16 =512    | // 32 位数据线
+|_________________________________________________________|
+| 我们要特别注意 HADDR[25:0]的对应关系：
+| 当 Bank1 接的是 16 位宽度存储器的时候： HADDR[25:1] 对应 FSMC-A[24:0]
+| 当 Bank1 接的是 8  位宽度存储器的时候： HADDR[25:0] 对应 FSMC_A[25:0]
+|                                                     +_____________________+
+|_____________________________________________________|        HADDR        |
+| Bank__1__ | Chip single |       Address range       | [27:26]  | [25:00]  |
+|___________|_____________|___________________________|__________|__________|_____+
+|   1       | FSMC_NE1    | 0x6000 0000 ~ 0x63FF FFFF |    00    |                |
+|___________|_____________|___________________________|__________|                |
+|   2       | FSMC_NE2    | 0x6400 0000 ~ 0x67FF FFFF |    01    |                |
+|___________|_____________|___________________________|__________| FMSC_A[25:00]  |
+|   3       | FSMC_NE3    | 0x6800 0000 ~ 0x6BFF FFFF |    10    |                |
+|___________|_____________|___________________________|__________|                |
+|   4       | FSMC_NE4    | 0x6C00 0000 ~ 0x6FFF FFFF |    11    |                |
+|___________|_____________|___________________________|__________|________________|
+
+
+
+// FSMC_SRAM 3个寄存器
+// ____________________________________________________________
+        FSMC_BCR1/2/3/4   => 控制寄存器有    4 个， 分别对应 4 个不同的存储区域
+                          // 控制存储器类型
+                          // 数据线宽度
+                          // 信号的有效极性
+        FSMC_BTR1/2/3/4   => 片选时序寄存器有 4 个， 分别对应 4 个不同的存储区域
+                          // 又叫（读时序寄存器）
+                          // 各种时间延时
+                          // 如数据保持时间
+                          // 如地址保持时间
+        FMC_BWTR1/2/3/4   => 写时序寄存器有   4 个， 分别对应 4 个不同的存储区域
+                          // 各种数据延时
+
+
+
+
+
+/*******************************************************************************
+        => STM32_FSMC 程序
+*******************************************************************************/
+// FSMC有4种模式（A， B， C， D）
+// 如果配置为模式A
+        EXTMOD = 0      // 模式1
+        EXTMOD = 1      // 模式A
+
+
+// HCLK = 72MHz
+// 写时序要求
+// ADDSET = 0
+// DATAST = 2
+// ____________________________________________________________
+        (ADDSET + 1) + (DATAST + 1)     >55(ns)
+        (DATAST + 1)                    >40(ns)
+        (ADDSET + 1)                    >0 (ns)
+1. （ADDSET+1） + （DATAST+1） +   》55(ns) => (0+1+1+2) = 4 * 13.8
+2. （DATAST+1）                    》40(ns) => (1+2) = 13.8ns * 3
+3. （ADDSET+1）                    》0 (ns) => (0+1) = 13.8ns
+
+
+// HCLK = 72MHz
+// 读时序要求
+// ADDSET = 0
+// DATAST = 1 经测试DATAST配置为1，SRAM不能正常工作
+// ____________________________________________________________
+        (ADDSET + 1) + (DATAST + 1) + 2(HCLK)    >55(ns)
+        (DATAST + 1)                             >25(ns)
+        (ADDSET + 1)                             >0 (ns)
+1. （ADDSET+1） + （DATAST+1） + 2  》55(ns) => (0+1+1+1+2) = 5 * 13.8
+2. （DATAST+1）                    》25(ns) => (1+1) = 13.8ns * 2
+3. （ADDSET+1）                    》0 (ns) => (0+1) = 13.8ns
+
+
+
+
+
+
+
+// 初始化FSMC_SRAM
+// ____________________________________________________________
+void FSMC_SRAM_Init(void)
+{
+        FSMC_NORSRAMInitTypeDef                 sram_init;      // SRAM初始化
+        FSMC_NORSRAMTimingInitTypeDef           sram_read;      // SRAM读时序
+        FSMC_NORSRAMTimingInitTypeDef           sram_write;     // SRAM写时序
+        sram_read.FSMC_AccessMode               = FSMC_AccessMode_A;
+        sram_read.FSMC_AdddressHoldTime         = 0;    // SRAM 没用到
+        sram_read.FSMC_AddressSetuptime         = 0;    // ADDSET = (0+1)HCLK时钟周期 = 13.8ns
+        sram_read.FSMC_BusTurnAroundDuration    = 0;    // SRAM 没用到
+        sram_read.FSMC_CLKDivision              = 0;    // SRAM 没用到
+        sram_read.FSMC_DataLatency              = 0;    // SRAM 没用到
+        sram_read.FSMC_DataSetupTime            = 2;    // DATAST = (1+2)HCLK时钟周期 = 13.8ns *3
+                                                        // (2)是经验值， 理论值是（1），后面再测试 //
+                                                        
+        sram_write.FSMC_AccessMode              = FSMC_AccessMode_A;
+        sram_write.FSMC_AdddressHoldTime        = 0;    // SRAM 没用到
+        sram_write.FSMC_AddressSetuptime        = 0;    // ADDSET = (0+1)HCLK时钟周期 = 13.8ns
+        sram_write.FSMC_BusTurnAroundDuration   = 0;    // SRAM 没用到
+        sram_write.FSMC_CLKDivision             = 0;    // SRAM 没用到
+        sram_write.FSMC_DataLatency             = 0;    // SRAM 没用到
+        sram_write.FSMC_DataSetupTime           = 2;    // DATAST = (1+2)HCLK时钟周期 = 13.8ns *3
+                                                        // 理论值是（2） ////////////////////////
+                                                        
+
+        sram_init.FSMC_Bank = FSMC_Bank1_NORSRAM3;                      // 使用Bank1的第3块内存区
+        sram_init.FSMC_ExtendedMode = FSMC_ExtendedMode_Enable;         // 单独配置读和写的时序
+        sram_init.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;      // 数据宽度（16bit）
+        sram_init.FSMC_MemoryType = FSMC_MemoryType_SRAM;               // 存储器类型：SRAM
+        
+        
+        sram_init.FSMC_AsynchronousWait =       // 未使用
+        sram_init.FSMC_BurstAccessMode =        // 未使用
+        sram_init.FSMC_DataAddressMux =         // 未使用
+        sram_init.FSMC_WaitSignal =             // 未使用
+        sram_init.FSMC_WaitSignalActive =       // 未使用
+        sram_init.FSMC_WaitSignalPolarity =     // 未使用
+        sram_init.FSMC_WrapMode =               // 未使用
+        sram_init.FSMC_WriteBurst =             // 未使用
+        
+        
+        // 使用写操作时序
+        sram_init.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+        sram_init.FSMC_ReadWriteTimingStruct = &sram_read;
+        // FSMC_ExtendedMode 配置为 FSMC_WriteOperation_Enable， 下面语句才有效
+        sram_init.FSMC_WriteTimingStruct     = &sram_write;
+        
+        
+        // 写入配置到寄存器
+        FSMC_NORSRAMInit(&sram_init);
+        // 使能FSMC
+        FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM3, ENABLE);
+}
+
+
+
+
+#define SRAM_BASE_ADDR          (0x68000000)                    // SRAM起始地址
+#define SRAM_SIZE               (1*1024*1024)                   // 1M字节
+#define SRAM_END_ADDR           (SRAM_BASE_ADDR + SRAM_SIZE)    // SRAM结束地址
+
+
+// 使用绝对地址访问SRAM for keil-sdk
+// 使用 __attribut__ 这个语法，需要使用全局变量
+// ____________________________________________________________
+uint8_t g_value __attribute__((at (SRAM_BASE_ADDR + 40)));
+
+
+int main(void)
+{
+        FSMC_SRAM_Init();
+        
+        uint8_t  *ptr8;
+        uint16_t *ptr16;
+        uint32_t *ptr32
+        ptr8   = (uint8_t  *)(SRAM_BASE_ADDR + 0);
+        ptr16  = (uint16_t *)(SRAM_BASE_ADDR + 16);
+        ptr32  = (uint32_t *)(SRAM_BASE_ADDR + 32);
+        *ptr8  = 0xAB;
+        *ptr16 = 0xABCD;
+        *ptr32 = 0xABCDEFGH;
+        printf("data = 0x%x", *ptr8);
+        printf("data = 0x%x", *ptr16);
+        printf("data = 0x%x", *ptr32);
+        
+        g_value = 80;
+        printf("g_value = %d, g_value address = 0x%x", g_value, (uint8_t)&g_value);
+        
+}

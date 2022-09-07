@@ -1,0 +1,542 @@
+// 扩展 norFlash 和 SRAM 运行程序和数据时， 访问扩展的 norFlash 和 SRAM时，
+// 必须也和访问内部 norFlash 和 SRAM 一样， 直接使用地址来访问， 比如：
+        *((uint32_t *)0xC3443323) = 100;        // 写
+        data = *((uint32_t *)0xC3443323);       // 读
+// 但是SPI和I2C接口做不到这一点
+
+
+
+
+// 42-45S16400J.pdf
+// _____________________________________________________________________________
+// SDRAM内部结构
+// 命令引脚（#表示低电平有效）
+        CLK             // 时钟引脚
+        CKE             // 时钟使能引脚
+        CS#             // 片选引脚
+        RAS#            // 行地址选通信号
+        CAS             // 列地址选通信号
+        WE#             // 写使能
+        A10             // 它是复用引脚，用于发送预充电命令
+                        // 当传送命令时，它是命令引脚
+                        // 当传送地址时，它是地址引脚
+                        
+// 地址引脚
+        A0
+        A1
+        A2
+        A3
+        A4
+        A5
+        A6
+        A7
+        A8
+        A9
+        A10             // A10 命令和地址复用线
+        A11
+        BS0             // Bank 选择
+        BS1             // Bank 选择
+// 数据引脚
+        DQ0
+        DQ1
+        DQ2
+        DQ3
+        DQ4
+        DQ5
+        DQ6
+        DQ7
+        DQ8
+        DQ9
+        DQ10
+        DQ11
+        DQ12
+        DQ13
+        DQ14
+        DQ15
+// 选择高低字节引脚
+        LDQM 
+        UDQM
+        
+        
+// 地址引脚         
+// _____________________________________________________________________________
+// 程序通过地址（0xC004344）访问 SDRAM 的某个存储单元时，
+// （0xC004344）被拆成 3 个部分， 然后发送给 SDRAM，最终定位到（0xC004344）所指向的内存单元
+        Bank地址          // 区域地址，告诉SDRAM要访问那个Bank
+        行地址            // 访问 Bank 中的那一行
+        列地址            // 访问 Bank 中的那一列
+// 4096 * 256 * 16      // 每个 Bank 的大小
+        4096            // 矩阵行数
+        256             // 矩阵列数
+        16              // 每个单元的大小为 16 bit
+        
+        
+        
+// A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, BS0, BS1
+        BS0     BS1
+         0       0      // Bank 0
+         0       1      // Bank 1
+         1       0      // Bank 2
+         1       1      // Bank 3
+// 选择 Bank 中的某一行， SDRAM的每个Bank总共有（4096）行， 因此行地址的范围是
+        1111 1111 1111
+        0000 0000 0000
+// 选择 Bank 中的某一列， SDRAM的每个Bank总共有（256 ）列， 因此列地址的范围是
+        1111 1111
+        0000 0000
+// 发送列址时， A8， A9,  A10, A11闲置不用， 但是 A10为
+        低电平： 不起作用
+        高电平： 带了一个预充电命令
+        实际上没有单独的列地址命令，列地址是被包含在了读写命令中，发送读写命令时，
+        读写命令里面包含列地址
+    发送行列地址的顺序（先行址址， 再列地址）， 发送行地址时 BS0和BS1 为Bank地址
+    发送列地址时会一直保持 Bank 地址信号。
+        
+
+
+// 数据引脚  
+// _____________________________________________________________________________
+        DQ0, DQ1, DQ2, DQ3, DQ4, DQ5, DQ6, DQ7, DQ8, DQ9, DQ10, DQ11, DQ12, DQ13, DQ14, DQ15, 
+一般情况下，读写的都是 16 bit的数据， 不过如果想读写 8 bit数据的话， 可以通过DQM线来选择
+        LDQM = 1;       UDQM = 0;       // 低 8 个数据有效， 读写访问 低8个位
+        LDQM = 0;       UDQM = 1;       // 高 8 个数据有效， 读写访问 高8个位
+        LDQM = 1;       UDQM = 1;       // 数据16个位都有效，访问整个单元
+
+
+// _____________________________________________________________________________
+FMC通过地址线将地址发送给 SDRAM 后， 并不会立即交给 “行列地址译码器”进行译码， 而是先锁存
+和缓存
+        1. 行地址锁存
+                // 当 RAS 为低电平时表示传输的是行地址， 命令译码器会发 “送行地址有效信号”
+                // 给地址锁存器， 会将地址（A0 - A11）锁在起来， 一旦锁存后将不会受到后续
+                // 列地址信号的影响， 而 BS0和BS1则会交给 BANK 控制器逻辑， 用于选择那个Bank
+        2. 行地址缓存
+                // 临时存放行地址用， 行地址译码器会从“行地址缓存”中得到行地址， 进行译码
+                // 后就能找到某一行
+        3. 列地址锁存
+               // CAS 为低电平时， 表示传送的是列地址， 命令译码器会发送“列地址有效信号”
+               // 交给列地址锁存器， 此时就会将列地址（A0 - A7）锁存起来， 一旦锁丰起来
+               // 将不会受到后续的行地址信号的影响
+        4. 列地址缓存
+                // 与行地址缓存一样
+        5. 突发计数器
+
+
+
+// SDRAM 刷新
+// _____________________________________________________________________________
+        如果 SDRAM 只有 1    行， 那么 (64)ms        刷新一次就可以了
+        如果 SDRAM 只有 2    行， 那么 (2  / 4096)ms 刷新一次就可以了
+        如果 SDRAM 只有 4096 行， 那么 (64 / 4096)ms 刷新一次就可以了
+1. 自动刷新（自动刷新是由STM32来发送自动刷新命令来完成刷新的）
+        发送“自动刷新命令”的时间间隔 = （64）ms / 4096 =  (0.015625)ms = (15625)ns
+        FMC需要每间隔（15625）ns就向SDRAM控制器发送一次自动刷新命令
+        不过设置时间间隔以 CLK 的周期来衡量的， STM32F429工作在 180MHZ时， CLK最高为
+        90MHZ, （1/90）MHz = 1/(90 * 10^6) = 11.11ns
+        (15626 / 11.11) = 1406 个CLK周期
+        不过实际情况还对（1406 - 20） = 1386
+2. 自刷新（不需要STM32发送刷新命令，而是由SDRAM自已来产生刷新的）
+        // 自刷新控制器， 会每隔一段时间就会自动产生刷新信号， 然后交给“刷新控制器”
+        // 当STM休眠后， CLK 就没用信号了， 此时 StM32无法再给SDRAM发送自动刷新
+        // 命令， 此时 SDRAM 就会启动自刷新。
+        // 当SDRAM进入自刷新模式， 无法访问SDRAM
+
+
+
+// 命令
+// _____________________________________________________________________________
+1. 行地址命令
+        // 发送行地址命令动作是由 FMC 自动完成的
+        // FMC 会自动的将地址拆分为： 行地址（包括 Bank 地址）， 列地址
+2. 列地址命令
+        // 行地址选通无效， 列地址选能有效
+        // 发送列地址时， BS0，BS1上的Bank信号还有继续有效
+        // A0-A9, A11， 实际上只有（A0-A7）这8根引脚会传输列地址
+        // A10: 低电平（此时A10不起作用）， 表示不带预充电， 为普通写
+3. SDRAM 读写延时
+        // 发送写命令时， 可以立即发数据
+        // 发送读命令时， 需在延时（CAS Latency）
+
+
+
+
+// 设置SDRAM模式寄存器的命令
+// _____________________________________________________________________________
+        CKE     H，高电平
+        DQM     x，无所谓
+        CS#     L，低电平
+        RAS#    L，低电平
+        CAS#    L，低电平
+        WE#     L，低电平
+ BS0, BS1, A10, A0 - A11 有效信号
+                // 传输为模式值
+A0  A1  A2      // 突发模式长度
+    A3          // 地址模式
+    0           // 连续突发模式
+    1           // 跳跃突发模式
+A4  A5  A6      // CAS Latency 读命令 到 读出数据的间隔
+    A7
+    A8
+    A9          // Write Mode
+    0           // 突发读 + 突发写
+    1           // 突发读 + 单个写
+
+
+
+// 刷新命令
+// _____________________________________________________________________________
+        CKE     H， CLK有效， 此时 FMC 向 SDRAM 发送自动刷新命令
+        CKE     L， CLK无效， 此时 FMC 就没有办法与 SDRAM 通信， SDRAM只能启动自刷新
+     
+     
+        
+// 预充电命令    
+// _____________________________________________________________________________
+        预充电的作用是关闭当前的操作， 对Bank中所有存储单元的数据进行重写，
+        保证数据的有效性，为访问一下行做准备， 预充电对数据进行重写其实就是
+        一个刷新的过程， 只不过这个刷新是不定时的， 而自动刷新自刷新是周期性的
+方法 1
+        // 发送读写命令时带一个预充电命令，读写命令的 A10 为高电平时就表示
+        // 带预充电， SDRAM执行读写的一段时间后， 会自动执行预充电命令
+方法 2
+        // 发送单独的预充电命令
+        
+        
+        
+CAS_Latency     // 读命令到DQ输出数据之间的延时
+tRCD            // 行地址命令与读写命令之间的延时
+                // 也就是说，发送行地址命令之后， 必须施加 tRCD 之后才能发送读、写命令
+tRAS            // 列地址命令与预充电命令之间的延时
+tRP             // 预充电命令与下一个 Bank Activ 之间的延时
+tCCD            // 
+
+tRC  = 60 ns    // 最小 60ns
+tRAS = 42 ns    // 最大 100000ns
+
+
+
+
+
+// _____________________________________________________________________________
+// STM32F429
+// _____________________________________________________________________________
+FMC_SDCR1               // 控制FMC的BANK1（0x140）
+FMC_SDCR2               // 控制FMC的BANK2（0x144）
+14:13  RPIPE            // 读管道（Read pipe）
+                        // 这些位可定义在 CAS 延迟后多少个 HCK 时钟周期读取数据
+        00              // 0 个 HCLK 时钟周期延迟
+        01              // 1 个 HCLK 时钟周期延迟
+        10              // 2 个 HCLK 时钟周期延迟
+        11              // 保留
+12  RBURST               // 突发读
+        0               // 不将单次读请求作为突发请求管理
+        1               // 始终将单次读请求作为突发请求管理
+11:10 SDCLK
+        00              // 禁止 SDCLK 时钟
+        01              // 保留
+        10              // SDCLK 周期 = 2 * HCLK 周期
+        11              // SDCLK 周期 = 3 * HCLK 周期
+9  WP                   // 写保护
+        0               // 允许写访问
+        1               // 禁止写访问
+8:7                     // CAS 延时（CAS Latency）
+        00              // 保留
+        01              // 1 个周期
+        10              // 2 个周期
+        11              // 3 个周期
+// SDRAM 的时钟有 2 种选择： 可配置为 HCLK/2, HCLK/3
+// HCLK = 180MHz;       HCLK/2 = 90MHz;         CLK = 90MHz;    周期 = 11.11ns
+// STM32F429_HCLK =         180MHz
+// 配置 CAS Latency：        2 或 3 个CLK周期
+// 配置SDRAM内部 Bank 数：    4
+// 配置数据宽度：             16bit
+// 配置NR（行地址位数）；      12
+// 配置Nc（列地址位数）；      8
+// _____________________________________________________________________________
+SDRAM 时序寄存器有 2 个
+// FMC_SDTR1 对应 FMC 的 SDRAM 驱动1（FMC Bank1）
+// FMC_SDTR2 对应 FMC 的 SDRAM 驱动2（FMC Bank2）
+        tRCD    // 行到列的延时（Row to column delay）
+                // 这些位定义激活命令与（读写）命令之间的延时，按存储器时钟周期数计
+        0000    // 1 个周期
+        0001    // 2 个周期
+        ....
+        1111    //16 个周期
+        tRP     // 行预充电延迟（Row precharge delay）
+        tWR     // 恢复延时（Recovery delay）
+        tRC     // 行循环延时（Row cycle delay）
+        tRAS    // 自刷新时间（Self refresh time）
+        tXSR    // 退出自刷新命令 与 BankActive的延时
+        tMRD    // 加载模式寄存器激活（Load Mode Register Active）
+// _____________________________________________________________________________
+SDRAM 命令模式寄存器（FMC_SDCMR）
+        21:9    MRD     // 暂存程序设置的模式值
+        8:5     NRFS    // 设置自动刷新的次数
+        CTB1(4)         // 此位为1时， 表示将命令发送给 FMC_SDRAM驱动1（Bank1）所驱动的 SDRAM
+        CTB2(3)         // 此位为1时， 表示将命令发送给 FMC_SDRAM驱动2（Bank2）所驱动的 SDRAM
+        MODE(2:0)       // 命令模式（command mode）
+        000             // 正常模式
+        001             // 时钟配置模式
+        010             预充电所有bank命令
+        011             // 自动刷新命令
+        100             // 设置模式寄存器的命令
+        101             、、 自刷新命令
+        110             // 掉电命令
+        111             、、 保留
+// _____________________________________________________________________________
+SDRAM 刷新定时器（FMC_SDRTR）
+        CLK个数 = (64 ms / 4096) / Tclk
+        不过手册要求还要减去一个（20）， 所以最终
+        CLK个数 = (64 ms / 4096) / Tclk -20 = （64 ms / 4096）/(1/CLK) - 20
+        假设： CLK = 90MHz
+        CLK个数 = （64 ms / 4096）/(1/90MHz) - 20
+        CLK个数 = （64*10^6 ns / 4096）/(11.11 ns) - 20 = 1386
+        
+        
+        
+        
+        
+// FMC 地址引脚对应   
+// _____________________________________________________________________________
+        FMC_D[15:0]             SDRAM_DQ[15:0]
+        FMC_A[12:0]             SDRAM_A [12:0]  
+        FMC_A[13]               SDRAM_NC【13】        // 空引脚    
+        FMC_A[15:14]            SDRAM[BS1:BS0]      // Bank
+        FMC_NABL[1:0]           SDRMM[LDQM:UDQM]
+        、、FMC_NAB0                LDQM
+        、、FMC_NAB1                UDQM
+// FMC 命令引脚对应   
+// _____________________________________________________________________________
+        FMC_SDCLK               SDRAM_CLK
+        FMC_SDNWE               SDRAM_WE
+        FMC_SDCKE[1:0]          // 有2个引脚
+                // 我们只用到 1 个引脚
+                FMC_SDCKE0 -> SDRAM_CKE
+        FMC_SDNE[1:]          // 有2个引脚
+                // 我们只用到 1 个引脚
+                FMC_SDNE0 -> SDRAM_CS
+        FMC_SDRAS               SDRAM_RAS
+        FMC_SDCAS               SDRAM_CAS
+        
+        
+// FMC SDRAM 配置  
+// _____________________________________________________________________________
+        1. 配置控制寄存器 FMC_SDCR1或FMC_SDCR2， 向FMC设置SDRAM的基本信息
+           具体配置那一个， 根据选择的是SDRAM驱动1，还是驱动2来决定
+           基本信息：
+                // 突发访问
+                // CLK频率
+                // 是否写保护
+                // 设置CAS_Latency
+                // 设置SDRAM的Bank数
+                // 数据线宽度
+                // 行地址位数
+                // 列地址位数
+        2. 配置时序寄存器（FMC_SDTR1或FMC_SDTR2），设置时序中所需的各种延时
+           具体配置那一个寄存器，由选择驱动来决定
+                // tRC
+                // tWR
+                // tRCD
+                // tRP
+                .....
+        3. 配置刷新定时寄存器FMC_SDRTR，设置FMC向SDRAM发送自动刷新命令的频率
+           就是给定时器一个时间， 定时时间到后就发送一个自动刷新命令给SDRAM
+        4. 配置命令模式寄存器FMC_SDCMR， 向 SDRAM发送初始化命令， 对SDRAM进行
+           初始化，初始化成功之后， 即可使用映射的地址来读写访问SDRAM
+           访问SDRAM时， 是使用 （0xC0000000 - 0xCFFFFFFF）驱动1, 还是使用
+           （0xD0000000 - 0xDFFFFFFF）驱动2 地址， 是由选择驱动来决定
+           
+           
+           
+           
+           
+// _____________________________________________________________________________
+// STM32F429-CubeMX-HCLK 180MHz
+// _____________________________________________________________________________
+        DQ2     FMC_D2  （PD0）
+        DQ3     FMC_D3  （PD1）
+        DQ0     FMC_D0  （PD14）
+        DQ1     FMC_D1  （PD15）
+        
+        DQ4     FMC_D4  （PE7）
+        DQ5     FMC_D5  （PE8）
+        DQ6     FMC_D6  （PE9）
+        DQ7     FMC_D7  （PE10）
+        DQ8     FMC_D8  （PE11）
+        DQ9     FMC_D9  （PE12）
+        DQ10    FMC_D10 （PE13）
+        DQ11    FMC_D11 （PE14）
+        DQ12    FMC_D12 （PE15）
+        DQ13    FMC_D13 （PD8）
+        DQ14    FMC_D14 （PD9）
+        DQ15    FMC_D15 （PD10）
+WE      FMC_SDNWE       （PC0）
+CS      FMC_SDNE0       （PC2）
+CKE     FMC_SDCKE0      （PC3）
+CAS     FMC_SDNCAS      （PG15）
+RAS     FMC_SDNRAS      （PF11）
+CLK     FMC_SDCLK       （PG8）
+BA0     FMC_BA0         （PG4）           // BS0
+BA1     FMC_BA1         （PG5）           // BS1
+LDQM    FMC_NBL0        （PE0）           // 低位字节
+UDQM    FMC_NBL1        （PE1）           // 高位字节
+        A0      FMC_A0  （PF0）
+        A1      FMC_A1  （PF1）
+        A2      FMC_A2  （PF2）
+        A3      FMC_A3  （PF3）
+        A4      FMC_A4  （PF4）
+        A5      FMC_A5  （PF5）
+        A6      FMC_A6  （PF12）
+        A7      FMC_A7  （PF13）
+        A8      FMC_A8  （PF14）
+        A9      FMC_A9  （PF15）
+        A10     FMC_A10 （PG0）
+        A11     FMC_A10 （PG1）
+        A12     FMC_A10 （PG2）
+
+
+// CubeMX SDRAM 配置信息
+SDRAM control
+        Bank                                            SDRAM bank 1
+        Number of column address bits                   8  bits                         // 列地址
+        Number of row    address bits                   12 bits                         // 行地址
+        CAS latency                                     2  memory clock cycles
+        Write protection                                Disable
+        SDRAM common clock                              2 HCLK clock cycles             // 180MHz/2
+        SDRAM common burst read                         Enable
+        SDRAM common read pipe delay                    1  HCLK clock cycles
+SDRAM timing in memory clock cycles
+        Load mode register to active delay              3
+        Exit self_refresh delay                          8
+        Self-refresh time                                2
+        SDRAM common row cycle delay                     7
+        Write recovery time                              3
+        SDRAM common row precharge delay                 15         
+        Row to column delay                              16
+
+
+
+
+
+SDRAM_HandleTypeDef     hsdram1;
+void MX_FMC_Init(void)
+{
+        // 第 1 步： 由CubeMX完成（配置SDRAM基本信息）
+        FMC_SDRAM_TimingTypeDef         SdramTiming;
+        hsdram1.Instance                = FMC_SDRAM_DEVICE;             // 设置SDRAM控制器的第1个地址
+        hsdram1.Init.SDBank             = FMC_SDRAM_BANK1;              // 设置SDRAM驱动1
+        hsdram1.Init.ColumnBitsNumber   = FMC_SDRAM_COLUMN_BITS_NUM_8;  // 设置SDRAM列地址位数
+        hsdram1.Init.RowBitsNumber      = FMC_SDRAM_ROW_BITS_NUM_12;    // 设置SDRAM行地址位数
+        hsdram1.Init.MemoryDataWidth    = FMC_SDRAM_MEM_BUS_WIDTH_16;   // 设置SDRAM数据宽度
+        hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4; // 设置SDRAM_Bank 数量
+        hsdram1.Init.CASLatency         = FMC_SDRAM_CAS_LATENCY_2;      // 
+                                                                        // 禁止写保护
+        hsdram1.Init.WriteProtection    = FMC_SDRAM_WRITE_PROTECTION_DIABLE;
+        hsdram1.Init.SDClockPeriod      = FMC_SDRAM_CLOCK_PERIOD_2;     // 设置SDRAM的时钟（HCLK/2）
+                                                                        // SDRAM时钟频率 = 180MHz / 2 = 90MHz
+        hsdram1.Init.ReadBurst          = FMC_SDRAM_RBURST_ENABLE;      // 设置突发读
+        hsdram1.Init.ReadPipeDelay      = FMC_SDRAM_RPIPE_DELAY_1;      //
+        
+        // 第 2 步： 由CubeMX完成（配置SDRAM时序所需的各种延时）
+        SdramTiming.LoadToActiveDelay   = 3;    // tRSC
+        SdramTiming.ExitSelfRefreshDelay= 8;    // tXSR
+        SdramTiming.SelfRefreshTime     = 2;    // 
+        SdramTiming.RowCycleDelay       = 7;    // 
+        SdramTiming.WriteRecoveryTime   = 3;    // tWR
+        SdramTiming.RPDelay             = 15;   // 
+        SdramTiming.RCDDelay            = 16;   //
+              
+      if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK) {
+                Error_Handler;
+      }
+// 第 3 步： 设置FMC发送自动刷新命令的频率
+        HAL_StatusTypeDef ret;
+        ret = HAL_SDRAM_ProgramRefreshRate(&hsdram, 1386);
+        if (ret != HAL_OK) {
+                Error_Info;
+        }
+// 第 4 步： FMC向SDRAM发送初始化命令， 对SDRAM进行初始化
+        COMMAND 类型：
+        typedef struct {
+                uint32_t CommandMode;
+                uint32_t CommandTarget;                 // 设置FMC的SDRAM驱动
+                uint32_t AutoRefreshNumber;             // 初始化发送的自动刷新命令个数
+                uint32_t ModeRegisterDefinition;        // 设置SDRAM模式寄存器的模式值
+        } FMC_SDRM_CommandTypeDef;
+        SDRAM_Init_Sequence();
+}
+
+
+// 初始化SDRAM
+static void SDRAM_Init_Sequence(void)
+{
+        // 上电， 等待CLK稳定， 使能FMC的CLK时钟
+        SDRAM_Send_Cmd(FMC_SDRAM_CMD_CLK_ENABLE, 0, 0);
+        // 至少延时 100us， 等待CLK稳定
+        HAL_Delay(1);
+        
+        // 发送对于SDRAM所有BANK进行预充电的命令
+        SDRAM_Send_Cmd(FMC_SDRAM_CMD_PALL, 0, 0);
+        
+        // 向SDRAM至少发送 2 次自动刷新命令
+        SDRAM_Send_Cmd(FMC_SDRAM_CMD_AUTOREFRESH_MODE, 2, 0);
+        
+        // 发送设置模式寄存命令，设置模式值
+        uint32_t modevalue = 0x21;
+        SDRAM_Send_Cmd(FMC_SDRAM_CMD_LOAD_MODE, 0, modevalue);
+}
+// 设置模式值所用到的宏
+// 突发长度
+#define SDRAM_MODEREG_BURST_LENGTH_1             ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_LENGTH_2             ((uint16_t)0x0001)
+#define SDRAM_MODEREG_BURST_LENGTH_4             ((uint16_t)0x0002)
+#define SDRAM_MODEREG_BURST_LENGTH_8             ((uint16_t)0x0004)
+// 突发类型
+#define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL      ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_TYPE_INTERLEAVED     ((uint16_t)0x0008)
+// CAS Latency
+#define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
+#define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
+// 操作模式
+#define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
+// 设置写类型
+#define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000) 
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
+
+
+
+
+static void SDRAM_Send_Cmd(uint32_t cmd, uint32_t freshNum, uint32_t moderegValue)
+{
+        FMC_SDRAM_CommandTypeDef        command;
+        command.CommandMode     = cmd;  // 设置要发送的命令
+                                        // 设置SDRAM的驱动
+        command.CommandTarget   = FMC_SDRAM_CMD_TARGET_BANK1;
+        // 只有当发送自动刷新命令时， 才需要设置刷新次数
+        if (command = FMC_SDRAM_CMD_AUTOREFRESH_MODE) {
+                command.AutoRefreshNumber = freshNum;
+        }
+        // 当发送的命令为设置模式寄存器的命令时， 才需要设置模式值
+        if (command = FMC_SDRAM_CMD_LOAD_MODE) {
+                command.ModeRegisterDefinition = moderegValue;
+        }
+        
+        // 调用HAL库函数，初始化SDRAM
+        HAL_StatusTypeDef ret;
+        ret = HAL_SDRAM_SendCommand(&hsdram, &command, 0x1000);
+}
+
+#define SDRAM_BANK_START_ADDR   (0xC0000000)
+#define SDRAM_BANK_END_ADDR     (0xC0000000 + (4*1024*1024*16 / 8))     // 8MByte
+int main(void)
+{
+        MX_FMC_Init();
+        // 0xC0000000 - 0xCFFFFFFF
+        uint32_t addr = 0;
+        // 向SDRAM中写入数据
+        while (1) {
+                for (addr = SDRAM_BANK_START_ADDR; addr < SDRAM_BANK_END_ADDR; addr+=4) {
+                        *((uint32_t *)addr) = 0x10101010;
+                }
+        }
+}
