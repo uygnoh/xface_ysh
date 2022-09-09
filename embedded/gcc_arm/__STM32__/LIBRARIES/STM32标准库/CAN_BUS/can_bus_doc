@@ -1,62 +1,62 @@
 /*******************************************************************************
         => STM32F10x_BxCAN__结构体
 *******************************************************************************/
-//BxCAN初始化结构体
+// BxCAN 初始化结构体
 //_________________________________________________________
 typedef struct {
-        uint16_t CAN_Prescaler; //配置CAN外设的时钟分频，可设置为（1~1024）
-        uint8_t  CAN_Mode;      //配置CAN的工作模式，回环或正常模式
-        uint8_t  CAN_SJW;       //配置SJW极限值（1~4）
-        uint8_t  CAN_BS1;       //配置BS1段长度（1~16）
-        uint8_t  CAN_BS2;       //配置BS2段长度（1~8）
-        FunctionalState CAN_TICM;//是否使能TICM时间触发功能
-        FunctionalState CAN_ABOM;//是否使能ABOM自动离线管理功能
-        FunctionalState CAN_AWUM;//是否使能AWUM自动唤醒功能
-        FunctionalState CAN_NART;//是否使能NART自动重传功能
-        FunctionalState CAN_RFLM;//是否使能RFLM锁定FIFO功能
-        FunctionalState CAN_TXFP;//配置TXFP报文优先级的判定方法
+        uint16_t CAN_Prescaler;         // 配置CAN外设的时钟分频，可设置为（1~1024）
+        uint8_t  CAN_Mode;              // 配置CAN的工作模式，回环或正常模式
+        uint8_t  CAN_SJW;               // 配置SJW极限值（1~4）
+        uint8_t  CAN_BS1;               // 配置BS1段长度（1~16）
+        uint8_t  CAN_BS2;               // 配置BS2段长度（1~8）
+        FunctionalState CAN_TICM;       // 是否使能TICM时间触发功能
+        FunctionalState CAN_ABOM;       // 是否使能ABOM自动离线管理功能
+        FunctionalState CAN_AWUM;       // 是否使能AWUM自动唤醒功能
+        FunctionalState CAN_NART;       // 是否使能NART自动重传功能
+        FunctionalState CAN_RFLM;       // 是否使能RFLM锁定FIFO功能
+        FunctionalState CAN_TXFP;       // 配置TXFP报文优先级的判定方法
 } CAN_InitTypeDef;
 
 
-//BxCAN发送结构体
+// BxCAN 发送结构体
 //_________________________________________________________
 typedef struct {
-        uint32_t StdId;  //存储报文的标准标识符 11 位， 0-0x7FF
-        uint32_t ExtId;  //存储报文的扩展标识符 29 位， 0-0x1FFFFFFF
-        uint8_t  IDE;    //存储 IDE 扩展标志
-        uint8_t  RTR;    //存储 RTR 远程帧标志
-        uint8_t  DLC;    //存储报文数据段长度（0-8）当报文是遥控帧时，DLC=0
-        uint8_t  Data[8];//存储报文数据段的内容
+        uint32_t StdId;                 // 存储报文的标准标识符 11 位， 0-0x7FF
+        uint32_t ExtId;                 // 存储报文的扩展标识符 29 位， 0-0x1FFFFFFF
+        uint8_t  IDE;                   // 存储 IDE 扩展标志
+        uint8_t  RTR;                   // 存储 RTR 远程帧标志
+        uint8_t  DLC;                   // 存储报文数据段长度（0-8）当报文是遥控帧时，DLC=0
+        uint8_t  Data[8];               // 存储报文数据段的内容
 } CanTxMsg;
 
 
-//BxCAN接收结构体
+// BxCAN 接收结构体
 //_________________________________________________________
 typedef struct {
-        uint32_t StdId;  //存储报文的标准标识符 11 位， 0-0x7FF
-        uint32_t ExtId;  //存储报文的扩展标识符 29 位， 0-0x1FFFFFFF
-        uint8_t  IDE;    //存储 IDE 扩展标志
-        uint8_t  RTR;    //存储 RTR 远程帧标志
-        uint8_t  DLC;    //存储报文数据段长度（0-8）当报文是遥控帧时，DLC=0
-        uint8_t  Data[8];//存储报文数据段的内容
-        uint8_t  FMI;    //存储了本报文是经过筛选器存储进 FIFO 的， 0-0xFF
-                         //本成员只存在于接收结构体，它存储了筛选器的编号，
-                         //表示本报文经过那个筛选器存储进接收FIFO的，可以简化软件处理
+        uint32_t StdId;                 // 存储报文的标准标识符 11 位， 0-0x7FF
+        uint32_t ExtId;                 // 存储报文的扩展标识符 29 位， 0-0x1FFFFFFF
+        uint8_t  IDE;                   // 存储 IDE 扩展标志
+        uint8_t  RTR;                   // 存储 RTR 远程帧标志
+        uint8_t  DLC;                   // 存储报文数据段长度（0-8）当报文是遥控帧时，DLC=0
+        uint8_t  Data[8];               // 存储报文数据段的内容
+        uint8_t  FMI;                   // 存储了本报文是经过筛选器存储进 FIFO 的， 0-0xFF
+                                        // 本成员只存在于接收结构体，它存储了筛选器的编号，
+                                        // 表示本报文经过那个筛选器存储进接收FIFO的，可以简化软件处理
 } CanRxMsg;
 
 
-//BxCAN筛选器结构体
+// BxCAN 筛选器结构体
 //_________________________________________________________
 typedef struct {
-        uint16_t CAN_FilterIdHigh;              //CAN_FxR1寄存器的高16位
-        uint16_t CAN_FilterIdLow;               //CAN_FxR1寄存器的低16位
-        uint16_t CAN_FilterMaskIdHigh;          //CAN_FxR2寄存器的高16位
-        uint16_t CAN_FilterMaskIdLow;           //CAN_FxR2寄存器的低16位
-        uint16_t CAN_FilterFIFOAssignment;      //设置经过筛选后的数据存储到那个接收FIFO
-        uint8_t  CAN_FilterNumber;              //筛选器编号，范围（0~27）
-        uint8_t  CAN_FilterNumber;              //筛选器模式
-        uint8_t  CAN_FilterNumber;              //设置筛选器的尺度
-        FunctionalState CAN_FilterActivation;   //是否使能本筛选器
+        uint16_t CAN_FilterIdHigh;              // CAN_FxR1寄存器的高16位
+        uint16_t CAN_FilterIdLow;               // CAN_FxR1寄存器的低16位
+        uint16_t CAN_FilterMaskIdHigh;          // CAN_FxR2寄存器的高16位
+        uint16_t CAN_FilterMaskIdLow;           // CAN_FxR2寄存器的低16位
+        uint16_t CAN_FilterFIFOAssignment;      // 设置经过筛选后的数据存储到那个接收FIFO
+        uint8_t  CAN_FilterNumber;              // 筛选器编号，范围（0~27）
+        uint8_t  CAN_FilterNumber;              // 筛选器模式
+        uint8_t  CAN_FilterNumber;              // 设置筛选器的尺度
+        FunctionalState CAN_FilterActivation;   // 是否使能本筛选器
 } CAN_FilterInitTypeDef;
 
 
@@ -64,34 +64,35 @@ typedef struct {
 /*******************************************************************************
         => CAN总线
 *******************************************************************************/
-//STM32_BxCAN    = 标准CAN协议
+//     STM32_BxCAN    VS        标准CAN协议
 //_________________________________________________________
-SYNC_SEG段       = __CAN标准协议中（SS）
-BS1段            = __CAN标准协议中（PTS + PBS1）
-BS2段            = __CAN标准协议中（PBS2）
+        SYNC_SEG段               = __CAN标准协议中（SS）
+        BS1段                    = __CAN标准协议中（PTS + PBS1）
+        BS2段                    = __CAN标准协议中（PBS2）
 
 
-//STM32_BxCAN工作模式（4种工作模式）
+
+// STM32_BxCAN工作模式（4种工作模式）
 //_________________________________________________________
 1 正常模式
-        //可以从总线发送和接收数据
+        // 可以从总线发送和接收数据
         //
 2 静默模式
-        //只可以向总线发送数据“1”，不能发送数据“0”
-        //可以从总线上接收数据
-        //这种模式一般用于监测，分析总线上的流量
+        // 只可以向总线发送数据“1”，不能发送数据“0”
+        // 可以从总线上接收数据
+        // 这种模式一般用于监测，分析总线上的流量
 3 回环模式
-        //发送的数据直接到输入（总线可以监测到数据）
-        //不能从总线上接收数据
+        // 发送的数据直接到输入（总线可以监测到数据）
+        // 不能从总线上接收数据
 4 静默回环模式
-        //发送的数据直接到输入（总线不可监测到数据）
-        //不能从总线上接收数据
-        //这种方式可以在“热自检”
+        // 发送的数据直接到输入（总线不可监测到数据）
+        // 不能从总线上接收数据
+        // 这种方式可以在“热自检”
         
         
         
 /*******************************************************************************
-        => STM32BxCAN__位时序__波特率__
+        => STM32BxCAN__位时序__波特率
 *******************************************************************************/
 +________________________________________________________+
 |  SYNC_SEG  |         BS1         |         BS2         |
@@ -102,7 +103,7 @@ BS2段            = __CAN标准协议中（PBS2）
                                    +                     +
                                    +                     +
                                  采样点                 发送点
-//位时序和采样点
+// 位时序和采样点
 //_________________________________________________________
 STM32的CAN外设位时序中只包含“3段”（同步段SYNC_SEG， 位段1， 位段2）
 采样点位于BS1和BS2段交界处。 其中SYNC_SEG段固定长度为“1Tq”， BS1和BS2可以在
@@ -110,22 +111,22 @@ STM32的CAN外设位时序中只包含“3段”（同步段SYNC_SEG， 位段1�
 以在位时序寄存器中配置。
 
 
-//CAN波特率
+// CAN波特率
 //_________________________________________________________
-SYNC_SEG段       //固定为“1Tq”
-BS1段            //设置为“5Tq”（实际写入TS1[3:0]的值为4）
-BS2段            //设置为“3Tq”（实际写入TS2[3:0]的值为2）
-Tpclk           //APB1按默认值为F=36MHz， Tpclk=1/36MHz
-1Tq时间长度      //Tq = (BRP[9:0]+1)*Tpclk = 4 * (1/36) = 1/9MHz
-1位的时间长度     //T1bit = (1Tq + Ts1 + Ts2) = 1+5+3 = 9Tq
-波特率           //BaudRate = 1/N Tq = 1/(1/9MHz * 9) = 1Mbps
+        SYNC_SEG段       // 固定为“1Tq”
+        BS1段            // 设置为“5Tq”（实际写入TS1[3:0]的值为4）
+        BS2段            // 设置为“3Tq”（实际写入TS2[3:0]的值为2）
+        Tpclk           // APB1按默认值为F=36MHz， Tpclk=1/36MHz
+        1Tq时间长度      // Tq = (BRP[9:0]+1)*Tpclk = 4 * (1/36) = 1/9MHz
+        1位的时间长度     // T1bit = (1Tq + Ts1 + Ts2) = 1+5+3 = 9Tq
+        波特率           // BaudRate = 1/N Tq = 1/(1/9MHz * 9) = 1Mbps
 
 
 
 /*******************************************************************************
-        => STM32BxCAN__筛选器__
+        => STM32BxCAN__筛选器
 *******************************************************************************/
-//筛选器（掩码模式设置）
+// 筛选器（掩码模式设置）
 //_________________________________________________________
 | 1 | 0 | 1 | 1 | 1 | 1 | 0 | 1 | ...   //ID
 |___|___|___|___|___|___|___|___|

@@ -543,7 +543,7 @@ void spi_flash_wakeup(void)
   */
 static  uint16_t spi_timeout_info(uint8_t err_code)
 {
-  /* 等待超时后的处理,输出错误信息 */
-  FLASH_ERROR("SPI 等待超时!err_code = %d",err_code);
-  return 0;
+        /* 等待超时后的处理,输出错误信息 */
+        FLASH_ERROR("SPI 等待超时!err_code = %d",err_code);
+        return 0;
 }

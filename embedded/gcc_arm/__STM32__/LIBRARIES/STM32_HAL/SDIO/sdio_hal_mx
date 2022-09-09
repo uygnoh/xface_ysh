@@ -36,70 +36,70 @@ SDIO clock divide factor                        //分频系数为（0）
 */
 SD_HandleTypeDef hsd;
 void MX_SDIO_SD_Init(void) {
-hsd.Instance                 = SDIO;
-hsd.Init.ClockEdge           = SDIO_CLOCK_EDGE_RISING;        //数据在上升沿采样
-hsd.Init.ClockBypass         = SDIO_CLOCK_BYPASS_DIABLE;      //不旁路
-hsd.Init.ClockPowerSave      = SDIO_CLOCK_POWER_DAVE_DISABLE; //不节能
-hsd.Init.BusWide             = SDIO_BUS_WIDE_1B;              //将数据宽度设置为1
-hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE; //失能硬件流控
-hsd.Init.ClockDiv            = 0;                             //分频系数为（0）
-//
-//调用HAL_SD_Init函数，初始化SDIO外设，识别SD卡
-//识别SD卡时，HAL函数使用默认参数将SDIO_CK配置为（FOP=400KHz）
-//识别完成之后，使用上面的值将SDIO_CK改为（FPP），设置为（45MHZ）
-if (HAL_SD_Init(&hsd) != HAL_OK) {
-        __Error_Handler(__FILE__, __LINE__);
+        hsd.Instance                 = SDIO;
+        hsd.Init.ClockEdge           = SDIO_CLOCK_EDGE_RISING;        // 数据在上升沿采样
+        hsd.Init.ClockBypass         = SDIO_CLOCK_BYPASS_DIABLE;      // 不旁路
+        hsd.Init.ClockPowerSave      = SDIO_CLOCK_POWER_DAVE_DISABLE; // 不节能
+        hsd.Init.BusWide             = SDIO_BUS_WIDE_1B;              // 将数据宽度设置为1
+        hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE; //失能硬件流控
+        hsd.Init.ClockDiv            = 0;                             // 分频系数为（0）
+        //
+        // 调用HAL_SD_Init函数，初始化SDIO外设，识别SD卡
+        // 识别SD卡时，HAL函数使用默认参数将SDIO_CK配置为（FOP=400KHz）
+        // 识别完成之后，使用上面的值将SDIO_CK改为（FPP），设置为（45MHZ）
+        if (HAL_SD_Init(&hsd) != HAL_OK) {
+                __Error_Handler(__FILE__, __LINE__);
 }
-//在SD卡识别模式时（只能使用1根数据线__DAT0)，在识别完成后仍然可以只使用一根数据线
-//但是为了提高通信速度，我们还需要将SDIO外设的（DAT3~DAT0）这四根线都配置为有效。
+// 在SD卡识别模式时（只能使用1根数据线__DAT0)，在识别完成后仍然可以只使用一根数据线
+// 但是为了提高通信速度，我们还需要将SDIO外设的（DAT3~DAT0）这四根线都配置为有效。
 if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK) {
         __Error_Handler(__FILE__, __LINE__);
 }
-}
+
 
 
 /*******************************************************************************
         => SD_CARD__Test__
 *******************************************************************************/
-HAL_StatusTypeDef HAL_SD_WriteBlock(            //如果返回（HAL_OK）表示成功
-        SD_HandleTypeDef        *hsd,           //SD卡所用的结构体指针
+HAL_StatusTypeDef HAL_SD_WriteBlock(            // 如果返回（HAL_OK）表示成功
+        SD_HandleTypeDef        *hsd,           // SD卡所用的结构体指针
         uint8_t                 *pData,         //（应用缓存空间）存放要写入的数据
-        uint32_t                BlockAdd,       //比如设置为（16），表示第（16）块
-        uint32_t                NumberOfBlocks, //块数（单块就写入1）
-        uint32_t                Timeout)        //超时时间（一般设置为0x1000）
+        uint32_t                BlockAdd,       // 比如设置为（16），表示第（16）块
+        uint32_t                NumberOfBlocks, // 块数（单块就写入1）
+        uint32_t                Timeout)        // 超时时间（一般设置为0x1000）
 
 
 void sdio_test(void)
 {
-        //获取SD卡基本信息（总块数， 块大小）
+        // 获取SD卡基本信息（总块数， 块大小）
         HAL_SD_CardInfoTypeDef CardInfo;
         HAL_SD_GetCardInfo(&hsd, &CardInfo);
-        printf("BlockNbr      = %d\n", CardInfo.BlockNbr);         //物理总块数
-        printf("BlockSize     = %d\n", CardInfo.BlockSize);        //物理块大小
-        printf("LogBlockNbr   = %d\n", CardInfo.LogBlockNbr);      //逻辑总块数
-        printf("LogBlockSize  = %d\n", CardInfo.LogBlockSize);     //逻辑块大小
-        //向SD卡某块写入数据_______________________________________
+        printf("BlockNbr      = %d\n", CardInfo.BlockNbr);         // 物理总块数
+        printf("BlockSize     = %d\n", CardInfo.BlockSize);        // 物理块大小
+        printf("LogBlockNbr   = %d\n", CardInfo.LogBlockNbr);      // 逻辑总块数
+        printf("LogBlockSize  = %d\n", CardInfo.LogBlockSize);     // 逻辑块大小
+        // 向SD卡某块写入数据_______________________________________
         uint8_t buf1[512] = {0};
         for (i = 0; i < 512; i++) {
                 buf1[i] = 210;
         }
-        //写SD卡之前，先判断SD卡是否处在（传输状态），不在的话就循环等待，直到为传输状态
+        // 写SD卡之前，先判断SD卡是否处在（传输状态），不在的话就循环等待，直到为传输状态
         while (HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER);
-        //向SD卡某块写入数据， 此时SD卡处于（接收数据状态）
-        //数据接收完成后，向SD卡存储单元保存数据时，SD卡又处于（编程状态），
-        //保存完成数据后，再次回到（传输状态）
+        // 向SD卡某块写入数据， 此时SD卡处于（接收数据状态）
+        // 数据接收完成后，向SD卡存储单元保存数据时，SD卡又处于（编程状态），
+        // 保存完成数据后，再次回到（传输状态）
         HAL_SD_WriteBlocks(&buf, buf1, 12, 1, 0x1000);
         
         
-        //读出该块里的数据_________________________________________
+        // 读出该块里的数据_________________________________________
         uint8_t buf2[512] = {0};
-        //此时SD卡可能处于（接收数据状态或者编程状态）数据还没有保存到SD卡中
-        //所以这里应该循环等待SD卡回到（传输状态），然后再读出数据
+        // 此时SD卡可能处于（接收数据状态或者编程状态）数据还没有保存到SD卡中
+        // 所以这里应该循环等待SD卡回到（传输状态），然后再读出数据
         while (HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER);
         HAL_SD_ReadBlocks(&buf, buf2, 12, 1, 0x1000);
         
         
-        //比较写入读出的数据________________________________________
+        // 比较写入读出的数据________________________________________
         for (i = 0; i < 512; i++) {
                 if (buf1[i] != buf2[2]) {
                         printf("读出的数据与写入的数据不相符！\n");
