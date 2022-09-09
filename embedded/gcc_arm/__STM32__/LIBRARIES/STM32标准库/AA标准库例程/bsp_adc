@@ -1,0 +1,82 @@
+//______________________________________________________________________________
+//      ADC模拟数字转换器
+//______________________________________________________________________________
+被控制对象 --->非电量 --->模拟传感器 --->模拟电量 --->A/D转换器 --->数字量 --->单片机
+单片机 ---> 数字量 --->D/A转换器 --->模拟电量 --->执行元件 --->控制操作 --->被控制对象
+        // 将模拟量转换为数字量的过程称为模数转换，完成这一转换的器件称为ADC
+        // 将数字量转换为模拟量的过程称为数模转换，完成这一转换的器件称为DAC
+
+
+1 分辨率
+        // 分辨率是指AD转换器输出数字量的最低有效位变化一个数码时，对应输入模拟量的变化
+        // 最大输入电压为5V，8位的A/D转换器，它分辨最小的输入电压变体化量为[5V/2^8=19.53mV]
+2 相对精度
+        // 相对精度是指A/D转换器实际输出数字量与理论输出数字量之间的最大差值
+        // 通常用最低有效位LSB的倍数来表示
+3 转换速度
+        // 转换速度是指A/D转换器完成一次转换所需要的时间
+        // 即从转换开始到输出端出现的稳定的数字信号所需要的时间
+
+
+
+// STM32的ADC功能描述
+// ____________________________________________________________
+        1 STM32的ADC是12位逐次逼近型的模数转换器
+        2 它有18个通道，可以测量16个外部和2个内部信号源
+        3 各通道的AD转换可以 单次，连续，扫描，间断，模式执行
+        4 ADC的结果可以左对齐或右对齐方式存储在16位数据寄存器中
+        5 模拟看门狗特性允许应用程序检测输入电压是否超出用户定义的高/低阀值
+        6 STM32的ADC最大转换速率为1MHz，也就是1uS(在ADCCLK=14M,采样周期为1.5个ADC时钟下得到)
+        7 不要让ADC的时钟超过14MHz，否则将导致结果准确度下降
+
+
+
+// ADC模数转换器配置流程
+// ____________________________________________________________
+void stm32f1_adc_setup(void)
+{
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1,  ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    
+    // 将PC5引脚配置为模拟输入模式
+    GPIO_InitTypeDef    GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    
+    //ADC1的配置
+    ADC_InitTypeDef   ADC_InitStructure;
+    ADC_InitStructure.ADC_Mode               = ADC_Mode_Independent;    //独立模式
+    ADC_InitStructure.ADC_ScanConvMode       = ENABLE;                  //连续多通道模式
+    ADC_InitStructure.ADC_ContinuousConVMode = ENABLE;                  //连续转换模式
+    ADC_InitStructure.ADC_ExternalTrigConv   = ADC_ExternalTrigConv_None;//不受外界决定 
+    ADC_InitStructure.ADC_DataAlign          = ADC_DataAlign_Right;     //数据右对齐
+    ADC_InitStructure.ADC_NBrOfChannel       = 1;                       //扫描通道数1
+    
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15, 1, ADC_SampleTime_55Cycles5)
+    ADC_Cmd(ADC1, ENABLE);
+    ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+}
+// 获得ADC1中的数据，并转换
+// ____________________________________________________________
+u32 conresult;
+u32 Test_ConverisonResult(void)
+{
+        if (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == SET) {
+        conresult = ADC_GetConversionValue(ADC1);
+                //2^12=4096 VDDA=3.3V=3300mV
+                conresult = conresult * 3300;
+                conresult = conresult / 4096;
+        }
+        ADC_ClearITPendingBit(ADC1, ADC_IT_EOC); //清除ADC中断
+        return(conresult);
+}
+//数码管显示转换结果，显示在4位数码管上
+while (1)
+{
+        conversionValue = Test_ConversionResult();
+        ConversionValue = ConversionValue * 1000;
+        NumbTube_Display(conversionValue, 4);
+}
+
