@@ -19,16 +19,27 @@
 #define SPI_MISO_PIN            GPIO_Pin_6
 
 
+#define SPI_TIMEOUT             1000
+
 
 /*******************************************************************************
         => W25Q64__宏定义
 *******************************************************************************/
 #define DUMMY                   0x00
-#define WRITE_ENABLE            0x06
-#define READ_JEDEC_ID           0x9F    // 读取ID
-#define ERASE_SECTOR            0x20    // 擦除扇区, 每次擦除(4KB)
-#define READ_STATUS             0x05    // 读状态寄存器
-#define READ_DATA               0x03    // 读取数据
-#define PAGE_PROGRAM            0x02    // 写入数据（一次最多可以写256字节）
-#define PAGE_SIZE               256     // 页大小
+#define WRITE_ENABLE            0x06            // 写使能
+#define WRITE_DISABLE           0x04            // 写禁止
+#define READ_JEDEC_ID           0x9F            // 读取ID
+#define ERASE_CHIP              0xC7            // 擦除芯片
+#define ERASE_SECTOR            0x20            // 擦除扇区, 每次擦除(4KB)
+#define READ_STATUS             0x05            // 读状态寄存器
+#define READ_DATA               0x03            // 读取数据
+#define PAGE_PROGRAM            0x02            // 写入数据（一次最多可以写256字节）
+#define PAGE_SIZE               256             // 页大小
+//______________________________________________________________________________
+#define sFLASH_ID               0xEF3015        // W25X64
+#define sFLASH_ID               0xEF4015        // W25Q16
+#define sFLASH_ID               0xEF4017        // W25Q64
+#define sFLASH_ID               0xEF4018        // W25Q128
+#define SPI_FLASH_PageSize              256
+#define SPI_FLASH_PerWritePageSize      256
 #endif

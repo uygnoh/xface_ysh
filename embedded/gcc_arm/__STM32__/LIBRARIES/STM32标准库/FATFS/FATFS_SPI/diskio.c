@@ -31,8 +31,8 @@ DSTATUS disk_status (
 
         case SPI_FLASH :
                 if (spi_flash_read_id() == W25Q_FLASH_ID) {
-                        stat = 0;               //W25Q_FLASH状态正常
-                } else {                       //W25Q_FLASH状态（不）正常，初始化失败
+                        stat = 0;               // W25Q_FLASH状态正常
+                } else {                       // W25Q_FLASH状态（不）正常，初始化失败
                         stat = STA_NOINIT;
                 }
                 return stat;
@@ -86,8 +86,8 @@ DRESULT disk_read (
                 return res;
 
         case SPI_FLASH :
-                //计算偏移（2*1024*1024）/(4096)=512
-                //扇区偏移2MB，外部FLASH文件系统空间放在SPI_FLASH后面的（6MB）空间中
+                // 计算偏移（2*1024*1024）/(4096)=512
+                // 扇区偏移2MB，外部FLASH文件系统空间放在SPI_FLASH后面的（6MB）空间中
                 sector += 512;
                 
                 spi_flash_buffer_read(buff, sector*4096, count*4096);
@@ -119,8 +119,8 @@ DRESULT disk_write (
                 return res;
 
         case SPI_FLASH :
-                //计算偏移（2*1024*1024）/(4096)=512
-                //扇区偏移2MB，外部FLASH文件系统空间放在SPI_FLASH后面的（6MB）空间中
+                // 计算偏移（2*1024*1024）/(4096)=512
+                // 扇区偏移2MB，外部FLASH文件系统空间放在SPI_FLASH后面的（6MB）空间中
                 sector += 512;
                 
                 //先擦除，再写入

@@ -146,7 +146,7 @@ void eeprom_wait_end(void)
 }
 
 
-//每次写入不能超过8字节
+// 每次写入不能超过8字节
 void ee_write_page(uint8_t addr, uint8_t *tx_buf, uint8_t num_byte)
 {
         I2CTIMEOUT = I2C_LONG_TIMEOUT;
