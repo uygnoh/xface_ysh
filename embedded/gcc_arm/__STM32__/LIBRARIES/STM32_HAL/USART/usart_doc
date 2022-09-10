@@ -2,19 +2,19 @@
         => USART__结构体__
 *******************************************************************************/
 typedef struct {
-        USART_TypeDef                  *Instance;   //UART寄存器基地址
-        UART_InitTypeDef                Init;       //UART通信参数
-        uint8_t                        *pTxBuffPtr; //指向UART发送缓冲区
-        uint16_t                        TxXferSize; //UART发送数据大小
-        uint16_t                        TxXferCount;//UART发送计数器
-        uint8_t                        *pRxBuffPtr; //指向UART接收缓冲区
-        uint16_t                        RxXferSize; //UART接收数据大小
-        uint16_t                        RxXferCount;//UART接收计数器
-        DMA_HandleTypeDef              *hdmatx;      //UART发送参数设置（DMA模式）
-        DMA_HandleTypeDef              *hdmarx;      //UART接收参数设置（DMA模式）
-        HAL_LockTypeDef                 Lock;        //锁定对象
-        __IO HAL_UART_StateTypeDef      State;       //UART通信状态
-        __IO uint32_t                  ErrorCode;   //UART错误代码
+        USART_TypeDef                  *Instance;   // UART寄存器基地址
+        UART_InitTypeDef                Init;       // UART通信参数
+        uint8_t                        *pTxBuffPtr; // 指向UART发送缓冲区
+        uint16_t                        TxXferSize; // UART发送数据大小
+        uint16_t                        TxXferCount;// UART发送计数器
+        uint8_t                        *pRxBuffPtr; // 指向UART接收缓冲区
+        uint16_t                        RxXferSize; // UART接收数据大小
+        uint16_t                        RxXferCount;// UART接收计数器
+        DMA_HandleTypeDef              *hdmatx;      // UART发送参数设置（DMA模式）
+        DMA_HandleTypeDef              *hdmarx;      // UART接收参数设置（DMA模式）
+        HAL_LockTypeDef                 Lock;        // 锁定对象
+        __IO HAL_UART_StateTypeDef      State;       // UART通信状态
+        __IO uint32_t                  ErrorCode;   // UART错误代码
 } UART_HandleTypeDef;
 
 
@@ -93,7 +93,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 *******************************************************************************/
 void USART1_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&huart1);
+        HAL_UART_IRQHandler(&huart1);
 }
 
 1) uint8_t rDataBuffer[1];

@@ -35,7 +35,10 @@ int main(void)
     
     HAL_Init();
     SystemClock_Config();
-    UART1_Config();
+    
+    
+    
+    usart_setup();
     
     while (1)
     {

@@ -2,23 +2,23 @@
         => STM32F10x__IIC__结构体
 *******************************************************************************/
 typedef struct {
-        uint32_t I2C_ClockSpeed;                //设置I2C时钟频率
-        uint32_t I2C_Mode;                      //指定工作模式（IIC模式或SMBUS模式）
-        uint32_t I2C_DutyCycle;                 //指定时钟占空比（2:1 16:9）
-        uint32_t I2C_QwnAddress1;               //指定自身I2C地址
-        uint32_t I2C_Ack;                       //使能或关闭ACK（一般使能）
-        uint32_t I2C_AcknowledgedAddress;       //指定地址的长度（7位或10位）
+        uint32_t I2C_ClockSpeed;                // 设置I2C时钟频率
+        uint32_t I2C_Mode;                      // 指定工作模式（IIC模式或SMBUS模式）
+        uint32_t I2C_DutyCycle;                 // 指定时钟占空比（2:1 16:9）
+        uint32_t I2C_QwnAddress1;               // 指定自身I2C地址
+        uint32_t I2C_Ack;                       // 使能或关闭ACK（一般使能）
+        uint32_t I2C_AcknowledgedAddress;       // 指定地址的长度（7位或10位）
 } I2C_InitTypeDef;
 typedef struct {
-        vu16 CR1;                               //I2C 控制寄存器 1
-        vu16 CR2;                               //I2C 控制寄存器 2
-        vu16 OAR1;                              //I2C 自身地址寄存器 1
-        vu16 OAR2;                              //I2C 自身地址寄存器 2
-        vu16 DR;                                //I2C 数据寄存器
-        vu16 SR1;                               //I2C 状态寄存器 1
-        vu16 SR2;                               //I2C 状态寄存器 2
-        vu16 CCR;                               //I2C 时钟控制寄存器
-        vu16 TRISE;                             //I2C 上升时间寄存器
+        vu16 CR1;                               // I2C 控制寄存器 1
+        vu16 CR2;                               // I2C 控制寄存器 2
+        vu16 OAR1;                              // I2C 自身地址寄存器 1
+        vu16 OAR2;                              // I2C 自身地址寄存器 2
+        vu16 DR;                                // I2C 数据寄存器
+        vu16 SR1;                               // I2C 状态寄存器 1
+        vu16 SR2;                               // I2C 状态寄存器 2
+        vu16 CCR;                               // I2C 时钟控制寄存器
+        vu16 TRISE;                             // I2C 上升时间寄存器
 } I2C_TypeDef;
 
 

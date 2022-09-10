@@ -282,10 +282,10 @@ void spi_write_buffer(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t NumByteToWr
         NumOfSingle = NumByteToWrite % SPI_FLASH_PageSize;
         
         
-        // ____________________________________________________
+        // _____________________________________________________________________
         // SPI_FLASH_PageSize 页地址对齐
         // Addr = 0; 则WrtieAddr地址刚好页对齐
-        // ____________________________________________________
+        // _____________________________________________________________________
         if (Addr == 0) {
                 // 如果不满一页， 直接写入. （NumByteToWrite < SPI_FLASH_PageSize）
                 if (NumOfPage == 0) {
@@ -302,12 +302,13 @@ void spi_write_buffer(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t NumByteToWr
                 }
                 
                 
-        // ____________________________________________________
+        // _____________________________________________________________________
         // SPI_FLASH_PageSize 页地址不对齐
         // Addr != 0; 则WrtieAddr地址不对齐
-        // ____________________________________________________
+        // _____________________________________________________________________
         } else {
                 // NumByteToWrite < SPI_FLASH_PageSize
+                // ____________________________________________________
                 if (NumOfPage == 0) {
                         // 当前剩余的 count个位置比NumOfSingle小， 一页写不完
                         if (NumOfSingle > count) {
@@ -323,6 +324,7 @@ void spi_write_buffer(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t NumByteToWr
                                 spi_write_page(WriteAddr, pBuffer, NumByteToWrite);
                         }
                 // NumByteToWrite > SPI_FLASH_PageSize
+                // ____________________________________________________
                 } else {
                         // 地址不对齐多出的count分开处理， 不加入这个运算
                         NumByteToWrite -= count;
@@ -337,10 +339,10 @@ void spi_write_buffer(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t NumByteToWr
                         // 把整页都写了
                         while (NumOfPage--) {
                                 spi_write_page(WriteAddr, pBuffer, SPI_FLASH_PageSize);
+                                WriteAddr += SPI_FLASH_PageSize;
+                                pBuffer   += SPI_FLASH_PageSize;
                         }
-                        WriteAddr += SPI_FLASH_PageSize;
-                        pBuffer   += SPI_FLASH_PageSize;
-                        
+
                         // 若有多余的不满一页的数据， 把它写完
                         if (NumOfSingle != 0) {
                                 spi_write_page(WriteAddr, pBuffer, NumOfSingle);
