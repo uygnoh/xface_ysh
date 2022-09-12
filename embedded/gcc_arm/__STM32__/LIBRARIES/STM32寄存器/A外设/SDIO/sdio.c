@@ -292,9 +292,9 @@ int sd_write_block(uint32_t addr, unsigned char *buf)
         *(volatile uint32_t *)(0x40012C00 + 0x28) = 0x200;
         //SDIO_DCTRL
         tmp  = 0;
-        tmp |= (9 << 4);        //data block size 512
-        tmp |= (0 << 1);        //data transfer direction host to card
-        tmp |= (1 << 0);        //data transfer enable
+        tmp |= (9 << 4);        // data block size 512
+        tmp |= (0 << 1);        // data transfer direction host to card
+        tmp |= (1 << 0);        // data transfer enable
         *(volatile uint32_t *)(0x40012C00 + 0x2C) = tmp;
         
         //Send command__24__ （WRITE_BLOCK adtc R1）
