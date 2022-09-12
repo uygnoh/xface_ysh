@@ -1,0 +1,158 @@
+/*******************************************************************************
+        => STM32F429
+*******************************************************************************/
+        // SDIO CubeMX 配置
+        // ____________________________________________________
+        // SDIO:
+                Mode[ SD 4 bits wide bus ]
+        // DMA Settings
+                DMA Request     Stream           Direction               Priority
+                SDIO_RX         DMA2 Stream 3    Peripheral to Memory    Low
+                SDIO_TX         DMA2 Stream 6    Memory To Peripheral    Low
+        // NVIC Settings
+                SDIO global interrupt           Enabled         抢占级别    子优先级别
+                                                OK
+                                                
+                                                
+        // MiddleWares -> FATFS
+        // ____________________________________________________
+                SD Card
+                
+       
+        // STM32F429 时钟配置 
+        // ____________________________________________________
+        RCC 使用（HSE）， 将HCLK配置为 （180 MHz）
+        使能了SDIO后， SDIOCLK会自动配置为（45 MHz）
+        
+        
+        
+/*******************************************************************************
+        => STM32F429
+*******************************************************************************/
+// 初始化好 SD_driver 后， fatfs.c 中的函数会将结构体变量 SD_Driver 的指针提交给
+// “文件系统代码”， 文件系统代码就可以通过 SD_Driver 结构体变量中的函数指针， 最终
+// 调用HAL库的SD卡驱动函数
+const Diskio_drvTypeDef SD_Driver = {
+        SD_initialize,
+        SD_status,
+        SD_read,
+        SD_write,
+        SD_ioctl
+};
+
+
+
+typedef struct {
+        // 存放 SD_initialize 的函数指针， 最终调用的一定是HAL库 HAL_SD_Init 函数
+        DSTATUS         (*disk_initialize)(BYTE);
+        
+        // 存放 SD_status 的函数指针， 最终调用的一定是HAL库 HAL_SD_GetCardState 函数
+        DSTATUS         (*disk_status)(BYTE);
+        
+        // 存放 SD_read 的函数指针， 最终调用的一定是HAL库 HAL_SD_ReadBlocks_DMA 函数
+        // SD_read -> BSP_SD_WriteBlocks_DMA -> HAL_SD_ReadBlocks_DMA
+        DSTATUS         (*disk_read)(BYTE, BYTE*, DWORD, UINT);
+        
+        // 存放 SD_write 的函数指针， 最终调用的一定是HAL库 HAL_SD_WriteBlocks_DMA 函数
+        DSTATUS         (*disk_write)(BYTE, BYTE*, DWORD, UINT);
+        
+        // 存放 SD_ioctl 的函数指针， 最终调用的一定是HAL库 HAL_SD_GetCardInfo 函数
+        DRESULT         (*disk_ioctl)(BYTE, BYTE, void *)
+} Diskio_drvTypeDef;
+
+
+
+
+// 关联函数
+// 将文件系统与SD卡关联起来
+void MX_FATFS_Init(void)
+{
+        retSD = FATFS_LinkDriver(&SD_Driver, SDPath);
+}
+
+
+
+
+
+        
+/*******************************************************************************
+        => STM32F429
+*******************************************************************************/
+
+char wrBuffer[] = "11111111111111111\r\n";
+BYTE rdBuffer[4096];    // 用于存放读到的数据
+BYTE work[512];         // f_mkfs 所使用的工作空间， 一般为一个块大小
+int main(void)
+{
+}
+
+int SD_FS_Test(void)
+{
+        FATFS   fs;
+        FIL     fp;
+        
+        
+        // 挂载SD卡
+        // ____________________________________________________
+        FRESULT         ret;
+        ret = f_mount(&fs, "0:", 0);
+        if (ret != FR_OK) {
+                printf("挂载失败");
+                return ret;
+        }
+        
+        // 在根目录（0:）下创建 dir1 子目录
+        // ____________________________________________________
+        FILINFO fno;
+label:  ret = F_stat("0:/dir1", &fno);
+        if (ret == FR_NO_FILESYSTEM) {
+                // 如果没有文件系统， 那么就创建文件系统
+                f_mkfs("0:", FM_FAT, 0, work, sizeof(work));
+                goto    label;
+        } else if (ret == FR_NO_FILE) {
+                f_mkdir("0:/dir1");
+        } else if (ret != FR_OK) {
+                printf("f_stat 出错了");
+                return;
+        } else {
+                printf("dir1 存在");
+        }
+        
+        // 在dir1目录下， 新建（file.txt）普通文件
+        // ____________________________________________________
+        ret = f_open(&fp, "0:/dir1/file.txt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS);
+        if (ret != FR_OK) {
+                printf("f_open 出错了");
+                return;
+        } else {
+                printf("f_open 打开成功");
+        }
+        
+        
+        
+        // 写 file.txt 文件
+        // ____________________________________________________
+        UINT    bw;     // 写入的字节数
+        ret = f_write(&fp, wrBuffer, sizeof(wrBuffer), &bw);
+        if (ret != FR_OK) {
+                printf("f_write 出错了");
+                return ret;
+        } else {
+                printf("f_write 成功了");
+        }
+        
+        
+        // 读文件
+        // ____________________________________________________
+        ret = f_lseek(&fp, 0);
+        if (ret != FR_OK) {
+                printf("调整文件位置失败了");
+                return ret;
+        }
+        UINT    br;     // 读到的字节数
+        f_read(&fp, rdBuffer, sizeof(rdBuffer), &br);
+        
+        
+        f_close(&fp);           // 关闭文件
+        f_mount(0, "0:", 0);    // 取消挂载
+}
