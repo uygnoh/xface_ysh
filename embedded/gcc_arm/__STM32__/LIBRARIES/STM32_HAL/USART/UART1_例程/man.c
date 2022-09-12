@@ -43,7 +43,7 @@ int main(void)
 
 
         if (HAL_UART_Receive_IT(&huart1, &rx_data, 1) != HAL_OK) {
-          Error_Handler();
+                Error_Handler();
         }
 
         while (1);
