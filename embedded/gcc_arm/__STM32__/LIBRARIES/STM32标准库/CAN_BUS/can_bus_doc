@@ -48,10 +48,10 @@ typedef struct {
 // BxCAN 筛选器结构体
 //_________________________________________________________
 typedef struct {
-        uint16_t CAN_FilterIdHigh;              // CAN_FxR1寄存器的高16位
-        uint16_t CAN_FilterIdLow;               // CAN_FxR1寄存器的低16位
-        uint16_t CAN_FilterMaskIdHigh;          // CAN_FxR2寄存器的高16位
-        uint16_t CAN_FilterMaskIdLow;           // CAN_FxR2寄存器的低16位
+        uint16_t CAN_FilterIdHigh;              // CAN_FxR1 寄存器的高16位
+        uint16_t CAN_FilterIdLow;               // CAN_FxR1 寄存器的低16位
+        uint16_t CAN_FilterMaskIdHigh;          // CAN_FxR2 寄存器的高16位
+        uint16_t CAN_FilterMaskIdLow;           // CAN_FxR2 寄存器的低16位
         uint16_t CAN_FilterFIFOAssignment;      // 设置经过筛选后的数据存储到那个接收FIFO
         uint8_t  CAN_FilterNumber;              // 筛选器编号，范围（0~27）
         uint8_t  CAN_FilterNumber;              // 筛选器模式

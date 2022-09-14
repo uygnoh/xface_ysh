@@ -1,0 +1,132 @@
+/*******************************************************************************
+        => LIN 总线
+*******************************************************************************/
+        // 单片机使用串口(不需要交叉连接)     LIN-TJA1020
+        // UART_TxD  ---> LIN_TxD
+        // UART_RxD  ---> LIN_RxD
+        // 收发器的引脚为（开漏模式）， 所以引脚配置时候要启用上拉
+        
+        
+        // LIN 数据规范
+        // ____________________________________________________
+        1. 断开帧（同步间隔段）：STM32可以直接发出或者在接收时进行判断
+        2. 同频段， 也就是STM32发出数据（0x55）
+        3. （受保护ID段 + 数据段 + 校验和），就是串口要发送的数据。
+           只是数据以过规则运算了！
+        4. 总线上的所有的： 数据都是符合串口的数据（8 位数据位， 1 位起始位， 1 位停止位）
+        
+        
+        // LIN 总线数据结构
+|-----------------------------------------------------------------------------------------------|
+|  同步间隔段（>= 13 bit） + 同步段（0x55） + 受保护的ID（ID = 6 bit） + 数据段（<= 8 Byte） + 校验和  |
+|-----------------------------------------------------------------------------------------------|
+
+
+
+
+/*******************************************************************************
+        => LIN 总线 （STM32F103）
+*******************************************************************************/
+// 由于LIN的特殊性， 需要引入超时机制， 而且必须是精确延时， 然后用查询函数进行查询
+// 设置定时器时基为 0.5ms ， 使用TIM2
+void timeDelayInit(void)
+{
+        RCC->APB1RSTR.TIM2Reset_RW = 1;
+        RCC->APB1RSTR.TIM2Reset_RW = 0;
+        RCC->APB1RSTR.TIM2ClockEnable_RW = ENABLE;
+        // (72-000-000 / 1000 / 2) - 1 = 35999; // 0.5ms一个计数值
+        TIM2->PSC.PrescaleValue_RW      = 35999;
+        TIM2->CR1.OnePulseMode_RW       = 1;    // 使用单脉冲模式
+        TIM2->EGR.UpdateGeneration_W    = 1;    // 操作更新事件进行更新一次
+}
+
+// ms        延时时间
+// resetTime 强制停止
+int timeDelay(uint32_t ms, uint8_t resetTime)
+{
+        // 利用静态变量，查询延时
+        static uint8_t enableTime = 0;
+        if (resetTime) {
+                enableTime = 0;
+                TIM2->EGR.UpdateGeneration_W = 1;
+                return 0;
+        }
+        if (enableTime == 0) {
+                enableTime = 1;
+                TIM2->ARR.AutoReloadValue_RW = ms*2;
+                TIM2->CR1.CountEnable_RW = 1;
+                return 1;
+        } else {
+                return TIM2->CR1.CountEnable_RW == 1 ? 2 : (enableTime = 0);
+        }
+}
+
+// 查表法返回校验Id
+uint8_t idParityQueryWay(uint8_t ID)
+{
+        uint8_t idHadParity[64] = {
+                0x80， 0xc1, 0x42, 0x03, 0xc4, 0x85, 0x06, 0x47
+                ...
+        }
+        return idHadParity[ID];
+}
+// 输入值： 接收到的ID
+// 返回值： ID
+// 如果（ID = 0xFF）， 表示ID错误！
+inline uint8_t idParityCheck(uint8_t IDResult)
+{
+        return (idParityQueryWay(IDResult & 0x3F) == IDResult) ? (IDResult & 0x3F) : 0xFF;
+}
+
+
+
+// 校验函数， 如果是增强型校验， 则输入ID， 否则输入0
+uint8_t GetCheckCarry(uint8_t *dataBuffer, uint16_t length, uint8_t enhanceCheckID)
+{
+        uint16_t sum = 0;
+        for (i = 0; i < length; i++) {
+                sum += dataBuffer[i];
+                sum = sum > 0xFF ? ((sum+1) & 0xFF) : sum;
+        }
+        sum += enhanceCheckID;
+        sum = sum > 0xFF ? ((sum+1) & 0xFF) : sum;
+        return (uint8_t)(~sum);
+}
+
+
+
+
+
+
+
+// Lin总线发送函数： 
+// 标准格式： 同步间隔段 + 同步段 + 受保护的ID段 + 数据段（0-8） + 校验和
+// MasterMode:  0       同步间隔
+// MasterMode:  1       主发送
+// MasterMode:  2       主接收
+// 
+// CehckWay:    0       标准校验
+// CehckWay:    1       增强校验
+
+
+int linSend(USART_TypeDef *U, uint8_t masterMode, uint8_t checkWay, uint8_t ID, uint8_t *p, uint8_t len, uint8_t customCheckSum)
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+// 配置PICO-SDK环境变量( vim $HOME/.bashrc )
+// ____________________________________________________________
+# CMake
+export PATH=$PATH:/home/ysh/rp2040_pico/CMake/cmake-3.19.4/bin
+
+# PICO-RP2040
+export PICO_SDK_PATH="$HOME/rp2040_pico/pico-sdk"
+
+
+
+// 编译程序
+// ____________________________________________________________
+        mkdir   build
+        cd      build
+        cmake ..
