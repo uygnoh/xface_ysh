@@ -12,9 +12,10 @@
 
 
 // 使用 XBAR1 来实现， 将 QTMR4通道3的输出， 映射到DS0（GPIO1_IO03）
+// ____________________________________________________________
         QTMR4_CH3       连接在      XBAR1_IN39
         GPIO01_IO03     复用成      XBAR1_INOUT17
-// 我们需要2个寄存器： XBARAx_SEL8 IOMUXC_GPR_GPR6
+// 我们需要2个寄存器： XBARAx_SEL8 + IOMUXC_GPR_GPR6
 
 
 
@@ -33,3 +34,30 @@
         最后,在经过以上设置之后,QTMR4 通道 3 的输出就会经过 XBAR,从 XBAR_INOUT17
         输出到 GPIO1_IO03 上,即 DS0 所连接的 IO 口,这样 PWM 就可以直接输出到 DS0,而不需
         要通过杜邦线来飞线了
+        
+        
+        
+        
+// IOMUXC_SW_MUX_CTL_PAD_GPIO_AD_B0_03
+// ____________________________________________________________
+// ALT1 — Select mux mode: ALT1 mux port: XBAR1_INOUT17 of instance: xbar1
+        
+        
+        
+// IOMUXC_GPR_GPR6(400A_C018h)
+// ____________________________________________________________
+// IOMUXC XBAR1_INOUT17 function direction select [29]
+   0 XBAR1_INOUT as input
+   1 XBAR1_INOUT as output
+(uint32_t *)(0x400AC018) = 1 << 29;
+
+
+
+// XBARAx_SEL8(403B_C010h)
+// ____________________________________________________________
+// 设置 XBARA1_SEL8 寄存器 SEL17[14:8] = 39
+// 则选择 XBAR_IN39 ， 即 QTMR4 的通道 3 作为输入源
+(uint32_t *)(0x403BC010) = 39 << 8;     
+                                        
+
+

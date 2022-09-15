@@ -558,10 +558,10 @@ int main(void)
         unsigned int baud_rate  = 9600;
         unsigned int ubrr_value = (F_CPU / (baud_rate * 16UL)) - 1;
         char string[] = "Hello world!\n";
-        UBRR0H  = (unsigned char)(ubrr_value >> 8);     //set Baud rate
-        UBRR0L  = (unsigned char)ubrr_value;
-        UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);         //normal mode, init clk
-        UCSR0B |= (1 << TXEN0);                          //enable transmit
+        UBRR0H  = (unsigned char)(ubrr_value >> 8);     // set Baud rate
+        UBRR0L  = (unsigned char)ubrr_value;            // set Baud rate
+        UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);         // normal mode, init clk
+        UCSR0B |= (1 << TXEN0);                          // enable transmit
         while (1) {
                 usart_putstring(string);
                 _delay_ms(1000);
@@ -579,10 +579,10 @@ void usart_putstring(char *str_ptr)
 
 
 
-//把传感器的数据发送到PC
-//Display DMS Readings on PC Screen
+// 把传感器的数据发送到PC
+// Display DMS Readings on PC Screen
 ___________________________________________________________
-#define F_CPU           (8000000UL)     //8MHz
+#define F_CPU           (8000000UL)     // 8MHz
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
@@ -696,13 +696,13 @@ _____________________________________________________________
         TCNT0 < OCR0A   =>   PWM: High
         TCNTO > OCR0A   =>   PWM: Low
 |___________________________________________________________|
-| //Non-inverted mode                                       |
+| // Non-inverted mode                                      |
 |                   OCR0A + 1                               |
 |    Duty cycle = _____________ * 100                       |
 |                      256                                  |
 |                                                           |
 |                                                           |
-| //inverted mode                                           |
+| // inverted mode                                          |
 |                   256 - OCR0A                             |
 |    Duty cycle = _______________ * 100                     |
 |                      256                                  |
@@ -711,7 +711,7 @@ _____________________________________________________________
 
 
 
-| // EXample: Fast PWM at 3.8Hz
+// EXample: Fast PWM at 3.8Hz
 |____________________________________________________________________|
 |f_pwm = f_clock / prescaler / 256                                   |
 |____________________________________________________________________|
@@ -721,7 +721,7 @@ _____________________________________________________________
 |       4 output a wave of 20% duty cycle at PD5(OC0B)               |
 |       5 Prescaler factor p = 1024                                  |
 |____________________________________________________________________|
-|  f_pwm = 10^6 / 1024 / 256 = 3.8 Hz                                |
+|  f_pwm = 1000000 Hz / 1024 / 256 = 3.8 Hz                          |
 |                                                                    |
 |                  OCR0A + 1                                         |
 |   Duty cycle = _____________ * 100 == 80  => (OCR0A = 203)         |
@@ -740,7 +740,7 @@ int main(void)
         OCR0A   = 203;                  // 80% duty cycle
         OCR0B   = 50;                   // 20% duty cycle
         TCCR0A  = 0b10100011;           // fast PWM, non-inverted
-        TCCR0B  = 0b00000101;           // timer prescaler，并且启动PWM 
+        TCCR0B  = 0b00000101;           // PWM_Freq = (F_CPU / 1024)
 }
 
 
@@ -748,28 +748,52 @@ int main(void)
 /*******************************************************************************
         => Interrupt
 *******************************************************************************/
+        // Resource/event                       Interrupt Serviec routine
+        External Interrupt Request 0            INT0_vect
+        External Interrupt Request 1            INT1_vect
+        Timer/Counter 2 Compare Match A         TIMER2_COMPA_vect
+        Timer/Counter 2 Compare Match B         TIMER2_COMPB_vect
+        Timer/Counter 2 Overflow                TIMER2_OVF_vect
+        Timer/Counter 1 Compare Match A         TIMER1_COMPA_vect
+        Timer/Counter 1 Compare Match B         TIMER1_COMPB_vect
+        Timer/Counter 1 Overflow                TIMER1_OVF_vect
+        Timer/Counter 0 Compare Match A         TIMER0_COMPA_vect
+        Timer/Counter 0 Compare Match B         TIMER0_COMPB_vect
+        Timer/Counter 0 Overflow                TIMER0_OVF_vect
+        USART, Rx Complete                      USART_RX_vect
+        USART, Tx Complete                      USART_TX_vect
+        ADC Conversion Complet                  ADC_vect
+        
+
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 int main(void)
 {
-        sei();          // enable global interrupt
-        EIMSK   = 0x01; // enable INT0
+        sei();          // 打开全局中断
+        EIMSK   = 0x01; // 打开 INT0 中断
 }
 
-ISR(INT0_vect)          // interrupt service routine
+// 中断 INT0 服务程序
+// ____________________________________________________________
+ISR(INT0_vect)
 {
 }
 
 
-//EXternal interrupt register
+
+// EXternal interrupt register
+// ____________________________________________________________
  EIMSK
 _______________________________________
 | - | - | - | - | - | - | INT1 | INT0 |
 |___|___|___|___|___|___|______|______|
 
 
-//Timer interrupt register
+
+// Timer interrupt register
+// ____________________________________________________________
                        ____________________________________
  TIMSK0                | Output compare  | Timer overflow |
 _______________________|_________________|________________|
@@ -786,7 +810,10 @@ _______________________|_________________|________________|
 | - | - |  -   | - | - | OCIE2B | OCIE2A | TOIE2 |
 |___|___|______|___|___|________|________|_______|
 
-//ADC control register       ________
+
+
+// ADC control register
+// ____________________________________________________________
  ADCSRA[ ADCIE ]             |   *  |
 _____________________________|______|________________________
 | ADEN | ADSC | ADATE | ADIF | ADIE | ADPS2 | ADPS1 | ADPS0 |
@@ -794,7 +821,7 @@ _____________________________|______|________________________
 
 
 
-| //Example: ADC Interrupt
+// Example: ADC Interrupt
 |_________________________________________________________|
 |       1 //Read from ADC0(PC0) using interrupt           |
 |       2 //Store the ADC reading to a variable "value"   |
@@ -818,6 +845,7 @@ ISR(ADC_vect)
         unsigned char low, high;
         ADCSRA  |= (1 << ADIF);         // clear ADIF
         low      = ADCL;                // read low byte first
-        high     = ADCH;
-        value    = (high << 8) + low;   // calulate integer value
+        high     = ADCH;                // read high byte
+        value    = high;
+        value    = (value << 8) + low;   // calulate integer value
 }

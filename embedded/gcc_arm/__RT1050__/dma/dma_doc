@@ -1,0 +1,93 @@
+// https://doc.embedfire.com/mcu/i.mxrt/i.mxrt1052/zh/latest/doc/chapter19/chapter19.html
+
+
+
+        TCD0_SADDR              // 源地址寄存器，保存数据源的起始地址
+        TCD0_SOFF               // 源地址偏移，完成一次基本读写后源地址的变化量，(有符号类型)
+	TCD0_SLAST              // 源地址最终调整寄存器，当主循环完成后，可通过设置该寄存器修改最终的源地址
+	
+        TCD0_DADDR              // 目的地址寄存器，保存写入区域的起始地址
+        TCD0_DOFF               // 目的地址偏移寄存器，完成一次基本读写后目的地址的变化量，(有符号类 型)
+	TCD0_DLASTSGA           // 目的地址最终调整寄存器，当主循环完成后，可通过设置该寄存器修改最终 的目的地址
+
+
+	TCD0_ATTR               // 传输属性寄存器，主要用于设置源地址和目的地址的数据宽度
+	TCD0_CSR                // TCD控制和状态寄存器
+	
+	
+	// 次循环传输数据量寄存器，根据次循环偏移使用情况分为
+	// 禁止次循环偏移 、 开启但没有使用次循环偏移 、 开启并使用了次循环偏移
+	// 这三种情况对应同 一个寄存器，但是寄存器各个位的含义不同
+	TCD0_NBYTES_MLNO
+	TCD0_NBYTES_MLOFFNO
+	TCD0_NBYTES_MLOFFYES
+	
+	
+        // 主循环计数和通道连接寄存器，
+        // 同次循环传输数据量寄存器类似，根据配置 不同，寄存器的各个位含义不同
+        TCD0_CITER_ELINKNO
+        TCD0_CITER_ELINKYES
+	
+        
+        // 主循环起始计数值寄存器，同主循环计数和通道连接寄存器类，根据配置不 同，
+        // 寄存器的各个位含义不同。特别注意，初始化时要保证与主循环起始计数值寄存器的值相等
+        TCD0_BITER_ELINKNO
+        TCD0_BITER_ELINKYE
+
+	
+typedef struct _edma_config {
+        bool enableContinuousLinkMode;    /*是否开启次循环连接模式*/
+        bool enableHaltOnError;           /*是否允许错误停止模式*/
+        bool enableRoundRobinArbitration;/*选择使用固定优先级模式或轮询通道仲裁模式*/
+        bool enableDebugMode;             /*是否使能Debug模式*/
+} edma_config_t;
+
+typedef struct _edma_transfer_config {
+        uint32_t srcAddr;                      /*源数据地址*/
+        uint32_t destAddr;                     /*目的数据地址 */
+        edma_transfer_size_t srcTransferSize;  /*源数据宽度*/
+        edma_transfer_size_t destTransferSize; /*目的数据宽度*/
+        int16_t srcOffset;                     /*源地址偏移*/
+        int16_t destOffset;                    /*目的地址偏移*/
+        uint32_t minorLoopBytes;               /*次循环，传输字节数*/
+        uint32_t majorLoopCounts;              /*主循环，循环计数值（循环次数）*/
+} edma_transfer_config_t;
+
+typedef enum _edma_transfer_size {
+        kEDMA_TransferSize1Bytes = 0x0U,  /* 一次传输1个字节 */
+        kEDMA_TransferSize2Bytes = 0x1U,  /* 一次传输2个字节 */
+        kEDMA_TransferSize4Bytes = 0x2U,  /* 一次传输4个字节*/
+        kEDMA_TransferSize8Bytes = 0x3U,  /* 一次传输8个字节*/
+        kEDMA_TransferSize16Bytes = 0x4U, /*一次传输16个字节*/
+        kEDMA_TransferSize32Bytes = 0x5U, /*一次传输32个字节*/
+} edma_transfer_size_t;
+
+typedef struct _edma_handle {
+        edma_callback callback;   /*主循环完成回调函数 */
+        void *userData;          /*回调函数参数 */
+        DMA_Type *base;           /*eDMA基地址 */
+        edma_tcd_t *tcdPool;      /*指向 TCDs 的指针*/
+        uint8_t channel;          /*eDMA 通道编号 */
+        /*第一个TCD的索引号. 该编号指定的TCD将会被加载到eDMA驱动器*/
+        volatile int8_t header;
+        /*最后一个TCD的索引号.该编号指定的TCD将会从eEMA驱动器保存到TCD存储结构 */
+        volatile int8_t tail;
+        volatile int8_t tcdUsed; /*已经使用的 TCD 槽数量. */
+        volatile int8_t tcdSize; /*在队列中TCD槽总数*/
+        uint8_t flags;            /*当前eDMA通道状态 */
+} edma_handle_t
+typedef struct _edma_tcd {
+        __IO uint32_t SADDR;     /*SADDR 寄存器,用于设置源地址 */
+        __IO uint16_t SOFF;      /*SOFF 寄存器, 每次传输之后的源地址偏移量 */
+        __IO uint16_t ATTR;      /*ATTR 寄存器, 源和目的传输的数据宽度*/
+        __IO uint32_t NBYTES;    /*Nbytes 寄存器, 用于设置次循环传输字节数 */
+        __IO uint32_t SLAST;     /*SLAST 寄存器 */
+        __IO uint32_t DADDR;     /*DADDR 寄存器, 用于设置目的地址 */
+        __IO uint16_t DOFF;      /*DOFF 寄存器, 每次传输之后目的地址偏移量 */
+        __IO uint16_t CITER;     /*CITER 寄存器, 用于保存次循环未完成的字节数*/
+        /*DLASTSGA 寄存器, 在scatter-gather 模式下用于保存下一个eDMA的TCD */
+        __IO uint32_t DLAST_SGA;
+        __IO uint16_t CSR;       /*CSR 寄存器, 用于保存 TCD 状态 */
+        __IO uint16_t BITER;     /*BITER 寄存器, 次循环计数值. */
+} edma_tcd_t;
+
