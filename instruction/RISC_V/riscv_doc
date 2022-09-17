@@ -321,7 +321,7 @@
         CSRRW(Atomic Read/Write CSR)
         // CSRRW RD, CSR, RS1
 |____________________________________________________________________|
-|crrw t6, mscratch, t6       // t6 = mscratch; mscratch = t6         |
+|       csrrw rd, CSR, rs1      // rd = CSR;   CSR = rs1             |
 |____________________________________________________________________|
 |       31:20       |   19:15    |  14:12  |   11:7   |   6:0        |
 |       csr         |   rs1      |  funct3 |   rd     |   opcode     |
@@ -337,10 +337,10 @@
 
 
 
-CSRRS(Atomic Read and Set Bits in CSR)
+        CSRRS(Atomic Read and Set Bits in CSR)
         // CSRRS RD, CSR, RS1
 |_________________________________________________________| 
-|  csrrs x5, mie, x6           // x5 = mie; mie |= x6;    |
+|       csrrs x5, mie, x6       // x5 = mie; mie |= x6;   |
 |_________________________________________________________|  
 1 // CSRRS先读出“CSR”中的值，将其按“XLEN位”的宽度进行
   // “零扩展(zero-extend)”后写入“RD”； 然后逐个检查“RS1”中的值，

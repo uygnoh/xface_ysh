@@ -1,0 +1,234 @@
+/*******************************************************************************
+        => 编码器
+*******************************************************************************/
+// TIMx 从模式控制寄存器(TIMx_SMCR)
+// ____________________________________________________________
+        SMS[2:0]        // 从模式选择
+           001          // 计数器根据 TI1FP1 电平， 仅在 TI2FP2 边沿递增/递减计数
+           010          // 计数器根据 TI2FP2 电平， 仅在 TI1FP1 边沿递增/递减计数
+           011          // 计数器在 TI1FP1 和 TI2FP2 的边沿都计数， 计数的方向取决于另外一个信号的电平
+           
+           
+// ____________________________________________________________
+        编码器分辨率：  11 PPR
+        编码器供电:     5 V
+        电机减速比：    30:1
+        
+        
+        
+        
+        
+        
+/*******************************************************************************
+        => 编码器程序 1
+*******************************************************************************/
+        TIM3_CH1(PC6)           // 编码器 A 相
+        TIM3_CH2(PC7)           // 编码器 B 相
+        
+
+
+TIM_HandleTypeDef               TIM3_Handle;            // 定时器句柄
+TIM_Encoder_InitTypeDef         TIM3_Encode_Handle;     // 定时器编码句柄
+// 通用定时器， 编码器接口初始化
+// ____________________________________________________________
+void timx_encode_init(uint16_t arr, uint16_t psc)
+{
+        GPIO_InitTypeDef        gpio_init_struct;
+        
+        __HAL_RCC_GPIOC_CLK_ENABLE();
+        __HAL_RCC_TIM3_CLK_ENABLE();
+        
+        // 初始化编码器通道IO
+        gpio_init_struct.Pin            = GPIO_PIN_6 | GPIO_PIN_7;      // 编码器通道（1， 2）
+        gpio_init_struct.Mode           = GPIO_MODE_AF_PP;              // 复用推挽
+        gpio_init_struct.Pull           = GPIO_NOPULL;                  // 不上下拉
+        gpio_init_struct.Speed          = GPIO_SPEED_FREQ_HIGH;         // 高速
+        gpio_init_struct.Alternate      = GPIO_AF2_TIM3;                // IO复用
+        HAL_GPIO_Init(GPIOC, &gpio_init_struct);
+        
+        // 配置定时器编码器接口
+        TIM3_Handle.Instance            = TIM3;
+        TIM3_Handle.Init.Prescaler      = psc;
+        TIM3_Handle.Init.Period         = arr;
+        TIM3_Handle.Init.ClockDivision  = TIM_CLOCKDIVISION_DIV1;       // 不分频
+        
+        TIM3_Encode_Handle.EncoderMode  = TIM_ENCODERMODE_TIM12;        // TIM1, TIM2都检测（AB两相都检测）
+        TIM3_Encode_Handle.IC1Polarity  = TIM_ICPOLARITY_RISING;        // 边沿检测器设置， 非反相
+        TIM3_Encode_Handle.IC1Selection = TIM_ICSELECTION_DIRECTTI;     // 通道1映射到IC1
+        TIM3_Encode_Handle.IC1Prescaler = TIM_ICPSC_DIV1;               // 不分频
+        TIM3_Encode_Handle.IC1Filter    = 10;                           // 滤波器设置
+        
+        TIM3_Encode_Handle.IC2Polarity  = TIM_ICPOLARITY_RISING;        // 边沿检测器设置， 非反相
+        TIM3_Encode_Handle.IC2Selection = TIM_ICSELECTION_DIRECTTI;     // 通道2映射到IC2
+        TIM3_Encode_Handle.IC2Prescaler = TIM_ICPSC_DIV1;               // 不分频
+        TIM3_Encode_Handle.IC2Filter    = 10;                           // 滤波器设置
+        HAL_TIM_Encoder_Init(&TIM3_Handle, &TIM3_Encode_Handle);
+        
+        
+        HAL_TIM_Encoder_Start(&TIM_Handle, TIM_CHANNEL_1);              // 开启编码器1
+        HAL_TIM_Encoder_Start(&TIM_Handle, TIM_CHANNEL_2);              // 开启编码器2
+        
+        
+        
+        // 配置定时器中断
+        HAL_NVIC_SetPriority(TIM3_IRQn, 2, 0);
+        HAL_NVIC_EnableIRQ(TIM3_IRQn);
+        __HAL_TIM_CLEAR_FLAG(&TIM3_Handle, TIM_IT_UPDATE);      // 清除更新中断
+        __HAL_TIM_ENABLE_IT(&TIM3_Handle, TIM_IT_UPDATE);       // 开启更新中断
+        
+}
+
+        
+
+// 定时器3中断服务函数
+// ____________________________________________________________
+void TIM3_IRQHandler(void)
+{
+        HAL_TIM_IRQHandler(&TIM3_Handle);
+}
+
+
+
+// 向上溢出就加（1）， 向下溢出就减（1）
+// 中断回调函数
+// ____________________________________________________________
+volatile int timex_encode_count = 0;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+        // 判断 CR1的DIR位
+        if (__HAL_TIM_IS_TIM_COUNTING_DOWN(&TIM3_Handle)) {
+                timex_encode_count--;   // CR1[DIR] = 1; 递减计数
+        } else {
+                timex_encode_count++;   // CR1[DIR] = 0; 递增计数
+        }
+}
+
+        
+        
+// 获取编码器实际脉冲个数
+// ____________________________________________________________
+int32_t timx_get_encode(void)
+{
+        // 当前总计数值 = 计数器当前值 + 溢出次数 * 65535
+        return ((int32_t)(__HAL_TIM_GET_COUNTER(&TIM3_Handle) + timex_encode_count * 65535);
+}
+        
+
+
+// 电机速度计算
+// 电机转动一圈为 11 个脉冲数， 因为编码器采用 4 倍来采样
+// 电机的减速比： 30
+// 1, 计算（200ms）间隔的计数变化量         变化量var = 第二次计数 - 第一次计数
+// 2, 计算（1min）间隔的计数变化量          变化量var * 50 * 60
+// 3, 计算（1min）间隔编码器的输出脉冲个数   变化量var * 50 * 60 / 4
+// 4, 计算（1min）间隔编码器转过的圈数       变化量var * 50 * 60 / 4 / 11
+// 4, 计算电机转速                         变化量var * 50 * 60 / 4 / 30
+// ____________________________________________________________
+int32_t encode_old, encode_now, var;
+int32_t speed_computer(void)
+{
+        encode_now = timx_get_encode();         // 获取当前编码器计数值
+        var        = ecnode_now - encode_old;   // 计算计数变化量
+        encode_old = encode_now;
+        // 返回电机速度值（转/每分钟）
+        return (int32_t)(var * 5 * 60 / 4 / 11 / 30);
+}
+
+
+
+
+int main(void)
+{
+        timx_encode_init(0xffff, 0);
+
+        while (1) {
+                printf("编码器的计数值为: %d\n", timx_get_encode());
+                printf("电机的速度: %d\n", speed_computer());
+                // 延时200ms
+                delay_ms(200);
+        }
+}
+
+
+
+
+
+
+
+
+
+/*******************************************************************************
+        => 编码器程序 2
+*******************************************************************************/
+// 电机参数结构体
+typedef struct {
+        uint8_t state;          // 电机状态
+        float current;          // 电机电流
+        float volatage;         // 电机电压
+        float power;            // 电机功率
+        float speed;            // 电机速度
+        int32_t motor_pwm;      // 设置PWM
+} Motor_TypeDef;
+
+
+
+// ____________________________________________________________
+// 每 1ms 都会进入这个函数计算电机的速度
+// encode_now           // 编码器现在的数值
+// ms                   // 计算速度的间隔， 中断 1ms 进入一次
+
+Motor_TypeDef   motor;
+int32_t encode_old, encode_now, var;
+void speed_computer(int32_t encode_now, uint8_t ms)
+{
+        uint8_t i       = 0;
+        uint8_t j       = 0;
+        float temp      = 0.0;
+        static uint8_t sp_count = 0;
+        static uint8_t k        = 0;
+        static float speed_arr[10] = {0.0};     // 存储速度进行滤波运算
+        
+        if (sp_count == ms) {                   // 50ms 计算一次速度
+                // 计算电机转速
+                // 每1步： 计算50ms计数变化量
+                // 每2步： 计算1min内计数变化量
+                // 每3步： 除以编码器旋转一圈的计数次数
+                // 每4步： 除以减速比即可得出电机转速
+                encode_now = timx_get_encode();         // 获取当前编码器计数值
+                var        = ecnode_now - encode_old;   // 计算计数变化量
+                speed_arr[k++] = (float)(var * ((1000 / ms) * 60.0)  / 4 / 11 / 30;
+                encode_old = encode_now;                // 保存当前编码器的值
+                
+                // 累计10次速度值， 后续进行滤波
+                if (k == 10) {                          // 冒泡排序算法
+                        for (i = 10; i >= 1; i--) {
+                                for (j = 0; i < (i-1); j++) {
+                                        if (speed_arr[j] > speed_arr[j+1]) {
+                                                temp = speed_arr[j];
+                                                speed_arr[j] = speed_arr[j+1];
+                                                speed_arr[j+1] = temp;
+                                                
+                                        }
+                                }
+                        }
+                        temp = 0.0;
+                        
+                        for (i = 2; i < 8; i++) {       // 去除两边高低数据
+                                temp += speed_arr[i];   // 将中间数据累加
+                        }
+                        
+                        temp = (float)(temp / 6);       // 求速度平均值
+                        
+                        // 一阶低通滤波
+                        // 公式： Y(n) = qX(n) + (1-q)Y(n-1)
+                        // X(n)         为本次采样值
+                        // Y(n-1)       为上次滤波输出值
+                        // Y(n)         为本次滤波输出值
+                        // q            为滤波系数
+                        motor.speed = (float)(((float)0.48 * temp) + (motor.speed * (float)0.052));
+                }
+                sp_count = 0;
+        }
+        sp_count++;
+}
+

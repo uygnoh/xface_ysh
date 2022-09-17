@@ -1,0 +1,10 @@
+// LwIP 使用一个数据结构 - netif - 来描述一个网卡
+
+
+
+// netif 相关底层函数
+static void low_level_init(struct netif *netif);
+static err_t low_level_output(struct netif *netif, struct pbuf *p);
+static struct pbuf *low_level_input(struct netif *netif);
+err_t ethernetif_init(struct netif *netif);
+void ethernetif_input(void *pParams);

@@ -1,0 +1,100 @@
+// ESP32-C3 中断触发方式
+        GPIO_INTR_DISABLE       // 禁用GPIO中断
+        GPIO_INTR_POSEDGE       // GPIO中断类型：上升沿
+        GPIO_INTR_NEGEDGE       // 下降沿
+        GPIO_INTR_ANYEDGE       // 上升沿和下降沿
+        GPIO_INTR_LOW_LEVEL     // 输入低电平触发
+        GPIO_INTR_HIGH_LEVEL    // 输入高电平触发
+        
+        
+        
+// 简单方法
+// ____________________________________________________________
+gpio_pad_select_gpio(GPIO_NUM_36);
+gpio_set_direction(GPIO_NUM_36, GPIO_MODE_INPUT);
+gpio_intr_enable(GPIO_NUM_36);
+gpio_set_intr_type(GPIO_NUM_36, GPIO_INTR_NEGEDGE);
+gpio_pullup_en(GPIO_NUM_36);
+
+
+
+// 结构体方法
+// ____________________________________________________________
+#define GPIO_INPUT_IO_0    36
+#define GPIO_INPUT_PIN_SEL  (1ULL<<GPIO_INPUT_IO_0)      // 配置GPIO_IN位寄存器
+
+void gpio_init(void)
+{
+        gpio_config_t io_conf;                          // 定义一个gpio_config类型的结构体，下面的都算对其进行的配置
+
+        io_conf.intr_type    = GPIO_INTR_NEGEDGE;       // 下降沿触发
+        io_conf.mode         = GPIO_MODE_INPUT;         // 选择输入模式
+        io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;      // 配置GPIO_IN寄存器
+        io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;   //
+        io_conf.pull_up_en   = GPIO_PULLUP_ENABLE;      // 内部上拉
+
+        gpio_config(&io_conf);                          // 最后配置使能
+}
+
+
+
+// 配置FreeRTOS任务和队列
+// https://www.jianshu.com/p/a10c180315b0
+// ____________________________________________________________
+// 注意：gpio_isr_handler中断回调函数是加载在IRAM_ATTR中，不能执行其他耗时操作，包括printf打印信息
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "driver/gpio.h"
+
+#define ESP_INTR_FLAG_DEFAULT 0
+
+static xQueueHandle gpio_evt_queue = NULL; //定义一个队列返回变量
+
+void IRAM_ATTR gpio_isr_handler(void* arg) 
+{
+        // 把中断消息插入到队列的后面，将gpio的io参数传递到队列中
+        uint32_t gpio_num = (uint32_t) arg;
+        xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
+}
+
+void gpio_task(void* arg) 
+{
+        printf(" \r\n start gpio task ...\r\n  ");
+        uint32_t io_num;
+        for (;;) {
+                // 不断读取gpio队列，读取完后将删除队列
+                if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
+                        printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
+                }
+        }
+}
+
+void gpio_intr_init(void)
+{
+        // 注册中断服务
+        gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+        // 设置GPIO的中断回调函数
+        gpio_isr_handler_add(GPIO_INPUT_IO_0, gpio_isr_handler, (void*) GPIO_INPUT_IO_0);
+        // 创建一个消息队列，从中获取队列句柄
+        gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
+        // 创建GPIO检测任务
+        xTaskCreate(gpio_task     // 任务函数
+            , "gpio_task_example" // 任务名字
+            , 2048                // 任务堆栈大小
+            , NULL                // 传递给任务函数的参数
+            , 10                  // 任务优先级
+            , NULL);              // 任務句柄
+}
+
+
+
+
+
+
+
+
+
+
+
+
