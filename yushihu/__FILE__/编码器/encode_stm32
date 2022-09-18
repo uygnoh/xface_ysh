@@ -11,7 +11,7 @@
            
 // ____________________________________________________________
         编码器分辨率：  11 PPR
-        编码器供电:     5 V
+        编码器供电:     5  V
         电机减速比：    30:1
         
         
@@ -53,6 +53,7 @@ void timx_encode_init(uint16_t arr, uint16_t psc)
         TIM3_Handle.Init.ClockDivision  = TIM_CLOCKDIVISION_DIV1;       // 不分频
         
         TIM3_Encode_Handle.EncoderMode  = TIM_ENCODERMODE_TIM12;        // TIM1, TIM2都检测（AB两相都检测）
+                                                                        // 4 倍来检测
         TIM3_Encode_Handle.IC1Polarity  = TIM_ICPOLARITY_RISING;        // 边沿检测器设置， 非反相
         TIM3_Encode_Handle.IC1Selection = TIM_ICSELECTION_DIRECTTI;     // 通道1映射到IC1
         TIM3_Encode_Handle.IC1Prescaler = TIM_ICPSC_DIV1;               // 不分频
@@ -220,12 +221,12 @@ void speed_computer(int32_t encode_now, uint8_t ms)
                         temp = (float)(temp / 6);       // 求速度平均值
                         
                         // 一阶低通滤波
-                        // 公式： Y(n) = qX(n) + (1-q)Y(n-1)
+                        // 公式： Y(n)   =  q * X(n) + (1-q) * Y(n-1)
                         // X(n)         为本次采样值
                         // Y(n-1)       为上次滤波输出值
                         // Y(n)         为本次滤波输出值
                         // q            为滤波系数
-                        motor.speed = (float)(((float)0.48 * temp) + (motor.speed * (float)0.052));
+                        motor.speed = (float)(((float)0.48 * temp) + (motor.speed * (float)0.52));
                 }
                 sp_count = 0;
         }
