@@ -63,6 +63,8 @@
    NUM_INTERRUPT [12:0]         // 只读
                                 // 硬件支持的中断源数目
 
+
+
 //      cliccfg
 // ____________________________________________________________
   nlbits[4:1]           // 用于指定 clicintctl[i]寄存器中 Level 域的比特数
@@ -364,13 +366,14 @@ void EXTI0_IRQHandler(void)
 /*******************************************************************************
         => gdvf32 向量中断
 *******************************************************************************/
-retcode = ECLIC_Register_IRQ(   EXTI0_IRQn, ECLIC_NON_VECTOR_INTERRUPT, //非向量中断
-                                ECLIC_LEVEL_TRIGGER, 3, 0, NULL );
-retcode = ECLIC_Register_IRQ(   TIMER2_IRQn, ECLIC_VECTOR_INTERRUPT,    //向量中断
-                                ECLIC_LEVEL_TRIGGER, 2, 0, NULL );
-retcode = ECLIC_Register_IRQ(   TIMER1_IRQn, ECLIC_VECTOR_INTERRUPT,    //向量中断
-                                ECLIC_LEVEL_TRIGGER, 1, 0, NULL );
-
+// 向量中断需要加上下面这句话
+// ____________________________________________________________
+   #define __INTERRUPT     __attribute__((interrupt))
+   
+   
+   
+// 向量中断中上下文的保护函数
+// ____________________________________________________________
 #define SAVE_IRQ_CSR_CONTEXT()                          \
         rv_csr_t __mcause = __RV_CSR_READ(CSR_MCAUSE);  \
         rv_csr_t __mepc   = __RV_CSR_READ(CSR_MEPC);    \
@@ -381,26 +384,37 @@ retcode = ECLIC_Register_IRQ(   TIMER1_IRQn, ECLIC_VECTOR_INTERRUPT,    //向量
         __RV_CSR_WRITE(CSR_MSUBM, __msubm);             \
         __RV_CSR_WRITE(CSR_MEPC,  __mepc);              \
         __RV_CSR_WRITE(CSR_MCAUSE,__mcause);
+
+
+
+retcode = ECLIC_Register_IRQ(   EXTI0_IRQn, ECLIC_NON_VECTOR_INTERRUPT, // 非向量中断
+                                ECLIC_LEVEL_TRIGGER, 3, 0, NULL );
+retcode = ECLIC_Register_IRQ(   TIMER2_IRQn, ECLIC_VECTOR_INTERRUPT,    // 向量中断
+                                ECLIC_LEVEL_TRIGGER, 2, 0, NULL );
+retcode = ECLIC_Register_IRQ(   TIMER1_IRQn, ECLIC_VECTOR_INTERRUPT,    // 向量中断
+                                ECLIC_LEVEL_TRIGGER, 1, 0, NULL );
+
+
         
-//第一种向量中断
+// 第一种向量中断
 //_____________________________________________________________     
 __INTERRUPT void TIMER1_IRQHandler(void)
 {
-        //Save CSR context
+        // 保存上下文环境
         SAVE_IRQ_CSR_CONTEXT();
         
-        //中断处理程序
+        // 中断处理程序
         
-        //Restore CSR context
+        // 恢复上下文环境
         RESTORE_IRQ_CSR_CONTEXT();
 }
 
 
-//第二种向量中断
+// 第二种向量中断
 //_____________________________________________________________    
 __INTERRUPT void TIMER2_IRQHandler(void)
 {
-        //进入中断时间较快
+        // 不保存上下文环境， 进入中断时间较快
 }
 
 

@@ -2,25 +2,25 @@
         => 位置式__PID__
 *******************************************************************************/
 typedef struct {
-        float sv;       //用户设定值
-        float pv;       //传感器传回数据
-        float kp;       //比例系数
-        float t;        //PID计算周期--采样周期
-        float ti;       //积分时间（常数）
-        float td;       //微分时间（常数）
-        float ek;       //本次偏差
-        float ek_1;     //上次偏差
-        float sum_ek;   //历史偏差之和
-        float pout;     //P算法计算结果
-        float iout;     //I算法计算结果
-        float dout;     //D算法计算结果
-        float out;      //（PID）算法计算结果
-        float out0;     //当（PID==0）时，加上一个常数，使控制不会失控
-        uint16_t xms;   //由定时器产生（每1m增加一次）
+        float sv;       // 用户设定值
+        float pv;       // 传感器传回数据
+        float kp;       // 比例系数
+        float t;        // PID计算周期--采样周期
+        float ti;       // 积分时间（常数）
+        float td;       // 微分时间（常数）
+        float ek;       // 本次偏差
+        float ek_1;     // 上次偏差
+        float sum_ek;   // 历史偏差之和
+        float pout;     // P算法计算结果
+        float iout;     // I算法计算结果
+        float dout;     // D算法计算结果
+        float out;      // （PID）算法计算结果
+        float out0;     // 当（PID==0）时，加上一个常数，使控制不会失控
+        uint16_t xms;   // 由定时器产生（每1m增加一次）
         uint16_t pwmcycle;      //PWM周期
 } pid;
 
-//1MS中断一次
+// 1MS中断一次
 void TIM3_IRQHandler(void)
 {
         uint8_t status;

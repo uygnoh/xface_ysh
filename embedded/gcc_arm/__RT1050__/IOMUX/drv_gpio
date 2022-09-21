@@ -125,6 +125,7 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
 
 //______________________________________________________________________________
 //      => MIMXRT1052.h
+//      => IOMUXC_SW_PAD_CTL_PAD_GPIO_XXXX 电气属性配置
 //______________________________________________________________________________
 
 // 压摆率设置            
@@ -247,7 +248,7 @@ static inline void IOMUXC_SetPinConfig(uint32_t muxRegister,
 //______________________________________________________________________________
 void led_init(void)
 {
-        // 配置PAD模式为： GPIO
+        // 配置复用功能为（GPIO01-09）
         IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_09_GPIO01_IO09, 0U);
         // 配置PAD属性：压摆率低速 驱动电阻260 速率100MHz
         IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_09_GPIO1_IO09，
