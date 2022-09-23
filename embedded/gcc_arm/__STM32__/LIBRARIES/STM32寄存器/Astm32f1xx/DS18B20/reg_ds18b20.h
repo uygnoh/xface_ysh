@@ -1,5 +1,5 @@
-#ifndef __REG_DS18B20_H__
-#define __REG_DS18B20_H__
+#ifndef __YSH_DS18B20_H__
+#define __YSH_DS18B20_H__
 #include "common.h"
 
 //DS18B20__数据方向设置__(PIN_11)

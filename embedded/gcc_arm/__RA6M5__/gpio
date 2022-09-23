@@ -1,7 +1,0 @@
-// PCNTR1(Port Control Register 1) 端口控制寄存器1
-// Base address: PORTm = 0x4008_0000 + 0x0020 × m (m = 0 to 9, A, B)
-// ____________________________________________________________
-31:16   PODR15 - PODR0          // Pmn Output Data
-15:0    PDR15  - PDR0           // Pmn Direction
-
-PORT0->PCNTR1

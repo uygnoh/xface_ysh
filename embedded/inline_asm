@@ -2,7 +2,7 @@
         => gcc-arm-none-eabi
 *******************************************************************************/
 //通用的内嵌汇编模版
-asm (assembler template 
+asm (assembler template                       // 汇编语句
 		: output operands             // optional  输出运算符列表
 		: input operands              // optional  输入运算符列表
 		: list of clobbered registers // optional  被更改资源列表
@@ -10,7 +10,7 @@ asm (assembler template
 
 
 
-//http://www.ethernut.de/en/documents/arm-inline-asm.html
+// http://www.ethernut.de/en/documents/arm-inline-asm.html
 // 换行符和制表符的使用可以使得指令列表看起来变得美观
 // 下例中内嵌了一条汇编指令实现了将立即数（1）赋值给寄存器R1的操作
 // 由于没有任何形式的输入和输出，所以输入和输出列表的位置上什么都没有填写

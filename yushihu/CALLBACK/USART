@@ -1,4 +1,13 @@
+//______________________________________________________________________________
+//      UART 中断处理模式
+//______________________________________________________________________________
+        ORE-过载错误： 收到一帧数据没有即时处理， 新到来的数据会覆盖旧数据
+
+
+
+
 // 中断发送
+// ____________________________________________________________
 HAL_StatusTypeDef       HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, 
                                              uint8_t *pData, 
                                              uint16_t size)
@@ -8,6 +17,7 @@ void HAL_UART_TxCpltCallback(UaRT_HandleTypeDef *huart)
 
 
 // 中断接收
+// ____________________________________________________________
 HAL_StatusTypeDef       HAL_UART_Receive_IT(UART_HandleTypeDef *huart, 
                                              uint8_t *pData, 
                                              uint16_t size)
@@ -23,16 +33,8 @@ void HAL_UART_ErrorCallback(UaRT_HandleTypeDef *huart)
 //______________________________________________________________________________
 //      UART 中断编程流程
 //______________________________________________________________________________
-        1. 初始化串口
-        2. 开启中断
-        3. 实现中断响应函数
-        4. HAL_UART_Transmit_IT
-           HAL_UART_Receive_IT
-        5. 重写回调函数
-        
-        
-        
 
+        
         1. 初始化串口
 // ____________________________________________________________
         // 配置GPIO引脚
@@ -80,7 +82,9 @@ void HAL_UART_ErrorCallback(UaRT_HandleTypeDef *huart)
 
         5 重写回调函数
 // ____________________________________________________________
-
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 
 
 
@@ -137,11 +141,10 @@ void HAL_UART_RxCpltCallback(UART_HnadleTypeDef *huart)
 
 
 #include <stdio.h>
-UART_HandleTypeDef huart1;
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#endif
-PUTCHAR_PROTOTYPE
+UART_HandleTypeDef      huart1;
+
+// printf 处理函数
+int __io_putchar(int ch)
 {
         HAL_UART_Transmit(&huart, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
 }
