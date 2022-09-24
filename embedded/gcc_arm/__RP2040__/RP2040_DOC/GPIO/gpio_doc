@@ -1,0 +1,61 @@
+//______________________________________________________________________________
+//      => RP2040-GPIO
+//______________________________________________________________________________
+        Slew Rate               // 压摆率(上升速率)
+        Output Enable           // 输出使能
+        Output Data             // 输出数据
+        Drive Strength          // 驱动器强度
+        
+        
+        Input Enable            // 输入使能
+        Input Data              // 输入数据
+        Schmitt Trigger         // 施密特触发器
+        Pull Up / Pull Down     // 上拉 / 下拉
+        
+        
+        
+//______________________________________________________________________________
+//      => RP2040-GPIO 寄存器
+//______________________________________________________________________________
+        GPIO0_STATUS            // GPIO0 状态寄存器
+        IRQTOPROC       [26]    // interrupt to processors, after override is applied
+        IRQFROMPAD      [24]    // interrupt from pad before override is applied
+        INTOPERI        [19]    // input signal to peripheral, after override is applied
+        INFROMPAD       [17]    // input signal from pad, before override is applied
+        OETOPAD         [13]    // output enable to pad after register override is applied
+        OEFROMPERI      [12]    // output enable from selected peripheral, before register override is applied
+        OUTTOPAD        [9]     // output signal to pad after register override is applied
+        OUTFROMPERI     [8]     // output signal from selected peripheral, before register override is applied
+        
+        
+        
+        GPIO0_CTRL              // GPIO 控制寄存器
+        IRQOVER[29:28]
+                00              // don’t invert the interrupt
+                01              // invert the interrupt
+                10              // drive interrupt low
+                11              // drive interrupt high
+        INOVER[17:16]
+                00              // don’t invert the peri input
+                01              // invert the peri input
+                10              // drive peri input low
+                11              // drive interrupt high
+        OEOVER[13:12]
+                00              // drive output enable from peripheral signal selected by funcsel
+                01              // drive output enable from inverse of peripheral signal selected by funcsel
+                10              // disable output
+                11              // enable output
+        OUTOVER[9:8]
+                00              // drive output from peripheral signal selected by funcsel
+                01              // drive output from inverse of peripheral signal selected by funcsel
+                10              // drive output low
+                11              // drive output high
+        FUNCSEL[4:0]
+                                // Funciton select
+                                // 31 == NULL
+                
+                
+                
+                
+                
+                

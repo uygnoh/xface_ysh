@@ -149,11 +149,9 @@
         
         
 /*******************************************************************************
-        => gdvf32 计时器中断和软件配置
+        => 内部中断
+        => 计时器中断Timer-Interrupt + 软件中断Software-Interrupt
 *******************************************************************************/
-外部中断    // 外部设备产生的中断
-内部中断    // （计时器中断Timer-Interrupt + 软件中断Software-Interrupt）
-
 
         0xD100_0000     mtime_lo        // 计时器的低32位
         0xD100_0004     mtime_hi        // 计时器的高32位
@@ -191,15 +189,12 @@ int32_t ECLIC_Register_IRQ(
 
 
 
-
 /*******************************************************************************
-        => gdvf32 计时器中断和软件中断例程
+        => 内部中断程序
 *******************************************************************************/
-        // RV32-gdvf32 内核中断例程
-        // RV32-gdvf32 计时器中断运行10次， 软件中断运行10次，程序停止
-
-
-
+// RV32-gdvf32 内核中断例程
+// RV32-gdvf32 计时器中断运行10次， 软件中断运行10次，程序停止
+//_____________________________________________________________
 #include <stdio.h>
 #include "nuclei_sdk_soc.h"
 
@@ -262,6 +257,7 @@ void software_irq_handler(void)
 
 int main(void)
 {
+        //_____________________________________________________
         // 第一个例程（计时器中断）
         //_____________________________________________________
         uint32_t returnCode;
@@ -273,13 +269,15 @@ int main(void)
                 0,                              // 中断优先级
                 mtimer_irq_handler);            // 注册计时器中断
                     
-        __enable_irq();                         //打开全局中断
+        __enable_irq();                         // 打开全局中断
         
         setup_timer();                          // 内核计时器设置
         while (int0_cnt < 10);                  // 计时器中断进入（10）， 则关闭它
         ECLIC_DisableIRQ(SysTimer_IRQn);        // 关闭计时器中断
 
-        
+
+
+        //_____________________________________________________
         // 第二个例程（软件中断）
         //_____________________________________________________
         returnCode = ECLIC_Register_IRQ(
@@ -304,61 +302,24 @@ int main(void)
 /*******************************************************************************
         => 外部中断
 *******************************************************************************/
-#include "gd32vf103.h"
-#include "systick.h"
-
-#define LED_PIN                 GPIO_PIN_7
-#define LED_GPIO_PORT           GPIOA
-#define LED_GPIO_CLK            RCU_GPIOA
-
-#define KEY_PIN                 GPIO_PIN_0
-#define KEY_GPIO_PORT           GPIOA
-#define KEY_GPIO_CLK            RCU_GPIOA
-#define KEY_EXTI                EXTI0_IRQn
-#define KEY_PORT_SOURCE         GPIO_PORT_SOURCE_GPIOA
-#define KEY_PIN_SOURCE          GPIO_PIN_SOURCE_0
-#define KEY_LINE                EXTI_0
-
 int main(void)
 {
-	//LED
-	rcu_periph_clock_enable(LED_GPIO_CLK);	//enable the peripherals clock
-	gpio_init(LED_GPIO_PORT, GPIO_MODE_OUT_PP,
-			GPIO_OSPEED_50MHZ, LED_PIN);	//GPIO output with push-pull
-	GPIO_BC(LED_GPIO_PORT) = LED_PIN;	//bit clear
-
-	//KEY
-	eclic_global_interrupt_enable();	//enable the global interrupt
-	eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL3_PRIO1);	//set the priority group
-	rcu_periph_clock_enable(KEY_GPIO_CLK);	//enable the peripherals clock
-	rcu_periph_clock_enable(RCU_AF);	//enable alternate function clock
-	gpio_init(KEY_GPIO_PORT, GPIO_MODE_IN_FLOATING,
-			GPIO_OSPEED_50MHZ, KEY_PIN);	//configure button pin as input
-	eclic_irq_enable(KEY_EXTI, 1, 1);	//enable the EXTI0 interrupt @priority(1, 1)
-	gpio_exti_source_select(KEY_PORT_SOURCE,
-			KEY_PIN_SOURCE);	//select GPIO pin exti sources
-	exti_init(KEY_LINE, EXTI_INTERRUPT, EXTI_TRIG_FALLING);	//configure key EXTI line
-	exti_interrupt_flag_clear(KEY_LINE);	//clear EXTI lines pending flag
-
-    while(1){
-    	//GPIO_BOP(LED_GPIO_PORT) = LED_PIN; //1
-    	//delay_1ms(1000);
-    	//GPIO_BC(LED_GPIO_PORT) = LED_PIN; //0
-        //delay_1ms(1000);
-    }
-}
-
-void Toggle_LED(void) {
-	gpio_bit_write(LED_GPIO_PORT, LED_PIN,
-			(bit_status)(1-gpio_input_bit_get(LED_GPIO_PORT, LED_PIN)));
-}
-
-void EXTI0_IRQHandler(void)
-{
-    if(RESET != exti_interrupt_flag_get(KEY_LINE)){
-        exti_interrupt_flag_clear(KEY_LINE);
-        Toggle_LED();
-    }
+        int32_t retcode;
+        gd_rvstart_led_init(LED3);
+        gd_rvstart_key_init(WAKEUP_KEY_GPIO_PORT, KEY_MODE_EXTI);
+        
+        key_exti_init();
+        
+        retcode = ECLIC_Register_IRQ(   EXTI0_IRQn,
+                                        ECLIC_NON_VECTOR_INTERRUPT,
+                                        ECLIC_LEVEL_TRIGGER, 
+                                        1,
+                                        0,
+                                        NULL);
+        __enable_irq();
+        
+        while (1);
+        return 0;
 }
 
 
@@ -366,6 +327,16 @@ void EXTI0_IRQHandler(void)
 /*******************************************************************************
         => gdvf32 向量中断
 *******************************************************************************/
+        // 直接跳转中断服务函数， 没有上下文保护
+        // 中断服务函数使用（__attribute__((interrupt))）,
+        // 编译器会自动进行判断， 当发现该函数调用了其它子函数，
+        // 则会自动插入一段代码进行上下文保存。
+        // 全局中断关闭（mstatus.MIE）， 默认不支持中断嵌套
+
+
+
+
+
 // 向量中断需要加上下面这句话
 // ____________________________________________________________
    #define __INTERRUPT     __attribute__((interrupt))
