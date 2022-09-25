@@ -1,5 +1,5 @@
 //______________________________________________________________________________
-//      => RP2040-GPIO
+//      => RP2040 - GPIO
 //______________________________________________________________________________
         Slew Rate               // 压摆率(上升速率)
         Output Enable           // 输出使能
@@ -15,9 +15,10 @@
         
         
 //______________________________________________________________________________
-//      => RP2040-GPIO 寄存器
+//      => RP2040 - IO_BANK0_BASE : 0x40014000 
 //______________________________________________________________________________
-        GPIO0_STATUS            // GPIO0 状态寄存器
+        GPIOx_STATUS            //      GPIO0 状态寄存器
+                                // _____________________________________________
         IRQTOPROC       [26]    // interrupt to processors, after override is applied
         IRQFROMPAD      [24]    // interrupt from pad before override is applied
         INTOPERI        [19]    // input signal to peripheral, after override is applied
@@ -29,7 +30,8 @@
         
         
         
-        GPIO0_CTRL              // GPIO 控制寄存器
+        GPIOx_CTRL              //      GPIO 控制寄存器
+                                // _____________________________________________
         IRQOVER[29:28]
                 00              // don’t invert the interrupt
                 01              // invert the interrupt
@@ -55,7 +57,54 @@
                                 // 31 == NULL
                 
                 
-                
-                
-                
+//______________________________________________________________________________
+//      => RP2040 - PADS_BANK0_BASE : 0x4001c000
+//______________________________________________________________________________
+        
+        GPIO0           Offsets: 0x04
+        GPIO1           Offsets: 0x08
+        .............................
+        GPIO28          Offsets: 0x74
+        GPIO29          Offsets: 0x78
+        //_____________________________________________________
+        OD[7]           // Output disable. Has priority over output enable from peripherals
+        OE[6]           // Input  enable
+        DRIVE[5:4]      // Drive  strength
+                00      // 2  mA
+                01      // 4  mA
+                10      // 8  mA
+                11      // 12 mA
+        PUE[3]          // Pull up enable
+        PDE[2]          // Pull down enable
+        SCHMITT[1]      // Enable schmitt trigger
+        SLEWFAST[0]     // Slew rate control. 1 = Fast, 0 = Slow
+        
+        
+        
+        
+        
+        
+        
+        
+
+//______________________________________________________________________________
+//      => RP2040 - SIO_BASE : 0xd0000000
+//______________________________________________________________________________
+        
+        SIO: GPIO_IN      Register      Offset: 0x04    // GPIO输入寄存器
+        SIO: GPIO_OUT     Register      Offset: 0x010   // GPIO输出寄存器
+        SIO: GPIO_OUT_SET Register      Offset: 0x014   // GPIO输出设置寄存器
+        SIO: GPIO_OUT_CLR Register      Offset: 0x018   // GPIO输出清除寄存器
+        SIO: GPIO_OUT_XOR Register      Offset: 0x01c   // GPIO输出XOR寄存器
+        SIO: GPIO_OE      Register      Offset: 0x020   // GPIO输出使能寄存器
+        SIO: GPIO_OE_SET  Register      Offset: 0x024
+        SIO: GPIO_OE_CLR  Register      Offset: 0x028
+        SIO: GPIO_OE_XOR  Register      Offset: 0x02c
+                                
+                                
+                                
+                                
+                                
+                                
+                                
                 
