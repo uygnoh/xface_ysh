@@ -19,7 +19,7 @@
                 ISR     //
                 OSR     //
                 FIFO    // 数据的推入或拉出
-                DMA     // 持续吞吐量高达1字每系统时钟，若系统时钟为100MHz，每秒最高吞吐量为“100M字”
+                DMA     // 持续吞吐量高达1字节每系统时钟，若系统时钟为100MHz，每秒最高吞吐量为“100M字”
                 IRQ     // PIO总共有8个中断表示位，可以同步状态机或其它用途
                 DIV     // 一个16位整数，8位小数的小数时钟分频器
 
@@ -251,3 +251,156 @@ SET destination, data
 
 
 
+
+
+
+
+/*******************************************************************************
+        => Micropython-pio
+*******************************************************************************/
+//MicroPython引入了一个新的@rp2.Asm_pio装饰器和rp.PIO类
+
+
+//PIO程序的定义和状态机配置
+1 程序定义，包括使用了多少个引脚，使用到的引脚都可以使用装饰器完成
+2 程序设置，设置状态机的频率，将引脚映射绑定到某一个引脚并指定一个状态机来运行特定的程序
+
+
+//@asm_pio装饰器
+//装饰器的本质是一个函数， 站其它函数不需要任何代码上的改动的前提下，添加额外的功能
+@asm_pio(
+        out_init=None,          //输出引脚初始化(rp.PIO.OUT_HIGH rp.PIO.OUT_LOW)
+        set_init=None,          //设置引脚初始化(rp.PIO.OUT_HIGH rp.PIO.OUT_LOW)
+        sideset_init=None,      //侧置引脚初始化(rp.PIO.OUT_HIGH rp.PIO.OUT_LOW)
+        
+        in_shiftdir=0,          //数据输入方向(PIO.SHIFT_RIGHT)
+                                则OSR的低位先时行输出，若向左移动则高位先时行输出
+        out_shiftdir=0,         //数据输出方向(PIO.SHIFT_LEFT)
+                                则OSR的高位先进行输出，若向右移动则低位先时行输出
+                                
+        autopush=False,         //自动推送
+        autopull=False,         //自动拉取
+        push_thresh=32,         //推送阈值
+        pull_thresh=32,         //拉取阈值
+        
+        fifo_join=0             //
+)
+
+
+//MicroPyton使用PIO是以状态机为单位的，所以我们的函数都是围绕着状态机的
+rp2.StateMachine(sm_id, program, freq=-1, *, in_base=None, out_base=None,
+        set_base=None, jmp_pin=None, sideset_base=None, in_shiftdir=None,
+                out_shifdir=None, push_thresh=None, pull_thresh=None)
+sm_id           //使用状态机ID， 0~3为“PIO0”， 4~7为“PIO1”
+program         //状态机运行程序
+freq            //状态机运行频率，默认为系统时钟频率
+in_base         //用于in()指令的第一个引脚
+out_base        //用于out()指令的第一个引脚
+set_base        //用于set()指令的第一个引脚
+jmp_pin         //用于jmp(pin, ...)指令的第一个引脚
+sideset_base    //用于侧置的第一个引脚
+in_shiftdir     //ISR将移动的方向
+out_shiftdir    //OSR将移动的方向
+push_thresh     //推送阈值
+pull_thresh     //拉取阈值
+
+
+//active获取或设置状态机当前是否正在运行
+//当value不为空，为设置状态机，反之则为获取当前状态机
+StateMachine.active([value])
+
+//重新启动状态机，并跳转到程序的起始地址
+StateMachine.restart()
+
+//函数EXEC为执行单个PIO指令
+StateMachine.exec(instr)
+
+//从状态机RX_FIFO中提取一个字
+//如果FIFO为空，它会阻塞直到数据到达（即状态机推送一个字）
+//shift为在返回之前右移位数
+StateMachine.get(buf=None, shift=0)
+
+//put函数将一个字推送到状态机的TX_FIFO中
+//如果TX_FIFO已满，它将阻塞直到有空间（即状态机拉一个字）
+//shift在推送之前左移位数
+StateMachine.put(value, shift=0)
+
+//RX_FIFO和TX_FIFO函数其作用为读取对应fifo中的字数
+StateMachine.rx_fifo()
+StateMachine.tx_fifo()
+
+
+
+/*******************************************************************************
+        => Micropython-pio 例程
+*******************************************************************************/
+//WS2812B是一款单总线驱动的控制电路与发光电路与一体的智能外控LED光源
+//可采用单线输出方式，串接LED使之输出动作同步, 数据协议采用单极性归零码
+//因为内部集成控制电路，显示更趋细腻平滑, 数据发送速度可达800Kbps
+
+import time
+form machine import Pin
+improt rp2
+
+max_lum = 100
+r=0
+g=0
+b=0
+
+//通过adm_pio装饰器初始化PIO
+//初始化了侧置引脚, 因为这里只有一个初始化信息，说明侧置引脚的数量为“1”
+//数据输出移动方向为由右向左移动
+//开启了自动拉取，当OSR达到阈值，自动将TX—FIFO中的数据拉取到OSR中
+//拉取阈值为24位，也就是发送数据的长度
+@rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shifdir=rp2.PIO.SHIFT_LEFT,
+        autopull=True, pull_thresh=24)
+def ws2812()
+        T1 = 2
+        T2 = 5
+        T3 = 3
+        wrap_target()   //程序包装开始
+        label("bitloop")
+        //将OSR的数据读取“1位”到X寄存器中，并将侧引脚设置为“0”，延时2个时钟周期
+        out(x, 1)               .side(0)        [T3 - 1]
+        //如果X中的数值为“0”则跳转到标签“do_zero”，反之则顺序执行一下条指令
+        //同时将侧置设置为“1”，延时1个时钟周期
+        jmp(not_x, "do_zero")   .side(1)        [T1 - 1]
+        //如果顺序运行则会跳转标签“bitloop”并同时将侧置设置为“1”，延时4个时钟周期
+        //用于表示数据“1”
+        jmp("bitloop")          .side(1)        [T2 - 1]
+        label("do_zero")
+        nop()                   .side(0)        [T2 - 1]
+        wrap()          //程序包装结束
+        
+        
+//状态机初始化
+sm = rp2.StateMachine(0, ws2812, freq=8_000_000, sideset_base=Pin(4))
+//打开状态机
+sm.active(1)       
+
+//在循环中，我们不断的改变RGB数值，并通过sm.put()函数将数值传输给TXFIFO
+//TXFIFO会自动被状态机拉取到OSR寄存器中，并执行WS2812驱动程序实现不同颜色的呼吸灯
+while (Ture)
+        for i in range(0, max_lum):
+                r=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)
+        
+        for i in range(0, max_lum):
+                g=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)
+        
+        for i in range(0, max_lum):
+                b=i
+                b=max_lum-i
+                rgb = (g<<24) | (r<<16) | (b<<8)
+                sm.put(rgb)
+                time.sleep_ms(10)
+        time.sleep_ms(300)

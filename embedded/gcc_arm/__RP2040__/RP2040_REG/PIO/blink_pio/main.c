@@ -5,7 +5,7 @@
 
 int main(void) {
         static const uint led_pin = 25;
-        static const float pio_freq = 2000;     // Hz
+        static const float pio_freq = 2000;     // 2000Hz
         
         // 选择PIO硬件（PIO0 或 PIO1）
         PIO pio = pio0;
@@ -20,7 +20,7 @@ int main(void) {
         // Calculate the PIO clock divider
         float div = (float)clock_get_hz(clk_sys) / pio_freq;
         
-        //
+        // 初始化 PIO
         blink_program_init(pio, sm, offset, led_pin, div);
         
         // Start running our PIO program int the state machine
