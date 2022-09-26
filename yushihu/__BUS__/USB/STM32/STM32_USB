@@ -271,7 +271,7 @@ JoyStick_InterfaceDescriptor[] = {
 };
 
 
-// 端点描述符（Endpiint Descriptor）
+// 端点描述符（Endpoint Descriptor）
 // ____________________________________________________________
 Offset  Field               Size    Value       描述
   0     bLength              1      数字        // 该描述字包含的字节数目，一般是 7
@@ -291,7 +291,7 @@ Offset  Field               Size    Value       描述
                                                 HS的INTR EP：    取值 1~16 ，间隔是 2（bInterval - 1）  
                                                 HS的BULK/CTRL OUT EP: 设定了设备的最大NAK率（
                                                            即每个微帧最多回几个NAK）取值：0~255
-Joystick_InterfaceDescriptor[] = {
+Joystick_Endpoint Descriptor[] = {
         0x07,           // 描述符的长度： 7字节
         5,              // 描述符类型： 端点描述符
         0x81,           // 端点的特性： B3-B0（端点号）， B6-B4（0）， B7（1-IN，0-OUT）

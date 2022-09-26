@@ -1,0 +1,116 @@
+// ChibiOS 项目文件结构
+        main.c
+        Makefile
+        cfg/chconf.h            // chibios   内核配置文件 
+        cfg/halconf.h           // chibios   HAL库配置文件
+        cfg/mcuconf.h           // STM32-MCU 相关配置文件
+        
+        
+        
+// 分配一个工作区
+// 其中<name>是其标识符， <size>其大小以字节表示
+// static THD_WORKING_AREA(<name>, <size>);
+// ____________________________________________________________
+
+
+
+// 声明一个函数
+// 其中<name>是它的标识符， <args>是传递给函数的参数， <code>是它的实现
+// ____________________________________________________________
+        static THD_FUNCTION(<name>, <args>) {
+                <code>
+        }
+
+
+
+//______________________________________________________________________________
+//      => 创建线程
+//______________________________________________________________________________
+// 声明一个名为waThread1的工作区， 其大小为 128字节
+static THD_WORKING_AREA(waThread1, 128);
+// 声明了一个名为 Thread1 的函数
+static THD_FUNCTION(Thread1, arg)
+{
+        (void)arg;
+        chRegSetThreadName("blinker");
+
+        while (true) {
+                palClearPad(GPIOA, GPIOA_LED_GREEN);
+                chThdSleepMilliseconds(500);
+                palSetPad(GPIOA, GPIOA_LED_GREEN);
+                chThdSleepMilliseconds(500);
+        }
+
+}
+
+
+
+int main(void)
+{
+        halInit();
+        chSysInit();
+        
+        sdStart(&SD2, NULL);            // 使用默认配置初始化串行驱动程序2
+        
+         chThdCreateStatic(             // 创建闪烁线程（Thread1）
+                waThread1,              // 指向工作区域的指针（waThread1，我们之前声明的那个）
+                sizeof(waThread1),      // 工作区的大小
+                NORMALPRIO + 1,         // 线程的优先级
+                Thread1,                // 作为线程执行的函数（Thread1，之前已声明过）
+                NULL);                  // 一个将传递给Thread1函数的参数（在这种情况下，我们没有传递任何东西）
+}
+
+
+
+
+//______________________________________________________________________________
+//      => USB-printf
+//______________________________________________________________________________
+#include "ch.h"
+#include "hal.h"
+/* Serial configuration. */
+static const SerialConfig myserialcfg = {
+        115200,
+        0,
+        USART_CR2_STOP1_BITS,
+        0
+};
+/* Dummy LED blinker thread. */
+static THD_WORKING_AREA(waThdBlinker, 128);
+static THD_FUNCTION(ThdBlinker, arg) 
+{
+        (void) arg;
+        chRegSetThreadName("Blinker");
+        while(true) {
+                palToggleLine(LINE_LED3_RED);
+                chThdSleepMilliseconds(500);
+        }
+}
+/* Application entry point. */
+int main(void) 
+{
+        /* ChibiOS/HAL and ChibiOS/RT initialization. */
+        halInit();
+        chSysInit();
+        /* Creating a dummy blinker thread. */
+        chThdCreateStatic(waThdBlinker, sizeof(waThdBlinker), NORMALPRIO, ThdBlinker,
+                    NULL);
+        /* Enabling event on falling edge of PA0 signal.*/
+        palEnablePadEvent(GPIOA, 0U, PAL_EVENT_MODE_FALLING_EDGE);
+        /* Configuring VCP related GPIO. This configuration is already
+        performed at board level initialization but is here reported
+        only as example of how to configure GPIO at application level. */
+        palSetPadMode(GPIOC, 4U, PAL_MODE_ALTERNATE(7) | PAL_STM32_OSPEED_HIGHEST |
+                           PAL_STM32_OTYPE_PUSHPULL);
+        palSetPadMode(GPIOC, 5U, PAL_MODE_ALTERNATE(7) | PAL_STM32_OSPEED_HIGHEST |
+                           PAL_STM32_OTYPE_PUSHPULL);
+        /* Starting Serial Driver 1 with our configuration. */
+        sdStart(&SD1, &myserialcfg);
+        /* main() thread loop. */
+        while (true) {
+                /* Waiting for a falling edge.*/
+                palWaitPadTimeout(GPIOA, 0U, TIME_INFINITE);
+                /* Printing a string over USART1 using Serial driver.*/
+                sdWrite(&SD1, (uint8_t*)"Hello PLAY embedded\r\n", 22U);
+        }
+}
