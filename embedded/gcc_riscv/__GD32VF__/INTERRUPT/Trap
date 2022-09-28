@@ -200,7 +200,7 @@ _start:
         ......
         la      a0, trap_entry          // 将异常处理入口地址装入寄存器
         csrw    mtvec, a0               // 将a0寄存器的值写入到mtvec寄存器
-        csrw    mcause, x0              // 将0定入到mcause寄存器
+        csrw    mcause, x0              // 将0写入到mcause寄存器
 
         ja      t1, _init               // t1 = _init， 将标签地址装入t1寄存器
         jalr    t1                      // pc = t1, 将t1中的值赋给程序计数器PC

@@ -1,0 +1,93 @@
+/*******************************************************************************
+        => ChibiOS__创建静态线程
+        => http://wiki.csie.ncku.edu.tw/embedded/chibios
+*******************************************************************************/
+        // 首先利用  WORKING_AREA(Thread_Name, stack_size) 
+        // 這个宏（macro） 去配置一块记忆体给 Thread， 包括这个线程所需要的（栈内存）
+        // 和 Thread自己本身存储数据结构所需要的（内存）， 還有 external context, 
+        // internal context (詳見後面 context switch 的部分)和 interrupt stack
+        // (用來 serve interrupt 用的)
+        
+        
+        // 接著呼叫 chThdCreateStatic() 來創造一個靜態的 Thread
+        
+        
+        // chThdCreateStatic ()         裡面會呼叫到一行 
+                                        chSchWakeupS(tp = chThdCreateI(wsp, size, prio, pf, arg), RDY_OK);
+        // chThdCreateI()               會將這個 Thread 的資料結構做好初始化 
+                                        (包括設定好 priority, 初始的 function pointer…等等)
+        // chSchWakeupS()               則是會比對新建的 Thread, 與目前的 Thread 哪個 priority 比較高, 
+                                        並決定新建的 Thread 是可以立刻開始跑或是要被放入 ready list。
+
+
+
+/*******************************************************************************
+        => ChibiOS__线程间通信
+*******************************************************************************/
+// 行程間通訊 ( Inter-Process Communication, IPC )
+typedef struct Semaphore {
+        ThreadsQueue    s_queue;
+        cnt_t           s_cnt;
+} Semaphore;
+        // 呼叫 chSemWaitS() 來等待, 取用 Semaphore
+        // - 如果沒有 semaphore 可以取用則進入 s_queue 裡面等待
+
+        // 呼叫 chSemSignalI() 來釋放 Semaphore
+        // - 釋放後會先看 s_queue 裡面有沒有 Thread 在等待,有的話就 pop 一條 Thread 出來給他用
+
+
+        // Binary Semaphore
+        // - 直接採用 Counting Semaphore 的方式實作 Binary Semaphore
+        // - Counter 被限制為不能超過 1 
+        // - 一個 Binary Semaphore 不能重複做 signal 運算
+
+
+
+/*******************************************************************************
+        => ChibiOS__互斥
+*******************************************************************************/
+typedef struct Mutex {
+        ThreadsQueue    m_queue;
+        Thread          m_owner;
+        struct Mutex   m_next;
+} Mutex;
+        // 實作 Mutex (假設有 Thread A 欲鎖住一個 Mutex)
+        // ____________________________________________________
+        1 先判斷這個 Mutex 有無其他 Thread 鎖著
+        2 沒有的話就直接鎖住
+        3 有的話會再判斷鎖住這個 Mutex 的 Thread ( 假設為Thread B ), 
+          它的 priority 有沒有比 Thread A 大
+        4 如果比 Thread A 大, 則 Thread A 會按照其 priority 被塞進這個 Mutex 的 m_queue 裡, 
+          與其他 Thread 一起等待這個 Mutex 被解鎖
+        5 如果比 Thread A 小, 則會先將 Thread B 的 priority 提升至跟 Thread A 一樣的 level, 
+          並做 Reschedule 的動作，讓 Thread B 快點執行完。至於 Thread A 則會按照其 priority 被塞
+          進這個 Mutex 的 m_queue 裡, 與其他 Thread 一起等待這個 Mutex 被解鎖
+
+
+
+/*******************************************************************************
+        => ChibiOS__Synchronous Messages
+*******************************************************************************/
+// 在 ChibiOS / RT 之中，Thread 與 Thread 之間也有所謂的同步訊息傳送/接收機制
+
+
+        // 傳送者 ( Sender )
+        // ____________________________________________________
+        呼叫 chMsgSend() 來傳送訊息
+        此時會被塞進接收者的 p_msgqueue 裡面(等待接收者提取訊息)
+        判斷接收者的狀態，並喚醒接收者，告知訊息已傳送，可以起來接收訊息了
+        傳送者自己本身會進入某種睡眠狀態 ( THD_STATE_SNDMSGQ )
+        接收者收到訊息後，會呼叫 chMsgRelease() 喚醒傳送者，告知訊息傳遞已經結束，可以起來了
+        
+        
+        // 接收者 ( Reciever )
+        // ____________________________________________________
+        呼叫 chMsgWait() 來等待接收訊息
+        此時會先進入某種睡眠狀態 ( THD_STATE_WTMSG )
+        直到被傳送者喚醒後，會從自己的 p_msgqueue 裡面提取訊息接收
+
+        最後把傳送者的狀態設成 ( THD_STATE_SNDMSG )，並呼叫 chMsgRelease()喚醒傳送者，
+        告知訊息傳遞已經結束，可以起來了
+
+
+
