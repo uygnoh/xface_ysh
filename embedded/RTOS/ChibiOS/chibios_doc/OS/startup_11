@@ -1,0 +1,145 @@
+// https://blog.csdn.net/weixin_39380685/article/details/108735631?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5-108735631-blog-82498716.pc_relevant_multi_platform_whitelistv6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5-108735631-blog-82498716.pc_relevant_multi_platform_whitelistv6&utm_relevant_index=6
+// 上述源代码中原来有很多其他的宏，我们将所有的宏置为FALSE以构造一个简单的情况，
+// 同时CH_CFG_NO_IDLE_THREAD的宏也为FALSE，相当于OS将会创建一个Idle任务。
+chSysInit();    >>>
+                _scheduler_init();      // _scheduler_init 函数主要对OS的任务就绪表
+                                        // 进行了初始化，任务就绪表是以一个queue的形式存在的；
+                _vt_init();             // _vt_init函数对OS的虚拟定时器组件（vt）进行初始化，
+                                        // vt应该是用于系统的时间片调度使用的
+                _trace_init();          // trace是OS的跟踪系统，暂时不关心；
+                
+                
+                // _thread_init函数并传入了 ch.mainthread 对象指针
+                // （这个ch是ChibiOS的系统结构对象），且分配了一个NORMALPRIO的
+                // 任务优先级，函数执行完毕后返回了该任务的线程对象指针（其实就是
+                // 所传入的ch.mainthread对象指针）返回给currp（这个currp是系统
+                // 的当前任务指针（位于就绪表中）），这里源码写了一句注释“Now this 
+                // instructions flow becomes the main thread”，也就是说，通过这
+                // 个_thread_init后，现在程序已经不仅仅是在main函数中运行了，而成为
+                // 了main线程。 我们分析一下ChibiOS是如何实现这样的操作的。
+// 事实上，_thread_init函数是一个用来初始化线程对象用的通用函数，它负责将一个线程对象按照
+// 所传入的任务名name和任务优先级prio进行初始化，并默认将这个任务的状态置为CH_STATE_WTSTART
+// 也就是任务刚被创建时候的“等待启动”的状态，另外就是初始化了这个线程对象的链表、队列等系统资源。
+// 似乎没什么特别的。 从代码上，我们还看不出来为何现在已经是在main线程中而不是普通的main函数中了，
+// 那么我们继续看。
+                currp = _thread_init(&ch.mainthread, "main", NORMALPRIO);
+                
+                
+                
+                // 将刚刚的线程对象的任务状态改为了CH_STATE_CURRENT也就是当前任务状态
+                currp->state = CH_STAT_CURRENT;
+                // 从系统的状态上，似乎是完成了从函数到线程的转变，但此时CPU并没有意识到什么变化。
+                // 接着就是port_init和chSysEnable，前者在STM32中配置了一下NVIC的组别，后者其实
+                // 就是开启了系统中断。 接下去由大括号包起来的代码是通过chThdCreate函数创建了一个
+                // Idle任务。 那么这里我们先插入看一下任务是如何被创建的，进入这个函数：
+                // 可以看到chThdCreate函数中重点就是一行代码：
+                port_init();
+                chSysEnable();
+                {
+                        static const thread_descriptor_t idle_descriptor = {
+                                "idle",
+                                THD_WORKING_AREA_BASE(ch_idle_thread_wa),
+                                THD_WORKING_AREA_END(chi_idle_thread_wa);
+                                IDLEPRIO,
+                                _idle_thread,
+                                NULL
+                        };
+                        chThdCreate(&idle_descriptor);
+                }
+
+           
+           
+           
+                chSchWakeupS(tp, MSG_OK);
+                // 它会将传入的线程对象指针也就是tp与当前就绪任务指针也就是currp进行优
+                // 先级对比，如果当前任务的优先级并没有低于tp，那么就只是将tp插入到就绪
+                // 表中并不进行调度；反过来，如果tp的任务优先级足够高，那么chSchWakeupS
+                // 将会调度tp来运行，具体操作是通过chSchReadyI将当前任务放回到就绪表中，
+                // 然后将传入的任务也就是tp的状态修改为当前任务，然后调用chSysSwitch函数
+                // 完成这两个任务的上下文切换。
+                chSysSwitch函数中重点起作用的就是port_swtich函数，这个函数带“port”也就
+                是和平台是相关的，在armcm0中的实现这样的：
+                ....................................
+                .....................................
+                在M0中的操作比M3、M4的要复杂一些。上述汇编代码完成了context的切换。
+                // 由于Idle任务的优先级是很低的，所以事实上此时并不会发生任务切换，但是，
+                // 当有其他任务同样通过chThdCreate函数被创建时，且优先级高于了main线程的
+                // NORMAL优先级，那么main函数当前运行的CPU状态将会在任务上下文切换函数中
+                // 被记录，然后等到比main函数优先级任务高的任务都进入等待后，main函数将会
+                // 再次被切换回来，由此可以看到main函数就是在上面创建main线程的过程中，
+                // 悄悄地被转变成了一个任务线程。
+                // 那么除了任务创建的过程中会发生任务切换，还有哪些情况下也会发生任务切换呢。
+                // 我们继续看代码，在main函数中可以看到有调用chThdSleepMilliseconds函数，
+                // 这个函数用于延时，事实上，延时函数就会让当前函数进入睡眠状态，其实际函数
+                // 调用时chThdSleep函数，实现如下：
+                chSysLock();
+                chThdSleeps(time);
+                chSysLock();
+                // 头和尾显然是上锁和解锁，中间传入延时时间，
+                // 并实际上调用了chSchGoSleepTimeoutS函数：
+                chSchGoSleepTimeoutS(CH_STATE_SLEEPING, time);
+                // 之后又调用了chSchGoSleepS函数，在这里面间接调用
+                // 了chSysSwitch函数，同样可以完成任务的切换。
+                
+                如果当前任务不调用延时函数，而是死循环运行呢，ChibiOS是否
+                有能力剥夺当前运行的任务优先级较低的任务，而让另一个就绪任务运行呢？
+                我们继续分析，将能看到通过系统的SysTick定时器来进行调度切换。
+                我们找到os/hal/ports/STM32/LLD/TIMv1中的hal_st_lld.c文件，里面
+                有一个函数，如下：
+                OSAL_IRQ_HANDLER(SysTick_Handler)
+                // 其中OSAL_IRQ_HANDLER其实是对IRQ函数的封装，由于ARMCM的CPU不
+                // 需要对中断服务函数进行特别的封装所以这里就相当于实现了一个普通的
+                // C函数，里面主要调用了如下的函数：
+                OSAL_IRQ_PROLOGUE();
+                osalSysLockFromISR();
+                osalOsTimerHandlerI();
+                osalSysUnlockFromISR();
+                OSAL_IRQ_EPILOGUE();
+                // 玄机就在最后一条函数，我们进入这个函数，可以看到它是一个宏
+                #define OSAL_IRQ_EPILOGURE      CH_IRQ_EPILOGUE()
+                // 然后这还是一个宏的封装，最后调用了关键函数：
+                PORT_IRQ_EPILOGUE()
+                // 继续找其定义，在chcore_v6m.h中的定义是这样的：
+                #define PORT_IRQ_EPILOGUE       _port_irq_epilogue(_saved_lr)
+                void _port_irq_epilogue(regarm_t lr) {
+                        if (lr != (regarm_t)0xFFFFFFF1U) {
+                                struct port_extctx *ctxp;
+                                port_lock_from_isr();
+                                ctxp = (struct port_extctx *)__get_PSP();
+                                ctxp--;
+                                __set_PST((uint32_t)ctxp);
+                                ctxp->xpsr = (regarm_t)0x01000000;
+                                if (chSchIsPreemptionRequired()) {
+                                        ctxp->pc = (regarm_t)_port_switch_from_isr;
+                                } else {
+                                        ctxp->pc = (regarm_t)_port_exit_from_isr;
+                                }
+                        }
+                }
+                这里比较巧妙的是最后面的对ctxp的cp进行赋值的操作，本质上实现了退出中断的
+                时候，将会去调用_port_switch_from_isr或者_port_exit_from_isr（具体取
+                决于是否要进行调度），然后我们可以在chcoreasm_v6m.s中找到这两个函数的实现，基本过程如下：
+                _port_switch_from_isr:
+                        bl      chSchDoReschedule
+                _port_exit_from_isr:
+                        ldr     r2, SCB_ICSR
+                        ldr     r3, .L3
+                        str     r3, [r2, #0]
+        #if CORTEX_ALTERNATE_SWITCH
+                        cpsie   i
+                        .word   ICSR_PENDSVSET
+        #else
+                        .word   ICSR_NMIPENDSET
+        #endif
+        可以看到，这两个函数最终都会执行_port_exit_from_isr的部分，
+        只不过_port_switch_from_isr会调用chSchDoReschedule函数去进行调度切换，
+        完成上下文的切换。之后通过ldr、str指令将SCB_ICSR的PENDSV位或者NMI位置位，具
+        体取决于CORTEX_ALTERNATE_SWITCH这个宏，此宏开启的话，CPU现场的切换将会放到
+        PendSV中断里面（PendSV是一个优先级最低的中断异常），否则就是在NMI中完成切换，
+        这两种的区别在于PendSV将会在所有中断结束后发生切换，而NMI是立刻发生切换的。
+
+
+
+
+
+

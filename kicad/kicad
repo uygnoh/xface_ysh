@@ -3,42 +3,42 @@
 *******************************************************************************/
 //https://www.sparkfun.com
 ngspice                         0xxF 代码级免费的电路模拟程序 0xxF 
-surface mount technology	//表面安装技术SMT
-printed circuit board		//印刷电路板PCB
-Substrate(e.g. “FR4”)		//FR-4是PCB使用的基板，是板料的一种类别
-Copper				//铜泊
-Solder Mask Keepout		//暴露铜的地方
-Solder Mask			//刷绿色油漆的地方 	
-Silkscreen			//丝印层，标示符号或文字 
-plated-through hole		//PTH, 通孔
+surface mount technology	// 表面安装技术SMT
+printed circuit board		// 印刷电路板PCB
+Substrate(e.g. “FR4”)		// FR-4是PCB使用的基板，是板料的一种类别
+Copper				// 铜泊
+Solder Mask Keepout		// 暴露铜的地方
+Solder Mask			// 刷绿色油漆的地方 	
+Silkscreen			// 丝印层，标示符号或文字 
+plated-through hole		// PTH, 通孔
 
 
 //_____________________________________________________________
 // KiCad___设计流程__
 //_____________________________________________________________
-1 Design Circuit                            //电路设计
-2 Create Symbols    (library editor)        //制作原理图库
-3 Schematic Capture (eeschema)              //制作原理图
-4 Create Footprints (footprint editor)      //制作封装库
-5 Generate netlist  (cvpcb)                 //生成网络表
-6 Board layout      (pcbnew)                //制作PCB
-7 Production        (GerbView )             //生成Greb文件
-8 Generate BOM      (Digi-Key )             //生成物料清单       
+1 Design Circuit                            // 电路设计
+2 Create Symbols    (library editor)        // 制作原理图库
+3 Schematic Capture (eeschema)              // 制作原理图
+4 Create Footprints (footprint editor)      // 制作封装库
+5 Generate netlist  (cvpcb)                 // 生成网络表
+6 Board layout      (pcbnew)                // 制作PCB
+7 Production        (GerbView )             // 生成Greb文件
+8 Generate BOM      (Digi-Key )             // 生成物料清单       
 
 
 //_____________________________________________________________
 //kicad快捷键操作( Help ->List HotKeys )
 //_____________________________________________________________
-        delete          //删除组件
-        A               //添加组件
-        C               //复制组件
-        E               //组件编辑
-        G               //拖动组件
-        M               //移动组件
-        R               //旋转组件
-        Q               //不连引脚
-        P               //放置电源
-        W               //放置导线
+        delete          // 删除组件
+        A               // 添加组件
+        C               // 复制组件
+        E               // 组件编辑
+        G               // 拖动组件
+        M               // 移动组件
+        R               // 旋转组件
+        Q               // 不连引脚
+        P               // 放置电源
+        W               // 放置导线
         X               //
         Y               //
 
