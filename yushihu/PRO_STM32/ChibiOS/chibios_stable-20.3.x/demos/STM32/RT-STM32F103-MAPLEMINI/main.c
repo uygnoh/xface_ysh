@@ -72,7 +72,7 @@ static void cmd_write(BaseSequentialStream *chp, int argc, char *argv[]) {
 }
 
 
-
+PAL_MODE_ALTERNATE(n)
 static const ShellCommand commands[] = {
         {"write", cmd_write},
         {NULL, NULL}
@@ -99,11 +99,12 @@ static __attribute__((noreturn)) THD_FUNCTION(Thread1, arg)
         (void)arg;
         chRegSetThreadName("blinker");
         while (true) {
-                systime_t time = serusbcfg.usbp->state == USB_ACTIVE ? 250 : 500;
+                systime_t time = serusbcfg.usbp->state == USB_ACTIVE ? 100 : 100;
                 palClearPad(GPIOA, GPIOA_LED);
                 chThdSleepMilliseconds(time);
                 palSetPad(GPIOA, GPIOA_LED);
                 chThdSleepMilliseconds(time);
+                palReadPad(GPIOA, GPIOA_LED);
         }
 }
 

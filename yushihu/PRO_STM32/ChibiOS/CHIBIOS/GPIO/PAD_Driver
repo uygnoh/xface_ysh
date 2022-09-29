@@ -1,0 +1,88 @@
+/*******************************************************************************
+        => PAD   -    I/O Ports Abstraction Layer
+*******************************************************************************/
+//      PAL 全称是 I/O Ports Abstraction Layer
+//      即“IO硬件抽象层”， ChibiOS通过对GPIO进行抽象， 
+//      使得不同的平台不同的MCU能够用同样风格的代码进行IO的操作
+
+
+
+// 开启 PAD 子系统
+// ____________________________________________________________
+        // demos/RT-STM32F103-MAPLEMINI/cfg/halconf.h // 文件位置
+        // Enables the PAL subsystem.
+        #if !defined(HAL_USE_PAL) || defined(__DOXYGEN__)
+        #define HAL_USE_PAL                         TRUE
+        #endif
+        
+        
+        
+// IO配置
+// ____________________________________________________________
+// IO的配置有两种，一种是静态的，也就是在板级定义的时候进行定义
+// 另外一种是动态的，通过我们app里面的代码进行动态的配置或者修改，
+// 这里我们引出一个函数：
+        #define palSetPadMode(port, pad, mode) \
+                palSetGroupMode(port, PAL_PORT_BIT(pad), 0U, mode)
+                
+        // 可以看到， 这事实上是一个宏函数， 通过定义port（端口）， 
+        // pad（端口子序号）， mode（端口模式）来配置端口。 这里以STM32F4为例，
+        // port可以是 GPIOA， GPIOB， GPIOC…… 这些定义， pad可以是 0 - 15，
+        // mode相对多一些， 有如下的宏：
+        PAL_MODE_RESET                          // 未配置
+        PAL_MODE_UNCONNECTED                    // 未连接
+        PAL_MODE_INPUT                          // 输入
+        PAL_MODE_INPUT_PULLUP                   // 上拉输入
+        PAL_MODE_INPUT_PULLDOWN                 // 下拉输入
+        PAL_MODE_INPUT_ANALOG                   // 模拟输入
+        PAL_MODE_OUTPUT_PUSHPULL                // 推挽输出
+        PAL_MODE_OUTPUT_OPENDRAIN               // 开漏输出
+        
+        
+        // 另外 STM32 还有一个特殊的：
+        #define PAL_MODE_ALTERNATE(n)           \
+                        (PAL_STM32_MODE_ALTERNATE | PAL_STM32_ALTERNATE(n))  
+        // 用来配置AF外设复用的，具体 n 配置为多少就要看芯片手册里面对应的IO的AF序号了
+
+
+
+/*******************************************************************************
+        => PAD   -    PAL操作
+*******************************************************************************/
+// 推挽输出
+// ____________________________________________________________
+// 推挽输出能够输出大的电流，可以实现亮灯、驱动外部芯片等功能，下面我们以
+// 连接在板子上PA9上的LED为例子，通过配置该IO为输出并设置输出电平为高电
+// 平来点亮这个LED，需要用到的有palSetPad 和 palClearPad：
+
+        palSetPadMode(GPIOA,  9, PAL_MODE_OUTPUT_PUSHPULL);
+        palSetPad(GPIOA, 9);            // 拉高点亮
+        palClearPad(GPIOA, 9);          // 拉低熄灭
+
+
+
+// 上拉输入
+// ____________________________________________________________
+// 上拉输入常常用于检测外部按键，这里我们以链接了外部按键的PC13为例，通
+// 过配置该IO为上拉输入并读取该IO口来检测按键，需要用到的函数是palReadPad
+// 这个宏函数：
+
+        palSetPadMode(GPIOC, 13, PAL_MODE_INPUT_PULLUP);
+        if (palReadPad(GPIOC, 13) == PAL_LOW) {
+                printf("push button!\r\n");
+                while (padReadPad(GPIOC, 13) == PAL_LOW);   // 等待按键释放
+        }
+
+
+
+// 复用设置
+// ____________________________________________________________
+// 对于使用硬件的I2C、SPI等设备，需要进行AF配置的，那么就需要配置为复用
+// 模式， 这里以串口为例， 比如PA0和PA1作为UART4的TX和RX复用，那么可
+// 以配置如下：
+
+        palSetPadMode(GPIOA, 0, PAL_MODE_ALTERNATE(8));
+        palSetPadMode(GPIOA, 1, PAL_MODE_ALTERNATE(8));
+
+
+
