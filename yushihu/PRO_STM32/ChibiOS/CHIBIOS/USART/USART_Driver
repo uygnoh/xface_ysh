@@ -1,0 +1,282 @@
+/*******************************************************************************
+        => USART 通用同步/异步接收发送器
+        https://www.playembedded.org/blog/stm32-usart-chibios-serial/
+*******************************************************************************/
+        // 每个STM32的UART外设都带有一些专用I / O，
+        // 可以使用GPIO备用功能进行重新路由。 那些IO是：
+        （UART_TX）       // 传输线
+        （UART_RX）       // 接收器线
+        （UART_CTS）      // 清除发送
+        （UART_RTS）      // 请求发送
+        // 可以使用两个额外的 I/O 来控制两个设备之间的串行数据流，
+        // 这两个 I/O 是 清除发送（或CTS）和请求发送 （或RTS）：
+        // 在这种情况下，接收器的RTS连接到发送器CTS; 当接收器降低
+        // 线路时，发送器发送一个字节。
+
+
+
+/*******************************************************************************
+        => ChibiOS 串行驱动程序
+*******************************************************************************/
+// ChibiOS/HAL 提供了一种通过称为串行驱动程序（通常缩短为SD）
+// 的软件驱动程序来快速简便地使用UART的方法。
+//
+//
+// 串行驱动程序使用 I/O 队列缓冲输入和输出流，这提供了一个主要优点：
+// 用户应用程序不必连续服务 中断请求， 因为驱动程序在数据交换内部执
+// 行此操作，在这些缓冲区中存储数据。此机制允许轻松实现 生产者 - 消费者模式，
+// 而无需应用程序端的任何努力：在此方案中，驱动程序填充缓冲区并且用户应用程
+// 序使用数据。如果应用程序以比生产速率更快的速度消耗数据，则这种模式不会丢失
+// 任何字节，并且考虑到串行波特率和典型的STM32核心速度，这种情况很容易实现。
+//
+//
+// 另外，ChibiOS/HAL 提供另一个处理UART驱动程序的驱动程序：UART驱动程序：
+// 此驱动程序向应用程序公开IRQ，因此用户必须正确填写一些驱动程序回调以处理字
+// 符接收，传输和最终操作错误。该驱动程序将在稍后提供，我们将仅关注串行驱动程序。
+//
+//
+// 串行驱动程序的每个API都以前缀“sd”开头。 函数名称为驼峰式，预处理器常量为大写，变量为小写
+
+
+
+// halconf.h
+// ____________________________________________________________
+#if !defined(HAL_USE_SERIAL) || defined(__DOXYGEN__)
+#define HAL_USE_SERIAL                      TRUE
+#endif
+
+
+// mcuconf.h
+// ____________________________________________________________
+#define STM32_SERIAL_USE_USART1             FALSE
+#define STM32_SERIAL_USE_USART2             TRUE
+#define STM32_SERIAL_USE_USART6             FALSE
+#define STM32_SERIAL_USART1_PRIORITY        12
+#define STM32_SERIAL_USART2_PRIORITY        12
+#define STM32_SERIAL_USART6_PRIORITY        12
+
+
+
+// 串行驱动程序对象
+// ____________________________________________________________
+/** @brief USART1 serial driver identifier.*/
+#if STM32_SERIAL_USE_USART1 || defined(__DOXYGEN__)
+SerialDriver SD1;
+#endif
+// 例如，将STM32 USART1分配给串行驱动程序，SD1对象将变为可用。
+// 请注意，驱动程序实现的编号与外设编号一致：USART外设1与SD1，
+// USART外设2至SD2， UART外设3至SD3等相关联
+
+
+
+// 串口驱动初始化
+// ____________________________________________________________
+void sdInit(void) {
+
+  ...
+
+}
+// 如果在HAL配置文件中启用了驱动程序，则会在HAL初始化时自动调用此函数。
+// HAL初始化发生在我们的halInit调用应用程序的主要部分。 我们已经注意到
+// PAL驱动程序中的类似方法，实际上这种方法在每个ChibiOS/HAL驱动程序中
+// 都采用。该sdInit函数初始化对象和变量移动驱动器的状态SD_UNINIT到SD_STOP
+//
+// 请注意，sdInit仅初始化与串行驱动程序相关的变量和对象。用户不得将初始化与配置混淆
+//
+// 如果在HAL配置文件中启用了ChibiOS驱动程序，则会在HAL初始化时自动初始化
+// 该驱动程序。 初始化与变量初始化相关， 而不是硬件配置。
+
+
+
+// 配置串口驱动
+// ____________________________________________________________
+void sdStart(SerialDriver *sdp, const SerialConfig *config) {
+
+  ...
+
+}
+// 在开始串行通信之前，用户应用程序应至少调用此函数一次。其目的是配置外设，
+// 这涉及我们引入的所有可配置性的设置：波特率，奇偶校验位，停止位长度，编码等
+//
+// 最常见的范例是在需要时启动驱动程序，并在操作完成后停止驱动程序。
+// Starting Serial Driver 2 with my configuration.
+sdStart(&SD2, &my_sd_configuration);
+//
+// Doing some operation on Serial Driver 2.
+// 执行串口操作
+//
+// Stopping.
+sdStop(&SD2);
+
+
+
+// 配置结构
+// ____________________________________________________________
+// 配置结构由两个独立的部分组成：
+// 第一部分在所有类型的硬件中保持不变，第二部分严格依赖于硬件
+// FILE: os/common/ext/ST/STM32F1xx/stm32f103xb.h
+// FIND: Bit definition for USART_CR1 register
+//
+/**
+ * @brief   STM32 Serial Driver configuration structure.
+ * @details An instance of this structure must be passed to @p sdStart()
+ *          in order to configure and start a serial driver operations.
+ * @note    This structure content is architecture dependent, each driver
+ *          implementation defines its own version and the custom static
+ *          initializers.
+ */
+typedef struct {
+        // @brief Bit rate.
+        uint32_t                  speed;
+        // End of the mandatory fields.
+
+        // @brief Initialization value for the CR1 register.
+        uint32_t                  cr1;
+        // @brief Initialization value for the CR2 register.
+        uint32_t                  cr2;
+        // @brief Initialization value for the CR3 register.
+        uint32_t                  cr3;
+} SerialConfig;
+
+
+
+
+// 使用默认配置启动串行驱动程序
+// ____________________________________________________________
+// Activates the serial driver 2 using the driver default configuration.
+        sdStart(&SD2, NULL);
+// 这是串行驱动程序的特性，当接收到NULL配置时，它以为STM32定义的默认配置开始
+        /** @brief Driver default configuration.*/
+        static const SerialConfig default_config = {
+                SERIAL_DEFAULT_BITRATE,
+                0,
+                USART_CR2_STOP1_BITS,
+                0
+        };
+// 这种配置意味着没有特性，1位停止，没有硬件流控制，8位数据大小
+// 和波特率等于SERIAL_DEFAULT_BITRATE，它在项目HAL配置文件中定义为38400bps。
+/**
+ * @brief   Default bit rate.
+ * @details Configuration parameter, this is the baud rate selected for the
+ *          default configuration.
+ */
+#if !defined(SERIAL_DEFAULT_BITRATE) || defined(__DOXYGEN__)
+#define SERIAL_DEFAULT_BITRATE              38400
+#endif
+
+
+
+/*******************************************************************************
+        => ChibiOS 读写
+*******************************************************************************/
+// 与串行驱动程序相关的操作是与字符处理容易关联的操作
+        sdPut(sdp, char);                       // 放
+        char token = sdGet(sdp);                // 取
+        sdWrite(sdp, string, size);             // 读
+        char* buffer = sdRead(sdp, size);       // 写
+// 在这些函数中，sdp是指向我们正在操作的串行驱动程序的指针。
+// 请记住，要使用此功能，应启动驱动程序。获取并放置单个字符的
+// 作品，读取字符串上的写入但希望指定读取/写入的缓冲区大小。例如
+        sdPut(&SD2, 'a');
+        char token = sdGet(&SD1);
+        sdWrite(&SD6, "Hohoho\r\n", 8);
+        char buffer[30] = sdRead(&SD3, 5);
+
+
+
+/*******************************************************************************
+        => I/O函数 与 I/O队列交互
+*******************************************************************************/
+// 可以在项目的HAL配置文件中配置队列大小，默认值为16个字节或16个字符。
+// 在异步模式下，输入和输出完全独立
+
+// 使用超时放置，获取，读取和写入
+// 在某些应用中，阻塞功能不合适。 让我们考虑一下RX线断开的情况。 如果我们尝
+// 试做一个sdGet，我们的线程将无限期地卡在那里。为了管理这种情况，可以使用超时的相同功能。
+        sdPutTimeout(sdp, char, timeout);
+        char token = sdGetTimeout(sdp, timeout);
+        sdWriteTimeout(sdp, string, size, timeout);
+        char* buffer = sdReadTimeout(sdp, size, timeout);
+// 超时应表示为系统滴答。 由于这不是立竿见影的，
+// 因此有一些宏将毫秒转换为 systemtick
+        TIME_S2I(secs)
+        TIME_MS2I(msecs)
+        TIME_US2I(usecs)
+// 例如，如果我们想要读取4个字节，超时50ms，我们应该写
+        char* buffer = sdReadTimeout(&SD2, 4, TIME_MS2I(50));
+
+// 另请注意，也接受 TIME_IMMEDIATE 和 TIME_INFINITE
+// 函数将在第一种情况下立即返回，它将像没有超时的函数一样运行
+// 函数将在第二种情况下无限等待
+
+
+
+/*******************************************************************************
+        => 串行驱动程序 BaseSequentialStream
+*******************************************************************************/
+// ChibiOS / HAL提供了许多抽象接口：其中一个可能很有趣，
+// 因为它允许打印格式化的字符串。 我们谈论的接口是 BaseSequentialStream
+//
+// 在面向对象的编程中，接口只是一个抽象的API，它是一种行为描述而不是代
+// 码实现。在BaseSequentialStream的情况下，指定的行为是该接口有4个方法：
+/**
+ * @brief   BaseSequentialStream specific methods.
+ */
+
+#define _base_sequential_stream_methods                                         \
+                                                                                \
+        _base_object_methods                                                    \
+                                                                                \
+        /* Stream write buffer method.*/                                        \
+        size_t (*write)(void *instance, const uint8_t *bp, size_t n);           \
+                                                                                \
+        /* Stream read buffer method.*/                                         \
+        size_t (*read)(void *instance, uint8_t *bp, size_t n);                  \
+                                                                                \
+        /* Channel put method, blocking.*/                                      \
+        msg_t (*put)(void *instance, uint8_t b);                                \
+                                                                                \
+        /* Channel get method, blocking.*/                                      \
+        msg_t (*get)(void *instance);
+        // 
+        // 换句话说，我们声明实现此接口的驱动程序应提供4种方法（write，read，put和get）
+        // 我们并不是在讨论如何实现这些方法，而是在定义相关参数和返回类型
+
+
+// 使用chprintf打印格式化的字符串
+// ____________________________________________________________
+// ChibiOS提供了一个名为streams的可选模块，它提供了一些功能，包括
+// API chprintf：这个API是printf的ChibiOS版本，并在BaseSequentialStream
+// 上打印格式化字符串，就像输出流上的printf一样。 流模块位于 os/hal/lib/streams，
+// 因为它被认为是一个可选模块，默认情况下不包含它。
+
+// 要使用它，我们必须编辑makefile并添加文件  
+// chibios182 / os / hal / lib / streams / streams.mk 的包含。
+// 这可以在名为“其他文件（可选）”的部分中进行（请参阅下一个代码框的最后一行）。
+        include $(CHIBIOS)/os/hal/lib/streams/streams.mk
+
+
+int chprintf(BaseSequentialStream *chp, const char *fmt, ...)
+// 它与printf完全相同，  区别在于接收的第一个参数是指向
+// BaseSequentialStream的指针。 因此，我们可以将指向串
+// 行驱动程序的指针作为第一个参数传递给chprintf，并在其上打印格式化的字符串
+/* This would print "Hello World 1st test" */
+        chprintf(&SD2, "Hello World %dst test!\r\n", 1);
+
+ 
+
+/* The previous line will give a warning at 
+   compile time resolved using this instead. */
+        chprintf((BaseSequentialStream*)&SD2, "Hello World %dst test!\r\n", 1);
+
+ 
+
+/* If you have to use many chprintf and do not want to cast
+   every time you can use this trick. */
+        BaseSequentialStream* bsp = (BaseSequentialStream*)&SD2;
+        chprintf(bsp, "Hello ");
+        chprintf(bsp, "World ");
+        chprintf(bsp, "%dst ", 1);
+        chprintf(bsp, "test\r\n");
+
+

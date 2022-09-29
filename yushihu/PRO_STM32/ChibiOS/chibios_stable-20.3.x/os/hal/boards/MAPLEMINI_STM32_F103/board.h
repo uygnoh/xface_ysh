@@ -140,7 +140,7 @@
  * PB1    - Push Pull output  (LED).
  * PB9    - Push Pull output  (USB switch).
  */
-#define VAL_GPIOBCRL            0x88888838      /*  PB7...PB0 */
+#define VAL_GPIOBCRL            0xFF888838      /*  PB7...PB0 */
 #define VAL_GPIOBCRH            0x88888838      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
