@@ -321,11 +321,11 @@ endfiniloop:
                 ldr     r2, =__data_base__
  8000218:	20000800 	.word	0x20000800
                 ldr     r3, =__data_end__
- 800021c:	20000800 	.word	0x20000800
+ 800021c:	20000824 	.word	0x20000824
                 ldr     r1, =__bss_base__
- 8000220:	20000800 	.word	0x20000800
+ 8000220:	20000828 	.word	0x20000828
                 ldr     r2, =__bss_end__
- 8000224:	200013d0 	.word	0x200013d0
+ 8000224:	200013d8 	.word	0x200013d8
                 ldr     r4, =__init_array_base__
  8000228:	08000160 	.word	0x08000160
                 ldr     r5, =__init_array_end__
@@ -725,9 +725,9 @@ const stm32_dma_stream_t *dmaStreamAllocI(uint32_t id,
  8000486:	600d      	str	r5, [r1, #0]
  8000488:	e7d6      	b.n	8000438 <dmaStreamAllocI.part.0.constprop.42+0x48>
  800048a:	bf00      	nop
- 800048c:	20000f44 	.word	0x20000f44
+ 800048c:	20000f6c 	.word	0x20000f6c
  8000490:	40021000 	.word	0x40021000
- 8000494:	20000834 	.word	0x20000834
+ 8000494:	2000085c 	.word	0x2000085c
  8000498:	08003ef0 	.word	0x08003ef0
  800049c:	00000000 	.word	0x00000000
 
@@ -840,14 +840,14 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep) {
  800054c:	00000000 	.word	0x00000000
 
 08000550 <gotoXy>:
-}
 
-static void gotoXy(void *ip, uint8_t x, uint8_t y) {
-  SSD1306Driver *drvp = (SSD1306Driver *)ip;
+static void gotoXy(void *ip, uint8_t x, uint8_t y)
+{
+        SSD1306Driver *drvp = (SSD1306Driver *)ip;
 
-  drvp->x = x;
+        drvp->x = x;
  8000550:	7301      	strb	r1, [r0, #12]
-  drvp->y = y;
+        drvp->y = y;
  8000552:	7342      	strb	r2, [r0, #13]
 }
  8000554:	4770      	bx	lr
@@ -855,17 +855,17 @@ static void gotoXy(void *ip, uint8_t x, uint8_t y) {
 	...
 
 08000560 <drawPixel>:
-  if (x > SSD1306_WIDTH || y > SSD1306_HEIGHT) return;
+        if (x > SSD1306_WIDTH || y > SSD1306_HEIGHT) return;
  8000560:	2980      	cmp	r1, #128	; 0x80
  8000562:	d81d      	bhi.n	80005a0 <drawPixel+0x40>
  8000564:	2a40      	cmp	r2, #64	; 0x40
  8000566:	d81b      	bhi.n	80005a0 <drawPixel+0x40>
-static void drawPixel(void *ip, uint8_t x, uint8_t y, ssd1306_color_t color) {
+{
  8000568:	b430      	push	{r4, r5}
-  if (drvp->inv) {
+        if (drvp->inv) {
  800056a:	7b84      	ldrb	r4, [r0, #14]
  800056c:	b114      	cbz	r4, 8000574 <drawPixel+0x14>
-    color = (ssd1306_color_t)!color;
+                color = (ssd1306_color_t)!color;
  800056e:	fab3 f383 	clz	r3, r3
  8000572:	095b      	lsrs	r3, r3, #5
  8000574:	2501      	movs	r5, #1
@@ -878,12 +878,12 @@ static void drawPixel(void *ip, uint8_t x, uint8_t y, ssd1306_color_t color) {
  8000586:	f991 000f 	ldrsb.w	r0, [r1, #15]
  800058a:	fa05 f202 	lsl.w	r2, r5, r2
  800058e:	b252      	sxtb	r2, r2
-  if (color == SSD1306_COLOR_WHITE) {
+        if (color == SSD1306_COLOR_WHITE) {
  8000590:	42ab      	cmp	r3, r5
-    drvp->fb[x + (y / 8) * SSD1306_WIDTH_FIXED + 1] |= 1 << (y % 8);
+                drvp->fb[x + (y / 8) * SSD1306_WIDTH_FIXED + 1] |= 1 << (y % 8);
  8000592:	bf0c      	ite	eq
  8000594:	4302      	orreq	r2, r0
-    drvp->fb[x + (y / 8) * SSD1306_WIDTH_FIXED + 1] &= ~(1 << (y % 8));
+                drvp->fb[x + (y / 8) * SSD1306_WIDTH_FIXED + 1] &= ~(1 << (y % 8));
  8000596:	ea20 0202 	bicne.w	r2, r0, r2
  800059a:	73ca      	strb	r2, [r1, #15]
 }
@@ -895,97 +895,98 @@ static void drawPixel(void *ip, uint8_t x, uint8_t y, ssd1306_color_t color) {
 
 080005b0 <PUTC>:
 
-static char PUTC(void *ip, char ch, const ssd1306_font_t *font, ssd1306_color_t color) {
+static char PUTC(void *ip, char ch, const ssd1306_font_t *font, ssd1306_color_t color)
+{
  80005b0:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
-  SSD1306Driver *drvp = (SSD1306Driver *)ip;
-  uint32_t i, b, j;
+        SSD1306Driver *drvp = (SSD1306Driver *)ip;
+        uint32_t i, b, j;
 
-  // Check available space in OLED
-  if (drvp->x + font->fw >= SSD1306_WIDTH ||
+        // Check available space in OLED
+        if (drvp->x + font->fw >= SSD1306_WIDTH ||
  80005b4:	f890 c00c 	ldrb.w	ip, [r0, #12]
  80005b8:	f892 e000 	ldrb.w	lr, [r2]
-static char PUTC(void *ip, char ch, const ssd1306_font_t *font, ssd1306_color_t color) {
+{
  80005bc:	b083      	sub	sp, #12
-  if (drvp->x + font->fw >= SSD1306_WIDTH ||
+        if (drvp->x + font->fw >= SSD1306_WIDTH ||
  80005be:	eb0c 070e 	add.w	r7, ip, lr
  80005c2:	2f7f      	cmp	r7, #127	; 0x7f
  80005c4:	dc3c      	bgt.n	8000640 <PUTC+0x90>
-      drvp->y + font->fh >= SSD1306_HEIGHT) {
+                drvp->y + font->fh >= SSD1306_HEIGHT) {
  80005c6:	7854      	ldrb	r4, [r2, #1]
  80005c8:	7b45      	ldrb	r5, [r0, #13]
  80005ca:	4425      	add	r5, r4
-  if (drvp->x + font->fw >= SSD1306_WIDTH ||
+        if (drvp->x + font->fw >= SSD1306_WIDTH ||
  80005cc:	2d3f      	cmp	r5, #63	; 0x3f
  80005ce:	dc37      	bgt.n	8000640 <PUTC+0x90>
  80005d0:	4698      	mov	r8, r3
  80005d2:	9101      	str	r1, [sp, #4]
  80005d4:	4616      	mov	r6, r2
  80005d6:	4605      	mov	r5, r0
-    return 0;
-  }
+                return 0;
+        }
 
-  // Go through font
-  for (i = 0; i < font->fh; i++) {
+        // Go through font
+        for (i = 0; i < font->fh; i++) {
  80005d8:	b36c      	cbz	r4, 8000636 <PUTC+0x86>
  80005da:	f04f 0a00 	mov.w	sl, #0
  80005de:	4673      	mov	r3, lr
  80005e0:	f1a1 0b20 	sub.w	fp, r1, #32
-    b = font->dt[(ch - 32) * font->fh + i];
+                b = font->dt[(ch - 32) * font->fh + i];
  80005e4:	fb0b a204 	mla	r2, fp, r4, sl
  80005e8:	6871      	ldr	r1, [r6, #4]
  80005ea:	f831 7012 	ldrh.w	r7, [r1, r2, lsl #1]
-    for (j = 0; j < font->fw; j++) {
+                for (j = 0; j < font->fw; j++) {
  80005ee:	b1db      	cbz	r3, 8000628 <PUTC+0x78>
  80005f0:	2400      	movs	r4, #0
  80005f2:	fa5f f98a 	uxtb.w	r9, sl
-      if ((b << j) & 0x8000) {
+                        if ((b << j) & 0x8000) {
  80005f6:	fa07 f304 	lsl.w	r3, r7, r4
  80005fa:	041b      	lsls	r3, r3, #16
-        drawPixel(drvp, drvp->x + j, drvp->y + i, color);
-      } else {
-        drawPixel(drvp, drvp->x + j, drvp->y + i,(ssd1306_color_t)! color);
+                                drawPixel(drvp, drvp->x + j, drvp->y + i, color);
+                        } else {
+                                drawPixel(drvp, drvp->x + j, drvp->y + i, (ssd1306_color_t)! color);
  80005fc:	bf58      	it	pl
  80005fe:	fab8 f388 	clzpl	r3, r8
  8000602:	7b6a      	ldrb	r2, [r5, #13]
  8000604:	eb0c 0104 	add.w	r1, ip, r4
  8000608:	444a      	add	r2, r9
-        drawPixel(drvp, drvp->x + j, drvp->y + i, color);
+                                drawPixel(drvp, drvp->x + j, drvp->y + i, color);
  800060a:	bf4c      	ite	mi
  800060c:	4643      	movmi	r3, r8
-        drawPixel(drvp, drvp->x + j, drvp->y + i,(ssd1306_color_t)! color);
+                                drawPixel(drvp, drvp->x + j, drvp->y + i, (ssd1306_color_t)! color);
  800060e:	095b      	lsrpl	r3, r3, #5
  8000610:	b2c9      	uxtb	r1, r1
  8000612:	b2d2      	uxtb	r2, r2
  8000614:	4628      	mov	r0, r5
  8000616:	f7ff ffa3 	bl	8000560 <drawPixel>
-    for (j = 0; j < font->fw; j++) {
+                for (j = 0; j < font->fw; j++) {
  800061a:	7833      	ldrb	r3, [r6, #0]
  800061c:	3401      	adds	r4, #1
  800061e:	429c      	cmp	r4, r3
  8000620:	f895 c00c 	ldrb.w	ip, [r5, #12]
  8000624:	d3e7      	bcc.n	80005f6 <PUTC+0x46>
  8000626:	7874      	ldrb	r4, [r6, #1]
-  for (i = 0; i < font->fh; i++) {
+        for (i = 0; i < font->fh; i++) {
  8000628:	f10a 0a01 	add.w	sl, sl, #1
  800062c:	45a2      	cmp	sl, r4
  800062e:	d3d9      	bcc.n	80005e4 <PUTC+0x34>
  8000630:	469e      	mov	lr, r3
  8000632:	eb0c 0703 	add.w	r7, ip, r3
-  		}
-  	}
-  */
+                }
+        }
+        */
 
-  // Increase pointer
-  drvp->x += font->fw;
+        // Increase pointer
+        drvp->x += font->fw;
  8000636:	9801      	ldr	r0, [sp, #4]
  8000638:	732f      	strb	r7, [r5, #12]
 
-  // Return character written
-  return ch;
+        // Return character written
+        return ch;
 }
  800063a:	b003      	add	sp, #12
  800063c:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-    return 0;
+                return 0;
  8000640:	2000      	movs	r0, #0
 }
  8000642:	b003      	add	sp, #12
@@ -994,11 +995,12 @@ static char PUTC(void *ip, char ch, const ssd1306_font_t *font, ssd1306_color_t 
 
 08000650 <PUTS>:
 
-static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_t color) {
+static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_t color)
+{
  8000650:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
  8000652:	460c      	mov	r4, r1
-  // Write characters
-  while (*str) {
+        // Write characters
+        while (*str) {
  8000654:	7809      	ldrb	r1, [r1, #0]
  8000656:	b181      	cbz	r1, 800067a <PUTS+0x2a>
  8000658:	4607      	mov	r7, r0
@@ -1007,8 +1009,8 @@ static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_
  800065e:	e002      	b.n	8000666 <PUTS+0x16>
  8000660:	f814 1f01 	ldrb.w	r1, [r4, #1]!
  8000664:	b149      	cbz	r1, 800067a <PUTS+0x2a>
-    // Write character by character
-    if (PUTC(ip, *str, font, color) != *str) {
+                // Write character by character
+                if (PUTC(ip, *str, font, color) != *str) {
  8000666:	462b      	mov	r3, r5
  8000668:	4632      	mov	r2, r6
  800066a:	4638      	mov	r0, r7
@@ -1016,30 +1018,30 @@ static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_
  8000670:	7823      	ldrb	r3, [r4, #0]
  8000672:	4298      	cmp	r0, r3
  8000674:	d0f4      	beq.n	8000660 <PUTS+0x10>
-    str++;
-  }
+                str++;
+        }
 
-  // Everything OK, zero should be returned
-  return *str;
+        // Everything OK, zero should be returned
+        return *str;
 }
  8000676:	4618      	mov	r0, r3
  8000678:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
-static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_t color) {
+{
  800067a:	2300      	movs	r3, #0
 }
  800067c:	4618      	mov	r0, r3
  800067e:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
 
 08000680 <toggleInvert>:
-  drvp->inv = !drvp->inv;
+        drvp->inv = !drvp->inv;
  8000680:	7b83      	ldrb	r3, [r0, #14]
  8000682:	f100 0110 	add.w	r1, r0, #16
  8000686:	fab3 f383 	clz	r3, r3
  800068a:	095b      	lsrs	r3, r3, #5
  800068c:	7383      	strb	r3, [r0, #14]
-  for (idx = 0; idx < sizeof(drvp->fb); idx++) {
+        for (idx = 0; idx < sizeof(drvp->fb); idx++) {
  800068e:	2200      	movs	r2, #0
-    if (idx % SSD1306_WIDTH_FIXED == 0) continue;
+                if (idx % SSD1306_WIDTH_FIXED == 0) continue;
  8000690:	4809      	ldr	r0, [pc, #36]	; (80006b8 <toggleInvert+0x38>)
  8000692:	e00b      	b.n	80006ac <toggleInvert+0x2c>
  8000694:	fba0 c302 	umull	ip, r3, r0, r2
@@ -1048,12 +1050,12 @@ static char PUTS(void *ip, char *str, const ssd1306_font_t *font, ssd1306_color_
  800069e:	1ad3      	subs	r3, r2, r3
  80006a0:	b29b      	uxth	r3, r3
  80006a2:	b113      	cbz	r3, 80006aa <toggleInvert+0x2a>
-    drvp->fb[idx] = ~drvp->fb[idx];
+                drvp->fb[idx] = ~drvp->fb[idx];
  80006a4:	780b      	ldrb	r3, [r1, #0]
  80006a6:	43db      	mvns	r3, r3
  80006a8:	700b      	strb	r3, [r1, #0]
  80006aa:	3101      	adds	r1, #1
-  for (idx = 0; idx < sizeof(drvp->fb); idx++) {
+        for (idx = 0; idx < sizeof(drvp->fb); idx++) {
  80006ac:	3201      	adds	r2, #1
  80006ae:	b292      	uxth	r2, r2
  80006b0:	f5b2 6f81 	cmp.w	r2, #1032	; 0x408
@@ -1114,7 +1116,7 @@ __STATIC_FORCEINLINE void __set_BASEPRI(uint32_t basePri)
  80006f2:	bc30      	pop	{r4, r5}
  80006f4:	4770      	bx	lr
  80006f6:	bf00      	nop
- 80006f8:	20000f20 	.word	0x20000f20
+ 80006f8:	20000f48 	.word	0x20000f48
  80006fc:	00000000 	.word	0x00000000
 
 08000700 <notify1>:
@@ -1185,7 +1187,7 @@ bool chSchIsPreemptionRequired(void) {
  8000748:	619a      	str	r2, [r3, #24]
  800074a:	4770      	bx	lr
  800074c:	e000ed00 	.word	0xe000ed00
- 8000750:	20000d88 	.word	0x20000d88
+ 8000750:	20000db0 	.word	0x20000db0
  8000754:	08000263 	.word	0x08000263
  8000758:	08000266 	.word	0x08000266
  800075c:	00000000 	.word	0x00000000
@@ -1223,7 +1225,7 @@ static inline void *chCoreAllocAlignedI(size_t size, unsigned align) {
  800077e:	bc10      	pop	{r4}
  8000780:	4770      	bx	lr
  8000782:	bf00      	nop
- 8000784:	20000f20 	.word	0x20000f20
+ 8000784:	20000f48 	.word	0x20000f48
 	...
 
 08000790 <chTMStopMeasurementX>:
@@ -1284,7 +1286,7 @@ NOINLINE void chTMStopMeasurementX(time_measurement_t *tmp) {
 }
  80007ce:	4770      	bx	lr
  80007d0:	e0001000 	.word	0xe0001000
- 80007d4:	20000d88 	.word	0x20000d88
+ 80007d4:	20000db0 	.word	0x20000db0
 	...
 
 080007e0 <chTMStartMeasurementX>:
@@ -1372,7 +1374,7 @@ static void wakeup(void *p) {
  8000854:	f383 8811 	msr	BASEPRI, r3
  8000858:	4770      	bx	lr
  800085a:	bf00      	nop
- 800085c:	20000d88 	.word	0x20000d88
+ 800085c:	20000db0 	.word	0x20000db0
 
 08000860 <chSchReadyI>:
 thread_t *chSchReadyI(thread_t *tp) {
@@ -1404,7 +1406,7 @@ thread_t *chSchReadyI(thread_t *tp) {
 }
  8000880:	4770      	bx	lr
  8000882:	bf00      	nop
- 8000884:	20000d88 	.word	0x20000d88
+ 8000884:	20000db0 	.word	0x20000db0
 	...
 
 08000890 <chEvtBroadcastFlagsI.constprop.34>:
@@ -1491,7 +1493,7 @@ void chEvtBroadcastFlagsI(event_source_t *esp, eventflags_t flags) {
  80008e6:	d1de      	bne.n	80008a6 <chEvtBroadcastFlagsI.constprop.34+0x16>
  80008e8:	e7f3      	b.n	80008d2 <chEvtBroadcastFlagsI.constprop.34+0x42>
  80008ea:	bf00      	nop
- 80008ec:	2000086c 	.word	0x2000086c
+ 80008ec:	20000894 	.word	0x20000894
 
 080008f0 <_idle_thread>:
  *          that this thread is executed only if there are no other ready
@@ -1730,7 +1732,7 @@ void i2c_lld_start(I2CDriver *i2cp) {
  8000a52:	e787      	b.n	8000964 <i2c_lld_start+0x64>
  8000a54:	000186a0 	.word	0x000186a0
  8000a58:	00061a80 	.word	0x00061a80
- 8000a5c:	20000834 	.word	0x20000834
+ 8000a5c:	2000085c 	.word	0x2000085c
  8000a60:	40021000 	.word	0x40021000
  8000a64:	08000ac1 	.word	0x08000ac1
  8000a68:	08000a81 	.word	0x08000a81
@@ -1777,7 +1779,7 @@ static void i2c_lld_serve_tx_end_irq(I2CDriver *i2cp, uint32_t flags) {
  8000aae:	4a02      	ldr	r2, [pc, #8]	; (8000ab8 <i2c_lld_serve_tx_end_irq+0x38>)
  8000ab0:	62da      	str	r2, [r3, #44]	; 0x2c
  8000ab2:	e7fe      	b.n	8000ab2 <i2c_lld_serve_tx_end_irq+0x32>
- 8000ab4:	20000d88 	.word	0x20000d88
+ 8000ab4:	20000db0 	.word	0x20000db0
  8000ab8:	08003fc4 	.word	0x08003fc4
  8000abc:	00000000 	.word	0x00000000
 
@@ -1849,7 +1851,7 @@ void chThdResumeI(thread_reference_t *trp, msg_t msg) {
  8000b1a:	62da      	str	r2, [r3, #44]	; 0x2c
  8000b1c:	e7fe      	b.n	8000b1c <i2c_lld_serve_rx_end_irq+0x5c>
  8000b1e:	bf00      	nop
- 8000b20:	20000d88 	.word	0x20000d88
+ 8000b20:	20000db0 	.word	0x20000db0
  8000b24:	08003fc4 	.word	0x08003fc4
 	...
 
@@ -1904,7 +1906,7 @@ void dmaServeInterrupt(const stm32_dma_stream_t *dmastp) {
 }
  8000b64:	bc30      	pop	{r4, r5}
  8000b66:	4770      	bx	lr
- 8000b68:	20000f44 	.word	0x20000f44
+ 8000b68:	20000f6c 	.word	0x20000f6c
  8000b6c:	00000000 	.word	0x00000000
 
 08000b70 <_usb_ep0out>:
@@ -2788,7 +2790,7 @@ void chSchWakeupS(thread_t *ntp, msg_t msg) {
     chSysSwitch(ntp, otp);
  80011e2:	f7ff b82d 	b.w	8000240 <_port_switch>
  80011e6:	bf00      	nop
- 80011e8:	20000d88 	.word	0x20000d88
+ 80011e8:	20000db0 	.word	0x20000db0
  80011ec:	00000000 	.word	0x00000000
 
 080011f0 <chThdCreateStatic.constprop.6>:
@@ -2861,7 +2863,7 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
  800124e:	4620      	mov	r0, r4
  8001250:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
  8001252:	bf00      	nop
- 8001254:	20000d88 	.word	0x20000d88
+ 8001254:	20000db0 	.word	0x20000db0
  8001258:	08000251 	.word	0x08000251
  800125c:	08003f64 	.word	0x08003f64
 
@@ -2894,7 +2896,7 @@ void chSchGoSleepS(tstate_t newstate) {
   chSysSwitch(currp, otp);
  800127e:	f7fe bfdf 	b.w	8000240 <_port_switch>
  8001282:	bf00      	nop
- 8001284:	20000d88 	.word	0x20000d88
+ 8001284:	20000db0 	.word	0x20000db0
 	...
 
 08001290 <chSchGoSleepTimeoutS>:
@@ -3228,7 +3230,7 @@ static inline void st_lld_set_alarm(systime_t abstime) {
  80013e2:	1c9a      	adds	r2, r3, #2
  80013e4:	e7f3      	b.n	80013ce <chSchGoSleepTimeoutS+0x13e>
  80013e6:	bf00      	nop
- 80013e8:	20000d88 	.word	0x20000d88
+ 80013e8:	20000db0 	.word	0x20000db0
  80013ec:	080007f1 	.word	0x080007f1
 
 080013f0 <chThdEnqueueTimeoutS>:
@@ -3267,7 +3269,7 @@ msg_t chThdEnqueueTimeoutS(threads_queue_t *tqp, sysinterval_t timeout) {
  800140c:	f04f 30ff 	mov.w	r0, #4294967295	; 0xffffffff
  8001410:	4770      	bx	lr
  8001412:	bf00      	nop
- 8001414:	20000d88 	.word	0x20000d88
+ 8001414:	20000db0 	.word	0x20000db0
 	...
 
 08001420 <oqPutTimeout>:
@@ -3498,7 +3500,7 @@ static inline void chRegSetThreadName(const char *name) {
  8001560:	f7ff ffde 	bl	8001520 <chThdSleep>
  8001564:	e7f4      	b.n	8001550 <Thread1+0x10>
  8001566:	bf00      	nop
- 8001568:	20000d88 	.word	0x20000d88
+ 8001568:	20000db0 	.word	0x20000db0
  800156c:	08003ee8 	.word	0x08003ee8
  8001570:	40010800 	.word	0x40010800
 	...
@@ -3679,7 +3681,7 @@ static inline bool chTimeIsInRangeX(systime_t time,
  8001676:	606b      	str	r3, [r5, #4]
 }
  8001678:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
- 800167c:	20000d88 	.word	0x20000d88
+ 800167c:	20000db0 	.word	0x20000db0
 
 08001680 <chMtxLockS>:
  *
@@ -3867,7 +3869,7 @@ void chMtxLockS(mutex_t *mp) {
  800175e:	4694      	mov	ip, r2
  8001760:	e7e9      	b.n	8001736 <chMtxLockS+0xb6>
  8001762:	bf00      	nop
- 8001764:	20000d88 	.word	0x20000d88
+ 8001764:	20000db0 	.word	0x20000db0
 	...
 
 08001770 <chprintf.constprop.3>:
@@ -4438,24 +4440,24 @@ int chprintf(BaseSequentialStream *chp, const char *fmt, ...) {
  8001b8c:	00000000 	.word	0x00000000
 
 08001b90 <fillScreen>:
-static void fillScreen(void *ip, ssd1306_color_t color) {
+{
  8001b90:	2900      	cmp	r1, #0
  8001b92:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
  8001b94:	bf0c      	ite	eq
  8001b96:	2700      	moveq	r7, #0
  8001b98:	27ff      	movne	r7, #255	; 0xff
-    drvp->fb[SSD1306_WIDTH_FIXED * idx] = 0x40;
+                drvp->fb[SSD1306_WIDTH_FIXED * idx] = 0x40;
  8001b9a:	2640      	movs	r6, #64	; 0x40
  8001b9c:	f100 0410 	add.w	r4, r0, #16
  8001ba0:	f500 6583 	add.w	r5, r0, #1048	; 0x418
  8001ba4:	f804 6c01 	strb.w	r6, [r4, #-1]
-    memset(&drvp->fb[SSD1306_WIDTH_FIXED * idx + 1],
+                memset(&drvp->fb[SSD1306_WIDTH_FIXED * idx + 1],
  8001ba8:	4620      	mov	r0, r4
  8001baa:	2280      	movs	r2, #128	; 0x80
  8001bac:	4639      	mov	r1, r7
  8001bae:	3481      	adds	r4, #129	; 0x81
  8001bb0:	f7fe fbd2 	bl	8000358 <memset>
-  for (idx = 0; idx < 8; idx++) {
+        for (idx = 0; idx < 8; idx++) {
  8001bb4:	42ac      	cmp	r4, r5
  8001bb6:	d1f5      	bne.n	8001ba4 <fillScreen+0x14>
 }
@@ -4815,7 +4817,7 @@ int main(void)
  8001dec:	4c05      	ldr	r4, [pc, #20]	; (8001e04 <main+0x64>)
  8001dee:	f103 0170 	add.w	r1, r3, #112	; 0x70
  8001df2:	e00b      	b.n	8001e0c <main+0x6c>
- 8001df4:	20000f44 	.word	0x20000f44
+ 8001df4:	20000f6c 	.word	0x20000f6c
  8001df8:	40021000 	.word	0x40021000
  8001dfc:	40007000 	.word	0x40007000
  8001e00:	08003f04 	.word	0x08003f04
@@ -5391,24 +5393,24 @@ static inline void dyn_list_init(dyn_list_t *dlp) {
  8002154:	888884b8 	.word	0x888884b8
  8002158:	40011000 	.word	0x40011000
  800215c:	88888844 	.word	0x88888844
- 8002160:	20000800 	.word	0x20000800
- 8002164:	2000086c 	.word	0x2000086c
+ 8002160:	20000828 	.word	0x20000828
+ 8002164:	20000894 	.word	0x20000894
  8002168:	08004078 	.word	0x08004078
- 800216c:	20000834 	.word	0x20000834
+ 800216c:	2000085c 	.word	0x2000085c
  8002170:	40005400 	.word	0x40005400
  8002174:	08000701 	.word	0x08000701
- 8002178:	20000d00 	.word	0x20000d00
+ 8002178:	20000d28 	.word	0x20000d28
  800217c:	40013800 	.word	0x40013800
- 8002180:	20000d88 	.word	0x20000d88
- 8002184:	20000f28 	.word	0x20000f28
- 8002188:	20000f20 	.word	0x20000f20
- 800218c:	20000e00 	.word	0x20000e00
+ 8002180:	20000db0 	.word	0x20000db0
+ 8002184:	20000f50 	.word	0x20000f50
+ 8002188:	20000f48 	.word	0x20000f48
+ 800218c:	20000e28 	.word	0x20000e28
  8002190:	08000761 	.word	0x08000761
- 8002194:	20000db8 	.word	0x20000db8
+ 8002194:	20000de0 	.word	0x20000de0
  8002198:	e000ed00 	.word	0xe000ed00
  800219c:	05fa0300 	.word	0x05fa0300
  80021a0:	e0042000 	.word	0xe0042000
- 80021a4:	200013d0 	.word	0x200013d0
+ 80021a4:	200013d8 	.word	0x200013d8
  80021a8:	080006c1 	.word	0x080006c1
  80021ac:	20005000 	.word	0x20005000
  80021b0:	08003f6c 	.word	0x08003f6c
@@ -5535,10 +5537,10 @@ static inline void dyn_list_init(dyn_list_t *dlp) {
   port->CRH = (port->CRH & mh) | crh;
  8002280:	4c29      	ldr	r4, [pc, #164]	; (8002328 <main+0x588>)
 
-        //palSetPadMode(IOPORT2, 6, PAL_MODE_STM32_ALTERNATE_OPENDRAIN); // SCL
-        //palSetPadMode(IOPORT2, 7, PAL_MODE_STM32_ALTERNATE_OPENDRAIN); // SDA
-        palSetPadMode(IOPORT3, 13, PAL_MODE_OUTPUT_PUSHPULL);         // LED on PC13
-
+        // I2C 硬件连接已经在（os/hal/boards/MAPLEMINI_STM32_F103）中配置了
+        //palSetPadMode(IOPORT2, 6, PAL_MODE_STM32_ALTERNATE_OPENDRAIN);        // SCL
+        //palSetPadMode(IOPORT2, 7, PAL_MODE_STM32_ALTERNATE_OPENDRAIN);        // SDA
+        palSetPadMode(IOPORT3, 13, PAL_MODE_OUTPUT_PUSHPULL);                   // LED on PC13
         chThdSleepMilliseconds(10);
  8002282:	2014      	movs	r0, #20
  8002284:	6862      	ldr	r2, [r4, #4]
@@ -5600,6 +5602,7 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  80022c6:	f885 0078 	strb.w	r0, [r5, #120]	; 0x78
  80022ca:	7229      	strb	r1, [r5, #8]
  80022cc:	f382 8811 	msr	BASEPRI, r2
+        // 串口1，使用默认配置
         sdStart(&SD1, NULL);
 
         // Blink Thread
@@ -5621,8 +5624,7 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  80022ee:	4814      	ldr	r0, [pc, #80]	; (8002340 <main+0x5a0>)
  80022f0:	f7fe ff7e 	bl	80011f0 <chThdCreateStatic.constprop.6>
 
-        while (true)
-        {
+        while (true) {
                 chThdSleepMilliseconds(500);
  80022f4:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
  80022f8:	f7ff f912 	bl	8001520 <chThdSleep>
@@ -5646,15 +5648,15 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  8002318:	e7c3      	b.n	80022a2 <main+0x502>
  800231a:	bf00      	nop
  800231c:	e0001000 	.word	0xe0001000
- 8002320:	20000e48 	.word	0x20000e48
+ 8002320:	20000e70 	.word	0x20000e70
  8002324:	08003fdc 	.word	0x08003fdc
  8002328:	40011000 	.word	0x40011000
  800232c:	08001541 	.word	0x08001541
- 8002330:	20001288 	.word	0x20001288
+ 8002330:	20001290 	.word	0x20001290
  8002334:	08003f84 	.word	0x08003f84
- 8002338:	2000086c 	.word	0x2000086c
+ 8002338:	20000894 	.word	0x20000894
  800233c:	08002601 	.word	0x08002601
- 8002340:	20000fc0 	.word	0x20000fc0
+ 8002340:	20000fc8 	.word	0x20000fc8
  8002344:	40021000 	.word	0x40021000
  8002348:	e000e100 	.word	0xe000e100
  800234c:	080008f1 	.word	0x080008f1
@@ -5722,7 +5724,7 @@ void chThdExit(msg_t msg) {
   chSchGoSleepS(CH_STATE_FINAL);
  80023c6:	f7fe bf4b 	b.w	8001260 <chSchGoSleepS>
  80023ca:	bf00      	nop
- 80023cc:	20000d88 	.word	0x20000d88
+ 80023cc:	20000db0 	.word	0x20000db0
 
 080023d0 <chSchDoReschedule>:
 void chSchDoRescheduleAhead(void) {
@@ -5783,7 +5785,7 @@ void chSchDoRescheduleAhead(void) {
   chSysSwitch(currp, otp);
  8002406:	f7fd bf1b 	b.w	8000240 <_port_switch>
  800240a:	bf00      	nop
- 800240c:	20000d88 	.word	0x20000d88
+ 800240c:	20000db0 	.word	0x20000db0
 
 08002410 <chMtxUnlock>:
  *
@@ -5909,22 +5911,22 @@ static inline bool chSchIsRescRequiredI(void) {
 }
  8002480:	bd70      	pop	{r4, r5, r6, pc}
  8002482:	bf00      	nop
- 8002484:	20000d88 	.word	0x20000d88
+ 8002484:	20000db0 	.word	0x20000db0
 	...
 
 08002490 <wrCmd>:
-static msg_t wrCmd(void *ip, uint8_t cmd) {
+{
  8002490:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
-  uint8_t txbuf[] = { 0x00, cmd };
+        uint8_t txbuf[] = { 0x00, cmd };
  8002494:	2600      	movs	r6, #0
-static msg_t wrCmd(void *ip, uint8_t cmd) {
+{
  8002496:	b082      	sub	sp, #8
-  i2cAcquireBus(drvp->config->i2cp);
+        i2cAcquireBus(drvp->config->i2cp);
  8002498:	6883      	ldr	r3, [r0, #8]
-  uint8_t txbuf[] = { 0x00, cmd };
+        uint8_t txbuf[] = { 0x00, cmd };
  800249a:	f88d 1005 	strb.w	r1, [sp, #5]
  800249e:	f88d 6004 	strb.w	r6, [sp, #4]
-static msg_t wrCmd(void *ip, uint8_t cmd) {
+{
  80024a2:	4604      	mov	r4, r0
  */
 void i2cAcquireBus(I2CDriver *i2cp) {
@@ -5939,7 +5941,7 @@ void i2cAcquireBus(I2CDriver *i2cp) {
   chMtxLockS(mp);
  80024ae:	f7ff f8e7 	bl	8001680 <chMtxLockS>
  80024b2:	f386 8811 	msr	BASEPRI, r6
-  i2cStart(drvp->config->i2cp, drvp->config->i2ccfg);
+        i2cStart(drvp->config->i2cp, drvp->config->i2ccfg);
  80024b6:	68a3      	ldr	r3, [r4, #8]
  80024b8:	e9d3 5300 	ldrd	r5, r3, [r3]
  80024bc:	f387 8811 	msr	BASEPRI, r7
@@ -5953,7 +5955,7 @@ void i2cAcquireBus(I2CDriver *i2cp) {
   i2cp->state = I2C_READY;
  80024cc:	f885 8000 	strb.w	r8, [r5]
  80024d0:	f386 8811 	msr	BASEPRI, r6
-  ret = i2cMasterTransmitTimeout(drvp->config->i2cp, drvp->config->sad,
+        ret = i2cMasterTransmitTimeout(drvp->config->i2cp, drvp->config->sad,
  80024d4:	68a3      	ldr	r3, [r4, #8]
  80024d6:	681d      	ldr	r5, [r3, #0]
  80024d8:	7a19      	ldrb	r1, [r3, #8]
@@ -5981,7 +5983,7 @@ void i2cAcquireBus(I2CDriver *i2cp) {
  80024fa:	702b      	strbeq	r3, [r5, #0]
  80024fc:	2300      	movs	r3, #0
  80024fe:	f383 8811 	msr	BASEPRI, r3
-  i2cReleaseBus(drvp->config->i2cp);
+        i2cReleaseBus(drvp->config->i2cp);
  8002502:	68a3      	ldr	r3, [r4, #8]
  */
 void i2cReleaseBus(I2CDriver *i2cp) {
@@ -6006,53 +6008,54 @@ static inline void osalMutexUnlock(mutex_t *mp) {
 
 08002520 <setDisplay>:
 
-static void setDisplay(void *ip, uint8_t on) {
+static void setDisplay(void *ip, uint8_t on)
+{
  8002520:	b538      	push	{r3, r4, r5, lr}
  8002522:	460d      	mov	r5, r1
  8002524:	4604      	mov	r4, r0
-  wrCmd(ip, 0x8D);
+        wrCmd(ip, 0x8D);
  8002526:	218d      	movs	r1, #141	; 0x8d
  8002528:	f7ff ffb2 	bl	8002490 <wrCmd>
-  wrCmd(ip, on ? 0x14 : 0x10);
+        wrCmd(ip, on ? 0x14 : 0x10);
  800252c:	2d00      	cmp	r5, #0
  800252e:	bf14      	ite	ne
  8002530:	2114      	movne	r1, #20
  8002532:	2110      	moveq	r1, #16
  8002534:	4620      	mov	r0, r4
  8002536:	f7ff ffab 	bl	8002490 <wrCmd>
-  wrCmd(ip, 0xAE);
+        wrCmd(ip, 0xAE);
  800253a:	4620      	mov	r0, r4
 }
  800253c:	e8bd 4038 	ldmia.w	sp!, {r3, r4, r5, lr}
-  wrCmd(ip, 0xAE);
+        wrCmd(ip, 0xAE);
  8002540:	21ae      	movs	r1, #174	; 0xae
  8002542:	f7ff bfa5 	b.w	8002490 <wrCmd>
  8002546:	bf00      	nop
 	...
 
 08002550 <updateScreen>:
-static void updateScreen(void *ip) {
+{
  8002550:	e92d 4ff8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
  8002554:	4604      	mov	r4, r0
  8002556:	25b0      	movs	r5, #176	; 0xb0
-    wrCmd(drvp, 0x00);
+                wrCmd(drvp, 0x00);
  8002558:	f04f 0800 	mov.w	r8, #0
  800255c:	f04f 0920 	mov.w	r9, #32
  8002560:	f100 070f 	add.w	r7, r0, #15
  8002564:	f200 4b17 	addw	fp, r0, #1047	; 0x417
-    wrCmd(drvp, 0xB0 + idx);
+                wrCmd(drvp, 0xB0 + idx);
  8002568:	4629      	mov	r1, r5
  800256a:	4620      	mov	r0, r4
  800256c:	f7ff ff90 	bl	8002490 <wrCmd>
-    wrCmd(drvp, 0x00);
+                wrCmd(drvp, 0x00);
  8002570:	2100      	movs	r1, #0
  8002572:	4620      	mov	r0, r4
  8002574:	f7ff ff8c 	bl	8002490 <wrCmd>
-    wrCmd(drvp, 0x10);
+                wrCmd(drvp, 0x10);
  8002578:	2110      	movs	r1, #16
  800257a:	4620      	mov	r0, r4
  800257c:	f7ff ff88 	bl	8002490 <wrCmd>
-  i2cAcquireBus(drvp->config->i2cp);
+        i2cAcquireBus(drvp->config->i2cp);
  8002580:	68a3      	ldr	r3, [r4, #8]
   osalMutexLock(&i2cp->mutex);
  8002582:	6818      	ldr	r0, [r3, #0]
@@ -6060,7 +6063,7 @@ static void updateScreen(void *ip) {
  8002586:	f389 8811 	msr	BASEPRI, r9
  800258a:	f7ff f879 	bl	8001680 <chMtxLockS>
  800258e:	f388 8811 	msr	BASEPRI, r8
-  i2cStart(drvp->config->i2cp, drvp->config->i2ccfg);
+        i2cStart(drvp->config->i2cp, drvp->config->i2ccfg);
  8002592:	68a3      	ldr	r3, [r4, #8]
  8002594:	e9d3 6300 	ldrd	r6, r3, [r3]
  8002598:	f389 8811 	msr	BASEPRI, r9
@@ -6074,7 +6077,7 @@ static void updateScreen(void *ip) {
   i2cp->state = I2C_READY;
  80025a8:	f886 a000 	strb.w	sl, [r6]
  80025ac:	f388 8811 	msr	BASEPRI, r8
-  ret = i2cMasterTransmitTimeout(drvp->config->i2cp, drvp->config->sad,
+        ret = i2cMasterTransmitTimeout(drvp->config->i2cp, drvp->config->sad,
  80025b0:	68a3      	ldr	r3, [r4, #8]
  80025b2:	681e      	ldr	r6, [r3, #0]
  80025b4:	7a19      	ldrb	r1, [r3, #8]
@@ -6100,7 +6103,7 @@ static void updateScreen(void *ip) {
     i2cp->state = I2C_LOCKED;
  80025d6:	7033      	strbeq	r3, [r6, #0]
  80025d8:	f388 8811 	msr	BASEPRI, r8
-  i2cReleaseBus(drvp->config->i2cp);
+        i2cReleaseBus(drvp->config->i2cp);
  80025dc:	68a3      	ldr	r3, [r4, #8]
  80025de:	3781      	adds	r7, #129	; 0x81
   osalMutexUnlock(&i2cp->mutex);
@@ -6108,7 +6111,7 @@ static void updateScreen(void *ip) {
  80025e2:	3501      	adds	r5, #1
  80025e4:	300c      	adds	r0, #12
  80025e6:	f7ff ff13 	bl	8002410 <chMtxUnlock>
-  for (idx = 0; idx < 8; idx++) {
+        for (idx = 0; idx < 8; idx++) {
  80025ea:	45bb      	cmp	fp, r7
  80025ec:	b2ed      	uxtb	r5, r5
  80025ee:	d1bb      	bne.n	8002568 <updateScreen+0x18>
@@ -6119,12 +6122,12 @@ static void updateScreen(void *ip) {
 08002600 <OledDisplay>:
 {
  8002600:	b580      	push	{r7, lr}
+void ssd1306ObjectInit(SSD1306Driver *devp)
+{
+        devp->vmt = &vmt_ssd1306;
+        devp->config = NULL;
 
-void ssd1306ObjectInit(SSD1306Driver *devp) {
-  devp->vmt = &vmt_ssd1306;
-  devp->config = NULL;
-
-  devp->state = SSD1306_STOP;
+        devp->state = SSD1306_STOP;
  8002602:	2701      	movs	r7, #1
  8002604:	4b3d      	ldr	r3, [pc, #244]	; (80026fc <OledDisplay+0xfc>)
  8002606:	b088      	sub	sp, #32
@@ -6132,94 +6135,95 @@ void ssd1306ObjectInit(SSD1306Driver *devp) {
  800260a:	4a3d      	ldr	r2, [pc, #244]	; (8002700 <OledDisplay+0x100>)
 }
 
-void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) {
-  const uint8_t cmds[] = {
+void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) 
+{
+        const uint8_t cmds[] = {
  800260c:	4c3d      	ldr	r4, [pc, #244]	; (8002704 <OledDisplay+0x104>)
  800260e:	ad01      	add	r5, sp, #4
  8002610:	619a      	str	r2, [r3, #24]
  8002612:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
  8002614:	c50f      	stmia	r5!, {r0, r1, r2, r3}
  8002616:	e894 0007 	ldmia.w	r4, {r0, r1, r2}
-  devp->vmt = &vmt_ssd1306;
+        devp->vmt = &vmt_ssd1306;
  800261a:	4e3b      	ldr	r6, [pc, #236]	; (8002708 <OledDisplay+0x108>)
  800261c:	4c3b      	ldr	r4, [pc, #236]	; (800270c <OledDisplay+0x10c>)
-  chDbgCheck((devp != NULL) && (config != NULL));
+        chDbgCheck((devp != NULL) && (config != NULL));
 
-  chDbgAssert((devp->state == SSD1306_STOP) || (devp->state == SSD1306_READY),
+        chDbgAssert((devp->state == SSD1306_STOP) || (devp->state == SSD1306_READY),
               "ssd1306Start(), invalid state");
 
-  devp->config = config;
+        devp->config = config;
  800261e:	4b3c      	ldr	r3, [pc, #240]	; (8002710 <OledDisplay+0x110>)
-  const uint8_t cmds[] = {
+        const uint8_t cmds[] = {
  8002620:	e885 0007 	stmia.w	r5, {r0, r1, r2}
 
-  // A little delay
-  chThdSleepMilliseconds(100);
+        // A little delay
+        chThdSleepMilliseconds(100);
  8002624:	20c8      	movs	r0, #200	; 0xc8
-  devp->state = SSD1306_STOP;
+        devp->state = SSD1306_STOP;
  8002626:	7127      	strb	r7, [r4, #4]
-  devp->vmt = &vmt_ssd1306;
+        devp->vmt = &vmt_ssd1306;
  8002628:	6026      	str	r6, [r4, #0]
-  devp->config = config;
+        devp->config = config;
  800262a:	60a3      	str	r3, [r4, #8]
 
-  // OLED initialize
-  for (idx = 0; idx < sizeof(cmds) / sizeof(cmds[0]); idx++) {
-    wrCmd(devp, cmds[idx]);
+        // OLED initialize
+        for (idx = 0; idx < sizeof(cmds) / sizeof(cmds[0]); idx++) {
+                wrCmd(devp, cmds[idx]);
  800262c:	4627      	mov	r7, r4
-  chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(100);
  800262e:	f7fe ff77 	bl	8001520 <chThdSleep>
  8002632:	f10d 0503 	add.w	r5, sp, #3
  8002636:	f10d 061f 	add.w	r6, sp, #31
-    wrCmd(devp, cmds[idx]);
+                wrCmd(devp, cmds[idx]);
  800263a:	f815 1f01 	ldrb.w	r1, [r5, #1]!
  800263e:	4638      	mov	r0, r7
  8002640:	f7ff ff26 	bl	8002490 <wrCmd>
-  for (idx = 0; idx < sizeof(cmds) / sizeof(cmds[0]); idx++) {
+        for (idx = 0; idx < sizeof(cmds) / sizeof(cmds[0]); idx++) {
  8002644:	42b5      	cmp	r5, r6
  8002646:	d1f8      	bne.n	800263a <OledDisplay+0x3a>
-    drvp->fb[SSD1306_WIDTH_FIXED * idx] = 0x40;
+                drvp->fb[SSD1306_WIDTH_FIXED * idx] = 0x40;
  8002648:	2740      	movs	r7, #64	; 0x40
  800264a:	4d32      	ldr	r5, [pc, #200]	; (8002714 <OledDisplay+0x114>)
  800264c:	f505 6681 	add.w	r6, r5, #1032	; 0x408
  8002650:	f805 7c01 	strb.w	r7, [r5, #-1]
-    memset(&drvp->fb[SSD1306_WIDTH_FIXED * idx + 1],
+                memset(&drvp->fb[SSD1306_WIDTH_FIXED * idx + 1],
  8002654:	4628      	mov	r0, r5
  8002656:	2280      	movs	r2, #128	; 0x80
  8002658:	21ff      	movs	r1, #255	; 0xff
  800265a:	3581      	adds	r5, #129	; 0x81
  800265c:	f7fd fe7c 	bl	8000358 <memset>
-  for (idx = 0; idx < 8; idx++) {
+        for (idx = 0; idx < 8; idx++) {
  8002660:	42b5      	cmp	r5, r6
  8002662:	d1f5      	bne.n	8002650 <OledDisplay+0x50>
 
-  // Clear screen
-  fillScreen(devp, SSD1306_COLOR_WHITE);
+        // Clear screen
+        fillScreen(devp, SSD1306_COLOR_WHITE);
 
-  // Update screen
-  updateScreen(devp);
+        // Update screen
+        updateScreen(devp);
  8002664:	4829      	ldr	r0, [pc, #164]	; (800270c <OledDisplay+0x10c>)
  8002666:	f7ff ff73 	bl	8002550 <updateScreen>
 
-  // Set default value
-  devp->x = 0;
+        // Set default value
+        devp->x = 0;
  800266a:	2100      	movs	r1, #0
-  devp->y = 0;
+        devp->y = 0;
 
-  devp->state = SSD1306_READY;
+        devp->state = SSD1306_READY;
  800266c:	2202      	movs	r2, #2
-        ssd1306FillScreen(&SSD1306D1, 0x00);
+        ssd1306FillScreen(&SSD1306D1, 0x00);    // SSD1306 清屏
  800266e:	6823      	ldr	r3, [r4, #0]
-  devp->x = 0;
+        devp->x = 0;
  8002670:	81a1      	strh	r1, [r4, #12]
  8002672:	689b      	ldr	r3, [r3, #8]
-  devp->state = SSD1306_READY;
+        devp->state = SSD1306_READY;
  8002674:	7122      	strb	r2, [r4, #4]
  8002676:	4825      	ldr	r0, [pc, #148]	; (800270c <OledDisplay+0x10c>)
  8002678:	4798      	blx	r3
                 ssd1306GotoXy(&SSD1306D1, 0, 1);
  800267a:	4d24      	ldr	r5, [pc, #144]	; (800270c <OledDisplay+0x10c>)
-                ssd1306Puts(&SSD1306D1, snum0, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
+                ssd1306Puts(&SSD1306D1, line0, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
  800267c:	4e26      	ldr	r6, [pc, #152]	; (8002718 <OledDisplay+0x118>)
  800267e:	f8df 80a4 	ldr.w	r8, [pc, #164]	; 8002724 <OledDisplay+0x124>
                 ssd1306GotoXy(&SSD1306D1, 0, 1);
@@ -6229,7 +6233,7 @@ void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) {
  8002688:	691b      	ldr	r3, [r3, #16]
  800268a:	2100      	movs	r1, #0
  800268c:	4798      	blx	r3
-                ssd1306Puts(&SSD1306D1, snum0, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
+                ssd1306Puts(&SSD1306D1, line0, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
  800268e:	6822      	ldr	r2, [r4, #0]
  8002690:	4641      	mov	r1, r8
  8002692:	6997      	ldr	r7, [r2, #24]
@@ -6252,7 +6256,7 @@ void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) {
  80026b0:	691b      	ldr	r3, [r3, #16]
  80026b2:	2100      	movs	r1, #0
  80026b4:	4798      	blx	r3
-                ssd1306Puts(&SSD1306D1, snum1, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
+                ssd1306Puts(&SSD1306D1, line1, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
  80026b6:	6822      	ldr	r2, [r4, #0]
  80026b8:	4918      	ldr	r1, [pc, #96]	; (800271c <OledDisplay+0x11c>)
  80026ba:	6997      	ldr	r7, [r2, #24]
@@ -6275,7 +6279,7 @@ void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) {
  80026d8:	691b      	ldr	r3, [r3, #16]
  80026da:	2100      	movs	r1, #0
  80026dc:	4798      	blx	r3
-                ssd1306Puts(&SSD1306D1, ionnum, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
+                ssd1306Puts(&SSD1306D1, line2, &ssd1306_font_11x18, SSD1306_COLOR_WHITE);
  80026de:	6822      	ldr	r2, [r4, #0]
  80026e0:	490f      	ldr	r1, [pc, #60]	; (8002720 <OledDisplay+0x120>)
  80026e2:	6997      	ldr	r7, [r2, #24]
@@ -6292,17 +6296,17 @@ void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) {
  80026f4:	20c8      	movs	r0, #200	; 0xc8
  80026f6:	f7fe ff13 	bl	8001520 <chThdSleep>
  80026fa:	e7c2      	b.n	8002682 <OledDisplay+0x82>
- 80026fc:	20000d88 	.word	0x20000d88
+ 80026fc:	20000db0 	.word	0x20000db0
  8002700:	08003edc 	.word	0x08003edc
  8002704:	08003164 	.word	0x08003164
  8002708:	080040a0 	.word	0x080040a0
- 800270c:	200008e8 	.word	0x200008e8
+ 800270c:	20000910 	.word	0x20000910
  8002710:	0800406c 	.word	0x0800406c
- 8002714:	200008f8 	.word	0x200008f8
+ 8002714:	20000920 	.word	0x20000920
  8002718:	08004064 	.word	0x08004064
- 800271c:	20000fb4 	.word	0x20000fb4
- 8002720:	20000f9c 	.word	0x20000f9c
- 8002724:	20000fa8 	.word	0x20000fa8
+ 800271c:	2000080c 	.word	0x2000080c
+ 8002720:	20000818 	.word	0x20000818
+ 8002724:	20000800 	.word	0x20000800
 	...
 
 08002730 <__early_init>:
@@ -6756,7 +6760,7 @@ OSAL_IRQ_HANDLER(STM32_USB1_LP_HANDLER) {
  8002a2a:	f8ca 3008 	str.w	r3, [sl, #8]
  8002a2e:	e6ca      	b.n	80027c6 <Vector90+0x16>
  8002a30:	40005c00 	.word	0x40005c00
- 8002a34:	20000d00 	.word	0x20000d00
+ 8002a34:	20000d28 	.word	0x20000d28
  8002a38:	08003f9c 	.word	0x08003f9c
   stm32_usb_descriptor_t *udp = USB_GET_DESCRIPTOR(ep);
  8002a3c:	f8db 3050 	ldr.w	r3, [fp, #80]	; 0x50
@@ -6907,7 +6911,7 @@ OSAL_IRQ_HANDLER(STM32_USB1_LP_HANDLER) {
  8002b5e:	d1ac      	bne.n	8002aba <Vector90+0x30a>
  8002b60:	e7af      	b.n	8002ac2 <Vector90+0x312>
  8002b62:	bf00      	nop
- 8002b64:	20000d00 	.word	0x20000d00
+ 8002b64:	20000d28 	.word	0x20000d28
 	...
 
 08002b70 <VectorD4>:
@@ -7161,9 +7165,9 @@ void sdIncomingDataI(SerialDriver *sdp, uint8_t b) {
  8002d12:	60f3      	str	r3, [r6, #12]
  8002d14:	e7e3      	b.n	8002cde <VectorD4+0x16e>
  8002d16:	bf00      	nop
- 8002d18:	2000086c 	.word	0x2000086c
- 8002d1c:	20000878 	.word	0x20000878
- 8002d20:	2000089c 	.word	0x2000089c
+ 8002d18:	20000894 	.word	0x20000894
+ 8002d1c:	200008a0 	.word	0x200008a0
+ 8002d20:	200008c4 	.word	0x200008c4
 	...
 
 08002d30 <VectorB0>:
@@ -7309,7 +7313,7 @@ void st_lld_serve_interrupt(void) {
   OSAL_IRQ_EPILOGUE();
  8002dda:	f7fd bc99 	b.w	8000710 <_port_irq_epilogue>
  8002dde:	bf00      	nop
- 8002de0:	20000d88 	.word	0x20000d88
+ 8002de0:	20000db0 	.word	0x20000db0
 	...
 
 08002df0 <VectorC0>:
@@ -7452,7 +7456,7 @@ OSAL_IRQ_HANDLER(STM32_I2C1_ERROR_HANDLER) {
  8002ec4:	f043 0340 	orr.w	r3, r3, #64	; 0x40
  8002ec8:	6093      	str	r3, [r2, #8]
  8002eca:	e7d8      	b.n	8002e7e <VectorC0+0x8e>
- 8002ecc:	20000834 	.word	0x20000834
+ 8002ecc:	2000085c 	.word	0x2000085c
 
 08002ed0 <VectorBC>:
   I2C_TypeDef *dp = i2cp->i2c;
@@ -7606,7 +7610,7 @@ OSAL_IRQ_HANDLER(STM32_I2C1_EVENT_HANDLER) {
  8002fcc:	2300      	movs	r3, #0
  8002fce:	f383 8811 	msr	BASEPRI, r3
  8002fd2:	e793      	b.n	8002efc <VectorBC+0x2c>
- 8002fd4:	20000834 	.word	0x20000834
+ 8002fd4:	2000085c 	.word	0x2000085c
  8002fd8:	00030002 	.word	0x00030002
  8002fdc:	00070082 	.word	0x00070082
  8002fe0:	00030008 	.word	0x00030008
@@ -7766,10 +7770,10 @@ void __init_ram_areas(void) {
  8003120:	4770      	bx	lr
  8003122:	bf00      	nop
  8003124:	08003fe4 	.word	0x08003fe4
- 8003128:	200013d0 	.word	0x200013d0
- 800312c:	200013d0 	.word	0x200013d0
- 8003130:	200013d0 	.word	0x200013d0
- 8003134:	080040c4 	.word	0x080040c4
+ 8003128:	200013d8 	.word	0x200013d8
+ 800312c:	200013d8 	.word	0x200013d8
+ 8003130:	200013d8 	.word	0x200013d8
+ 8003134:	080040e8 	.word	0x080040e8
 	...
 
 08003140 <__default_exit>:

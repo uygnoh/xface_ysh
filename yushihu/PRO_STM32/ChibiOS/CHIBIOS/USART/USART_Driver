@@ -218,7 +218,7 @@ typedef struct {
 // 因为它允许打印格式化的字符串。 我们谈论的接口是 BaseSequentialStream
 //
 // 在面向对象的编程中，接口只是一个抽象的API，它是一种行为描述而不是代
-// 码实现。在BaseSequentialStream的情况下，指定的行为是该接口有4个方法：
+// 码实现。 在BaseSequentialStream的情况下，指定的行为是该接口有4个方法：
 /**
  * @brief   BaseSequentialStream specific methods.
  */

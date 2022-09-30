@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccP41Gsx.s 			page 1
+ARM GAS  /tmp/ccBpq0c0.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -12,14 +12,14 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
    9              		.eabi_attribute 34, 1
   10              		.eabi_attribute 18, 4
   11              		.file	"hal_pal.c"
-  12              		.section	.gnu.lto_.profile.1f6234e38dda89ac,"",%progbits
+  12              		.section	.gnu.lto_.profile.228ed7c79e48a374,"",%progbits
   13 0000 789C6363 		.ascii	"x\234cc```\001bF\006\015\031\000\000\344\000P"
   13      60606001 
   13      6246060D 
   13      190000E4 
   13      0050
   14              		.text
-  15              		.section	.gnu.lto_.icf.1f6234e38dda89ac,"",%progbits
+  15              		.section	.gnu.lto_.icf.228ed7c79e48a374,"",%progbits
   16 0000 789C6363 		.ascii	"x\234cc``\020a@\000f\206\247W/<\340c\374\177\356^\017"
   16      60601061 
   16      40006686 
@@ -30,7 +30,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   17      00006F79 
   17      0A6A
   18              		.text
-  19              		.section	.gnu.lto_.jmpfuncs.1f6234e38dda89ac,"",%progbits
+  19              		.section	.gnu.lto_.jmpfuncs.228ed7c79e48a374,"",%progbits
   20 0000 789C6363 		.ascii	"x\234cc``hf@\000f\006FF\306\3729@\212\211\221\221\031"
   20      60606866 
   20      40006606 
@@ -57,8 +57,8 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   24      D3008C79 
   24      2625
   25              		.text
-  26              		.section	.gnu.lto_.inline.1f6234e38dda89ac,"",%progbits
-ARM GAS  /tmp/ccP41Gsx.s 			page 2
+  26              		.section	.gnu.lto_.inline.228ed7c79e48a374,"",%progbits
+ARM GAS  /tmp/ccBpq0c0.s 			page 2
 
 
   27 0000 789C6363 		.ascii	"x\234cc``\370\316\200\000\314\014\014\234\034\214\314"
@@ -98,14 +98,14 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   34      0600FB46 
   34      20A6
   35              		.text
-  36              		.section	.gnu.lto_.pureconst.1f6234e38dda89ac,"",%progbits
+  36              		.section	.gnu.lto_.pureconst.228ed7c79e48a374,"",%progbits
   37 0000 789C6363 		.ascii	"x\234cc```\007bf\006)F)&I\000\001\274\000a"
   37      60606007 
   37      62660629 
   37      46292649 
   37      0001BC00 
   38              		.text
-  39              		.section	.gnu.lto_palReadBus.1f6234e38dda89ac,"",%progbits
+  39              		.section	.gnu.lto_palReadBus.228ed7c79e48a374,"",%progbits
   40 0000 789C9591 		.ascii	"x\234\225\221\317K[A\020\307\347\373\346e\363b\215\377"
   40      CF4B5B41 
   40      10C7E7FB 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   42 0021 8AA1E0CD 		.ascii	"\212\241\340\315M\374\215\025D\252BxJ\016\212P(*\246"
   42      4DFC8D15 
   42      44AA4278 
-ARM GAS  /tmp/ccP41Gsx.s 			page 3
+ARM GAS  /tmp/ccBpq0c0.s 			page 3
 
 
   42      4A0E8A50 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   53      596D4C53 
   53      128A3712 
   54 0104 398AB5B3 		.ascii	"9\212\265\263\231\357F\321%\366\244\351\302X\375gR\207"
-ARM GAS  /tmp/ccP41Gsx.s 			page 4
+ARM GAS  /tmp/ccBpq0c0.s 			page 4
 
 
   54      99EF46D1 
@@ -229,7 +229,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   63      0181D6CC 
   63      62
   64              		.text
-  65              		.section	.gnu.lto_palWriteBus.1f6234e38dda89ac,"",%progbits
+  65              		.section	.gnu.lto_palWriteBus.228ed7c79e48a374,"",%progbits
   66 0000 789C9592 		.ascii	"x\234\225\222\317k\023Q\020\307\337w\337f\363sS\275"
   66      CF6B1351 
   66      10C7DF77 
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   67 0012 092D12C1 		.ascii	"\011-\022\301\020\252\320\375\223\244\315E\241\240\030"
   67      10AAD0FD 
   67      93A4CD45 
-ARM GAS  /tmp/ccP41Gsx.s 			page 5
+ARM GAS  /tmp/ccBpq0c0.s 			page 5
 
 
   67      A1A018
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   79 00f6 C015ACCE 		.ascii	"\300\025\254\316\026\242\362\230F~\\\255\314\330\361"
   79      16A2F298 
   79      467E5CAD 
-ARM GAS  /tmp/ccP41Gsx.s 			page 6
+ARM GAS  /tmp/ccBpq0c0.s 			page 6
 
 
   79      CCD8F1
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   90      22AC3D55 
   90      05A8
   91 01d2 FF5655BB 		.ascii	"\377VU\273~Am\366\261\355O\307f\353\360\240\330D&\246"
-ARM GAS  /tmp/ccP41Gsx.s 			page 7
+ARM GAS  /tmp/ccBpq0c0.s 			page 7
 
 
   91      7E416DF6 
@@ -394,7 +394,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
   98 024b 70E12F7D 		.ascii	"p\341/}\253\"6"
   98      AB2236
   99              		.text
- 100              		.section	.gnu.lto_palSetBusMode.1f6234e38dda89ac,"",%progbits
+ 100              		.section	.gnu.lto_palSetBusMode.228ed7c79e48a374,"",%progbits
  101 0000 789C9592 		.ascii	"x\234\225\222MK[A\024\206\317;\347\346\336D\253\353"
  101      4D4B5B41 
  101      1486CF3B 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  105      D22EEACE 
  105      E1CECC99 
  105      3BE77DE6 
-ARM GAS  /tmp/ccP41Gsx.s 			page 8
+ARM GAS  /tmp/ccBpq0c0.s 			page 8
 
 
  105      9DC3
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  117 0126 50CBACE4 		.ascii	"P\313\254\344\274R\241\376\3213\267fkw\243\276\363\301"
  117      BC52A1FE 
  117      D133B766 
-ARM GAS  /tmp/ccP41Gsx.s 			page 9
+ARM GAS  /tmp/ccBpq0c0.s 			page 9
 
 
  117      6B77A3BE 
@@ -522,7 +522,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  125      D0FD0752 
  125      75CA62
  126              		.text
- 127              		.section	.gnu.lto_.symbol_nodes.1f6234e38dda89ac,"",%progbits
+ 127              		.section	.gnu.lto_.symbol_nodes.228ed7c79e48a374,"",%progbits
  128 0000 789C6363 		.ascii	"x\234cc``\010\004b\006\246\371L\365\014\014\023\316"
  128      60600804 
  128      6206A6F9 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  130      33834518 
  130      181A1A1C 
  130      18
-ARM GAS  /tmp/ccP41Gsx.s 			page 10
+ARM GAS  /tmp/ccBpq0c0.s 			page 10
 
 
  131 0034 18989998 		.ascii	"\030\230\231\230\031\226<\374\307\310\000\000C.\024"
@@ -547,13 +547,13 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  131      432E14
  132 0043 1F       		.ascii	"\037"
  133              		.text
- 134              		.section	.gnu.lto_.refs.1f6234e38dda89ac,"",%progbits
+ 134              		.section	.gnu.lto_.refs.228ed7c79e48a374,"",%progbits
  135 0000 789C6363 		.ascii	"x\234cc```\004b\006\000\000D\000\010"
  135      60606004 
  135      62060000 
  135      440008
  136              		.text
- 137              		.section	.gnu.lto_.decls.1f6234e38dda89ac,"",%progbits
+ 137              		.section	.gnu.lto_.decls.228ed7c79e48a374,"",%progbits
  138 0000 789C9557 		.ascii	"x\234\225W}PT\327\025\177\347\335]X\226\005,\332\216"
  138      7D5054D7 
  138      157FE7DD 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  146      DAF512E7 
  146      42
  147 009f F11E8E32 		.ascii	"\361\036\2162M\266\247~:Q\346\240\254D\031B\011E\275"
-ARM GAS  /tmp/ccP41Gsx.s 			page 11
+ARM GAS  /tmp/ccBpq0c0.s 			page 11
 
 
  147      4DB6A77E 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  158      4F7475BC 
  159 0172 BC150AFA 		.ascii	"\274\025\012\372(\207$\345H%6)\350=\001\016C\004|\015"
  159      288724E5 
-ARM GAS  /tmp/ccP41Gsx.s 			page 12
+ARM GAS  /tmp/ccBpq0c0.s 			page 12
 
 
  159      48253629 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  170      651721C3 
  171 024a 7C507BE2 		.ascii	"|P{\342Q,'\023\201\243o:\207\234\301\274\256\272\000"
  171      512C2713 
-ARM GAS  /tmp/ccP41Gsx.s 			page 13
+ARM GAS  /tmp/ccBpq0c0.s 			page 13
 
 
  171      81A36F3A 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  182      53A37C2E 
  182      06DCC235 
  182      F87F
-ARM GAS  /tmp/ccP41Gsx.s 			page 14
+ARM GAS  /tmp/ccBpq0c0.s 			page 14
 
 
  183 032c D6838775 		.ascii	"\326\203\207u\2517\000\333\005\334D\303\033\236\335"
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  194      7DBC50FB 
  195 0403 0B95E20F 		.ascii	"\013\225\342\017\324\206\227\261B\245\204\357y\243\037"
  195      D48697B1 
-ARM GAS  /tmp/ccP41Gsx.s 			page 15
+ARM GAS  /tmp/ccBpq0c0.s 			page 15
 
 
  195      42A584EF 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  207 04d5 4DCA1324 		.ascii	"M\312\023$\310K\263{\333Vm\027\266\010\001\376.\010"
  207      C84BB37B 
  207      DB566D17 
-ARM GAS  /tmp/ccP41Gsx.s 			page 16
+ARM GAS  /tmp/ccBpq0c0.s 			page 16
 
 
  207      B60801FE 
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  219      77E81999 
  219      1137C18D 
  219      394D273D 
-ARM GAS  /tmp/ccP41Gsx.s 			page 17
+ARM GAS  /tmp/ccBpq0c0.s 			page 17
 
 
  219      E9B5
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  231      8B4F0AF4 
  231      248FEB8E 
  231      0DB68C
-ARM GAS  /tmp/ccP41Gsx.s 			page 18
+ARM GAS  /tmp/ccBpq0c0.s 			page 18
 
 
  232 0691 19B82EF5 		.ascii	"\031\270.\365\363\262y\355W@\321%\271\275\342\274'+"
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  243      6FBA4B95 
  243      746F
  244 0760 E10C07FA 		.ascii	"\341\014\007\372\313\253\264\336\321{\276/\312\030\305"
-ARM GAS  /tmp/ccP41Gsx.s 			page 19
+ARM GAS  /tmp/ccBpq0c0.s 			page 19
 
 
  244      CBABB4DE 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  256      BDFBE7BF 
  256      CE5C1413 
  256      23E84DA6 
-ARM GAS  /tmp/ccP41Gsx.s 			page 20
+ARM GAS  /tmp/ccBpq0c0.s 			page 20
 
 
  256      AC
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  267      5225C8
  268 0912 59DE7129 		.ascii	"Y\336q)\212J\322\223\005\355\222\345\013\263,\272\224"
  268      8A4AD293 
-ARM GAS  /tmp/ccP41Gsx.s 			page 21
+ARM GAS  /tmp/ccBpq0c0.s 			page 21
 
 
  268      05ED92E5 
@@ -1229,7 +1229,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  273      98FF02E8 
  273      8660DD
  274              		.text
- 275              		.section	.gnu.lto_.symtab.1f6234e38dda89ac,"",%progbits
+ 275              		.section	.gnu.lto_.symtab.228ed7c79e48a374,"",%progbits
  276 0000 70616C52 		.ascii	"palReadBus\000"
  276      65616442 
  276      757300
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  292 0046 00000000 		.ascii	"\000\000\000\000\000\000\000\000"
  292      00000000 
  293 004e 07010000 		.ascii	"\007\001\000\000"
-ARM GAS  /tmp/ccP41Gsx.s 			page 22
+ARM GAS  /tmp/ccBpq0c0.s 			page 22
 
 
  294 0052 5F70616C 		.ascii	"_pal_lld_setgroupmode\000"
@@ -1303,7 +1303,7 @@ ARM GAS  /tmp/ccP41Gsx.s 			page 1
  308              		.comm	__gnu_lto_v1,1,1
  309              		.comm	__gnu_lto_slim,1,1
  310              		.ident	"GCC: (15:7-2018-q2-6) 7.3.1 20180622 (release) [ARM/embedded-7-branch revision 261907]"
-ARM GAS  /tmp/ccP41Gsx.s 			page 23
+ARM GAS  /tmp/ccBpq0c0.s 			page 23
 
 
 DEFINED SYMBOLS
