@@ -56,7 +56,7 @@ typedef struct {
 
 
 
-// SSD1306 可以使用的方法
+// SSD1306 函数指针
 // ____________________________________________________________
 #define _ssd1306_methods                                                                        \
         void (*updateScreen)(void *ip);                                                         \

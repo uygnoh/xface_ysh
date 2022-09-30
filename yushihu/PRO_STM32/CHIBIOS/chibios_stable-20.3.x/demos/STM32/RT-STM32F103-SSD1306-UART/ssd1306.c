@@ -1,4 +1,4 @@
-// Steal from https://stm32f4-discovery.net/2015/05/library-61-ssd1306-oled-i2c-lcd-for-stm32f4xx/
+
 
 // SSD1306 页寻址命令（0x20 + 0x10）
 // 该模式下， 显示器从某一页的 column0 → column127 进行扫描，需要注意的是该模式在接收到
@@ -12,7 +12,7 @@
 //
 // 以官方文档中的例子做解析:
 // 命令0xB2设置要写入的页为 PAGE2； 低四位-命令0x03和高四位-命令0x00（发送的命令是0x10）
-// 共同构成地址0x03,即从SEG3开始写入显存
+// 共同构成地址0x03, 即从SEG3开始写入显存
 //
 //
 //
@@ -27,6 +27,7 @@
 // 页地址模式下设置列起始地址高位（Set Higher Column Start Address For Page Addressing
 //  Mode : 10h~1Fh）， 此指令用于在页地址模式下设置GDDRAM的列起始地址（8位）的高4位
 //
+
 
 
 #include <string.h>
@@ -57,7 +58,6 @@ static msg_t wrCmd(void *ip, uint8_t cmd)
         return ret;
 }
 
-
 static msg_t wrDat(void *ip, uint8_t *txbuf, uint16_t len)
 {
         const SSD1306Driver *drvp = (const SSD1306Driver *)ip;
@@ -73,7 +73,6 @@ static msg_t wrDat(void *ip, uint8_t *txbuf, uint16_t len)
 
         return ret;
 }
-
 
 static void updateScreen(void *ip)
 {
@@ -222,6 +221,8 @@ static const struct SSD1306VMT vmt_ssd1306 = {
         setDisplay
 };
 
+
+
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
@@ -233,6 +234,8 @@ void ssd1306ObjectInit(SSD1306Driver *devp)
 
         devp->state = SSD1306_STOP;
 }
+
+
 
 void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config) 
 {
@@ -296,6 +299,8 @@ void ssd1306Start(SSD1306Driver *devp, const SSD1306Config *config)
 
         devp->state = SSD1306_READY;
 }
+
+
 
 void ssd1306Stop(SSD1306Driver *devp) 
 {

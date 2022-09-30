@@ -1,9 +1,9 @@
 /*******************************************************************************
         => RP2040
 *******************************************************************************/
-BOOTSEL //启动选择按钮
-        按键未按下时，MCU复位或上电，则从Flash启动
-        如果按键按下，MCU复位或上电，则进入UF2下载模式
+        BOOTSEL         // 启动选择按钮
+                        // 按键未按下时，MCU复位或上电，则从Flash启动
+                        // 如果按键按下，MCU复位或上电，则进入UF2下载模式
         
         
         
@@ -13,11 +13,11 @@ BOOTSEL //启动选择按钮
 
         machine.Pin(id, mode=None, pull=None, value)
 //_____________________________________________________________
-Pin     //对象构造函数
-id      //GPIO编号，数值为（0~29）
-mode    //模式，可选( None, Pin.IN(0), Pin.OUT(1), Pin.OPEN_DRAIN(2) )
-pull    //使用内部上拉或下拉，仅在输入模式下有效( None, Pin.PULL_UP(1), Pin.PULL_DOWN(2) )
-value   //0(off), 1(on)
+        Pin     // 对象构造函数
+        id      // GPIO编号，数值为（0~29）
+        mode    // 模式，可选( None, Pin.IN(0), Pin.OUT(1), Pin.OPEN_DRAIN(2) )
+        pull    // 使用内部上拉或下拉，仅在输入模式下有效( None, Pin.PULL_UP(1), Pin.PULL_DOWN(2) )
+        value   // 0(off), 1(on)
 
 
 
@@ -25,31 +25,31 @@ value   //0(off), 1(on)
 //_____________________________________________________________
 from machine import Pin
 import utime
-#//初始化GPIO15，配置为输入模式，使用上拉电阻
-#//作为外部信号输入引脚，如果为低电平，打开led
+#// 初始化GPIO15，配置为输入模式，使用上拉电阻
+#// 作为外部信号输入引脚，如果为低电平，打开led
 button_num = 15
 button = Pin(button_num, Pin.IN, Pin.PULL_UP)
 
-#//配置GPIO16， 输出模式
+#// 配置GPIO16， 输出模式
 external_led_num = 16;
 external_led = Pin(external_led_num, Pin.OUT)
 
-#//配置GPIO25，输出模式
+#// 配置GPIO25，输出模式
 led_num = 25
 led = Pin(led_num, Pin.OUT)
 
 print("button gpio={0}".format(button_num))
 
 while True:
-	#//打开led
+	#// 打开led
 	led.off()
-	#//读取“button”的值， 延时10ms，使用软件消抖
+	#// 读取“button”的值， 延时10ms，使用软件消抖
 	if (button.value() == 0):
 		utime.sleep(0.01)
 		if (button.value() == 0):
-			#//Toggle led
+			#// Toggle led
 			external_led.toggle()
-			#//led turn on
+			#// led turn on
 			led.on()
 			print("button is pressed")
 			while (button.value() == 0):
