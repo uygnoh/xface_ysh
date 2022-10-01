@@ -24,6 +24,8 @@ BaseSequentialStream    *chp = (BaseSequentialStream *)&SD1;
 
 
 
+// I2C和SSD1306 参数设置
+// ____________________________________________________________
 static const I2CConfig i2ccfg = {
         OPMODE_I2C,                             // 选择I2C
         400000,                                 // 设置频率
@@ -53,6 +55,8 @@ static THD_FUNCTION(Thread1, arg)
                 chThdSleepMilliseconds(500);
         }
 }
+
+
 
 // SSD1306-OLED 线程
 // ____________________________________________________________
@@ -94,6 +98,8 @@ static __attribute__((noreturn)) THD_FUNCTION(OledDisplay, arg)
         ssd1306Stop(&SSD1306D1);
 }
 
+
+
 /*
  * Application entry point.
  */
@@ -107,13 +113,14 @@ int main(void)
         //palSetPadMode(IOPORT2, 7, PAL_MODE_STM32_ALTERNATE_OPENDRAIN);        // SDA
         palSetPadMode(IOPORT3, 13, PAL_MODE_OUTPUT_PUSHPULL);                   // LED on PC13
         chThdSleepMilliseconds(10);
-        // 串口1，使用默认配置
+        
+        // 启用串口1， 使用默认配置
         sdStart(&SD1, NULL);
 
-        // Blink Thread
+        // 使用静态方法（创建Blink线程）
         chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO + 1, Thread1, NULL);
         chprintf(chp, "Hello world\n\r");
-        // SSD1306 Thread
+        // 使用静态方法（创建OLED线程）
         chThdCreateStatic(waOledDisplay, sizeof(waOledDisplay), NORMALPRIO, OledDisplay, NULL);
 
         while (true) {
