@@ -62,6 +62,12 @@
         pkgs --upgrade
 
 
+// 如果scons --menuconfig 找不到 RT-Thread online packages
+// 需要运行：
+        source  ~/.env/env.sh
+        pkgs    --update
+
+
 
 /*******************************************************************************
         =>   RT-Thread 构建与配置系统
