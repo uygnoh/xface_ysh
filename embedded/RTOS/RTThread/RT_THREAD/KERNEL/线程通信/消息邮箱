@@ -1,0 +1,174 @@
+// IPC (Internal Process Communication)  内部进程通信
+
+
+//______________________________________________________________________________
+//      => 邮箱控制块
+//______________________________________________________________________________
+
+        // 邮箱中每个邮件是固定大小（4字节）
+        struct rt_mailbox {
+                struct  rt_ipc_object   parent;                 // 邮箱继承于-IPC对象
+                rt_uint32_t             *msg_pool;              // start address of message buffer
+                rt_uint16_t              size;                  // 邮箱大小
+                rt_uint16_t              entry;                 // 记录邮箱中邮件的数目
+                rt_uint16_t              in_offset;             // 邮箱 IN  偏移量
+                rt_uint16_t              out_offset;            // 邮箱 OUT 偏移量
+                                                                // sender thread suspended on this maibox
+                                                                // 如果邮箱已FULL， 挂起向邮箱中发送信息的线程 //
+                rt_list_t                suspend_sender_thread; // 挂起在邮箱中的发起线程
+        };
+        typedef struct rt_mailbox       *rt_mailbox_t;
+        
+        struct rt_mailbox               static_mb;     // 定义静态邮箱
+        rt_mailbox_t                    dynamic_mb;     // 定义动态邮箱
+        
+        
+        
+        
+// 初始化与脱离（静态方法）
+// ____________________________________________________________
+rt_err_t        rt_mb_init(     rt_mailbox_t mb,        // 邮箱控制块指针
+                                const char *name,      // 邮箱名称
+                                void *msgpool,          // 配置邮箱缓冲区
+                                rt_size_t size,         // 邮箱大小
+                                rt_uint8_t flag)        // RT_IPC_FLAG_FIFO
+                                                        // RT_IPC_FLAG_PRIO
+rt_err_t        rt_mb_detach(   rt_mailbox_t mb  );
+
+
+
+// 创建与删除（动态方法）
+// ____________________________________________________________
+rt_mailbox_t    rt_mb_create(   const char *name,       // 邮箱名称
+                                rt_size_t size,          // 邮箱大小
+                                rt_uint8_flag)           // FIFO | PRIO
+rt_err_t        rt_mb_delete(   rt_mailbox_t mb   )
+
+
+
+// 发送邮件
+// ____________________________________________________________
+rt_err_t        rt_mb_send(     rt_mailbox_t mb,        // 邮箱控制块指针
+                                rt_uint32_t  value)     // 邮件内容
+
+rt_err_t        rt_mb_send_wait(rt_mailbox_t mb,        // 邮箱控制块指针
+                                rt_uint32_t  value      // 邮件内容
+                                rt_int32_t   timeout)   // 超时时间
+                                
+                                
+// 接收邮件
+// ____________________________________________________________
+rt_err_t        rt_mb_recv(     rt_mailbox_t mb,        // 
+                                rt_uint32_t  *value,    //
+                                rt_int32_t   timeout)   //
+                                
+                                
+                                
+//______________________________________________________________________________
+//      => 
+//______________________________________________________________________________                                
+#include <rtthread.h>
+
+#define THREAD_PRIORITY         10
+#define THREAD_TIMESLICE        5                   
+                                
+static struct rt_mailbox       mb;      // 定义邮箱控制块
+static char mb_pool[128];               // 存放邮件的内存池
+              
+                                
+static char mb_str1[] = "I'm a mail!";
+static char mb_str2[] = "this is another mail!";
+static char mb_str3[] = "over";
+              
+                                
+
+// 线程1， 接收邮件                  
+// ____________________________________________________________
+ALIGN(RT_ALIGN_SIZE)
+static char thread1_stack[1024];
+static struct rt_thread thread1;
+static void thread1_entry(void *parameter)
+{
+        char *str;
+        
+        while (1) {
+                rt_kprintf("thread1: try to recv a mail\n");
+                
+                // 从邮箱中接收邮件
+                if (rt_mb_recv(&mb, (rt_uint32_t *)&str, RT_WAITING_FOREVER) == RT_EOK) {
+                        rt_kprintf("thread1: get a mail from mailbox, the counten: %s\n", str);
+                        // 当接收到第3封邮件的时候， 跳出 while()
+                        if (str == mb_str3) {
+                                break;
+                        }
+                        rt_thread_mdelay(100);
+                }
+        }
+        rt_mb_detach(&mb);
+}          
+
+
+
+// 线程2， 发送邮件
+// ____________________________________________________________
+ALIGN(RT_ALIGN_SIZE)
+static char thread2_stack[1024];
+static struct rt_thread thread2;
+static void thread2_entry(void *parameter)
+{
+        rt_uint8_t count;
+        count = 0;
+        
+        while (count < 10) {
+                count++;
+                if (count & 0x01) {
+                        // 发送 mb_str1 的地址到邮箱中
+                        rt_mb_send(&mb, (rt_uint32_t)&mb_str1);
+                } else {
+                        // 发送 mb_str2 的地址到邮箱中
+                        rt_mb_send(&mb, (rt_uint32_t)&mb_str2);
+                }
+                rt_thread_mdelay(200);
+        }
+        
+        // 发送邮件告诉线程1， 线程2已经运行结束
+        rt_mb_send(&mb, (rt_uint32_t)&mb_str3);
+}
+
+
+int mailbox_sample(void)
+{
+        rt_err_t result;
+        
+        // 初始化一个 MailBox
+        result = rt_mb_init(    &mb,
+                                "mbt",                  // 名字是： mbt
+                                &mb_pool[0],            // 邮箱用于的内存池是： mb_pool
+                                sizeof(mb_pool) / 4;    // 邮箱中的邮件数目， 因为一封邮件占（4Byte）
+                                RT_IPC_FLAG_FIFO);      // 采用 FIFO 方式进行线程等待
+        if (result != RT_EOK) {
+                rt_kprintf("init mailbox failed.\n");
+                return -1;
+        }
+        
+        
+        rt_thread_init( &thread1,
+                        "thread1",
+                        thread1_entry,
+                        RT_NULL,
+                        &thread1_stack[0],
+                        sizeof(thread1_stack);
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread1);
+        
+        rt_thread_init( &thread2,
+                        "thread2",
+                        thread2_entry,
+                        RT_NULL,
+                        &thread2_stack[0],
+                        sizeof(thread2_stack);
+                        THREAD_PRIORITY,
+                        THREAD_TIMESLICE);
+        rt_thread_startup(&thread2);
+}                     
