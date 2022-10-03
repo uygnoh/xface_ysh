@@ -17,9 +17,9 @@
 #include <serial.h>
 
 
-rt_device_t     u1_dev;         // 设备句柄
-rt_thread_t     u1_th;          // 线程句柄
-struct rt_semaphore sem;       // 串口接收数据信号量
+rt_device_t             u1_dev;         // 设备句柄
+rt_thread_t             u1_th;          // 线程句柄
+struct rt_semaphore     sem;            // 串口接收数据信号量
 struct serial_configure u1_config = RT_SERIAL_CONFIG_DEFAULT;
 
 

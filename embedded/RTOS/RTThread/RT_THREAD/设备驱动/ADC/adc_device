@@ -1,0 +1,105 @@
+// ADC设备接口
+                rt_device_find()        // 查找ADC设备
+                rt_adc_enable()         // 打开ADC设备
+                rt_adc_read()           // 读取ADC设备
+                rt_adc_disable()        // 关闭ADC设备
+rt_err          rt_adc_enable(rt_adc_device_t dev, rt_uint32_t channel)
+rt_uint32_t     rt_adc_read (rt_adc_device_t dev, rt_uint32_t channel)
+rt_err          rt_adc_disable(rt_adc_device_t dev, rt_uint32_t channel)
+//
+//
+// scons --menuconfig
+//
+// 第一步： 组件 -> 设备驱动程序 -> 使用ADC设备驱动程序        [Enable]
+// scons --menuconfig
+//______________________________________________________________________________
+//
+//
+// 第二步： 硬件驱动配置 -> On-chip Peripheral Drivers -> Enable ADC -> Enable ADC1
+//______________________________________________________________________________
+        #define BSP_USING_ADC1
+//
+//
+// board/CubeMX_Config/Src/stm32f1xx_hal_msp.c  // 硬件底层引脚配置
+
+
+#include <rtthread.h>
+#include <rtdevice.h>
+#include <board.h>
+
+
+
+                        // PB1     ------> ADC1_IN9
+rt_adc_device_t         adc_dev;        // ADC 设备
+
+
+
+void adc1_entry(void *parameter)
+{
+        rt_uint32_t adc_value;          // ADC 值
+        while (1) {
+                // 读取ADC1的数据
+                adc_value = rt_adc_read(adc_dev, 9);
+                rt_kprintf("adc_value: %d\n", adc_value);
+                rt_thread_mdelay(5000);
+        }
+}
+
+void blink(void *parameter)
+{
+        // defined the LED0 pin: PA2
+        #define LED0_PIN    GET_PIN(A, 2)
+        // set LED0 pin mode to output
+        rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
+
+        while (1) {
+                rt_pin_write(LED0_PIN, PIN_HIGH);
+                rt_thread_mdelay(100);
+                rt_pin_write(LED0_PIN, PIN_LOW);
+                rt_thread_mdelay(100);
+        }
+}
+
+
+
+int main(void)
+{
+        adc_dev = (rt_adc_device_t)rt_device_find("adc1");
+        if(RT_NULL == adc_dev) {
+                rt_kprintf("rt_device_find adc1 failed!\n");
+                return RT_ERROR;
+        }
+        rt_err_t ret = rt_adc_enable(adc_dev, 9);
+        if (ret < 0) {
+                rt_kprintf("rt_adc_enable adc1 failed!\n");
+        }
+        
+        
+        rt_thread_t tid;    // 线程句柄
+        tid = rt_thread_create("adc_sample1",
+                adc1_entry,
+                RT_NULL,
+                512,
+                9,
+                10);
+        if (tid != RT_NULL) {
+                // 线程创建成功，启动线程
+                rt_thread_startup(tid);
+        }
+        
+        
+        rt_thread_t blink_handle;    // 线程句柄
+        blink_handle = rt_thread_create("blink",
+                blink,
+                RT_NULL,
+                512,
+                9,
+                10);
+        if (blink_handle != RT_NULL) {
+                // 线程创建成功，启动线程
+                rt_thread_startup(blink_handle);
+        }
+
+        return 0;
+ 
+}

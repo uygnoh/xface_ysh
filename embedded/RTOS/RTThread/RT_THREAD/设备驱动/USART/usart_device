@@ -27,8 +27,8 @@ rt_err_t rt_device_control(rt_device_t dev, rt_uint8_t cmd, void *args)
         cmd     // 命令控制字，可取值：   
                 RT_DEVICE_CTRL_CONFIG
         
-        args    // 控制的参数，可取类型： 
-                struct serial_configure
+        args    // 控制的参数， 可取的类型： struct serial_configure
+                // 配置串口
         struct serial_configure {
                 rt_uint32_t baud_rate;
                 rt_uint32_t data_bit:4;
@@ -84,9 +84,9 @@ rt_err_t rt_device_control(rt_device_t dev, rt_uint8_t cmd, void *args)
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-//              串口发送
-////////////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+        => 串口数据发送
+*******************************************************************************/
 // board.h
 // ____________________________________________________________
 #define BSP_USING_UART1                 // 使用串口1
@@ -101,9 +101,11 @@ rt_err_t rt_device_control(rt_device_t dev, rt_uint8_t cmd, void *args)
 #include <rtdbg.h>
 #include <serial.h>
 
-rt_device_t     u1_dev; // 设备句柄
-                        // 串口配置（使用默认配置）
-struct serial_configure u1_config = RT_SERIAL_CONFIG_DEFAULT;
+
+
+rt_device_t     u1_dev;         // 串口设备句柄
+                                // 串口配置（使用默认配置）
+struct serial_configure        u1_config = RT_SERIAL_CONFIG_DEFAULT;
 
 int main(void)
 {
@@ -133,3 +135,28 @@ int main(void)
         
         return RT_EOK;
 }
+
+
+
+
+/*******************************************************************************
+        => 串口回调函数
+*******************************************************************************/
+// 设置发送完成回调函数
+// 在应用程序调用【rt_device_write()】写入数据时， 如果底层硬件能够支持自动发送， 那么上层
+// 应用可以设置一个回调函数， 这个回调函数会在底层硬件数据发送完成后， （例如： DMA上传完成
+// 或FIFO已以写入完毕， 产生完成中断时） 调用
+// 若串口以DMA接收模式打开， 当DMA完成一批数据的接收后会调用此回调函数
+rt_err_t rt_device_set_tx_complete(rt_device_t dev, 
+                        rt_err_t (*tx_done)(rt_device_t dev, void *buffer));
+                        
+                        
+
+// 设置接收完成回调函数
+// 若串口以中断接收模式打开， 当串口接收到一个数据产生中断时， 会调用接收回调函数， 并且会
+// 把此时缓冲区的数据大小放在 size 参数里， 把串口设备句柄放在 dev 参数里供调用
+rt_err_t rt_device_set_rx_indicate(rt_device_t dev,
+                        rt_err_t (*rx_ind)(rt_device_t dev, rt_size_t size));
+                        
+                        
+                        

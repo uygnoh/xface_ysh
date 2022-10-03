@@ -1,0 +1,228 @@
+/*******************************************************************************
+        => https://gcc.godbolt.org/
+*******************************************************************************/
+   
+        int main(void) {
+                return !!(NULL == 0);
+        }
+        
+        
+        
+/*******************************************************************************
+        => https://gcc.godbolt.org/
+*******************************************************************************/
+#include <stdio.h>
+
+int main(void) {
+        char *ptr;
+        char str[] = "hello world";
+        
+        // (char *)                     // (char[])
+        // sizeof(ptr)                  // sizeof(str)
+        // word[32-bit] = 4             // strlen(str)
+        ptr                     =       str;
+        
+        
+        // 打印（str）和（&str）的地址， 它们的地址相同
+        printf("str  == %x\n", str);
+        printf("&str == %x\n", &str);
+        
+        
+        printf("---------------------------------------\n");
+        
+        
+        char *p;
+        p = &str;
+        printf("str  == %x\n", str);
+        printf("&str == %x\n", &str);
+        printf("p    == %x\n", p);
+        printf("&p   == %x\n", &p);
+}
+
+
+
+/*******************************************************************************
+        => https://gcc.godbolt.org/
+*******************************************************************************/
+
+// declare / 声明
+   struct  GraphicsObject;
+
+
+// an instance / object form GraphicsObject
+   struct GraphicsObject        X;              // 非法
+   struct GraphicsObject       *X;              // 合法
+
+
+int main() {
+        char A;
+        char *ptrA = &A;
+        char *ptrX = ptrA;
+        
+        ptrA++;
+        ptrA--;
+}
+
+
+/*******************************************************************************
+        => https://gcc.godbolt.org/
+*******************************************************************************/
+// 设定绝对地址为 0x67A9 的32-bit整数变数的值为 0xAA6
+        *(int32_t *cosnt)(0x67A9)       =       0xAA6;
+        // Lvalue
+        // L表示定位器
+
+
+
+// void *    OR   char *
+// A pointer to void shall have the same representation and alignment 
+// requirements as a pointer to a character type
+// 关键描述： 规范 void * 和 char * 彼此可互换的表示法
+
+
+
+// void *
+// void 在最早的 C 语言是不存在的， 直到C89才确立， 为何要设计这样的类型呢？
+// 最早的C语言中， 任何函式若没有特别标注返回类型， 一律变成 int  (伴随着 0 作为
+// 返回值)， 但这导致无法验证 function prototype 和实际使用情况
+// 
+// void * 的设计， 导致开发者必须透过 explict（）或强制转型， 才能取最终 object
+// 否则就会丢出编译器的错误讯息， 从而避免危险的指标操作
+// 我们无法直接对 void * 做数值操作
+        int main(void) {
+                char *X = 0;
+                void *Y = 0;
+                char  a = *X;
+                char  b = *(char *)Y;   // 强制类型转换
+        }
+
+
+
+// Alignment（对齐）
+// 对于某种硬件架构， 像 ARM， 我们需要额外的 alignment。 ARMv5（含）以前，
+// 若要操作32-bit整数（uint32_t），该指标必须对齐 32-bit 边界（否则会在 
+// dereference 时触发 exception）于是， 当要从 void * 位址读取 uint16_t时， 
+// 需要这么做
+// may receive wrong value if ptr is not 2-byte aligned
+uint16_t value = *(uint16_t *)ptr;      // portable way of reading a little-endian value
+uint16_t value = *(uint16_t *)ptr | ((*(uint8_t *)(ptr+1)) << 8);
+
+
+
+/*******************************************************************************
+        => 安装  cdecl 程式， 可以帮助你产生 C 程式的宣告
+*******************************************************************************/
+        sudo apt-get install cdecl
+
+        cdecl> declare array of pointer to function returning struct tag
+        struct tag (*var[])()
+        
+        
+        cdecl> explain char *(*fptab[])(int)
+        declare fptab as array of pointer to function (int) returning pointer to char
+
+
+        
+/*******************************************************************************
+        => 没有 【双指标】 ， 只有 【指标的指标】
+*******************************************************************************/
+// 指标的指标 （pointer to pointer）
+// ____________________________________________________________
+int B = 2;
+void func(int **p) {
+        *p = &B;
+}
+
+int main(void) {
+        int A = 1;
+        int C = 3;
+        int *ptrA = &A;
+        func(&ptrA);
+        printf("%d\n", *ptrA);
+        return 0;
+}
+
+
+
+// 指标 （pointer）
+// ____________________________________________________________
+int B = 2;
+void func(int *p) {
+        p = &B;
+}
+
+int main(void) {
+        int A = 1;
+        int C = 3;
+        int *ptrA = &A;
+        func(ptrA);
+        printf("%d\n", *ptrA);
+        return 0;
+}
+
+
+
+// ____________________________________________________________
+int main(void) {
+        int X[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        printf("%d %d %d %d\n", X[4], *(X + 4), *(4 + X), 4[X]);
+}
+
+
+
+
+
+
+/*******************************************************************************
+        => OOP
+*******************************************************************************/
+// https://gitter.im/embedded2015/guts-general
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// forward declaration
+typedef struct object   Object;
+typedef int (*func_t)(Object *);
+
+
+struct object {
+        int a, b;
+        func_t add, sub;
+};
+
+
+static int add_impl(Object *self) {     // method
+        return self->a + self->b;
+}
+
+static int sub_impl(Object *self) {     // method
+        return self->a - self->b;
+}
+
+// & : address of
+// * : vlaue of   // indirect access
+int init_object(Object **self) {        // call-by-value
+        if (NULL == (*self = malloc(sizeof(Object)))) return -1;
+        (*self)->a = 0;
+        (*self)->b = 0;
+        (*self)->add = add_impl;
+        (*self)->sub = sub_impl;
+        return 0;
+}
+
+int main(int argc, char *argv[])
+{
+        Object  *o = NULL;
+        init_object(&o);
+        o->a = 9922;
+        o->b = 5566;
+        printf("add = %d, sub = %d\n", o->add(o), o->sub(o));
+        return 0;
+}
+
+
+
+
+
+

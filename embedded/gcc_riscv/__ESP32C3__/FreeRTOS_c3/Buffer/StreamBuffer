@@ -1,0 +1,154 @@
+/*******************************************************************************
+        => Stream Buffer 流数据缓冲区
+*******************************************************************************/
+StreamBufferHandle_t xStreamBufferCreate( size_t xBufferSizeBytes,      // Buffer大小
+                                          size_t xTriggerLevelBytes);   // 
+
+
+
+
+
+
+/*******************************************************************************
+        => Stream Buffer 流数据缓冲区
+*******************************************************************************/
+#include "stream_buffer.h"
+
+
+StreamBufferHandle_t    StreamBufferHandle = NULL;
+
+
+void task11(void *pvParam)
+{
+        char tx_buf[50];
+        int i = 0;
+        int stream_len = 0;     // 要发送数据的长度
+        int send_bytes = 0;     // 返回值： 实际发送了多少个数据
+        for (;;) {
+                vTaskDelay(pdMS_TO_TICKS(3000));
+                i++;
+                stream__len = sprintf(tx_buf, "StreamBuffer SendByte: -  %d", i);
+                send_bytes = xStreamBufferSend(StreamBufferHandle,   // StreamBuffer句柄
+                                            (void *)tx_buf,         // 所要发送数据的地址指针
+                                            stream_len,             // 所要发送数据的长度
+                                            portMAXDELAY);          // 阻塞时间
+                printf("Send: stream_len = %d, send_bytes = %d\n", stream_len, send_bytes);         
+        }
+}
+
+#include <string.h>
+void task22(void *pvParam)
+{
+        char rx_buf[50];
+        int receive_bytes = 0;
+        for (;;) {
+                memset(rx_buf, 0, sizeof(rx_buf));           // 初始化rx_buf为（0）
+                receive_bytes = xStreamBufferReceive( 
+                                        StreamBufferHandle,   // StreamBuffer句柄
+                                        (void *)rx_buf,       // 接收StreamBuffer中的数据
+                                        sizeof(rx_buf),       // 接收缓冲区长度
+                                        portMAXDELAY);        // 阻塞时间
+                printf("Receive: receive_bytes = %d, data = %s\n", receive_bytes, rx_buf);
+        }
+}
+
+void app_main(void)
+{
+        // 第一个参数： StreamBuffer大小
+        // 第二个参数： xStreamBuffer中的数据流有10个以上数据，
+        //             才能触发xStreamBufferReceive接收
+        StreamBufferHandle = xStreamBufferCreate(1000, 10);
+        if (StreamBufferHandle != NULL) {
+                vTaskSuppendAll();
+                xTaskCreate(task11, "TASK11", 1024 * 5, NULL, 1, NULL);
+                xTaskCreate(task22, "TASK22", 1024 * 5, NULL, 1, NULL);
+                xTaskResumeAll();
+        } else {
+                printf("Fail to creat stream buffer!\n");
+        }
+}
+
+
+
+/*******************************************************************************
+        =>  确定 Stream Buffer 大小
+*******************************************************************************/
+// 检测 StreamBuffer 剩余空间大小
+size_t  xStreamBufferSpaceAvailable( StreamBufferHandle_t xStreamBuffer)
+
+
+
+#include "stream_buffer.h"
+
+
+StreamBufferHandle_t    StreamBufferHandle = NULL;
+
+
+void task11(void *pvParam)
+{
+        char tx_buf[50];
+        int i = 0;
+        int stream_len = 0;     // 要发送数据的长度
+        int send_bytes = 0;     // 返回值： 实际发送了多少个数据
+        for (;;) {
+                vTaskDelay(pdMS_TO_TICKS(3000));
+                i++;
+                stream__len = sprintf(tx_buf, "StreamBuffer SendByte: -  %d", i);
+                send_bytes = xStreamBufferSend(StreamBufferHandle,   // StreamBuffer句柄
+                                            (void *)tx_buf,         // 所要发送数据的地址指针
+                                            stream_len,             // 所要发送数据的长度
+                                            portMAXDELAY);          // 阻塞时间
+                printf("Send: stream_len = %d, send_bytes = %d\n", stream_len, send_bytes);         
+        }
+}
+
+#include <string.h>
+void task22(void *pvParam)
+{
+        char rx_buf[50];
+        int receive_bytes = 0;
+        for (;;) {
+                memset(rx_buf, 0, sizeof(rx_buf));           // 初始化rx_buf为（0）
+                receive_bytes = xStreamBufferReceive( 
+                                        StreamBufferHandle,   // StreamBuffer句柄
+                                        (void *)rx_buf,       // 接收StreamBuffer中的数据
+                                        sizeof(rx_buf),       // 接收缓冲区长度
+                                        portMAXDELAY);        // 阻塞时间
+                printf("Receive: receive_bytes = %d, data = %s\n", receive_bytes, rx_buf);
+        }
+}
+
+
+// 这个任务检测 StreamBuffer 空间大小
+void task33(void *pvParam)
+{
+        int buf_space = 0;
+        int min_space = 1000;
+        for (;;) {
+                buf_space = xStreamBufferSpacesAvailable(StreamBufferHandle);
+                if (buf_space < min_space) {
+                        min_space = buf_space;
+                }
+                printf("buf_space = %d, min_space = %d\n", buf_space, min_space);
+                // 每 3 秒钟， 反映 StreamBuffer 空间
+                vTaskDelay(pdMS_TO_TICKS(3000));
+        }
+}
+void app_main(void)
+{
+        // 第一个参数： StreamBuffer大小
+        // 第二个参数： xStreamBuffer中的数据流有10个以上数据，
+        //             才能触发xStreamBufferReceive接收
+        StreamBufferHandle = xStreamBufferCreate(1000, 10);
+        if (StreamBufferHandle != NULL) {
+                vTaskSuppendAll();
+                xTaskCreate(task11, "TASK11", 1024 * 5, NULL, 1, NULL);
+                xTaskCreate(task22, "TASK22", 1024 * 5, NULL, 1, NULL);
+                xTaskCreate(task33, "TASK22", 1024 * 5, NULL, 1, NULL);
+                xTaskResumeAll();
+        } else {
+                printf("Fail to creat stream buffer!\n");
+        }
+}
+
+

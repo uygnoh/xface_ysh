@@ -1,0 +1,70 @@
+#include "FreeRTOS.h"
+#include "message_buffer.h"
+
+
+// 一次只能接收一条完整的 Message
+//
+MessageBufferHandle_t   xMessageBufferCreate( size_t xBufferSizeBytes )
+
+
+
+/*******************************************************************************
+        => MessageBuffer
+*******************************************************************************/
+#include "message_buffer.h"
+
+
+MessageBufferHandle_t    MessageBufferHandle = NULL;
+
+
+void task11(void *pvParam)
+{
+        int i = 0;
+        int str_len = 0;
+        int send_bytes = 0;
+        char tx_buf[50];
+        
+        for (i = 0; i < 3; i++) {
+                str_len = sprintf(tx_buf, "hello, NO %d\n", i);
+                send_bytes = xMessageBufferSend(MessageBufferHandle,
+                                                (void *)tx_buf,
+                                                str_len,
+                                                portMAX_DELAY);
+                printf("Send: i = %d, send_bytes = %d\n", i, send_bytes);
+        }
+        vTaskDelte(NULL);
+}
+
+
+void task22(void *pvParam)
+{
+        char rx_buf[200];
+        int receive_bytes = 0;
+        
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        for (;;) {
+                memset(rx_buf, 0, sizeof(rx_buf));           // 初始化rx_buf为（0）
+                receive_bytes = xMessageBufferReceive( 
+                                        MessageBufferHandle,   // MessageBuffer句柄
+                                        (void *)rx_buf,       // 接收StreamBuffer中的数据
+                                        sizeof(rx_buf),       // 接收缓冲区长度
+                                        portMAXDELAY);        // 阻塞时间
+                printf("Receive: receive_bytes = %d, data = %s\n", receive_bytes, rx_buf);
+                vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+}
+
+
+void app_main(void)
+{
+        // 第一个参数： MessageBuffer 大小
+        MessageBufferHandle = xMessageBufferCreate(1000);
+        if (MessageBufferHandle != NULL) {
+                vTaskSuppendAll();
+                xTaskCreate(task11, "TASK11", 1024 * 5, NULL, 1, NULL);
+                xTaskCreate(task22, "TASK22", 1024 * 5, NULL, 1, NULL);
+                xTaskResumeAll();
+        } else {
+                printf("Fail to creat stream buffer!\n");
+        }
+}

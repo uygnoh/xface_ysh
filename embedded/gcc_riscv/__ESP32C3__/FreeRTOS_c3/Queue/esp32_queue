@@ -67,7 +67,7 @@ void app_main(void)
 
 
 /*******************************************************************************
-        => esp32-c3（向队列中发送数据）__结构体传递__
+        => esp32-c3（向队列中发送数据）__结构体传递
 *******************************************************************************/
 typedef struct A_STRUCT {
         char id;
@@ -141,7 +141,7 @@ void app_main(void)
 
 
 /*******************************************************************************
-        => esp32-c3（向队列中发送数据）__指针传递__
+        => esp32-c3（向队列中发送数据）__指针传递
 *******************************************************************************/
 typedef struct A_STRUCT {
         char id;
@@ -265,8 +265,8 @@ void rx_task(void *pvParam)
         BaseType_t status;
         int i;
         while (1) {
-                //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
-                //接收任务的优先级别要 > 发送任务的优先级
+                // 使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
+                // 接收任务的优先级别要 > 发送任务的优先级
                 status = xQueueReceive(q_handle, &i, portMAX_DELAY);
                 if (status != pdPASS) {
                         printf("rec fail!\n");
@@ -295,8 +295,8 @@ void app_main(void)
 
 /*******************************************************************************
         => esp32-c3 队列集合
-        => TASK_00 => Queue_00  //任务00的内容写入队列1中
-        => TASK_00 => Queue_11  //任务11的内容写入队列2中
+        => TASK_00 => Queue_00  // 任务00的内容写入队列1中
+        => TASK_00 => Queue_11  // 任务11的内容写入队列2中
 *******************************************************************************/
 
 //_____________________________________________________________
@@ -340,13 +340,13 @@ void rx_task(void *pvParam)
 {
         QueueSetHandle_t q_set_handle;
         q_set_handle = (QueueSetHandle_t)pvParam;
-        QueueMemberHandle_t q_data;             //表示有数据的Queue
-        BaseType_t status;                      //返回状态
+        QueueMemberHandle_t q_data;             // 表示有数据的Queue
+        BaseType_t status;                      // 返回状态
         int i;
         while (1) {
-                //使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
+                // 使用portMAX_DELAY，会让接收任务一直阻塞在这里，直到接收到数据
                 q_data = xQueueSelectFromSet(q_set_handle, portMAX_DELAY);
-                //从有数据的队列取出数据
+                // 从有数据的队列取出数据
                 status = xQueueReceive(q_data, &i, portMAX_DELAY);
                 if (status != pdPASS) {
                         printf("rec fail!\n");

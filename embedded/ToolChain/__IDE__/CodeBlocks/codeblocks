@@ -1,3 +1,52 @@
 /*******************************************************************************
         => Code::Blocks
 *******************************************************************************/
+        Debugger settings
+                |
+                |
+                |---> GDB/CDB debugger 
+                        |
+                        |
+                        |---> Create Config:    [ OpenOCD ]
+                        |
+                        |
+                        |---> OpenOCD
+                                |
+                                |
+                                |---> Executable path: /usr/bin/arm-none-eabi-gdb
+                                
+        Compiler setting
+                |
+                |
+                |---> Global compiler settings
+                        |
+                        |
+                        |---> Selected compiler: [ GNU GCC Compiler for ARM ]
+                        |       // Set as default
+                        |
+                        |
+                        // Toolchain executables
+                        |---> Compiler's installation directory: [ /usr/bin ]
+                        |
+                        |       // program file
+                        |---> C   compiler:            [ arm-none-eabi-gcc ]
+                        |---> C++ compiler:            [ arm-none-eabi-g++ ]
+                        |---> Linker for dynamic libs: [ arm-none-eabi-g++ ]
+                        |---> Linker for static libs: [arm-none-eabi-ar]
+                        |---> Debugger:                 [GDB/CDB debugger: OpenOCD ]
+                        |---> Resoure compiler:
+                        |---> Make program:             make
+
+
+
+// OpenOCD Debugger
+        Remoteconnection =>
+                connection type: TCP
+                Serial port:
+                Baud:           115200
+                IP address:     127.0.0.1
+                Port:           3333
+        Additional GDB commands
+                After connection: monitor reset init
+                                  load pro_stm32f103
+                                  b main              
