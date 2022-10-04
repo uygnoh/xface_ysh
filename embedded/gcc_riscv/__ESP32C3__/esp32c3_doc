@@ -1,5 +1,5 @@
 /*******************************************************************************
-        => ESP32-IDF VSCODE
+        => ESP32-IDF for VSCODE
 *******************************************************************************/
         Espressif IDF           // 找到这个插件，安装
            |
@@ -47,12 +47,6 @@
 /*******************************************************************************
         => ESP32-IDF 启动流程
 *******************************************************************************/
-// esp32c3-idf 环境配置
-vim     $HOME/.bashrc
-# esp32c3-IDF
-alias get_idf='. $HOME/esp32/esp-idf/export.sh'
-
-
 
 // https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32c3/get-started/linux-macos-setup.html
 
@@ -76,7 +70,7 @@ alias get_idf='. $HOME/esp32/esp-idf/export.sh'
 
 
 /*******************************************************************************
-        => ESP32-IDF C/C++-SDK（软件开发工具包）
+        => ESP32-IDF 
 *******************************************************************************/
 https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32c3/get-started/index.html
 https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/toc.md
@@ -84,31 +78,42 @@ https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/
 
 // 安装（ubuntu/debian）环境依赖
 // ____________________________________________________________
-sudo apt-get install git wget flex bison gperf python3 python3-pip 
-python3-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
-  //访问权限问题，将用户添加至 Linux Dialout 组， 以便使用串口
-  //退出重新登录，上述修改就生效了
-___________________________________________________________
+sudo apt-get install    git wget flex bison gperf \
+                        python3 python3-pip python3-setuptools \
+                        cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+                        
+                        
+                        
+// 访问权限问题，将用户添加至 Linux Dialout 组， 以便使用串口
+// 退出重新登录，上述修改就生效了
+// ____________________________________________________________
         sudo usermod -a -G dialout $USER
+
 
 
 // 从 GitHub 上获取 ESP-IDF 仓库
 // ____________________________________________________________
-        mkdir -p  ~/esp32
+        mkdir -p  ~/esp32       // 下载ESP32-SDK开发包
         cd        ~/esp32
-        下载ESP32-SDK开发包
+
 
 
 // 安装 ESP-IDF 使用的各种工具
 // 编译器， 调试器， Python包， ......
 // ____________________________________________________________
-        cd      ~esp32/esp-idf
-        ./install.sh esp32c3
+        cd              ~esp32/esp-idf
+        ./install.sh    esp32c3
 
 
-// 设置环境变量
+
+// 设置 ESP-IDF 环境变量
+// .  $HOME/esp32/esp-idf/export.sh
 // ____________________________________________________________
-        . $HOME/esp32/esp-idf/export.sh
+// esp32c3-idf 环境配置
+        vim     $HOME/.bashrc
+        # esp32c3-IDF
+        alias get_idf='. $HOME/esp32/esp-idf/export.sh'
+        
 
 
 // 开始创建工程
@@ -127,11 +132,13 @@ ___________________________________________________________
         idf.py  menuconfig
 
 
+
 // 使用“idf.py build”命令编译工程
 // 运行以上命令可以编译应用程序和所有 ESP-IDF 组件，
 // 接着生成 bootloader、分区表和应用程序二进制文件。
 // ____________________________________________________________
         idf.py  build
+
 
 
 // 将工程文件 => 烧录到目标设备 | 监视工程运行情况
