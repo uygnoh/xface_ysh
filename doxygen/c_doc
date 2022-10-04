@@ -170,59 +170,135 @@ int main(void) {
 
 
 
+/*******************************************************************************
+        => bit
+*******************************************************************************/
+
+        // Set a bit
+        // ____________________________________________________
+        unsigned char a |=  (1 << n);
+        // Example:
+        a                   1 0 0 0 0 0 0 0
+        a  |=  (1 << 1)  =  1 0 0 0 0 0 1 0
+        a  |=  (1 << 3)  =  1 0 0 0 1 0 0 0
+        a  |=  (1 << 5)  =  1 0 1 0 0 0 0 0
+
+
+        // Clear a bit
+        // ____________________________________________________
+        unsigned char a &= ~(1 << n);
+        // Example:
+        a                   1 1 1 1 1 1 1 1
+        a  &= ~(1 << 1)  =  1 1 1 1 1 1 0 1
+        a  &= ~(1 << 3)  =  1 1 1 1 0 1 1 1
+        a  &= ~(1 << 5)  =  1 1 0 1 1 1 1 1
+
+
+        // Toogle a bit
+        // ____________________________________________________
+        unsigned char a ^=  (1 << n);
+        // Example:
+        a                   1 0 0 1 1 0 1 1
+        a  ^=  (1 << 1)  =  1 0 0 1 1 0 0 1
+        a  ^=  (1 << 3)  =  1 0 0 1 0 0 1 1
+        a  ^=  (1 << 5)  =  1 0 1 1 1 0 1 1
+        
+        
+        
+#include <stdio.h>
+/*  bit clear
+ *  a:    int
+ *  pos:  bit position to clear
+ */
+#define CLEARBIT(a, pos)        (a &= ~(1 << pos))
+
+int main(void) {
+        // 'z': decimal value 122 (=01111010)
+        char a = 'z';
+        
+        // clearing the 5th bit
+        char aOut = CLEARBIT(a, 5);
+        
+        // aOut = 'Z'; deciamal value 90 (=01011010)
+        printf("aOut = %c\n", aOut);
+        
+        return 0;
+}
 
 
 
 /*******************************************************************************
-        => OOP
+        => preprocessor
 *******************************************************************************/
-// https://gitter.im/embedded2015/guts-general
+        #       : Stringification / Stringizing （字串化）
+        ##      : concatenation （连结， 接续）
+
+
 
 #include <stdio.h>
-#include <stdlib.h>
 
-// forward declaration
-typedef struct object   Object;
-typedef int (*func_t)(Object *);
+#define WARN_IF(EXP)                                            \
+        do {     if (EXP)                                       \
+                        fprintf(stderr, "Warinig: " #EXP "\n"); \
+        } while (0)
 
-
-struct object {
-        int a, b;
-        func_t add, sub;
+// Example: 
+// ____________________________________________________________
+WARN_IF (x == 0);
+        -> do {
+                fprintf(stderr, "Warinig:  " "x == 0" "\n");
+        } while (0);
+        
+        
+        
+        
+        
+struct command {
+        char *name;
+        void (*function)(void);
 };
+struct command commands[] = {
+        { "quit", quit_command },
+        { "help", help_command },
+        // .....................
+};
+#define COMMAND(NAME)   { #NAME, NAME ## _command }
+struct command commands[] = {
+        COMMAND (quit),
+        COMMAND (help),
+        // ....................
+};
+// Example:
+//_____________________________________________________________
+#ifndef __RAY_OBJECTS_H__
+#define __RAY_OBJECTS_H__
+#define DECLARE_OBJECT(NAME)                                    \
+        struct __##NAME##_node;                                 \
+        typedef struct __##NAME##_node *NAME##_node;            \
+        struct __##NAME##_node {                                \
+                NAME    element;                                \
+                NAME##  _node next;                             \
+        };                                                      \
+        void append_##NAME(const NAME *X, NAME##_node *list);   \
+        void delete_##NAME##_list(NAME##_node *list);
+        
+DECLARE_OBJECT(light)
+DECLARE_OBJECT(rectangular)
+DECLARE_OBJECT(sphere)
+#undef DECLARE_OBJECT
+
+#endif
 
 
-static int add_impl(Object *self) {     // method
-        return self->a + self->b;
-}
-
-static int sub_impl(Object *self) {     // method
-        return self->a - self->b;
-}
-
-// & : address of
-// * : vlaue of   // indirect access
-int init_object(Object **self) {        // call-by-value
-        if (NULL == (*self = malloc(sizeof(Object)))) return -1;
-        (*self)->a = 0;
-        (*self)->b = 0;
-        (*self)->add = add_impl;
-        (*self)->sub = sub_impl;
-        return 0;
-}
-
-int main(int argc, char *argv[])
-{
-        Object  *o = NULL;
-        init_object(&o);
-        o->a = 9922;
-        o->b = 5566;
-        printf("add = %d, sub = %d\n", o->add(o), o->sub(o));
-        return 0;
-}
-
-
-
-
-
+// light 在 DECLARE_OBJECT(light) 中会取代 NAME， 因此会产生经下程式码
+        struct __light_node;
+        typedef struct __light_node *light_node;
+        struct __light_noce {
+                light   element;
+                light_node next;
+        };
+        void append_light(const light *X, light_node *list);
+        void delete_light_list(light_node *list);
+        
+        
 
