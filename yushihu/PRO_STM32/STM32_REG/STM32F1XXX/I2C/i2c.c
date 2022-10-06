@@ -11,8 +11,8 @@ void i2c_is_busy(void)
         
         while ((I2C2->SR2 & (1 << 1)) != 0) {           // 总线忙BUSY !=0 就在这里循环等待
                 RCC->APB2ENR    |= (1 << 3);            // GPIOB 时钟使能
-                GPIOB->CRH      &= 0xFFFF00FF;          // 这里只针对IIC2引脚初始化
-                GPIOB->CRH      |= 0x00007700;          // PB10-SCK PB11-SDA 开漏输出
+                GPIOB->CRH      &= (0xFFFF00FF);        // 这里只针对IIC2引脚初始化
+                GPIOB->CRH      |= (0x00007700);        // PB10-SCK PB11-SDA 开漏输出
                 for (i = 0; i < 10; i++) {              // 解决BUSY死锁问题
                         __PB_OUT(10) = ~__PB_OUT(10);   
                         delay_us(20);
@@ -31,14 +31,14 @@ void i2c_setup(void)
         // AF(复用功能)的IO重新映射，AFIO时钟才需要开启，并非属于普通IO时钟管理
         RCC->APB2ENR    |= (1 << 3);            // GPIOB 时钟使能
         GPIOB->CRH      &= (0XFFFF00FF);        // 这里只针对IIC2引脚初始化
-        GPIOB->CRH      |= (0X0000FF00);        // PB10-SCK PB11-SDA 开漏复用输出
+        GPIOB->CRH      |= (0X0000FF00);        // PB10-SCK PB11-SDA // 全部需要开漏复用输出
 
 
         // 以下是IIC2的寄存器配置
+        // 所有配置寄存器最好在CR1中的PE使能位关闭的情况设置
         RCC->APB1RSTR   |=  (1 << 22);  // 复位IIC2寄存器
         RCC->APB1RSTR   &= ~(1 << 22);  // 停止复位IIC2寄存器
         RCC->APB1ENR    |=  (1 << 22);  // I2C2  时钟使能
-
 
         I2C2->CR1       |=  (1 << 15);  // 复位IIC2
         I2C2->CR1       &= ~(1 << 15);
@@ -69,7 +69,7 @@ void i2c_setup(void)
         I2C2->CCR&       = ~(1 << 14);  // DUTY[14]    ---快速模式时的占空比
                                         // 0: 快速模式下:T low /T high = 2;
                                         // 1: 快速模式下:T low /T high = 16/9
-        I2C2->CCR       |= 0x1F;        // CCR[11:0] : 快速 / 标准模式下的时钟控制分频系数 (主模式 )，
+        I2C2->CCR       |= 0x1F;        // CCR[11:0] : 快速 / 标准模式下的时钟控制分频系数 (主模式 )，0x1F=31
                                         // 2*31*27ns+1*31*27ns=2511ns一个周期，398.24771kHZ 无法达到400khz
         I2C2->TRISE      = 0xC;         // TRISE[5:0] : 在快速 / 标准模式下的最大上升时间 (主模式)
                                         //  配置最大上升时间为324ns
@@ -89,63 +89,65 @@ void i2c_setup(void)
 
 void I2C_SingleWrite(uint8_t address, uint8_t subAddress, uint8_t data)
 {
-        u16 SR2_STATE=0, i=0;
+        int16_t SR2_STATE = 0, i = 0;
 
         i2c_is_busy();
 
-        I2C2->CR1 |= 1<<8;      // 产生起始条件 START=1;
-        i = TIMEOUT;
+        I2C2->CR1       |= (1 << 8);            // 产生起始条件 START=1;
+        i = TIMEOUT;                            // SB=1 起始条件已发--读取SR1 + 写DR可清除
         while ((I2C2->SR1 & (0x0001)) != 0x0001) {
-                if (i == 0) {
-                        I2C2->CR1 |= 1<<9;
+                if (i == 0) {                   // STOP: 停止条件产生
+                        I2C2->CR1 |= (1 << 9);
                         return;
                 } else {
                         i--;
                 }
-        } //SB=1 起始条件已发--读取SR1+写DR可清除。
-          //IIC_Start();
+        }
 
 
-        I2C2->DR = ((address<<1) | 0);
-        // IIC_Send_Byte((address<<1)|0);//发送器件地址+写命令
-
+        I2C2->DR = ((address << 1) | 0);        // 发送器件地址 + 写命令
+        
 
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0002)) != 0x0002) {
                 if (i == 0) {
-                        I2C2->CR1 |= 1<<9;
+                        I2C2->CR1 |= (1 << 9);
                         return;
                 } else {
                         i--;
                 }
-        } // 等待地址发送成功。ADDR=1代表地址发送成功,收到从机发出的接收
-          // 地址完成ACK后置位1//IIC_Wait_Ack(); //等待应答
+        } // 等待地址发送成功。 ADDR=1代表地址发送成功, 收到从机发出的接收
+          // 地址完成ACK后置位1 
+          
+          
+        // IIC_Wait_Ack(); // 等待应答
 
 
-        
-        SR2_STATE = I2C2->SR2;    //已读SR1-再读-SR2清除ADDR。
+        SR2_STATE = I2C2->SR2;    // 已读SR1-再读-SR2清除ADDR
         SR2_STATE = SR2_STATE;
-        /*注意，手册说在发送地址阶段不会设置TxE,所以这里TxE=0，不要通过
-        判断TxE=1来确定收到ACK*/
+        /* 注意: 手册说在发送地址阶段不会设置TxE, 所以这里 TxE=0， 不要通过
+                判断 TxE=1 来确定收到ACK */
 
 
-        I2C2->DR = subAddress;  //发出第一个DATA,这时候一写入DR马上进入移
-        // 位寄存器，TxE还是为1   //IIC_Send_Byte(subAddress); //写寄存器地址-DATA1
+        I2C2->DR = subAddress;  // 发出第一个DATA,这时候一写入DR马上进入移
+        // 位寄存器，TxE还是为1   // IIC_Send_Byte(subAddress);  // 写寄存器地址-DATA1
 
 
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0080)) != 0x0080) {
                 if (i == 0) {
-                        I2C2->CR1 |= 1<<9;
+                        I2C2->CR1 |= (1 << 9);
                         return;
                 } else {
                         i--;
                 }
-        } // 这里等待TxE=1是为了判断DR是否为空。
-          // IIC_Wait_Ack(); //等待应答
+        } // 这里等待 TxE=1 是为了判断DR是否为空。
+        
+        
+        // IIC_Wait_Ack(); //等待应答
 
 
-        I2C2->DR = data;        //发送数据--如果不行就考虑连续写2次DR测试下。
+        I2C2->DR = data;        // 发送数据--如果不行就考虑连续写2次DR测试下。
 
 
         i = TIMEOUT;
@@ -157,43 +159,47 @@ void I2C_SingleWrite(uint8_t address, uint8_t subAddress, uint8_t data)
                         i--;
                 }
         }
-        //TxE=1且BTF=1 数据寄存器空--移位寄存器已经排空
-        //IIC_Wait_Ack();       //等待应答
+        // TxE=1 且 BTF=1 数据寄存器空--移位寄存器已经排空
+        
+        
+        // IIC_Wait_Ack();       // 等待应答
 
-        I2C2->CR1 |= 1<<9;      // 产生停止条件 STOP=1;
+
+        I2C2->CR1 |= (1<<9);      // 产生停止条件 STOP=1;
 
 }
 
 
 void I2C_MultipleRead(  uint8_t address, 
-                        uint8_t subAddress, 
+                        uint8_t subAddress,
                         uint8_t *pBuf, 
                         uint8_t len)
 {
-        u16 SR2_STATE = 0, i = 0;
+        uint16_t SR2_STATE = 0, i = 0;
 
         i2c_is_busy();
 
-        I2C2->CR1|=1<<8; //产生起始条件 START=1;
+
+        // 产生起始条件 START=1;
+        // ____________________________________________________
+        I2C2->CR1       |= (1 << 8); 
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0001)) != 0x0001) {
                 if (i == 0) {
-                        I2C2->CR1 |= 1<<9;
+                        I2C2->CR1 |= (1 << 9);
                         return;
                 } else {
                         i--;
                 }
-        }// SB=1 起始条件已发--读取SR1+写DR可清除。
+        }// SB=1 起始条件已发 -- 读取SR1 + 写DR可清除
          // IIC_Start();
 
 
-
-        I2C2->DR = ((address<<1) | 0);
+        
+        // 发送器件地址 + 写命令
         // IIC_Send_Byte((address<<1)|0);
-        // 发送器件地址+写命令
-
-
-
+        // ____________________________________________________
+        I2C2->DR = ((address<<1) | 0);
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0002)) != 0x0002) { 
                 if(i==0) {
@@ -204,7 +210,11 @@ void I2C_MultipleRead(  uint8_t address,
                 }
         }// 等待地址发送成功。ADDR=1代表地址发送成功,
          // 收到从机发出的接收地址完成ACK后置位1
+         
+         
+         // ____________________________________________________
          // IIC_Wait_Ack(); 等待应答
+         // ____________________________________________________
 
 
         SR2_STATE=I2C2->SR2; // 已读SR1-再读-SR2清除ADDR。
@@ -213,10 +223,11 @@ void I2C_MultipleRead(  uint8_t address,
         判断TxE=1来确定收到ACK*/
 
 
-        I2C2->DR = subAddress;  // 发出第一个DATA,这时候一写入DR马上进入移位寄存器，TxE还是为1 
-                                // IIC_Send_Byte(subAddress); //写寄存器地址-DATA1
 
-
+        // IIC_Send_Byte(subAddress); // 写寄存器地址-DATA1
+        // 发出第一个DATA, 这时候一写入DR马上进入移位寄存器，TxE还是为1 
+        // ____________________________________________________
+        I2C2->DR = subAddress;             
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0084)) != 0x0084) {
                 if (i == 0) {
@@ -226,13 +237,17 @@ void I2C_MultipleRead(  uint8_t address,
                         i--;
                 }
         } // TxE=1且BTF=1 数据寄存器空--移位寄存器已经排空 
-          // IIC_Wait_Ack(); 等待应答
+        
+        
+        // ____________________________________________________
+        // IIC_Wait_Ack(); 等待应答
+        // ____________________________________________________
 
 
-        /*RESTART-中间插入重开始信号-手册只说10位地址有效-存在错误*/
-
-
-        I2C2->CR1 |= 1<<8;      //重开始信号-起始条件 START=1;
+        // 重新发送开始信号 - 起始条件 START=1;
+        // RESTART-中间插入重开始信号 - 手册只说10位地址有效-存在错误
+        // ____________________________________________________
+        I2C2->CR1 |= (1 << 8);      
         i = TIMEOUT;
         while ((I2C2->SR1 & (0x0001)) != 0x0001) {
                 if ( i==0 ) {
@@ -241,14 +256,15 @@ void I2C_MultipleRead(  uint8_t address,
                 } else {
                         i--;
                 }
-        } //SB=1 起始条件已发--读取SR1+写DR可清除。
-          //IIC_Start();
+        } // SB=1 起始条件已发--读取SR1+写DR可清除。
+          // IIC_Start();
 
 
-        I2C2->DR = ((address<<1) | 1);  //发送器件地址+读命令
+        // 发送器件地址 + 读命令
+        // ____________________________________________________
+        I2C2->DR = ((address<<1) | 1); 
 
-
-        I2C2->CR1 |= 1<<10;             //开启应答-------->>
+        I2C2->CR1 |= (1 << 10);             // 开启应答-------->>
         i = TIMEOUT;
         while((I2C2->SR1 & (0x0002)) != 0x0002) {
                 if (i == 0) {
@@ -258,17 +274,24 @@ void I2C_MultipleRead(  uint8_t address,
                         i--;
                 }
         }//等待地址发送成功。 ADDR=1代表地址发送成功,收到从机发出的接收地址完成ACK后置位1
-         //IIC_Wait_Ack(); //等待应答
+        
+
+        // ____________________________________________________
+        // IIC_Wait_Ack(); // 等待应答
+        // ____________________________________________________
+        
+        
+        // 已读SR1-再读-SR2清除ADDR-代表收到地址ACK
+        SR2_STATE = I2C2->SR2; 
 
 
-        SR2_STATE = I2C2->SR2; //已读SR1-再读-SR2清除ADDR-代表收到地址ACK
-
-
+        // 读取多个字节数据
+        // ____________________________________________________
         while (len) {
                 if (len == 1) {
-                        I2C2->CR1& = ~(1<<10);//NACK
+                        I2C2->CR1& = ~(1 << 10);  // NACK
 
-                        I2C2->CR1 |= 1<<9; // 请求产生停止条件STOP=1,
+                        I2C2->CR1 |= (1 << 9);  // 请求产生停止条件STOP=1,
                         // 注意位置-手册所需要当前字节传输完成ACK之前----执行停止请求后不要
                         // 设置CR1---->>
 
@@ -282,7 +305,7 @@ void I2C_MultipleRead(  uint8_t address,
                                 }
                         }// RxNE=1 数据寄存器接收到数据
 
-                        *pBuf = I2C2->DR;       //读数据,发送nACK
+                        *pBuf = I2C2->DR;       // 读数据, 发送nACK
 
                 } else {
 
@@ -296,7 +319,7 @@ void I2C_MultipleRead(  uint8_t address,
                                 }
                         }// RxNE=1 数据寄存器接收到数据
 
-                        *pBuf = I2C2->DR; //读数据,发送ACK
+                        *pBuf = I2C2->DR; // 读数据,发送ACK
 
                 }
 
