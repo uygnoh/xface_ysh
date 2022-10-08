@@ -1,5 +1,8 @@
 #ifndef __I2C_H__
 #define __I2C_H__
+
+#include "../m32.h"
+
 void i2c_is_busy(void);
 void i2c_setup(void);
 void i2c_send_byte(uint8_t addr, uint8_t sub_addr, uint8_t data);

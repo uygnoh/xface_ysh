@@ -1,11 +1,19 @@
 #include "gpio.h"
 
-#define GPIOX           (GPIOA)
-
 
 void gpio_setup(void)
 {
+        // GPIO 模式配置
+        // _____________________________________________________________________
+        GPIOX->CRL      |=  (GPIO_MODE_OUTPUT_PUSHPULL_50MHZ << 8 );    // PA_2
+        GPIOX->CRL      &= ~(GPIO_MODE_OUTPUT_PUSHPULL_50MHZ << 12);    // ^0
+
+
+
+
+
         #if USE_GPIOX_CRL
+        #define GPIOX           (GPIOA)
         // 通用输入输出端口模式配置（PIN0 ~ PIN7）
         // GPIO_CRL[ 复位值 : 0x4444 4444 ] // 端口配置低寄存器 //
         // _____________________________________________________________________

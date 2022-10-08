@@ -1,8 +1,19 @@
 #include "clock.h"
 
 
+/*******************************************************************************
+        => APB | AHB 外设时钟复位
+*******************************************************************************/
 void apb_ahb_clock_reset(void)
 {
+        // 外设时钟复位
+        // ____________________________________________________
+
+
+
+
+
+
         #if RCC_AHBRSTR_XXX
         // AHB外设时钟复位寄存器(RCC_AHBRSTR) // 复位值 :  0x0000 0000 //
         #endif
@@ -81,11 +92,20 @@ void apb_ahb_clock_reset(void)
         RCC->APB1RSTR   &= ~(RCC_APB1RSTR_WWDGRST);     // ^0
         #endif   
 }
-
-
+/*******************************************************************************
+        => APB | AHB 外设时钟使能
+*******************************************************************************/
 void apb_ahb_clock_enable(void)
 {
-        
+        // 外设时钟使能
+        // ____________________________________________________
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPAEN);       // GPIOA
+
+
+
+
+
+
         #if RCC_AHBENR_XXX
         // AHB外设时钟使能寄存器(RCC_AHBENR) // 复位值:0x0000 0014 //
         RCC->AHBENR     |=  (RCC_AHBENR_DMA1EN);        // DMA1
@@ -134,16 +154,10 @@ void apb_ahb_clock_enable(void)
         RCC->APB1ENR    |=  (RCC_APB1ENR_WWDGEN);       // WWDG
         #endif
 }
-
-
-
 /*******************************************************************************
-  函数名称: rcc_hsi_init()
-  输入参数: 无
-  输出参数: 无
-  函数功能: 内部高速时钟重新初始化
+        => 内部高速时钟重新初始化
 *******************************************************************************/
-void rcc_hsi_init(void)
+void rcc_hsi_setup(void)
 {
         // Set HSION bit
         RCC->CR         |= (0x00000001);
@@ -168,25 +182,22 @@ void rcc_hsi_init(void)
         RCC->CIR        =  (0x009F0000);
 }
 /*******************************************************************************
-  函数名称: rcc_setup()
-  输入参数: 无
-  输出参数: 无
-  函数功能: 设置系统时钟为72MHz, 在外部高速时钟晶体振荡器为“8MHz”的情况下
+        => 设置系统时钟为72MHz
+        => 在外部高速时钟晶体振荡器为[ 8MHz ]的情况下
 *******************************************************************************/
-void rcc_setup(void)
+int rcc_hse_setup(void)
 {
         __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
 
 
-        // Enable HSE  
-        RCC->CR |= ((uint32_t)RCC_CR_HSEON);
+        // HSE_ON[16]   // 打开外部高速晶体振荡器
+        RCC->CR         |= RCC_CR_HSEON;
 
-        // Wait till HSE is ready and if Time out is reached exit
+        // 等待外部高速晶体振荡器稳定， 如果超时， 则退出
         do {
                 HSEStatus = RCC->CR & RCC_CR_HSERDY;
                 StartUpCounter++;  
         } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
-
         if ((RCC->CR & RCC_CR_HSERDY) != RESET) {
                 HSEStatus = (uint32_t)0x01;
         } else {
@@ -197,44 +208,49 @@ void rcc_setup(void)
         if (HSEStatus == (uint32_t)0x01) {
                 // Enable Prefetch Buffer
                 FLASH->ACR |= FLASH_ACR_PRFTBE;
-
                 // Flash 2 wait state
                 FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
                 FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_2;    
 
 
-                // HCLK = SYSCLK
+                // HPRE[7:4]    // AHB预分频， HCLK 不分频
                 RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-          
-                // PCLK2 = HCLK
+
+                // PPRE1[10:8]  // 低速APB预分频(APB1)， HCLK 2分频
+                RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
+                
+                // PPRE2[13:11] // 高速APB预分频(APB2)， HCLK 不分频
                 RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
 
-                // PCLK1 = HCLK
-                RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV2;
 
-
-                // PLL configuration: PLLCLK = HSE * 9 = 72 MHz
-                RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | 
-                                                   RCC_CFGR_PLLXTPRE |
-                                                   RCC_CFGR_PLLMULL));
+                // 配置PLL: PLLCLK = HSE * 9 = 72 MHz
+                // ^0   RCC_CFGR_PLLSRC    [16]     
+                // ^0   RCC_CFGR_PLLXTPRE  [17]
+                // ^0   RCC_CFGR_PLLMULL   [21:18]
+                RCC->CFGR &= (0xFFC0FFFF);
                 RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
 
-                // Enable PLL
+                // 使能PLL
                 RCC->CR |= RCC_CR_PLLON;
 
-                Wait till PLL is ready
+                // 等待PLL稳定
                 while((RCC->CR & RCC_CR_PLLRDY) == 0) {
                 }
 
-                // Select PLL as system clock source
-                RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+                // 选择 PLL 作为系统时钟源
+                // ^0           RCC_CFGR_SW[1:0]
+                RCC->CFGR &= (0xFFFFFFFC);
                 RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
 
                 // Wait till PLL is used as system clock source
+                // ^STATUS      SWS[3:2]: 系统时钟切换状态 : 10: PLL输出作为系统时钟
                 while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08) {
                 }
+                
+                return (80);
         } else { 
                 // If HSE fails to start-up, the application will have wrong clock
                 // configuration. User can add here some code to deal with this error
+                return (-1);
         }
 }
