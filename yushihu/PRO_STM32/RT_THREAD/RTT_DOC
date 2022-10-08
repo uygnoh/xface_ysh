@@ -1,0 +1,104 @@
+/*******************************************************************************
+        =>   Env 用户手册
+        =>   https://github.com/RT-Thread/env
+*******************************************************************************/
+// Env 是 RT-Thread 推出的开发辅助工具，
+// 针对基于 RT-Thread 操作系统的项目工程，提供编译构建环境、图形化系统配置及软件包管理功能。
+// 其内置的 menuconfig 提供了简单易用的配置剪裁工具，可对内核、组件和软件包进行自由裁剪，使
+// 系统以搭积木的方式进行构建。
+
+
+
+// 安装 menuconfig 依赖
+// ____________________________________________________________
+// sudo apt-get install build-essential git libncurses-dev
+
+
+
+// 输入 【scons --menuconfig】 命令， 它会自动下载ENV环境
+// ____________________________________________________________
+// cd $RTTHREAD/bsp/stm32/stm32f103-100ask-mini/
+// scons --menuconfig
+
+
+
+// 配置 scons-menuconfig 的环境变量
+// ____________________________________________________________
+// echo    "export PATH=~/.env/tools/scripts:$PATH"    >>$HOME/.bashrc
+
+
+
+// RT-thread 编译器设置
+// ____________________________________________________________
+// cd      $RTTHREAD/bsp/stm32/stm32f103-100ask-mini/
+// gedit   rtconfig.py
+
+        whereis arm-none-eabi-gcc
+        EXEC_PATH   = r'/usr/bin/'
+        
+        
+        
+/*******************************************************************************
+        =>   软件包管理：  pkgs
+*******************************************************************************/
+        
+// 下载 ：如果软件包在本地已被选中，但是未下载，此时输入
+// ____________________________________________________________
+        pkgs --update   // 该软件包自动下载
+//
+//
+// 更新 ：如果选中的软件包在服务器端有更新，并且版本号选择的是 latest
+// ____________________________________________________________
+        pkgs --update   // 该软件包将会在本地进行更新
+//
+//
+// 删除 ：某个软件包如果无需使用
+// 需要先在 menuconfig 中取消其的选中状态，然后再执行
+// ____________________________________________________________
+        pkgs --update   // 此时本地已下载但未被选中的软件包将会被删除
+//
+//
+// 升级本地软件包信息
+// ____________________________________________________________
+        pkgs --upgrade
+
+
+// 如果scons --menuconfig 找不到 RT-Thread online packages
+// 需要运行：
+        source  ~/.env/env.sh
+        pkgs    --update
+
+
+
+/*******************************************************************************
+        =>   构建与配置系统
+*******************************************************************************/
+        scons --menuconfig
+        scons --pyconfig
+        
+        
+// https://www.rt-thread.org/document/site/#/development-tools/build-config-system/Kconfig
+// https://www.rt-thread.org/document/site/#/development-tools/build-config-system/SCons
+// 运行 scons --menuconfig 它会自动更新         -> .config      -> rtconfig.h
+
+
+        scons -c                // 清除编译目标。
+                                // 这个命令会清除执行 scons 时生成的临时文件和目标文件
+                                
+                                
+        scons --target=mdk5     // 在 BSP 目录生成一个新的 MDK      工程文件
+        scons --target=iar      // 在 BSP 目录生成一个新的 IAR      工程文件
+        scons --target=cmake    // 在 BSP 目录生成一个新的 Cmake    工程文件
+        Scons --target=makefile // 在 BSP 目录生成一个新的 Makefile 工程文件
+        
+        
+        scons --dist            // 搭建项目框架，使用此命令会在 BSP 目录下生成 dist 目录，
+                                // 这便是开发项目的目录结构，包含了RT-Thread源码及BSP相关工程，
+                                // 不相关的BSP文件夹及libcpu都会被移除，并且可以随意拷贝此工程
+                                // 到任何目录下使用。
+        
+        
+        rtconfig.py             // 编译器选项 (rtconfig.py)
+        
+        
+        

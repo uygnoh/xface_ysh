@@ -1,6 +1,8 @@
 /*******************************************************************************
         => ADC
 *******************************************************************************/
+// ADC 规则序列通道（转换顺序）
+// ____________________________________________________________
                                 // BIT[23:20]   规则通道序列长度
 ADC1_SQR1 = (3 - 1) << 20;      // (3 - 1):     表示总共有 3 个通道转换
 ADC1_SQR2 = 0;                  // No element in this register
@@ -13,6 +15,9 @@ ADC1_SQR2 = 0;                  // No element in this register
 ADC1_SQR3 = (3 << 10) | (14 << 5) | (0 << 0);
 
 
+
+// ADC 采样时间
+// ____________________________________________________________
 // ADC采样时间寄存器 1(ADC_SMPR1)      // SMP10 - SMP17
 // ADC采样时间寄存器 2(ADC_SMPR2)      // SMP0  - SMP9
 // 配置 ADC输入通道 - 0, ADC输入通道 - 14， ADC输入通道 - 3 采样时间
@@ -30,87 +35,23 @@ ADC1_SQR3 = (3 << 10) | (14 << 5) | (0 << 0);
 /*******************************************************************************
         => ChibiOS ADC driver
 *******************************************************************************/
-/**
- * @brief   Conversion group configuration structure.
- * @details This implementation-dependent structure describes a conversion
- *          operation.
- * @note    The use of this configuration structure requires knowledge of
- *          STM32 ADC cell registers interface, please refer to the STM32
- *          reference manual for details.
- */
 typedef struct {
-  /**
-   * @brief   Enables the circular buffer mode for the group.
-   */
-  bool                      circular;
-  /**
-   * @brief   Number of the analog channels belonging to the conversion group.
-   */
-  adc_channels_num_t        num_channels;
-  /**
-   * @brief   Callback function associated to the group or @p NULL.
-   */
-  adccallback_t             end_cb;
-  /**
-   * @brief   Error callback or @p NULL.
-   */
-  adcerrorcallback_t        error_cb;
-  /* End of the mandatory fields.*/
-  /**
-   * @brief   ADC CR1 register initialization data.
-   * @note    All the required bits must be defined into this field except
-   *          @p ADC_CR1_SCAN that is enforced inside the driver.
-   */
-  uint32_t                  cr1;
-  /**
-   * @brief   ADC CR2 register initialization data.
-   * @note    All the required bits must be defined into this field except
-   *          @p ADC_CR2_DMA, @p ADC_CR2_CONT and @p ADC_CR2_ADON that are
-   *          enforced inside the driver.
-   */
-  uint32_t                  cr2;
-  /**
-   * @brief   ADC SMPR1 register initialization data.
-   * @details In this field must be specified the sample times for channels
-   *          10...18.
-   */
-  uint32_t                  smpr1;
-  /**
-   * @brief   ADC SMPR2 register initialization data.
-   * @details In this field must be specified the sample times for channels
-   *          0...9.
-   */
-  uint32_t                  smpr2;
-  /**
-   * @brief   ADC watchdog high threshold register.
-   * @details This field defines the high threshold of the analog watchdog.
-   */
-  uint16_t                  htr;
-  /**
-   * @brief   ADC watchdog low threshold register.
-   * @details This field defines the low threshold of the analog watchdog.
-   */
-  uint16_t                  ltr;
-  /**
-   * @brief   ADC SQR1 register initialization data.
-   * @details Conversion group sequence 13...16 + sequence length.
-   */
-  uint32_t                  sqr1;
-  /**
-   * @brief   ADC SQR2 register initialization data.
-   * @details Conversion group sequence 7...12.
-   */
-  uint32_t                  sqr2;
-  /**
-   * @brief   ADC SQR3 register initialization data.
-   * @details Conversion group sequence 1...6.
-   */
-  uint32_t                  sqr3;
+        bool                      circular;             // 循环
+        adc_channels_num_t        num_channels;         // 序列长度
+        adccallback_t             end_cb;               // 结束回调函数
+        adcerrorcallback_t        error_cb;             // 错误回调函数
+        uint32_t                  cr1;                 // ADC 控制寄存器 1
+        uint32_t                  cr2;                 // ADC 控制寄存器 2
+        uint32_t                  smpr1;               // ADC 采样时间寄存器 1
+        uint32_t                  smpr2;               // ADC 采样时间寄存器 2
+        uint16_t                  htr;                 // ADC 看门狗高阀值寄存器
+        uint16_t                  ltr;                 // ADC 看门狗低阀值寄存器
+        uint32_t                  sqr1;                // ADC 规则序列寄存器 1
+        uint32_t                  sqr2;                // ADC 规则序列寄存器 2
+        uint32_t                  sqr3;                // ADC 规则序列寄存器 3
 } ADCConversionGroup;
 
-
-
-
-
+typedef void (*adccallback_t)(ADCDriver *adcp);
+typedef void (*adcerrorcallback_t)(ADCDriver *adcp, adcerror_t err);
 
 

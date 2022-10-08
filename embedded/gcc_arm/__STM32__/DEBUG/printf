@@ -1,46 +1,21 @@
 /*******************************************************************************
         => STM32CubeIDE使用串口调式程序
 *******************************************************************************/
-/* USER CODE BEGIN Includes */
+
 #include <string.h>
 #include <stdio.h>
-#define HAL_MAX_DELAY 0xFFFF
-
-/* USER CODE END Includes */
-
-/* Private variables--------------------------------*/
-UART_HandleTypeDef huart1;
-
-/* USER CODE BEGIN PV */
 #ifdef __GNUC__
     #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
     #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif
-
 PUTCHAR_PROTOTYPE
 {
-    /* 注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的 */
-    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-    return ch;
+        // 注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的
+        HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+        return ch;
 }
-/* USER CODE END PV */
 
-
-
-  char *strs = "Hello World\r\n";
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-    HAL_UART_Transmit(&huart1, strs, strlen(strs), 100);
-    HAL_Delay(500);
-    printf("Test1\r\n");
-    
-  }
-  /* USER CODE END 3 */
-}
 
 
 

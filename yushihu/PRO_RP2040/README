@@ -16,3 +16,7 @@
         cd      pico_freertos/build
         cmake   ..
         make
+        
+ 
+        ttyUSB0         // RS232-USB
+        ttyACM0         // USB-SERIAL

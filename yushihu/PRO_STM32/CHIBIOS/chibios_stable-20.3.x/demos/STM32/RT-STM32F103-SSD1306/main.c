@@ -50,9 +50,9 @@ static THD_FUNCTION(Thread1, arg)
         while (true)
         {
                 palClearPad(GPIOA, 2);
-                chThdSleepMilliseconds(500);
+                chThdSleepMilliseconds(100);
                 palSetPad(GPIOA, 2);
-                chThdSleepMilliseconds(500);
+                chThdSleepMilliseconds(100);
         }
 }
 
