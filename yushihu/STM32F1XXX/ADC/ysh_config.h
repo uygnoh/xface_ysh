@@ -1,8 +1,12 @@
-#ifndef __M32_H__
-#define __M32_H__
+#ifndef __YSH_CONFIG_H__
+#define __YSH_CONFIG_H__
 
-#include "stm32f10x.h"
+#include "stm32f103xe.h"
 
+
+
+void hardware_initialize(void);
+extern int hse_status;
 
 /*
  *      更新日期: 2022/10/06
@@ -65,6 +69,31 @@
 #define BIT_29                  ((uint32_t)0x20000000)
 #define BIT_30                  ((uint32_t)0x40000000)
 #define BIT_31                  ((uint32_t)0x80000000)
+/******************************************************************************/
+/*                                                                            */
+/*                              STM32F10X_GPIO_CONFIG                         */
+/*                                                                            */
+/******************************************************************************/
+// GPIO_CRL 清除配置的（4）位
+#define GPIO_CONF_CLR_00        ((uint32_t)0xFFFFFFF0)          // PA0
+#define GPIO_CONF_CLR_01        ((uint32_t)0xFFFFFF0F)          // PA1
+#define GPIO_CONF_CLR_02        ((uint32_t)0xFFFFF0FF)          // PA2
+#define GPIO_CONF_CLR_03        ((uint32_t)0xFFFF0FFF)          // PA3
+#define GPIO_CONF_CLR_04        ((uint32_t)0xFFF0FFFF)          // PA4
+#define GPIO_CONF_CLR_05        ((uint32_t)0xFF0FFFFF)          // PA5
+#define GPIO_CONF_CLR_06        ((uint32_t)0xF0FFFFFF)          // PA6
+#define GPIO_CONF_CLR_07        ((uint32_t)0x0FFFFFFF)          // PA7
+//
+//
+// GPIO_CRH 清除配置的（4）位
+#define GPIO_CONF_CLR_08        ((uint32_t)0xFFFFFFF0)          // PA8
+#define GPIO_CONF_CLR_09        ((uint32_t)0xFFFFFF0F)          // PA9
+#define GPIO_CONF_CLR_10        ((uint32_t)0xFFFFF0FF)          // PA10
+#define GPIO_CONF_CLR_11        ((uint32_t)0xFFFF0FFF)          // PA11
+#define GPIO_CONF_CLR_12        ((uint32_t)0xFFF0FFFF)          // PA12
+#define GPIO_CONF_CLR_13        ((uint32_t)0xFF0FFFFF)          // PA12
+#define GPIO_CONF_CLR_14        ((uint32_t)0xF0FFFFFF)          // PA14
+#define GPIO_CONF_CLR_15        ((uint32_t)0x0FFFFFFF)          // PA15
 /******************************************************************************/
 /*                                                                            */
 /*                              BitBand                                       */

@@ -1,7 +1,8 @@
-#ifndef __INTERRUPT_H__
-#define __INTERRUPT_H__
+#ifndef __YSH_INTERRUPT_H__
+#define __YSH_INTERRUPT_H__
 
-#include "m32.h"
+#include "ysh_config.h"
+void nvic_setup(void);
 
 
 /*******************************************************************************
