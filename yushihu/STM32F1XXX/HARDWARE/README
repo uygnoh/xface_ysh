@@ -1,0 +1,37 @@
+//
+#include "ysh_include.h"
+extern adc_data_t      adc_data;
+#include <string.h>
+#include <stdio.h>
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+PUTCHAR_PROTOTYPE
+{
+        // 注意下面第一个参数是&huart1，因为cubemx配置了串口1自动生成的
+        HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+        return ch;
+}
+
+void hardware_initialize(void)
+{
+                                        
+//      rcc_hse_setup();                // 第一步: 设置系统时钟
+                                        //        
+        apb_ahb_clock_enable();         // 第二步: 打开外设时钟
+                                        //
+//      apb_ahb_reset();                // 第三步: 外围设备复位
+                                        //
+        nvic_setup();                   // 第四步: 中断系统设置
+                                        //
+        gpio_setup();                   // 第五步: IO系统设置
+        
+        dma1_channel_1_setup();
+        adc_setup();
+        adc_start_convert();
+}
+
+
+

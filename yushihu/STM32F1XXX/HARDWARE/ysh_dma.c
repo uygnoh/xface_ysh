@@ -1,26 +1,12 @@
 #include "ysh_dma.h"
 
-struct adc_data_t {
-        uint16_t in0;
-        uint16_t in1;
-        uint16_t in2;
-        uint16_t in3;
-        // 占位EOC（规则组转换完成后还有一个EOC）
-        uint16_t last_eoc;
-};
-struct adc_data_t       adc_data;
+adc_data_t      adc_data = {0};
 
-void dma_printf(void)
-{
-        printf("in0 = %d\n", adc_data.in0);
-        printf("in1 = %d\n", adc_data.in1);
-        printf("in2 = %d\n", adc_data.in2);
-        printf("in3 = %d\n", adc_data.in3);
-}
+
 
 void dma1_channel_1_setup(void)
 {
-        #define DMA1_ChannelXXX						(DMA1_Channel1)
+        #define DMA1_ChannelXXX                         (DMA1_Channel1)
         DMA1_ChannelXXX->CCR &=  (0x00000000);          // ^0 [31:0]
                                                         // 
         DMA1_ChannelXXX->CCR &= ~(DMA_CCR_MEM2MEM);     // ^0 [14]
@@ -50,7 +36,7 @@ void dma1_channel_1_setup(void)
                                                         
                                                         
         DMA1_ChannelXXX->CNDTR  = 0x05;                 // 数据传输数量（5个）
-        DMA1_ChannelXXX->CPAR   = (uint32_t)&ADC1->DR;  // 外设地址
+        DMA1_ChannelXXX->CPAR   = (uint32_t)&ADC1->DR; // 外设地址
         DMA1_ChannelXXX->CMAR   = (uint32_t)&adc_data; // 存储器地址
         
         

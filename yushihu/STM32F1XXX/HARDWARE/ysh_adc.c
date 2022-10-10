@@ -2,7 +2,7 @@
 
 
 /*******************************************************************************
-  函数名称: void adc_conf(void)
+  函数名称: void adc_setup(void)
   输入参数: 无
   输出参数: 无
   函数功能: ADC配置（设置系统时钟为72MHz）， ADC1的时钟为（12MHz）
@@ -11,30 +11,23 @@
   |________________________________________________________________|
 *******************************************************************************/
 void adc_setup(void)
-{
-        RCC->APB2ENR    |=  BIT_00;             // AFIO  时钟开启
-        RCC->APB2ENR    |=  BIT_02;             // GPIOA 时钟开启
-        RCC->APB2ENR    |=  BIT_09;             // ADC1  时钟开启
-        GPIOA->CRL      &=  (0xFFFF0000);       // PA0 - aIN-0 模拟输入通道0
-                                                // PA1 - aIN-1 模拟输入通道0
-                                                // PA2 - aIN-2 模拟输入通道0
-                                                // PA3 - aIN-3 模拟输入通道0
-                                                // 72MHz / 6 = 12MHz
-        RCC->CFGR       &= ~(BIT_15 + BIT_14);  // 分频因子清零ADC_PRE[15:14]__PCLK2_DIV_2
-        RCC->CFGR       |=  BIT_15;             // 分频因子设置ADC_PRE[15:14]__PCLK2_DIV_6
+{                     
+        RCC->CFGR       &=  (0xFFFF3FFF);       // ^0   ADC_PRE[15:14]
+        RCC->CFGR       |=  (BIT_15);           // 10:  PCLK2-6分频后作为ADC时钟
+                                                // PCLK2=72MHz / 6 = 12MHz
         
         
         // ADC1 配置寄存器
         // ____________________________________________________
         ADC1->CR1       &=  (0xFFF0FFFF);       // ^0   DUALMOD[19:16]
-        ADC1->CR1       |=  (0xFFF0FFFF);       // 双模式选择:  0000 = 独立模式
+                                                // 双模式选择:  0000 = 独立模式
         ADC1->CR1       |=  (BIT_08);           // 扫描模式
         ADC1->CR2       |=  (BIT_01);           // 连续转换模式
         ADC1->CR2       |=  (BIT_08);           // DMA 模式
-        ADC1->CR2       &= ~(0xFFF1FFFF);       // ^0   CR2__EXTSEL[19:17] 
-        ADC1->CR2       |=  (0xFFFEFFFF);       // 软件控制转换: 111 = SWSTART
+        ADC1->CR2       &=  (0xFFF1FFFF);       // ^0   CR2__EXTSEL[19:17] 
+                                                // 不使用软件控制转换: 111 = SWSTART
         ADC1->CR2       |=  (BIT_20);           // ^0   EXTTRIG[20]
-                                                // 规则通道的外部触发转换模式
+                                                // 不使用外部事件启动转换
         ADC1->CR2       &= ~(BIT_11);           // 数据右对齐
 
 
@@ -43,7 +36,7 @@ void adc_setup(void)
         ADC1->SQR1      &= ~(0xFF0FFFFF);       // SQR1__L[23:20]__规则组转换的总数
         ADC1->SQR1      |=  (0x00400000);       // 共计 4 个通道转换
         ADC1->SQR3      &= ~(0xFFFFFFE0);       // ^0   SQR3__SQ1[4:0]
-        ADC1->SQR3      |=  (0xFFFFFFE0);       //      ADC1_通道0__选择第（1_序列）
+        ADC1->SQR3      |=  (0x00000000);       //      ADC1_通道0__选择第（1_序列）
         ADC1->SQR3      &= ~(0x1F << 5);        // ^0   SQR3__SQ2[5:9]
         ADC1->SQR3      |=  (0x01 << 5);        //      ADC1_通道1__选择第（2_序列）
         ADC1->SQR3      &= ~(0x1F << 10);       // ^0   SQR3__SQ3[10:14]
@@ -68,14 +61,17 @@ void adc_setup(void)
 
 void adc_start_convert(void)
 {
-        ADC1->CR2       |= BIT_00;      // 开启AD转换器
-        ADC1->CR2       |= BIT_03;      // 初始化校准寄存器
-        // ADC1->CR2_RSTCAL[3]该位由软件设置并由硬件清除。 
-        // 在校准寄存器被初始化后该位将被清除
-        while (ADC1->CR2 & BIT_03);     // 等待校准寄存器已初始化完成
-        // ADC1->CR2_CAL[2]该位由软件设置以开始校准，并在校准结束时由硬件清除
-        ADC1->CR2       |= BIT_02;      // 开启AD校准
-        while (ADC1->CR2 & BIT_02);     // 等待校准结束
-        ADC1->CR2       |= BIT_22;      // 启动规则转换通道
+        ADC1->CR2       |=  BIT_00;             // 上电
+        
+        // RSTCAL[3]    该位由软件设置并由硬件清除
+        ADC1->CR2       |=  BIT_03;             // 初始化校准寄存器
+        while (ADC1->CR2 & BIT_03);             // 等待校准寄存器已初始化完成
+        
+        // CAL[2]       该位由软件设置以开始校准，并在校准结束时由硬件清除
+        ADC1->CR2       |= BIT_02;              // 开启AD校准
+        while (ADC1->CR2 & BIT_02);             // 等待校准结束
+        
+        ADC1->CR2       |= BIT_00;              // 开启AD转换器
+        ADC1->CR2       |= BIT_22;              // 启动规则转换通道
 }
 

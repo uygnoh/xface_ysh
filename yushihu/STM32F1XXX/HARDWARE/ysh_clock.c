@@ -1,11 +1,77 @@
 #include "ysh_clock.h"
 
+uint8_t global_clock_state = 0;
 
 
 /*******************************************************************************
-        => APB | AHB 外设时钟复位
+        => APB + AHB 外设时钟使能
 *******************************************************************************/
-void apb_ahb_clock_reset(void)
+void apb_ahb_clock_enable(void)
+{
+        // 外设时钟使能 - ENABLE
+        // ____________________________________________________
+        RCC->APB2ENR    |=  (RCC_APB2ENR_AFIOEN);       // AFIO
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPAEN);       // GPIOA
+        RCC->APB2ENR    |=  (RCC_APB2ENR_ADC1EN);       // ADC1
+        RCC->AHBENR     |=  (RCC_AHBENR_DMA1EN);        // DMA1
+
+
+
+        #if RCC_AHBENR_XXX
+        // AHB外设时钟使能寄存器(RCC_AHBENR) // 复位值:0x0000 0014 //
+        RCC->AHBENR     |=  (RCC_AHBENR_DMA1EN);        // DMA1
+        RCC->AHBENR     |=  (RCC_AHBENR_DMA2EN);        // DMA2
+        RCC->AHBENR     |=  (RCC_AHBENR_CRCEN);         // CRC
+        #endif
+        
+        #if RCC_APB2ENR_XXX
+        // APB2 外设时钟使能寄存器(RCC_APB2ENR) // 复位值: 0x0000 0000 //
+        RCC->APB2ENR    |=  (RCC_APB2ENR_AFIOEN);       // AFIO
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPAEN);       // GPIOA
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPBEN);       // GPIOB
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPCEN);       // GPIOC
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPDEN);       // GPIOD
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPEEN);       // GPIOE
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPFEN);       // GPIOF
+        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPGEN);       // GPIOG
+        RCC->APB2ENR    |=  (RCC_APB2ENR_ADC1EN);       // ADC1
+        RCC->APB2ENR    |=  (RCC_APB2ENR_ADC2EN);       // ADC2
+        RCC->APB2ENR    |=  (RCC_APB2ENR_TIM1EN);       // TIM1
+        RCC->APB2ENR    |=  (RCC_APB2ENR_SPI1EN);       // SPI1
+        RCC->APB2ENR    |=  (RCC_APB2ENR_USART1EN);     // USART1
+        #endif
+        
+        #if RCC_APB1ENR_XXX
+        // APB1 外设时钟使能寄存器(RCC_APB1ENR) // 复位值: 0x0000 0000 //
+        RCC->APB1ENR    |=  (RCC_APB1ENR_USART2EN);     // USART2
+        RCC->APB1ENR    |=  (RCC_APB1ENR_USART3EN);     // USART3
+        RCC->APB1ENR    |=  (RCC_APB1ENR_USART4EN);     // USART4
+        RCC->APB1ENR    |=  (RCC_APB1ENR_USART5EN);     // USART5
+        RCC->APB1ENR    |=  (RCC_APB1ENR_I2C1EN);       // I2C1
+        RCC->APB1ENR    |=  (RCC_APB1ENR_I2C2EN);       // I2C2
+        RCC->APB1ENR    |=  (RCC_APB1ENR_SPI2EN);       // SPI2
+        RCC->APB1ENR    |=  (RCC_APB1ENR_SPI3EN);       // SPI3
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM2EN);       // TIM2
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM3EN);       // TIM3
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM4EN);       // TIM4
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM5EN);       // TIM5
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM6EN);       // TIM6
+        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM7EN);       // TIM7
+        RCC->APB1ENR    |=  (RCC_APB1ENR_CAN1EN);       // CAN1
+        RCC->APB1ENR    |=  (RCC_APB1ENR_CAN2EN);       // CAN2
+        RCC->APB1ENR    |=  (RCC_APB1ENR_BKPEN);        // BKP
+        RCC->APB1ENR    |=  (RCC_APB1ENR_PWREN);        // PWR
+        RCC->APB1ENR    |=  (RCC_APB1ENR_DACEN);        // DAC
+        RCC->APB1ENR    |=  (RCC_APB1ENR_WWDGEN);       // WWDG
+        #endif
+}
+
+
+
+/*******************************************************************************
+        => APB + AHB 外设复位
+*******************************************************************************/
+void apb_ahb_reset(void)
 {
         // 外设时钟复位
         // ____________________________________________________
@@ -93,69 +159,7 @@ void apb_ahb_clock_reset(void)
 
 
 /*******************************************************************************
-        => APB | AHB 外设时钟使能
-*******************************************************************************/
-void apb_ahb_clock_enable(void)
-{
-        // 外设时钟使能
-        // ____________________________________________________
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPAEN);       // GPIOA
-
-
-
-        #if RCC_AHBENR_XXX
-        // AHB外设时钟使能寄存器(RCC_AHBENR) // 复位值:0x0000 0014 //
-        RCC->AHBENR     |=  (RCC_AHBENR_DMA1EN);        // DMA1
-        RCC->AHBENR     |=  (RCC_AHBENR_DMA2EN);        // DMA2
-        RCC->AHBENR     |=  (RCC_AHBENR_CRCEN);         // CRC
-        #endif
-        
-        #if RCC_APB2ENR_XXX
-        // APB2 外设时钟使能寄存器(RCC_APB2ENR) // 复位值: 0x0000 0000 //
-        RCC->APB2ENR    |=  (RCC_APB2ENR_AFIOEN);       // AFIO
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPAEN);       // GPIOA
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPBEN);       // GPIOB
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPCEN);       // GPIOC
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPDEN);       // GPIOD
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPEEN);       // GPIOE
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPFEN);       // GPIOF
-        RCC->APB2ENR    |=  (RCC_APB2ENR_IOPGEN);       // GPIOG
-        RCC->APB2ENR    |=  (RCC_APB2ENR_ADC1EN);       // ADC1
-        RCC->APB2ENR    |=  (RCC_APB2ENR_ADC2EN);       // ADC2
-        RCC->APB2ENR    |=  (RCC_APB2ENR_TIM1EN);       // TIM1
-        RCC->APB2ENR    |=  (RCC_APB2ENR_SPI1EN);       // SPI1
-        RCC->APB2ENR    |=  (RCC_APB2ENR_USART1EN);     // USART1
-        #endif
-        
-        #if RCC_APB1ENR_XXX
-        // APB1 外设时钟使能寄存器(RCC_APB1ENR) // 复位值: 0x0000 0000 //
-        RCC->APB1ENR    |=  (RCC_APB1ENR_USART2EN);     // USART2
-        RCC->APB1ENR    |=  (RCC_APB1ENR_USART3EN);     // USART3
-        RCC->APB1ENR    |=  (RCC_APB1ENR_USART4EN);     // USART4
-        RCC->APB1ENR    |=  (RCC_APB1ENR_USART5EN);     // USART5
-        RCC->APB1ENR    |=  (RCC_APB1ENR_I2C1EN);       // I2C1
-        RCC->APB1ENR    |=  (RCC_APB1ENR_I2C2EN);       // I2C2
-        RCC->APB1ENR    |=  (RCC_APB1ENR_SPI2EN);       // SPI2
-        RCC->APB1ENR    |=  (RCC_APB1ENR_SPI3EN);       // SPI3
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM2EN);       // TIM2
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM3EN);       // TIM3
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM4EN);       // TIM4
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM5EN);       // TIM5
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM6EN);       // TIM6
-        RCC->APB1ENR    |=  (RCC_APB1ENR_TIM7EN);       // TIM7
-        RCC->APB1ENR    |=  (RCC_APB1ENR_CAN1EN);       // CAN1
-        RCC->APB1ENR    |=  (RCC_APB1ENR_CAN2EN);       // CAN2
-        RCC->APB1ENR    |=  (RCC_APB1ENR_BKPEN);        // BKP
-        RCC->APB1ENR    |=  (RCC_APB1ENR_PWREN);        // PWR
-        RCC->APB1ENR    |=  (RCC_APB1ENR_DACEN);        // DAC
-        RCC->APB1ENR    |=  (RCC_APB1ENR_WWDGEN);       // WWDG
-        #endif
-}
-
-
-
-/*******************************************************************************
-        => 内部高速时钟重新初始化
+        => HSI 内部高速时钟重新初始化
 *******************************************************************************/
 void rcc_hsi_setup(void)
 {
@@ -195,7 +199,7 @@ void rcc_hsi_setup(void)
         => 设置系统时钟为72MHz
         => 在外部高速时钟晶体振荡器为[ 8MHz ]的情况下
 *******************************************************************************/
-int rcc_hse_setup(void)
+void rcc_hse_setup(void)
 {
         __IO uint32_t StartUpCounter = 0;
         __IO uint32_t HSEStatus = 0;
@@ -259,10 +263,10 @@ int rcc_hse_setup(void)
                 while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08) {
                 }
                 
-                return (80);
+                global_clock_state = 0x80;
         } else { 
                 // If HSE fails to start-up, the application will have wrong clock
                 // configuration. User can add here some code to deal with this error
-                return (-1);
+                global_clock_state = 0x01;
         }
 }

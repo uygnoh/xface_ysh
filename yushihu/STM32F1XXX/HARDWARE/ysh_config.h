@@ -3,10 +3,6 @@
 
 #include "stm32f103xe.h"
 
-
-void hardware_initialize(void);
-extern int hse_status;
-
 /*
  *      更新日期: 2022/10/06
  */

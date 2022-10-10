@@ -5,9 +5,12 @@ void gpio_setup(void)
 {
         // GPIO 模式配置
         // ____________________________________________________
-        GPIOA->CRL      &=  (GPIO_CONF_CLR_02);                         // ^0
-        GPIOA->CRL      |=  (GPIO_MODE_OUTPUT_PUSHPULL_50MHZ << 8 );    // PA_2
-
+        //GPIOA->CRL      &=  (GPIO_CONF_CLR_02);                         // ^0
+        //GPIOA->CRL      |=  (GPIO_MODE_OUTPUT_PUSHPULL_50MHZ << 8 );    // PA_2
+        GPIOA->CRL      &=  (0xFFFF0000);       // PA0 - aIN-0 模拟输入通道0
+                                                // PA1 - aIN-1 模拟输入通道0
+                                                // PA2 - aIN-2 模拟输入通道0
+                                                // PA3 - aIN-3 模拟输入通道0
 
 
         #if GPIO_CRL_XXX
