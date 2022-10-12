@@ -8,12 +8,24 @@
 // http://cholla.mmto.org/electronics/displays/oled/
 
 
-#define ADC_GRP1_NUM_CHANNELS   1
+
+// ChibiOS提供了一个名为streams的可选模块，
+// 它提供了一些功能，包括chprintf打印格式化的字符串
+// ____________________________________________________________
+BaseSequentialStream    *chp = (BaseSequentialStream *)&SD1;
+
+
+
+#define ADC_GRP1_NUM_CHANNELS   1       // 
 #define ADC_GRP1_BUF_DEPTH      8
 
-#define ADC_GRP2_NUM_CHANNELS   8
+#define ADC_GRP2_NUM_CHANNELS   8       // 
 #define ADC_GRP2_BUF_DEPTH      16
 
+
+
+// typedef uint16_t adcsample_t;
+// &samples1[0] 是ADC使用DMA传输内存的首地址
 static adcsample_t samples1[ADC_GRP1_NUM_CHANNELS * ADC_GRP1_BUF_DEPTH];
 static adcsample_t samples2[ADC_GRP2_NUM_CHANNELS * ADC_GRP2_BUF_DEPTH];
 
@@ -29,8 +41,6 @@ char line2[10] = {'E', ' ', '0', '1', '2', '3', '4', '5', '6', 'Z'};
 /*
  * ADC streaming callback.
  */
-float           ad0in = 0;
-float           ad1in = 0;
 uint16_t        ion = 0;
 
 
@@ -38,12 +48,17 @@ static void adccallback(ADCDriver *adcp)
 {
 
         (void)adcp;
-
-        ion = samples2[6];
-        ad0in = (float) samples2[0];
-        ad1in = (float) samples2[1];
+        //ion++;
+       
 }
 
+static void adccallback11(ADCDriver *adcp) 
+{
+
+        (void)adcp;
+        ion = samples1[0];
+       
+}
 
 static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) 
 {
@@ -61,21 +76,21 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err)
 static const ADCConversionGroup adcgrpcfg1 = {
         FALSE,
         ADC_GRP1_NUM_CHANNELS,
-        NULL,
+        adccallback11,
         adcerrorcallback,
         0, 0,                         /* CR1, CR2 */
         ADC_SMPR1_SMP_AN10(ADC_SAMPLE_1P5),
         0,                            /* SMPR2 */
         ADC_SQR1_NUM_CH(ADC_GRP1_NUM_CHANNELS),
         0,                            /* SQR2 */
-        ADC_SQR3_SQ1_N(ADC_CHANNEL_IN6)
+        ADC_SQR2_SQ9_N(ADC_CHANNEL_IN10)
 };
 
 
 /*
  * ADC conversion group.
  * Mode:        Continuous, 16 samples of 8 channels, SW triggered.
- * Channels:    IN10, IN11, IN10, IN11, IN10, IN11, Sensor, VRef.
+ * Channels:    IN10, IN11, IN12, IN13, IN10, IN10, Sensor, VRef.
  */
 static const ADCConversionGroup adcgrpcfg2 = {
         TRUE,
@@ -88,17 +103,10 @@ static const ADCConversionGroup adcgrpcfg2 = {
         0,                            /* SMPR2 */
         ADC_SQR1_NUM_CH(ADC_GRP2_NUM_CHANNELS),
         ADC_SQR2_SQ8_N(ADC_CHANNEL_SENSOR) | ADC_SQR2_SQ7_N(ADC_CHANNEL_VREFINT),
-        ADC_SQR3_SQ6_N(ADC_CHANNEL_IN11)   | ADC_SQR3_SQ5_N(ADC_CHANNEL_IN10) |
-        ADC_SQR3_SQ4_N(ADC_CHANNEL_IN11)   | ADC_SQR3_SQ3_N(ADC_CHANNEL_IN10) |
-        ADC_SQR3_SQ2_N(ADC_CHANNEL_IN7)    | ADC_SQR3_SQ1_N(ADC_CHANNEL_IN6)
+        ADC_SQR3_SQ6_N(ADC_CHANNEL_IN10)   | ADC_SQR3_SQ5_N(ADC_CHANNEL_IN10) |
+        ADC_SQR3_SQ4_N(ADC_CHANNEL_IN13)   | ADC_SQR3_SQ3_N(ADC_CHANNEL_IN12) |
+        ADC_SQR3_SQ2_N(ADC_CHANNEL_IN11)   | ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10)
 };
-
-
-
-// ChibiOS提供了一个名为streams的可选模块，
-// 它提供了一些功能，包括chprintf打印格式化的字符串
-// ____________________________________________________________
-BaseSequentialStream    *chp = (BaseSequentialStream *)&SD1;
 
 
 
@@ -128,10 +136,35 @@ static THD_FUNCTION(Thread1, arg)
         while (true)
         {
                 palClearPad(GPIOA, 2);
-                chThdSleepMilliseconds(100);
+                chThdSleepMilliseconds(1000);
                 palSetPad(GPIOA, 2);
-                chThdSleepMilliseconds(100);
-                chprintf(chp, "ADC --- IN = %d\n\r", (uint16_t)ad0in);
+                chThdSleepMilliseconds(1000);
+
+                chprintf(chp, "samples2 PC0= %d\n\r", samples2[0]);
+                chprintf(chp, "samples2 PC1= %d\n\r", samples2[1]);
+                chprintf(chp, "samples2 PC2= %d\n\r", samples2[2]);
+                chprintf(chp, "samples2 PC3= %d\n\r", samples2[3]);
+                chprintf(chp, "samples2 PC0= %d\n\r", samples2[4]);
+                chprintf(chp, "samples2 PC0= %d\n\r", samples2[5]);
+                chprintf(chp, "---------------------------------\n\r");
+                chprintf(chp, "samples2 = %d\n\r", samples2[6]);
+                chprintf(chp, "samples2 = %d\n\r", samples2[7]);
+                chprintf(chp, "------------------------------------------\n\r");
+                chprintf(chp, "ino = %d\n\r", ion);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[8]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[16]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[24]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[32]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[40]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[48]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[56]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[64]);
+                chprintf(chp, "samples2 PC0======= %d\n\r", samples2[120]);
+                chprintf(chp, "------------------------------------------\n\r");
+                chprintf(chp, "samples1 PC0======= %d\n\r", samples1[0]);
+                chprintf(chp, "samples1 PC0======= %d\n\r", samples1[1]);
+                chprintf(chp, "samples1 PC0======= %d\n\r", ion);
+                
         }
 }
 
@@ -187,8 +220,12 @@ int main(void)
         halInit();
         chSysInit();
 
-        // GPIOC - Analog IN0
-        palSetPadMode(GPIOC, 0, PAL_MODE_INPUT_ANALOG);
+
+        palSetPadMode(GPIOC, 0, PAL_MODE_INPUT_ANALOG);         // PC0 - ADC123-IN(10)
+        palSetPadMode(GPIOC, 1, PAL_MODE_INPUT_ANALOG);         // PC0 - ADC123-IN(11)
+        palSetPadMode(GPIOC, 2, PAL_MODE_INPUT_ANALOG);         // PC0 - ADC123-IN(12)
+        palSetPadMode(GPIOC, 3, PAL_MODE_INPUT_ANALOG);         // PC0 - ADC123-IN(13)
+
 
         // I2C 硬件连接已经在（os/hal/boards/MAPLEMINI_STM32_F103）中配置了
         palSetPadMode(IOPORT2, 6, PAL_MODE_STM32_ALTERNATE_OPENDRAIN); // SCL
@@ -207,8 +244,9 @@ int main(void)
         adcStartConversion(&ADCD1, &adcgrpcfg2, samples2, ADC_GRP2_BUF_DEPTH);
         
         
-        // 启用串口 1， 使用默认配置
-        // [PA9  ---> TX] : [PA10 ---> RX]
+        // 启用串口 1， (NULL)使用默认配置
+        // PA9  ---> TX
+        // PA10 ---> RX
         sdStart(&SD1, NULL);
 
         // 使用静态方法（创建Blink线程）

@@ -2,6 +2,9 @@
 #define __CONFIG_H__
 
 #include "stm32f103xe.h"
+void ysh_delay_us(void);
+void ysh_delay_ms(void);
+
 
 /*
  *      更新日期: 2022/10/06
