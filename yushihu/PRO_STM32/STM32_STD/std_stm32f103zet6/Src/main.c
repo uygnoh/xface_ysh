@@ -5,7 +5,7 @@
 
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
-  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
 
@@ -15,8 +15,8 @@
 /*============================================================================*/
 int __io_putchar(int ch)
 {
-        USART_SendData(USART1, (uint8_t) ch);
-        while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET){
+        USART_SendData(USART1, (uint8_t)ch);
+        while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET) {
                 // Loop
         }
         return ch;
@@ -47,6 +47,46 @@ void usart_setup(void)
         USART_Init(USART1, &USART_InitStructure);
         // Enable the USART1
         USART_Cmd(USART1, ENABLE);
+}
+
+
+
+/*============================================================================*/
+/*                              exti                                          */
+/*============================================================================*/
+void exti_setup(void)
+{
+        EXTI_InitTypeDef   EXTI_InitStructure;
+        GPIO_InitTypeDef   GPIO_InitStructure;
+        NVIC_InitTypeDef   NVIC_InitStructure;
+        
+        // Enable GPIOB clock
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
+        // Configure PB.10 pin as 下拉输入
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+        GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+        // Enable AFIO clock
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+        // Connect EXTI0 Line to PB.10 pin
+        GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource10);
+
+        // Configure EXTI0 line
+        EXTI_InitStructure.EXTI_Line = EXTI_Line10;
+        EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+        EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+        EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+        EXTI_Init(&EXTI_InitStructure);
+
+        // Enable and set EXTI10 Interrupt to the lowest priority
+        NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);
 }
 
 
@@ -83,8 +123,13 @@ int main(void)
         // SystemInit() -> SetSysClock() -> SetSysClockTo72();
         // 系统运行到这里， 时钟配置为（HSE）外部高速晶体振荡器
         // 经过PLL倍频到（72MHz）, APB1 = 72MHz / 2, APB2 = 72MHz / 1
-        
+        //
+        //
+        // NVIC_PriorityGroup_4 : 4 bits for pre-emption priority
+        //                        0 bits for subpriority
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
         usart_setup();
+        exti_setup();
         blink();
         return (0);
 }

@@ -1,20 +1,19 @@
 /*******************************************************************************
         => STM32CubeIDE 使用标准库开发
 *******************************************************************************/
-        1. 首先下载标准库：STM32F10x_StdPeriph_Lib_V3.5.0 解压
-        2. 打开STM32CubeIDE，新建STM32工程（New -> STM32 Project）
-        3. Project Name:                std_stm32f103zet6
-           Targeted Project Type:       Empty
-        4. 下一步将标准库中的Libraries文件夹复制到新建的空白工程的文件夹中
-        5. 之后右键标准库中的startup删除这个文件夹，我们使用IDE自动生成的启动文件
-        6. 下一步将库文件中的stm32f10x_conf.h和stm32f10x_it.h复制到工程目录的
+        1. 打开STM32CubeIDE，新建STM32工程（New -> STM32 Project）
+           // Project Name:                std_stm32f103zet6
+           // Targeted Project Type:       Empty
+        2. 下一步将标准库中的Libraries文件夹复制到新建的空白工程的文件夹中
+        3. 之后右键标准库中的startup删除这个文件夹，我们使用IDE自动生成的启动文件
+        4. 下一步将库文件中的stm32f10x_conf.h和stm32f10x_it.h复制到工程目录的
             Inc文件夹中，将stm32f10x_it.c放到Src文件夹中，Refresh工程
-        7. 之后右键工程名，点击Properties，添加头文件路径全局宏
-           Properties ->C/C++ General ->Paths and Symbols ->Includes
-           Properties ->C/C++ General ->Paths and Symbols ->Symbols
+        5. 之后右键工程名，点击Properties，添加头文件路径全局宏
+           // Properties ->C/C++ General ->Paths and Symbols ->Includes
+           // Properties ->C/C++ General ->Paths and Symbols ->Symbols
                 STM32F10X_HD
                 USE_STDPERIPH_DRIVER
-        8. 添加宏STM32F10X_HD和USE_STDPERIPH_DRIVE,下一步打开工程中的
+        6. 添加宏STM32F10X_HD和USE_STDPERIPH_DRIVE,下一步打开工程中的
            core_cm3.c,修改__STREXB和__STREXH函数，在r前加&符号
            uint32_t __STREXB(uint8_t value, uint8_t *addr)
            {

@@ -4,11 +4,15 @@
         
         编码芯片PT2262 | SC2262
         解码芯片PT2272 | SC2272
+ 
+ 
+        // PT2262 // 引脚的（1 ~ 8）可以设置地址编码       
+        github/sui77/rc-switch/
         
         
         
 /*******************************************************************************
-        => 315 MHz 接收器
+        => 315 MHz 接收器， 读出接收到的数据
 *******************************************************************************/
 #include <RCSwitch.h>                   //  调用RC开关函数库
 RCSwitch my_switch = RCSwitch();        //  增加一个RC开关并设置名称
@@ -57,9 +61,10 @@ void loop() {
                 } else if (value == KEY_11) {
                         digitalWrite(LED, LOW);
                 }
-                my_switch.resetAvailable();
+                my_switch.resetAvailable();     // 重置可用的值
         }
 }
+
 
 
 /*******************************************************************************
@@ -69,9 +74,9 @@ void loop() {
 RCSwitch my_switch = RCSwitch();
 const int FRT = 4;                      // 设置315MHz无线模块发送管脚
 const unsigned long AKEY = 5754816;    // 遥控器A的值
-const unsigned long AKEY = 5754672;    // 遥控器B的值
-const unsigned long AKEY = 5754636;    // 遥控器C的值
-const unsigned long AKEY = 5754627;    // 遥控器D的值
+const unsigned long BKEY = 5754672;    // 遥控器B的值
+const unsigned long CKEY = 5754636;    // 遥控器C的值
+const unsigned long DKEY = 5754627;    // 遥控器D的值
 void setup() {
         Serial.begin(115200);
         my_switch.enableTransmit(FRT);  // 设置启用发送，并设置发送管脚

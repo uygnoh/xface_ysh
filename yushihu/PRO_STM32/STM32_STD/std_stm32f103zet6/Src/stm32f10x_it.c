@@ -8,6 +8,8 @@
 /******************************************************************************/
 void NMI_Handler(void)
 {
+        while (1) {
+        }
 }
 
 
@@ -82,7 +84,14 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
-/*void PPP_IRQHandler(void)
+void EXTI15_10_IRQHandler(void)
 {
-}*/
+        if(EXTI_GetITStatus(EXTI_Line10) != RESET) {
+                for (;;) {
+                        GPIOA->BSRR = 0x00000005;
+                }
+                // Clear the  EXTI line 10 pending bit
+                EXTI_ClearITPendingBit(EXTI_Line10);
+        }
+}
 
